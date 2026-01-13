@@ -6,7 +6,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';

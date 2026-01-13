@@ -2,8 +2,12 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface SoundSettings {
   masterVolume: number;
@@ -36,7 +40,9 @@ export const SoundSettings: React.FC = () => {
         const parsed = JSON.parse(savedSettings);
         setSettings((prev) => ({ ...prev, ...parsed }));
       } catch (error) {
-        logger.error('Failed to parse sound settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        getLogger().then((logger) => {
+          logger.error('Failed to parse sound settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        });
       }
     }
   }, []);
@@ -113,7 +119,9 @@ export const SoundSettings: React.FC = () => {
 
     audio.volume = volume;
     audio.play().catch((error) => {
-      logger.error('Failed to play test sound:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      getLogger().then((logger) => {
+        logger.error('Failed to play test sound:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      });
     });
   };
 

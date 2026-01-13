@@ -9,7 +9,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import fs from 'node:fs';
 import path from 'node:path';
 import { putBlobFile } from '@/app/lib/blob/client';
@@ -99,7 +98,7 @@ function findAssetFile(entry: AssetEntry): string | null {
  * Main upload function
  */
 async function main() {
-  // eslint-disable-next-line no-console
+   
   logger.info('📤 Starting asset upload to Vercel Blob...\n');
 
   // Check registry exists
@@ -111,7 +110,7 @@ async function main() {
   const raw = fs.readFileSync(REGISTRY_PATH, 'utf-8');
   const registry: AssetRegistry = JSON.parse(raw);
 
-  // eslint-disable-next-line no-console
+   
   logger.info(`📋 Loaded registry with ${Object.keys(registry.assets).length} assets\n`);
 
   let uploadedPublic = 0;
@@ -122,7 +121,7 @@ async function main() {
   for (const [id, entry] of Object.entries(registry.assets)) {
     // Skip if already uploaded to blob
     if (entry.host === 'vercel-blob' && entry.url) {
-      // eslint-disable-next-line no-console
+       
       logger.info(`⏭️  Skipping ${id} (already uploaded)`);
       skipped++;
       continue;
@@ -149,7 +148,7 @@ async function main() {
       const data = fs.readFileSync(filePath);
 
       // Upload to Vercel Blob
-      // eslint-disable-next-line no-console
+       
       logger.info(`📤 Uploading ${access} asset: ${key}`);
       const { url } = await putBlobFile({ key, data, contentType, access });
 
@@ -164,7 +163,7 @@ async function main() {
         uploadedPrivate++;
       }
 
-      // eslint-disable-next-line no-console
+       
       logger.info(`✅ Uploaded: ${id}`);
     } catch (err: unknown) {
       const error = err as Error;
@@ -183,22 +182,22 @@ async function main() {
   fs.writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\n');
 
   // Print summary
-  // eslint-disable-next-line no-console
+   
   logger.info('\n' + '='.repeat(50));
-  // eslint-disable-next-line no-console
+   
   logger.info('📊 Upload Summary:');
-  // eslint-disable-next-line no-console
+   
   logger.info(`   Public assets:  ${uploadedPublic}`);
-  // eslint-disable-next-line no-console
+   
   logger.info(`   Private assets: ${uploadedPrivate}`);
-  // eslint-disable-next-line no-console
+   
   logger.info(`   Skipped:        ${skipped}`);
-  // eslint-disable-next-line no-console
+   
   logger.info(`   Total:          ${uploadedPublic + uploadedPrivate + skipped}`);
-  // eslint-disable-next-line no-console
+   
   logger.info('='.repeat(50));
 
-  // eslint-disable-next-line no-console
+   
   logger.info(`\n✅ Registry updated: ${REGISTRY_PATH}\n`);
 }
 

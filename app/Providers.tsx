@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CartProvider } from './components/cart/CartProvider';
 import { PetalProvider } from '../providers';
+import { PetalCollectionProvider } from './contexts/PetalCollectionContext';
 import { WorldProvider } from './world/WorldProvider';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -47,7 +48,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <AuthProvider>
             <WorldProvider>
               <PetalProvider>
-                <CartProvider>
+                <PetalCollectionProvider>
+                  <CartProvider>
                   <GlobalMusicProvider>
                     {/* Site-wide starfield background (fixed, behind everything, z-0) */}
                     {showStarfield && <GlobalBackground />}
@@ -56,7 +58,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                     <SoapstoneDock />
                     <QuakeHUD />
                   </GlobalMusicProvider>
-                </CartProvider>
+                  </CartProvider>
+                </PetalCollectionProvider>
               </PetalProvider>
             </WorldProvider>
           </AuthProvider>

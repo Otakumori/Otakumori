@@ -1,8 +1,11 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
-import { useState, useCallback, useRef, useEffect } from 'react';
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { COLLECTION } from '@/app/lib/petals/constants';
 import { trackPetalCollection, trackPetalMilestone } from '@/app/lib/analytics/petals';
 
@@ -12,13 +15,86 @@ export interface CollectedPetal {
   x: number;
   y: number;
   timestamp: number;
-  }
+}
 
 export interface PetalCollectionState {
   sessionTotal: number;
   lifetimeTotal: number;
   hasCollectedAny: boolean;
   showAchievement: boolean;
+  lastCollectedValue: number; // Track for rare petal indicator
+}
+
+// Guest storage constants
+const GUEST_STORAGE_KEY = 'otm-guest-petals-background-v1';
+const GUEST_DAILY_LIMIT = 500;
+const SESSION_STORAGE_KEY = 'otm-session-petals-v1';
+const COLLECTION_FLAG_KEY = 'otm-has-collected-petal';
+
+// localStorage lock mechanism for multi-tab safety
+const STORAGE_LOCK_TIMEOUT = 5000;
+let storageLock: { key: string; timestamp: number } | null = null;
+
+function acquireStorageLock(key: string): boolean {
+  const now = Date.now();
+  if (storageLock && storageLock.key === key) {
+    // Lock still valid (within timeout)
+    if (now - storageLock.timestamp < STORAGE_LOCK_TIMEOUT) {
+      return true;
+    }
+  }
+  storageLock = { key, timestamp: now };
+  return true;
+}
+
+function safeLocalStorageGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      getLogger().then((logger) => {
+        logger.warn('localStorage quota exceeded', undefined, { key });
+      });
+      // Clear old data
+      try {
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+function safeLocalStorageSet(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      getLogger().then((logger) => {
+        logger.warn('localStorage quota exceeded - clearing session data', undefined, { key });
+      });
+      try {
+        // Try clearing session storage first
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        localStorage.setItem(key, value);
+        return true;
+      } catch {
+        getLogger().then((logger) => {
+          logger.error(
+            'Failed to write to localStorage after cleanup',
+            undefined,
+            undefined,
+            error instanceof Error ? error : new Error(String(error)),
+          );
+        });
+        return false;
+      }
+    }
+    return false;
+  }
 }
 
 export function usePetalCollection() {
@@ -27,34 +103,154 @@ export function usePetalCollection() {
     lifetimeTotal: 0,
     hasCollectedAny: false,
     showAchievement: false,
+    lastCollectedValue: 1,
   });
 
   const pendingCollections = useRef<CollectedPetal[]>([]);
-  const lastSubmitTime = useRef(0);
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isSubmittingRef = useRef(false);
+  const isUnmountingRef = useRef(false);
+  const lastStateRef = useRef(state);
 
-  // Load initial state from localStorage
+  // Update ref when state changes (for use in callbacks)
   useEffect(() => {
-    const hasCollected = localStorage.getItem('otm-has-collected-petal') === 'true';
-    setState((prev) => ({ ...prev, hasCollectedAny: hasCollected }));
+    lastStateRef.current = state;
+  }, [state]);
+
+  // Load initial state from storage on mount
+  useEffect(() => {
+    try {
+      const hasCollected = safeLocalStorageGet(COLLECTION_FLAG_KEY) === 'true';
+
+      // Restore session from sessionStorage
+      const sessionData = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      let sessionTotal = 0;
+      if (sessionData) {
+        try {
+          const parsed = JSON.parse(sessionData);
+          sessionTotal = parsed.sessionTotal || 0;
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      // For guests, restore from localStorage
+      let lifetimeTotal = 0;
+      const guestData = safeLocalStorageGet(GUEST_STORAGE_KEY);
+      if (guestData) {
+        try {
+          const parsed = JSON.parse(guestData);
+          const today = new Date().toISOString().split('T')[0];
+          const lastUpdate = parsed.lastUpdate
+            ? new Date(parsed.lastUpdate).toISOString().split('T')[0]
+            : null;
+
+          if (lastUpdate === today) {
+            lifetimeTotal = parsed.lifetimePetalsEarned || 0;
+            // If no session data, use today's earned
+            if (sessionTotal === 0) {
+              sessionTotal = parsed.todayEarned || 0;
+            }
+          }
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      setState((prev) => ({
+        ...prev,
+        sessionTotal,
+        lifetimeTotal,
+        hasCollectedAny: hasCollected || sessionTotal > 0,
+      }));
+    } catch (error) {
+      getLogger().then((logger) => {
+        logger.warn('Failed to load petal collection state', undefined, { error });
+      });
+    }
   }, []);
 
-  // Submit collected petals to API using centralized grant endpoint
+  // Persist guest petals to localStorage
+  const persistGuestPetals = useCallback((todayEarned: number, lifetimeTotal: number) => {
+    if (!acquireStorageLock(GUEST_STORAGE_KEY)) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const existing = safeLocalStorageGet(GUEST_STORAGE_KEY);
+      const existingData = existing ? JSON.parse(existing) : {};
+      const lastUpdate = existingData.lastUpdate
+        ? new Date(existingData.lastUpdate).toISOString().split('T')[0]
+        : null;
+
+      const data = {
+        balance: lifetimeTotal,
+        lifetimePetalsEarned: lifetimeTotal,
+        lastUpdate: new Date().toISOString(),
+        todayEarned:
+          lastUpdate === today ? (existingData.todayEarned || 0) + todayEarned : todayEarned,
+      };
+
+      safeLocalStorageSet(GUEST_STORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+      getLogger().then((logger) => {
+        logger.warn('Failed to persist guest petals', undefined, { error });
+      });
+    }
+  }, []);
+
+  // Check guest daily limit
+  const checkGuestDailyLimit = useCallback((): number => {
+    try {
+      const guestData = safeLocalStorageGet(GUEST_STORAGE_KEY);
+      if (!guestData) return GUEST_DAILY_LIMIT;
+
+      const parsed = JSON.parse(guestData);
+      const today = new Date().toISOString().split('T')[0];
+      const lastUpdate = parsed.lastUpdate
+        ? new Date(parsed.lastUpdate).toISOString().split('T')[0]
+        : null;
+
+      if (lastUpdate === today) {
+        const todayEarned = parsed.todayEarned || 0;
+        return Math.max(0, GUEST_DAILY_LIMIT - todayEarned);
+      }
+      return GUEST_DAILY_LIMIT;
+    } catch {
+      return GUEST_DAILY_LIMIT;
+    }
+  }, []);
+
+  // Submit collected petals to API
   const submitCollections = useCallback(async () => {
-    if (pendingCollections.current.length === 0) return;
+    if (
+      isSubmittingRef.current ||
+      pendingCollections.current.length === 0 ||
+      isUnmountingRef.current
+    ) {
+      return;
+    }
 
     const collections = [...pendingCollections.current];
     pendingCollections.current = [];
+    isSubmittingRef.current = true;
 
     const totalValue = collections.reduce((sum, c) => sum + c.value, 0);
 
     try {
-      // Use the centralized petal grant API
+      // Check guest daily limit first (client-side)
+      const remaining = checkGuestDailyLimit();
+      if (remaining <= 0) {
+        getLogger().then((logger) => {
+          logger.warn('Guest daily limit reached');
+        });
+        // Still update UI optimistically, but API will reject
+      }
+
       const response = await fetch('/api/v1/petals/grant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: totalValue,
+          amount: Math.min(totalValue, remaining > 0 ? remaining : totalValue),
           source: 'background_petal_click',
           metadata: {
             clickCount: collections.length,
@@ -69,60 +265,90 @@ export function usePetalCollection() {
 
         if (data.ok && data.data) {
           const { granted = totalValue, lifetimeEarned } = data.data;
-          const newLifetimeTotal = lifetimeEarned || state.lifetimeTotal + granted;
+          const currentState = lastStateRef.current; // Use ref for latest state
+          const newLifetimeTotal = lifetimeEarned || currentState.lifetimeTotal + granted;
+          const isGuest = !data.data.newBalance; // If no newBalance, likely guest
 
-          // Track petal milestone if reached
+          // Track milestones
           if (newLifetimeTotal && typeof newLifetimeTotal === 'number') {
             const milestones = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
             const reachedMilestone = milestones.find(
-              (m) => newLifetimeTotal >= m && state.lifetimeTotal < m,
+              (m) => newLifetimeTotal >= m && currentState.lifetimeTotal < m,
             );
             if (reachedMilestone) {
               trackPetalMilestone(reachedMilestone, newLifetimeTotal, 'background_petal_click');
             }
           }
 
-          setState((prev) => ({
-            ...prev,
-            sessionTotal: prev.sessionTotal + granted,
-            lifetimeTotal: newLifetimeTotal,
-          }));
+          setState((prev) => {
+            const newState = {
+              ...prev,
+              lifetimeTotal: newLifetimeTotal,
+            };
+
+            // Persist guest petals
+            if (isGuest) {
+              persistGuestPetals(granted, newLifetimeTotal);
+            }
+
+            // Persist session
+            try {
+              sessionStorage.setItem(
+                SESSION_STORAGE_KEY,
+                JSON.stringify({
+                  sessionTotal: prev.sessionTotal, // sessionTotal already updated optimistically
+                  timestamp: Date.now(),
+                }),
+              );
+            } catch {
+              // Ignore sessionStorage errors
+            }
+
+            return newState;
+          });
         }
       } else {
-        // If rate limited or daily limit reached, still update UI but don't retry
         const errorData = await response.json().catch(() => ({}));
         if (errorData.error === 'RATE_LIMITED' || errorData.error === 'DAILY_LIMIT_REACHED') {
-          // Don't re-add to pending - limits are intentional
-          logger.warn('Petal collection limited:', undefined, { value: errorData.error });
+          getLogger().then((logger) => {
+            logger.warn('Petal collection limited', undefined, { value: errorData.error });
+          });
         } else {
-          // Re-add failed collections to try again for other errors
+          // Re-add failed collections for retry
           pendingCollections.current.push(...collections);
         }
       }
     } catch (error) {
-      logger.error('Failed to submit petal collection:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-      // Re-add failed collections to try again
+      getLogger().then((logger) => {
+        logger.error(
+          'Failed to submit petal collection',
+          undefined,
+          undefined,
+          error instanceof Error ? error : new Error(String(error)),
+        );
+      });
+      // Re-add for retry
       pendingCollections.current.push(...collections);
+    } finally {
+      isSubmittingRef.current = false;
     }
-
-    lastSubmitTime.current = Date.now();
-  }, []);
+  }, [checkGuestDailyLimit, persistGuestPetals]);
 
   // Collect a petal
   const collectPetal = useCallback(
     (petalId: number, value: number, x: number, y: number) => {
-      // Track petal collection for analytics
+      // Track analytics
       trackPetalCollection({
         petalId,
         amount: value,
         source: 'background_petal_click',
         location: { x, y },
         metadata: {
-          sessionTotal: state.sessionTotal + value,
+          sessionTotal: lastStateRef.current.sessionTotal + value,
         },
       });
 
-      // Add to pending collections
+      // Add to pending
       pendingCollections.current.push({
         id: petalId,
         value,
@@ -131,23 +357,39 @@ export function usePetalCollection() {
         timestamp: Date.now(),
       });
 
-      // Update UI immediately
+      // Optimistic UI update
       setState((prev) => {
         const isFirstCollection = !prev.hasCollectedAny;
 
         if (isFirstCollection) {
-          localStorage.setItem('otm-has-collected-petal', 'true');
+          safeLocalStorageSet(COLLECTION_FLAG_KEY, 'true');
         }
 
-        return {
+        const newState = {
           ...prev,
           sessionTotal: prev.sessionTotal + value,
           hasCollectedAny: true,
           showAchievement: isFirstCollection,
+          lastCollectedValue: value,
         };
+
+        // Persist session immediately
+        try {
+          sessionStorage.setItem(
+            SESSION_STORAGE_KEY,
+            JSON.stringify({
+              sessionTotal: newState.sessionTotal,
+              timestamp: Date.now(),
+            }),
+          );
+        } catch {
+          // Ignore errors
+        }
+
+        return newState;
       });
 
-      // Schedule batch submit
+      // Schedule batch submit (debounced)
       if (submitTimeoutRef.current) {
         clearTimeout(submitTimeoutRef.current);
       }
@@ -156,26 +398,38 @@ export function usePetalCollection() {
         submitCollections();
       }, COLLECTION.DEBOUNCE_MS);
     },
-    [submitCollections, state.sessionTotal],
+    [submitCollections],
   );
 
-  // Dismiss achievement notification
+  // Dismiss achievement
   const dismissAchievement = useCallback(() => {
     setState((prev) => ({ ...prev, showAchievement: false }));
   }, []);
 
-  // Cleanup
+  // Cleanup - flush pending on unmount
   useEffect(() => {
     return () => {
+      isUnmountingRef.current = true;
+
+      // Flush pending collections before unmount
+      if (pendingCollections.current.length > 0 && !isSubmittingRef.current) {
+        // Fire and forget - don't wait
+        submitCollections();
+      }
+
       if (submitTimeoutRef.current) {
         clearTimeout(submitTimeoutRef.current);
       }
     };
-  }, []);
+  }, [submitCollections]);
 
-  return {
-    ...state,
-    collectPetal,
-    dismissAchievement,
-  };
+  // Memoize return value
+  return useMemo(
+    () => ({
+      ...state,
+      collectPetal,
+      dismissAchievement,
+    }),
+    [state, collectPetal, dismissAchievement],
+  );
 }

@@ -1,8 +1,12 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { ClerkProvider } from '@clerk/nextjs';
 import { clientEnv } from '@/env/client';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
@@ -14,7 +18,12 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
-    logger.error(' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
+    // Log error asynchronously (non-blocking)
+    getLogger().then((logger) => {
+      logger.error(' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
+    }).catch(() => {
+      // Silently fail if logger can't be loaded
+    });
     return <div>Authentication configuration error</div>;
   }
 

@@ -134,10 +134,14 @@ export async function GET(request: NextRequest) {
         ),
       };
 
+      // Get GLB URL from database field (if available)
+      const glbUrl = avatarConfig.glbUrl || null;
+
       return NextResponse.json({
         ok: true,
         data: transformedConfig,
         isCustom: true,
+        glbUrl: glbUrl || undefined,
         fallbackSpriteUrl: '/assets/default-avatar.png', // TODO: Generate sprite from 3D model
         defaultCharacterId: cfg?.baseModel,
       });
@@ -155,11 +159,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   return withRateLimit('character-config-post', async (_req) => {
     try {
-      const { userId } = await auth();
+      const { userId: clerkId } = await auth();
 
-      if (!userId) {
+      if (!clerkId) {
         return NextResponse.json({ ok: false, error: 'Authentication required' }, { status: 401 });
       }
+
+      // Convert Clerk ID to database user ID
+      const user = await db.user.findUnique({
+        where: { clerkId },
+        select: { id: true },
+      });
+
+      if (!user) {
+        return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+      }
+
+      const userId = user.id;
 
       const body = await request.json();
       const {

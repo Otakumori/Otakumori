@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { usePetalCollection } from '@/app/hooks/usePetalCollection';
+import { usePetalCollectionContext } from '@/app/contexts/PetalCollectionContext';
 import type { TreeArea } from '@/app/hooks/useTreeCanopyArea';
 
 /**
@@ -219,7 +219,7 @@ export default function SakuraPetalBackground({
   const petalsRef = useRef<SakuraPetal[]>([]);
   const lastSpawnTimeRef = useRef(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const { collectPetal } = usePetalCollection();
+  const { collectPetal } = usePetalCollectionContext();
 
   // Use provided tree area or detect it dynamically
   const [detectedTreeArea, setDetectedTreeArea] = useState<TreeArea | undefined>(providedTreeArea);

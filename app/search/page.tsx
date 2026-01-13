@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
 import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';

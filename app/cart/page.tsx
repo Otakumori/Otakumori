@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import FooterDark from '../components/FooterDark';
 import CartContent from '../components/shop/CartContent';
 import { t } from '@/lib/microcopy';

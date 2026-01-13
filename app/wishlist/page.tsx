@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -11,6 +10,11 @@ import FooterDark from '@/app/components/FooterDark';
 import { EmptyWishlist } from '@/app/components/empty-states';
 import { ShopGridSkeleton } from '@/app/components/ui/Skeleton';
 import GlassPanel from '@/app/components/GlassPanel';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface WishlistItem {
   id: string;
@@ -55,6 +59,7 @@ export default function WishlistPage() {
       }
     } catch (err) {
       setError('Failed to load wishlist');
+      const logger = await getLogger();
       logger.error('Wishlist fetch error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
@@ -83,6 +88,7 @@ export default function WishlistPage() {
       }
     } catch (err) {
       setError('Failed to remove item');
+      const logger = await getLogger();
       logger.error('Remove wishlist error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setRemoving((prev) => {

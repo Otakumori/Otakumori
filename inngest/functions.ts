@@ -298,3 +298,13 @@ export const cleanupOldData = inngest.createFunction(
 
 // Export Printify sync functions
 export { syncPrintifyProducts, manualPrintifySync, syncOnProductChange };
+
+// Export order fulfillment functions
+export { fulfillOrder, sendOrderConfirmationEmail } from './order-fulfillment';
+
+// ============================================================================
+// GLB CLEANUP FUNCTIONS
+// ============================================================================
+
+// Export GLB cleanup functions
+export { cleanupOldGLBFiles } from './glb-cleanup';

@@ -1,6 +1,5 @@
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';

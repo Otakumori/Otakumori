@@ -4,9 +4,12 @@
  * Automatically adjusts quality settings based on performance
  */
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { type PerformanceMetrics } from './performance-monitor';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 import { QUALITY_PRESETS, type QualitySettings } from './character-creator';
 
 export interface AdaptiveQualityConfig {
@@ -69,9 +72,11 @@ export class AdaptiveQualitySystem {
     if (avgFPS < this.config.minFPS && this.currentQualityIndex < this.config.qualitySteps.length - 1) {
       // Performance is poor, lower quality
       this.currentQualityIndex++;
-      logger.info(
-        `[AdaptiveQuality] Lowering quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
-      );
+      getLogger().then((logger) => {
+        logger.info(
+          `[AdaptiveQuality] Lowering quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
+        );
+      });
     } else if (
       avgFPS >= this.config.targetFPS &&
       this.currentQualityIndex > 0 &&
@@ -79,9 +84,11 @@ export class AdaptiveQualitySystem {
     ) {
       // Performance is good, try increasing quality
       this.currentQualityIndex--;
-      logger.info(
-        `[AdaptiveQuality] Increasing quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
-      );
+      getLogger().then((logger) => {
+        logger.info(
+          `[AdaptiveQuality] Increasing quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
+        );
+      });
     }
 
     return this.getCurrentQuality();

@@ -23,7 +23,7 @@ export function BodyCustomizer({ config, onChange, gender }: BodyCustomizerProps
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ minHeight: 'fit-content' }}>
       <h3 className="text-white font-semibold">Body Anatomy</h3>
 
       {/* Basic Body Properties */}

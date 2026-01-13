@@ -7,6 +7,9 @@ import * as THREE from 'three';
 import { ACESFilmicToneMapping, Color, type Group, type Mesh } from 'three';
 
 import type { AvatarSize } from '@/app/lib/avatar-sizes';
+import { EnhancedProceduralMesh } from '@/app/lib/3d/enhanced-procedural-mesh';
+import { assetRegistry } from '@/app/lib/3d/asset-registry';
+import { MorphTargetSystem, type MorphTargetConfig } from '@/app/lib/3d/morph-target-system';
 
 interface AvatarRendererProps {
   config: any;
@@ -97,49 +100,90 @@ function CharacterMesh({ config }: { config: any }) {
   const meshRef = useRef<Mesh>(null);
 
   useFrame((state, delta) => {
-    if (meshRef.current) {
-      // Apply morph targets based on configuration
-      const morphTargets = meshRef.current.morphTargetDictionary;
-      const morphInfluences = meshRef.current.morphTargetInfluences;
-      if (morphTargets && morphInfluences) {
-        // Use delta for smooth interpolation of morph targets (frame-rate independent)
-        const interpSpeed = Math.min(delta * 5, 1); // Smooth interpolation
+    if (bodyGroupRef.current) {
+      // Apply morph targets to all meshes in the body group
+      bodyGroupRef.current.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          const morphTargets = child.morphTargetDictionary;
+          const morphInfluences = child.morphTargetInfluences;
+          if (morphTargets && morphInfluences) {
+            // Use delta for smooth interpolation of morph targets (frame-rate independent)
+            const interpSpeed = Math.min(delta * 5, 1); // Smooth interpolation
 
-        // Apply face morphs with smooth transitions
-        if (morphTargets.eyeSize) {
-          const targetValue = (config.face?.eyes?.size || 1.0) - 1.0;
-          morphInfluences[morphTargets.eyeSize] +=
-            (targetValue - morphInfluences[morphTargets.eyeSize]) * interpSpeed;
-        }
-        if (morphTargets.jawStrength) {
-          const targetValue = config.face?.faceShape?.jawline || 0.5;
-          morphInfluences[morphTargets.jawStrength] +=
-            (targetValue - morphInfluences[morphTargets.jawStrength]) * interpSpeed;
-        }
-        if (morphTargets.cheekbones) {
-          const targetValue = config.face?.faceShape?.cheekbones || 0.5;
-          morphInfluences[morphTargets.cheekbones] +=
-            (targetValue - morphInfluences[morphTargets.cheekbones]) * interpSpeed;
-        }
+            // Apply face morphs with smooth transitions (for head mesh)
+            if (child.name === 'Head') {
+              if (morphTargets.eyeSize !== undefined) {
+                const targetValue = (config.face?.eyes?.size || 1.0) - 1.0;
+                morphInfluences[morphTargets.eyeSize] +=
+                  (targetValue - morphInfluences[morphTargets.eyeSize]) * interpSpeed;
+              }
+              if (morphTargets.eyeSpacing !== undefined) {
+                const targetValue = config.face?.eyes?.spacing || 0.5;
+                morphInfluences[morphTargets.eyeSpacing] +=
+                  (targetValue - morphInfluences[morphTargets.eyeSpacing]) * interpSpeed;
+              }
+              if (morphTargets.jawline !== undefined) {
+                const targetValue = config.face?.faceShape?.jawline || 0.5;
+                morphInfluences[morphTargets.jawline] +=
+                  (targetValue - morphInfluences[morphTargets.jawline]) * interpSpeed;
+              }
+              if (morphTargets.cheekbones !== undefined) {
+                const targetValue = config.face?.faceShape?.cheekbones || 0.5;
+                morphInfluences[morphTargets.cheekbones] +=
+                  (targetValue - morphInfluences[morphTargets.cheekbones]) * interpSpeed;
+              }
+              if (morphTargets.chin !== undefined) {
+                const targetValue = config.face?.faceShape?.chin || 0.5;
+                morphInfluences[morphTargets.chin] +=
+                  (targetValue - morphInfluences[morphTargets.chin]) * interpSpeed;
+              }
+              
+              // Expression morphs (can be animated)
+              const time = state.clock.getElapsedTime();
+              if (morphTargets.smile !== undefined) {
+                const targetValue = config.face?.expression?.smile || 0;
+                morphInfluences[morphTargets.smile] +=
+                  (targetValue - morphInfluences[morphTargets.smile]) * interpSpeed;
+              }
+              if (morphTargets.frown !== undefined) {
+                const targetValue = config.face?.expression?.frown || 0;
+                morphInfluences[morphTargets.frown] +=
+                  (targetValue - morphInfluences[morphTargets.frown]) * interpSpeed;
+              }
+              if (morphTargets.eyeBlink !== undefined) {
+                // Auto-blink animation
+                const blinkValue = Math.sin(time * 0.5) < -0.8 ? 1.0 : 0.0;
+                morphInfluences[morphTargets.eyeBlink] +=
+                  (blinkValue - morphInfluences[morphTargets.eyeBlink]) * interpSpeed;
+              }
+            }
 
-        // Apply body morphs with smooth transitions
-        if (morphTargets.muscleMass) {
-          const targetValue = config.body?.muscleMass || 0.5;
-          morphInfluences[morphTargets.muscleMass] +=
-            (targetValue - morphInfluences[morphTargets.muscleMass]) * interpSpeed;
+            // Apply body morphs with smooth transitions (for torso mesh)
+            if (child.name === 'Torso') {
+              if (morphTargets.muscleMass !== undefined) {
+                const targetValue = config.body?.muscleMass || 0.5;
+                morphInfluences[morphTargets.muscleMass] +=
+                  (targetValue - morphInfluences[morphTargets.muscleMass]) * interpSpeed;
+              }
+              if (morphTargets.bodyFat !== undefined) {
+                const targetValue = config.body?.bodyFat || 0.5;
+                morphInfluences[morphTargets.bodyFat] +=
+                  (targetValue - morphInfluences[morphTargets.bodyFat]) * interpSpeed;
+              }
+              if (morphTargets.chestSize !== undefined) {
+                const targetValue = config.body?.proportions?.chestSize || 1.0;
+                morphInfluences[morphTargets.chestSize] +=
+                  ((targetValue - 1.0) * 0.5 - morphInfluences[morphTargets.chestSize]) * interpSpeed;
+              }
+              if (morphTargets.breastSize !== undefined) {
+                const targetValue = config.body?.genderFeatures?.breastSize || 0.8;
+                morphInfluences[morphTargets.breastSize] +=
+                  ((targetValue - 1.0) * 0.5 - morphInfluences[morphTargets.breastSize]) * interpSpeed;
+              }
+            }
+          }
         }
-        if (morphTargets.bodyFat) {
-          const targetValue = config.body?.bodyFat || 0.5;
-          morphInfluences[morphTargets.bodyFat] +=
-            (targetValue - morphInfluences[morphTargets.bodyFat]) * interpSpeed;
-        }
-
-        // Use state.clock for time-based animations (breathing effect)
-        const time = state.clock.getElapsedTime();
-        if (morphTargets.breathe) {
-          morphInfluences[morphTargets.breathe] = Math.sin(time * 2) * 0.1;
-        }
-      }
+      });
     }
   });
 
@@ -169,105 +213,211 @@ function CharacterMesh({ config }: { config: any }) {
     const _weight = config.body?.weight || 1.0;
     const gender = config.gender || 'female';
     
-    // Create material
-    const material = new THREE.MeshStandardMaterial({
-      color: new Color(config.materials?.parameters?.colorA || '#FF6B9D'),
-      metalness: config.materials?.parameters?.metallic || 0.1,
-      roughness: config.materials?.parameters?.roughness || 0.3,
-      emissive: new Color(config.materials?.parameters?.rimColor || '#FFD700'),
-      emissiveIntensity: config.materials?.parameters?.rimStrength || 0.35,
-      transparent: true,
-      opacity: 1.0,
+    // Enhanced skin material
+    const skinMaterial = EnhancedProceduralMesh.createSkinMaterial(
+      config.materials?.parameters?.colorA || '#FFDBAC',
+      {
+        roughness: config.materials?.parameters?.roughness || 0.7,
+        metalness: config.materials?.parameters?.metallic || 0.05,
+        emissiveIntensity: config.materials?.parameters?.rimStrength || 0.1,
+      },
+    );
+    
+    // Head - Enhanced high-quality mesh
+    const headSize = 0.18 * (config.body?.proportions?.headSize || 1.0);
+    const headGeometry = EnhancedProceduralMesh.createHead(headSize, {
+      segments: 32,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
     });
     
-    // Head - Sphere with proper proportions
-    const headSize = 0.18 * (config.body?.proportions?.headSize || 1.0);
-    const headGeometry = new THREE.SphereGeometry(headSize, 32, 32);
-    const headMesh = new THREE.Mesh(headGeometry, material.clone());
+    // Create morph targets for head
+    const headMorphConfig: MorphTargetConfig = {
+      eyeSize: config.face?.eyes?.size || 1.0,
+      eyeSpacing: config.face?.eyes?.spacing || 0.5,
+      eyeHeight: config.face?.eyes?.height || 0.5,
+      jawline: config.face?.faceShape?.jawline || 0.5,
+      cheekbones: config.face?.faceShape?.cheekbones || 0.5,
+      chin: config.face?.faceShape?.chin || 0.5,
+      noseSize: config.face?.nose?.size || 1.0,
+      mouthSize: config.face?.mouth?.size || 1.0,
+      lipThickness: config.face?.mouth?.lipThickness || 0.5,
+      // Expressions (can be animated)
+      smile: config.face?.expression?.smile || 0,
+      frown: config.face?.expression?.frown || 0,
+      surprise: config.face?.expression?.surprise || 0,
+      wink: config.face?.expression?.wink || 0,
+      eyeBlink: config.face?.expression?.eyeBlink || 0,
+    };
+    const headMorphTargets = MorphTargetSystem.createMorphTargets(headGeometry, headMorphConfig, 'head');
+    
+    const headMesh = new THREE.Mesh(headGeometry, skinMaterial.clone());
+    if (headMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(headMesh, headMorphTargets, headMorphConfig);
+    }
     headMesh.position.set(0, 1.5 + height * 0.2, 0);
     headMesh.name = 'Head';
     group.add(headMesh);
     
-    // Neck - Cylinder connecting head to torso
+    // Neck - Enhanced high-quality mesh
     const neckLength = 0.12 * (config.body?.proportions?.neckLength || 1.0);
-    const neckGeometry = new THREE.CylinderGeometry(0.06, 0.08, neckLength, 16);
-    const neckMesh = new THREE.Mesh(neckGeometry, material.clone());
+    const neckGeometry = EnhancedProceduralMesh.createLimb(0.07, neckLength, 0.9, {
+      segments: 24,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const neckMesh = new THREE.Mesh(neckGeometry, skinMaterial.clone());
     neckMesh.position.set(0, 1.4 + height * 0.15, 0);
     neckMesh.name = 'Neck';
     group.add(neckMesh);
     
-    // Torso - Tapered cylinder (wider shoulders, narrower waist)
+    // Torso - Enhanced high-quality mesh with proper tapering
     const shoulderWidth = 0.25 * (config.body?.proportions?.shoulderWidth || 1.0);
     const waistSize = 0.18 * (config.body?.proportions?.waistSize || 1.0);
     const chestSize = 0.22 * (config.body?.proportions?.chestSize || 1.0);
     const torsoHeight = 0.5 + height * 0.15;
     
-    // Create torso with proper tapering
-    const torsoGeometry = new THREE.CylinderGeometry(
-      waistSize,
+    const torsoGeometry = EnhancedProceduralMesh.createTorso(
       shoulderWidth,
+      waistSize,
       torsoHeight,
-      32
+      {
+        segments: 32,
+        smoothNormals: true,
+        subdivision: 1,
+        weldVertices: true,
+        generateTangents: true,
+      },
     );
-    const torsoMesh = new THREE.Mesh(torsoGeometry, material.clone());
+    
+    // Create morph targets for torso
+    const torsoMorphConfig: MorphTargetConfig = {
+      muscleMass: config.body?.muscleMass || 0.5,
+      bodyFat: config.body?.bodyFat || 0.5,
+      shoulderWidth: config.body?.proportions?.shoulderWidth || 1.0,
+      chestSize: config.body?.proportions?.chestSize || 1.0,
+      waistSize: config.body?.proportions?.waistSize || 0.8,
+      hipWidth: config.body?.proportions?.hipWidth || 1.0,
+      breastSize: gender === 'female' ? (config.body?.genderFeatures?.breastSize || 0.8) : 0,
+      breastSeparation: gender === 'female' ? (config.body?.genderFeatures?.breastSeparation || 0) : 0,
+    };
+    const torsoMorphTargets = MorphTargetSystem.createMorphTargets(torsoGeometry, torsoMorphConfig, 'torso');
+    
+    const torsoMesh = new THREE.Mesh(torsoGeometry, skinMaterial.clone());
+    if (torsoMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(torsoMesh, torsoMorphTargets, torsoMorphConfig);
+    }
     torsoMesh.position.set(0, 1.0 + height * 0.1, 0);
     
-    // Gender-specific torso shaping
+    // Gender-specific torso shaping (base scaling, morph targets handle details)
     if (gender === 'female') {
       const breastSize = config.body?.genderFeatures?.breastSize || 0.8;
-      // Add chest definition for female
       torsoMesh.scale.set(1, 1, 0.85 + breastSize * 0.15);
     } else {
-      // Broader chest for male
       torsoMesh.scale.set(1, 1, 1.0 + chestSize * 0.1);
     }
     
     torsoMesh.name = 'Torso';
     group.add(torsoMesh);
     
-    // Hips - Wider base for natural body shape
+    // Hips - Enhanced high-quality mesh
     const hipWidth = 0.22 * (config.body?.proportions?.hipWidth || 1.0);
-    const hipGeometry = new THREE.CylinderGeometry(hipWidth, waistSize, 0.15, 32);
-    const hipMesh = new THREE.Mesh(hipGeometry, material.clone());
+    const hipGeometry = EnhancedProceduralMesh.createTorso(hipWidth, waistSize, 0.15, {
+      segments: 32,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const hipMesh = new THREE.Mesh(hipGeometry, skinMaterial.clone());
     hipMesh.position.set(0, 0.75 + height * 0.05, 0);
     hipMesh.name = 'Hips';
     group.add(hipMesh);
     
-    // Arms - Properly positioned and proportioned
+    // Arms - Enhanced high-quality meshes
     const armLength = 0.4 * (config.body?.proportions?.armLength || 1.0);
     const armRadius = 0.05;
     
     // Left arm
-    const leftArmGeometry = new THREE.CylinderGeometry(armRadius, armRadius * 0.9, armLength, 16);
-    const leftArmMesh = new THREE.Mesh(leftArmGeometry, material.clone());
+    const leftArmGeometry = EnhancedProceduralMesh.createLimb(armRadius, armLength, 0.9, {
+      segments: 24,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const armMorphConfig: MorphTargetConfig = {
+      armThickness: config.body?.proportions?.armThickness || 1.0,
+    };
+    const armMorphTargets = MorphTargetSystem.createMorphTargets(leftArmGeometry, armMorphConfig, 'limb');
+    const leftArmMesh = new THREE.Mesh(leftArmGeometry, skinMaterial.clone());
+    if (armMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(leftArmMesh, armMorphTargets, armMorphConfig);
+    }
     leftArmMesh.position.set(-(shoulderWidth + armLength / 2), 1.0 + height * 0.1, 0);
     leftArmMesh.rotation.z = Math.PI / 2;
     leftArmMesh.name = 'LeftArm';
     group.add(leftArmMesh);
     
     // Right arm
-    const rightArmGeometry = new THREE.CylinderGeometry(armRadius, armRadius * 0.9, armLength, 16);
-    const rightArmMesh = new THREE.Mesh(rightArmGeometry, material.clone());
+    const rightArmGeometry = EnhancedProceduralMesh.createLimb(armRadius, armLength, 0.9, {
+      segments: 24,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const rightArmMesh = new THREE.Mesh(rightArmGeometry, skinMaterial.clone());
+    if (armMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(rightArmMesh, armMorphTargets, armMorphConfig);
+    }
     rightArmMesh.position.set(shoulderWidth + armLength / 2, 1.0 + height * 0.1, 0);
     rightArmMesh.rotation.z = -Math.PI / 2;
     rightArmMesh.name = 'RightArm';
     group.add(rightArmMesh);
     
-    // Legs - Properly proportioned
+    // Legs - Enhanced high-quality meshes
     const legLength = 0.6 * (config.body?.proportions?.legLength || 1.0);
     const legRadius = 0.07;
     const thighGap = gender === 'female' ? (config.body?.genderFeatures?.thighGap || 0.3) * 0.1 : 0.05;
     
     // Left leg
-    const leftLegGeometry = new THREE.CylinderGeometry(legRadius, legRadius * 0.85, legLength, 16);
-    const leftLegMesh = new THREE.Mesh(leftLegGeometry, material.clone());
+    const leftLegGeometry = EnhancedProceduralMesh.createLimb(legRadius, legLength, 0.85, {
+      segments: 24,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const legMorphConfig: MorphTargetConfig = {
+      legThickness: config.body?.proportions?.legThickness || 1.0,
+      thighThickness: config.body?.proportions?.thighThickness || 1.0,
+    };
+    const legMorphTargets = MorphTargetSystem.createMorphTargets(leftLegGeometry, legMorphConfig, 'limb');
+    const leftLegMesh = new THREE.Mesh(leftLegGeometry, skinMaterial.clone());
+    if (legMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(leftLegMesh, legMorphTargets, legMorphConfig);
+    }
     leftLegMesh.position.set(-(hipWidth * 0.6 - thighGap), -legLength / 2 + height * 0.05, 0);
     leftLegMesh.name = 'LeftLeg';
     group.add(leftLegMesh);
     
     // Right leg
-    const rightLegGeometry = new THREE.CylinderGeometry(legRadius, legRadius * 0.85, legLength, 16);
-    const rightLegMesh = new THREE.Mesh(rightLegGeometry, material.clone());
+    const rightLegGeometry = EnhancedProceduralMesh.createLimb(legRadius, legLength, 0.85, {
+      segments: 24,
+      smoothNormals: true,
+      subdivision: 1,
+      weldVertices: true,
+      generateTangents: true,
+    });
+    const rightLegMesh = new THREE.Mesh(rightLegGeometry, skinMaterial.clone());
+    if (legMorphTargets.length > 0) {
+      MorphTargetSystem.applyMorphTargets(rightLegMesh, legMorphTargets, legMorphConfig);
+    }
     rightLegMesh.position.set(hipWidth * 0.6 - thighGap, -legLength / 2 + height * 0.05, 0);
     rightLegMesh.name = 'RightLeg';
     group.add(rightLegMesh);
@@ -291,46 +441,170 @@ function CharacterMesh({ config }: { config: any }) {
   return <group ref={bodyGroupRef} />;
 }
 
-// Hair Component
+// Hair Component with GLB asset loading support
 function HairComponent({ config }: { config: any }) {
-  if (!config.hair) return null;
+  const [hairModel, setHairModel] = useState<THREE.Group | null>(null);
+  const hairGroupRef = useRef<Group>(null);
+
+  useEffect(() => {
+    if (!config.hair) {
+      setHairModel(null);
+      return;
+    }
+
+    const loadHairAsset = async () => {
+      try {
+        // Try to load GLB asset first
+        const hairId = config.hair.style || config.hair.id;
+        const gender = config.gender || 'female';
+        
+        // Find matching hair asset
+        const hairAssets = assetRegistry.findAssetsByType('hair', gender);
+        const matchingAsset = hairAssets.find(
+          (asset) => asset.id === hairId || asset.category === config.hair.style,
+        );
+
+        if (matchingAsset && matchingAsset.glbPath) {
+          const model = await assetRegistry.loadAsset(matchingAsset.id);
+          if (model?.gltf?.scene) {
+            // Clone the scene to avoid modifying the original
+            const clonedScene = model.gltf.scene.clone();
+            setHairModel(clonedScene);
+            return;
+          }
+        }
+
+        // Fallback to procedural hair
+        const hairColor = config.hair.color?.primary || '#8B4513';
+        const hairMaterial = EnhancedProceduralMesh.createHairMaterial(hairColor, {
+          roughness: 0.8,
+          metalness: 0.1,
+          emissiveIntensity: 0.15,
+        });
+
+        // Create procedural hair geometry
+        const hairGeometry = EnhancedProceduralMesh.createHead(0.6, {
+          segments: 32,
+          smoothNormals: true,
+          subdivision: 1,
+          weldVertices: true,
+          generateTangents: true,
+        });
+
+        // Modify geometry for hair shape
+        const positions = hairGeometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+          const y = positions.getY(i);
+          if (y > 0) {
+            positions.setY(i, y * 1.2); // Extend upward for hair
+          }
+        }
+        positions.needsUpdate = true;
+        hairGeometry.computeVertexNormals();
+
+        const hairMesh = new THREE.Mesh(hairGeometry, hairMaterial);
+        const proceduralGroup = new THREE.Group();
+        proceduralGroup.add(hairMesh);
+        setHairModel(proceduralGroup);
+      } catch (error) {
+        console.error('[HairComponent] Failed to load hair:', error);
+        setHairModel(null);
+      }
+    };
+
+    loadHairAsset();
+  }, [config.hair, config.gender]);
+
+  if (!hairModel) return null;
 
   return (
-    <group>
-      {/* Hair geometry would be loaded here */}
-      <mesh>
-        {/* Higher quality hair geometry */}
-        <sphereGeometry args={[0.6, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.7]} />
-        <meshStandardMaterial
-          color={config.hair.color?.primary || '#8B4513'}
-          metalness={0.15}
-          roughness={0.7}
-          emissive={config.hair.color?.primary || '#8B4513'}
-          emissiveIntensity={0.1}
-        />
-      </mesh>
+    <group ref={hairGroupRef} position={[0, 1.5, 0]}>
+      <primitive object={hairModel} />
     </group>
   );
 }
 
-// Outfit Component
+// Outfit Component with GLB asset loading support
 function OutfitComponent({ config }: { config: any }) {
-  if (!config.outfit) return null;
+  const [outfitModel, setOutfitModel] = useState<THREE.Group | null>(null);
+  const outfitGroupRef = useRef<Group>(null);
+
+  useEffect(() => {
+    if (!config.outfit) {
+      setOutfitModel(null);
+      return;
+    }
+
+    const loadOutfitAsset = async () => {
+      try {
+        // Try to load GLB asset first
+        const outfitId = config.outfit.id || config.outfit.type;
+        const gender = config.gender || 'female';
+        
+        // Find matching outfit asset
+        const outfitAssets = assetRegistry.findAssetsByType('clothing', gender);
+        const matchingAsset = outfitAssets.find(
+          (asset) => asset.id === outfitId || asset.category === config.outfit.type,
+        );
+
+        if (matchingAsset && matchingAsset.glbPath) {
+          const model = await assetRegistry.loadAsset(matchingAsset.id);
+          if (model?.gltf?.scene) {
+            // Clone the scene to avoid modifying the original
+            const clonedScene = model.gltf.scene.clone();
+            
+            // Apply outfit color if specified
+            if (config.outfit.primary?.color) {
+              clonedScene.traverse((child) => {
+                if (child instanceof THREE.Mesh && child.material) {
+                  const material = child.material as THREE.MeshStandardMaterial;
+                  if (material.isMeshStandardMaterial) {
+                    material.color = new THREE.Color(config.outfit.primary.color);
+                  }
+                }
+              });
+            }
+            
+            setOutfitModel(clonedScene);
+            return;
+          }
+        }
+
+        // Fallback to procedural outfit
+        const outfitColor = config.outfit.primary?.color || '#FF6B9D';
+        const outfitMaterial = EnhancedProceduralMesh.createClothingMaterial(outfitColor, {
+          roughness: 0.6,
+          metalness: 0.2,
+          emissiveIntensity: 0.08,
+        });
+
+        // Create procedural outfit geometry
+        const outfitGeometry = EnhancedProceduralMesh.createTorso(0.6, 0.4, 1.2, {
+          segments: 32,
+          smoothNormals: true,
+          subdivision: 1,
+          weldVertices: true,
+          generateTangents: true,
+        });
+
+        const outfitMesh = new THREE.Mesh(outfitGeometry, outfitMaterial);
+        const proceduralGroup = new THREE.Group();
+        proceduralGroup.add(outfitMesh);
+        setOutfitModel(proceduralGroup);
+      } catch (error) {
+        console.error('[OutfitComponent] Failed to load outfit:', error);
+        setOutfitModel(null);
+      }
+    };
+
+    loadOutfitAsset();
+  }, [config.outfit, config.gender]);
+
+  if (!outfitModel) return null;
 
   return (
-    <group>
-      {/* Outfit geometry would be loaded here */}
-      <mesh>
-        {/* Higher quality outfit geometry */}
-        <cylinderGeometry args={[0.6, 0.4, 1.2, 32]} />
-        <meshStandardMaterial
-          color={config.outfit.primary?.color || '#FF6B9D'}
-          metalness={0.25}
-          roughness={0.6}
-          emissive={config.outfit.primary?.color || '#FF6B9D'}
-          emissiveIntensity={0.05}
-        />
-      </mesh>
+    <group ref={outfitGroupRef} position={[0, 1.0, 0]}>
+      <primitive object={outfitModel} />
     </group>
   );
 }

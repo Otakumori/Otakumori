@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { Shield, MessageSquare, Bell, Filter, UserX } from 'lucide-react';
 import GlassCard from './ui/GlassCard';
 import GlassButton from './ui/GlassButton';
 import { type UserSafetySettings, type UserSafetySettingsUpdate } from '@/app/lib/contracts';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface SafetySettingsProps {
   className?: string;
@@ -33,9 +37,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
             loadBlockedUsers(result.data.blockedUsers);
           }
         } else {
-          logger.error('Failed to load safety settings:', result.error);
+          const logger = await getLogger();
+          logger.error('Failed to load safety settings:', undefined, undefined, result.error instanceof Error ? result.error : new Error(String(result.error)));
         }
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Error loading safety settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
@@ -50,6 +56,7 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
       // For now, we'll just show the IDs
       setBlockedUsers(userIds.map((id) => ({ id, username: id })));
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Error loading blocked users:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
@@ -70,9 +77,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
       if (result.ok) {
         setSettings(result.data);
       } else {
-        logger.error('Failed to update safety settings:', result.error);
+        const logger = await getLogger();
+        logger.error('Failed to update safety settings:', undefined, undefined, result.error instanceof Error ? result.error : new Error(String(result.error)));
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Error updating safety settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setSaving(false);
@@ -105,9 +114,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
           });
         }
       } else {
-        logger.error('Failed to unblock user:', result.error);
+        const logger = await getLogger();
+        logger.error('Failed to unblock user:', undefined, undefined, result.error instanceof Error ? result.error : new Error(String(result.error)));
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Error unblocking user:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };

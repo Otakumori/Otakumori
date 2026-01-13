@@ -8,7 +8,6 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useCallback } from 'react';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 

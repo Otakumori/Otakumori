@@ -6,10 +6,14 @@
  * Client-side UI for admin console with feature flag toggles and system status.
  */
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 import type { EffectiveFeatureFlags } from '@/app/lib/config/featureFlags.server';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface AdminConsoleClientProps {
   userId?: string;
@@ -93,6 +97,7 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
       setSystemStatus(data.systemStatus || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
+      const logger = await getLogger();
       logger.error('Failed to load admin data', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
@@ -128,6 +133,7 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update setting');
+      const logger = await getLogger();
       logger.error('Failed to execute command', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setUpdating(null);

@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 
 export interface GameSaveData {
   gameId: string;

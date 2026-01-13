@@ -2172,3 +2172,64 @@ textarea,
     stroke-dashoffset: 0;
   }
 }
+
+/* ========================================
+   UI ANIMATION UTILITIES
+   Additional animation utilities for enhanced UI
+   ======================================== */
+
+/* Cursor glow styles */
+[data-clickable] {
+  cursor: pointer;
+}
+
+/* Perspective for 3D effects */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Snap scrolling */
+.snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+/* Respect reduced motion for new animations */
+@media (prefers-reduced-motion: reduce) {
+  .perspective-1000,
+  .preserve-3d,
+  .backface-hidden {
+    transform: none !important;
+    perspective: none !important;
+  }
+  
+  .snap-y {
+    scroll-snap-type: none;
+  }
+}

@@ -212,4 +212,10 @@ export const rateLimitConfigs = {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 1000, // 1000 requests per minute
   },
+
+  // Rate limiting for GLB export endpoint (resource-intensive operation)
+  glbExport: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    maxRequests: 5, // 5 exports per hour per user
+  },
 } as const;

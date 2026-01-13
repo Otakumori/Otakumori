@@ -1,7 +1,10 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
 class AudioMgr {
   private ctx: AudioContext | null = null;
   private buffers = new Map<string, AudioBuffer>();
@@ -23,7 +26,9 @@ class AudioMgr {
 
       // Check if the audio context is suspended (common on mobile)
       if (this.ctx.state === 'suspended') {
-        logger.warn(`Audio context suspended, cannot load: ${name}`);
+        getLogger().then((logger) => {
+          logger.warn(`Audio context suspended, cannot load: ${name}`);
+        });
         return;
       }
 
@@ -31,7 +36,9 @@ class AudioMgr {
       this.buffers.set(name, buf);
       // `Successfully loaded audio: ${name} (${buf.duration.toFixed(2}s)`);
     } catch (error) {
-      logger.warn(`Failed to load audio: ${name}`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+      getLogger().then((logger) => {
+        logger.warn(`Failed to load audio: ${name}`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+      });
       // Don't throw, just log the error and continue
     }
   }
@@ -47,13 +54,17 @@ class AudioMgr {
   play(name: string, { rate = 1, gain = 0.9, loop = false } = {}) {
     const buf = this.buffers.get(name);
     if (!buf || !this.ctx) {
-      logger.warn(`Cannot play audio: ${name} (not loaded or no audio context)`);
+      getLogger().then((logger) => {
+        logger.warn(`Cannot play audio: ${name} (not loaded or no audio context)`);
+      });
       return null;
     }
 
     // Check if audio context is suspended
     if (this.ctx.state === 'suspended') {
-      logger.warn(`Cannot play audio: ${name} (audio context suspended)`);
+      getLogger().then((logger) => {
+        logger.warn(`Cannot play audio: ${name} (audio context suspended)`);
+      });
       return null;
     }
 
@@ -74,7 +85,9 @@ class AudioMgr {
         }
       };
     } catch {
-      logger.warn(`Failed to play audio: ${name}`);
+      getLogger().then((logger) => {
+        logger.warn(`Failed to play audio: ${name}`);
+      });
       return null;
     }
   }

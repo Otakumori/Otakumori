@@ -1,6 +1,5 @@
 
 import { generateSEO } from '@/app/lib/seo';
-import { type Metadata } from 'next';
 
 
 export function generateMetadata() {

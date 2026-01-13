@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { stripHtml } from '@/lib/html';

@@ -1,5 +1,9 @@
-import { logger } from '@/app/lib/logger';
 import { env } from '@/env';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 import { PrintifyProducts, PrintifyError } from './schema';
 
 const RETRY_ATTEMPTS = 3;
@@ -61,7 +65,9 @@ export async function getProducts() {
     const json = await response.json();
     return PrintifyProducts.parse(json);
   } catch (error) {
-    logger.error('Printify API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    getLogger().then((logger) => {
+      logger.error('Printify API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    });
     throw error;
   }
 }
@@ -83,7 +89,9 @@ export async function getProductVariants(productId: string) {
 
     return await response.json();
   } catch (error) {
-    logger.error('Printify variants API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    getLogger().then((logger) => {
+      logger.error('Printify variants API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    });
     throw error;
   }
 }

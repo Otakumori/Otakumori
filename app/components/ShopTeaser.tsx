@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
 import { useState, useEffect } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface Product {
   id: string;
@@ -59,15 +63,18 @@ export default function ShopTeaser() {
 
             setProducts(transformedProducts);
           } else {
+            const logger = await getLogger();
             logger.warn('No products array in response');
             setProducts([]);
           }
         } else {
+          const logger = await getLogger();
           logger.error('API response not ok:', undefined, { status: response.status, statusText: response.statusText }, undefined);
           setError(`API Error: ${response.status}`);
           setProducts([]);
         }
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Failed to fetch products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setError('Failed to fetch products');
         setProducts([]);

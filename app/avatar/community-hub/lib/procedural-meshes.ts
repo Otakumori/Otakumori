@@ -4,7 +4,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import type { CharacterConfig } from './character-state';
 

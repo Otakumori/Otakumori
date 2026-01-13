@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { z } from 'zod';
 import { REQUIRED_SERVER_KEYS } from './env-keys';
 import { getServerEnv } from '@/env/server';

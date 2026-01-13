@@ -94,6 +94,18 @@ const adminRoutes = [
     icon: Zap,
     description: 'Configure burst effects',
   },
+  {
+    path: '/admin/orders',
+    name: 'Orders',
+    icon: Ticket,
+    description: 'Order operations center & financial tracking',
+  },
+  {
+    path: '/admin/content/blog',
+    name: 'Blog Posts',
+    icon: Flower,
+    description: 'Create and manage blog posts',
+  },
 ];
 
 export default function AdminNav() {

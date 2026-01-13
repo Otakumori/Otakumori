@@ -21,13 +21,17 @@ import {
   updatePrintifyProducts,
   processOrder,
   sendOrderConfirmation,
+  sendOrderConfirmationEmail,
   syncInventory,
   processPaymentWebhook,
   dailyInventorySync,
   weeklyProductUpdate,
   retryFailedOperation,
   cleanupOldData,
+  cleanupOldGLBFiles,
+  fulfillOrder,
 } from '../../../inngest/functions';
+import { generateGLBBackground } from '../../../inngest/glb-generation';
 
 export const runtime = 'nodejs';
 
@@ -41,12 +45,16 @@ export const { GET, POST, PUT } = serve({
     updatePrintifyProducts,
     processOrder,
     sendOrderConfirmation,
+    sendOrderConfirmationEmail,
+    fulfillOrder,
     syncInventory,
     processPaymentWebhook,
     dailyInventorySync,
     weeklyProductUpdate,
     retryFailedOperation,
     cleanupOldData,
+    cleanupOldGLBFiles,
+    generateGLBBackground,
   ],
   signingKey: env.INNGEST_SIGNING_KEY,
 });

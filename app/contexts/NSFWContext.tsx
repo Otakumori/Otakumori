@@ -1,5 +1,9 @@
-import { logger } from '@/app/lib/logger';
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface NSFWContextType {
   isNSFWAllowed: boolean;
@@ -34,6 +38,7 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         await fetch('/api/policy/age', { method: 'POST' });
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Failed to set server-side age verification:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     } else {
@@ -52,6 +57,7 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch('/api/policy/age', { method: 'DELETE' });
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Failed to clear server-side age verification:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };

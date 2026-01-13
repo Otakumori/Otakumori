@@ -6,7 +6,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { z } from 'zod';
 import { type ApiResponse, type ApiSuccess, type ApiError } from './api-contracts';
 

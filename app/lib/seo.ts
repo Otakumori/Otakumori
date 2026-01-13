@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import type { Metadata } from 'next';
 import { env } from '@/env';
 

@@ -9,8 +9,12 @@
 'use client';
 
 import { calculateGameReward } from '@/app/config/petalTuning';
-import { logger } from '@/app/lib/logger';
 import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export interface GameResultMetadata {
   combo?: number;
@@ -146,12 +150,14 @@ async function unlockAchievement(
       rewardAmount: data.data?.rewardDetails?.amount,
     };
   } catch (error) {
-    logger.error(
-      'Error unlocking achievement:',
-      undefined,
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
-    );
+    getLogger().then((logger) => {
+      logger.error(
+        'Error unlocking achievement:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -228,12 +234,14 @@ export async function recordGameResult(
       achievements: achievementResult,
     };
   } catch (error) {
-    logger.error(
-      'Error recording game result:',
-      undefined,
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
-    );
+    getLogger().then((logger) => {
+      logger.error(
+        'Error recording game result:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

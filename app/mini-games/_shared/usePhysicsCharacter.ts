@@ -8,7 +8,6 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import {
   PhysicsCharacterRenderer,

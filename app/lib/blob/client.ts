@@ -112,3 +112,45 @@ export async function headBlob(opts: {
   const size = Number(res.headers.get('content-length') ?? '0');
   return { exists: true, size: isNaN(size) ? 0 : size };
 }
+
+/**
+ * Delete a blob from Vercel Blob storage
+ * Uses @vercel/blob del function if available, otherwise falls back to REST API
+ *
+ * @param opts.url - Full blob URL
+ * @returns Object with success flag
+ */
+export async function deleteBlobFile(opts: {
+  url: string;
+}): Promise<{ success: boolean }> {
+  await ensureEnv();
+
+  try {
+    // Try to use @vercel/blob package if available
+    const { del } = await import('@vercel/blob');
+    await del(opts.url, { token: RW });
+    return { success: true };
+  } catch (importError) {
+    // Fallback to REST API if @vercel/blob not available
+    // Vercel Blob REST API DELETE: DELETE https://[url]
+    const res = await fetch(opts.url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${RW}`,
+        'x-api-version': '7',
+      },
+    });
+
+    if (res.status === 404) {
+      // File doesn't exist, consider deletion successful
+      return { success: true };
+    }
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Blob deletion failed (${res.status}): ${text || res.statusText}`);
+    }
+
+    return { success: true };
+  }
+}

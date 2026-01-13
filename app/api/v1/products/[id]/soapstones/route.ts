@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -9,8 +8,9 @@ import { Prisma } from '@prisma/client';
 export const runtime = 'nodejs';
 
 const createSchema = z.object({
-  message: z.string().min(1).max(280),
+  message: z.string().min(1).max(280).optional(),
   template: z.string().optional(),
+  slotValues: z.record(z.string()).optional(), // e.g., { SUBJECT: 'enemy', ACTION: 'rolling' }
 });
 
 // GET /api/v1/products/[id]/soapstones - List soapstones for a product
@@ -90,10 +90,52 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    const { message, template: _template } = validation.data;
+    const { message, template, slotValues } = validation.data;
 
     // Cost: 5 petals to place a sign
     const SOAPSTONE_COST = 5;
+
+    // Build message from template if template is provided and message is not
+    let finalMessage: string;
+    
+    if (template && !message) {
+      const templateRecord = await db.messageTemplate.findUnique({
+        where: { name: template, isActive: true },
+      });
+
+      if (!templateRecord) {
+        return NextResponse.json(
+          { ok: false, error: `Template "${template}" not found` },
+          { status: 400 },
+        );
+      }
+
+      // Build message from template pattern
+      finalMessage = templateRecord.pattern;
+
+      // Replace placeholders with slot values if provided
+      if (slotValues) {
+        Object.entries(slotValues).forEach(([key, value]) => {
+          const placeholder = `{${key.toUpperCase()}}`;
+          finalMessage = finalMessage.replace(placeholder, value);
+        });
+      }
+
+      // Validate final message length
+      if (finalMessage.length === 0 || finalMessage.length > 280) {
+        return NextResponse.json(
+          { ok: false, error: 'Generated message is invalid length' },
+          { status: 400 },
+        );
+      }
+    } else if (message) {
+      finalMessage = message;
+    } else {
+      return NextResponse.json(
+        { ok: false, error: 'Message or template is required' },
+        { status: 400 },
+      );
+    }
 
     const user = await db.user.findUnique({
       where: { clerkId: userId },
@@ -121,7 +163,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         data: {
           Product: { connect: { id: productId } },
           User: { connect: { id: user.id } },
-          text: message,
+          text: finalMessage,
         },
         include: {
           User: {

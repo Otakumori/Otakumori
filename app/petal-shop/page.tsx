@@ -6,7 +6,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
@@ -17,6 +16,11 @@ import {
 } from '@/app/lib/cosmetics/cosmeticsConfig';
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export default function PetalShopPage() {
   const {
@@ -71,6 +75,7 @@ export default function PetalShopPage() {
           setDiscountEnabled(false);
         }
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Failed to fetch data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setPetalBalance(0);
       } finally {
@@ -136,6 +141,7 @@ export default function PetalShopPage() {
         throw new Error(data.error || 'Purchase failed');
       }
     } catch (error: any) {
+      const logger = await getLogger();
       logger.error('Purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {
@@ -202,6 +208,7 @@ export default function PetalShopPage() {
         throw new Error(data.error || 'Purchase failed');
       }
     } catch (error: any) {
+      const logger = await getLogger();
       logger.error('Voucher purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {

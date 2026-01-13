@@ -12,7 +12,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { clientEnv } from '@/env/client';
 
 export interface GameSaveDataV2 {

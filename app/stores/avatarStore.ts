@@ -4,7 +4,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import * as THREE from 'three';

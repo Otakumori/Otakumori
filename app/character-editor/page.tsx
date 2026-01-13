@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 const CharacterEditor = dynamic(
   () => import('@/app/components/avatar/CharacterEditor'),
@@ -53,7 +57,7 @@ export default function CharacterEditorPage() {
     // Configuration changes are handled by the editor component
   };
 
-  const handleSave = (config: AvatarConfiguration) => {
+  const handleSave = async (config: AvatarConfiguration) => {
     if (isGuest) {
       // Save as guest character
       const name = prompt('Enter a name for your character:', 'My Character') || 'My Character';
@@ -63,14 +67,65 @@ export default function CharacterEditorPage() {
         setSelectedGuestCharacter(guestChar);
         alert(`Character "${name}" saved! It will be available for 7 days.`);
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         alert('Failed to save character. Please try again.');
       }
     } else {
       // For authenticated users, save to database
-      logger.warn('Saving configuration to database:', config);
-      // TODO: Implement database save for authenticated users
-      alert('Character saved! (Database save coming soon)');
+      try {
+        const idempotencyKey = `avatar-save-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+        const response = await fetch('/api/v1/character/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-idempotency-key': idempotencyKey,
+          },
+          body: JSON.stringify({
+            name: `Character ${new Date().toLocaleDateString()}`,
+            baseModel: config.baseModel,
+            baseModelUrl: config.baseModelUrl,
+            contentRating: config.contentRating,
+            showNsfwContent: config.showNsfwContent,
+            ageVerified: config.ageVerified,
+            defaultAnimation: config.defaultAnimation,
+            idleAnimations: config.idleAnimations,
+            allowExport: config.allowExport,
+            exportFormat: config.exportFormat,
+            parts: Object.entries(config.parts).map(([partType, partId], index) => ({
+              partType,
+              partId: partId || '',
+              attachmentOrder: index,
+            })),
+            morphTargets: config.morphTargets,
+            materialOverrides: Object.entries(config.materialOverrides).map(([slot, override]) => ({
+              slot,
+              type: override.type,
+              value: typeof override.value === 'string' ? override.value : override.value.getHex(),
+              opacity: override.opacity,
+              metallic: override.metallic,
+              roughness: override.roughness,
+              normalStrength: override.normalStrength,
+            })),
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to save character' }));
+          throw new Error(errorData.error || 'Failed to save character');
+        }
+
+        const result = await response.json();
+        if (result.ok) {
+          alert('Character saved successfully!');
+        } else {
+          throw new Error(result.error || 'Failed to save character');
+        }
+      } catch (error) {
+        const logger = await getLogger();
+        logger.error('Failed to save character to database:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        alert(`Failed to save character: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     }
   };
 
@@ -79,13 +134,14 @@ export default function CharacterEditorPage() {
     // The CharacterEditor will receive this via initialConfiguration
   };
 
-  const handleUseInGame = (config: AvatarConfiguration) => {
+  const handleUseInGame = async (config: AvatarConfiguration) => {
     if (isGuest) {
       // Save guest character first if not already saved
       const name = prompt('Enter a name for your character:', 'My Character') || 'My Character';
       try {
         saveGuestCharacter(config, name);
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }

@@ -1,5 +1,4 @@
 
-import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -152,7 +151,7 @@ async function searchUsers(
 }
 
 async function searchProducts(searchRequest: SearchRequest): Promise<SearchResult[]> {
-  const { query, filters: _filters } = searchRequest;
+  const { query, filters } = searchRequest;
 
   const whereClause: any = {
     OR: [
@@ -161,7 +160,65 @@ async function searchProducts(searchRequest: SearchRequest): Promise<SearchResul
       { category: { contains: query, mode: 'insensitive' } },
     ],
     active: true,
+    visible: true,
   };
+
+  // Apply product-specific filters
+  if (filters) {
+    const productFilters = filters as typeof filters & {
+      category?: string;
+      minPrice?: number;
+      maxPrice?: number;
+      inStock?: boolean;
+    };
+
+    // Category filter
+    if (productFilters.category) {
+      whereClause.AND = whereClause.AND || [];
+      whereClause.AND.push({
+        OR: [
+          { categorySlug: productFilters.category },
+          { category: productFilters.category },
+          { tags: { has: productFilters.category } },
+        ],
+      });
+    }
+
+    // Tags filter (for multiple categories/tags)
+    if (filters.tags && filters.tags.length > 0) {
+      whereClause.AND = whereClause.AND || [];
+      whereClause.AND.push({
+        OR: [
+          { categorySlug: { in: filters.tags } },
+          { category: { in: filters.tags } },
+          { tags: { hasSome: filters.tags } },
+        ],
+      });
+    }
+
+    // Price range filter (requires checking ProductVariant)
+    const variantFilters: any = {};
+    if (productFilters.minPrice != null || productFilters.maxPrice != null) {
+      variantFilters.priceCents = {
+        ...(productFilters.minPrice != null ? { gte: Math.round(productFilters.minPrice * 100) } : {}),
+        ...(productFilters.maxPrice != null ? { lte: Math.round(productFilters.maxPrice * 100) } : {}),
+      };
+    }
+
+    // Stock filter
+    if (productFilters.inStock === true) {
+      variantFilters.inStock = true;
+      variantFilters.isEnabled = true;
+    }
+
+    // Apply variant filters if any
+    if (Object.keys(variantFilters).length > 0) {
+      whereClause.AND = whereClause.AND || [];
+      whereClause.AND.push({
+        ProductVariant: { some: variantFilters },
+      });
+    }
+  }
 
   const products = await db.product.findMany({
     where: whereClause,
@@ -179,7 +236,8 @@ async function searchProducts(searchRequest: SearchRequest): Promise<SearchResul
         take: 1,
       },
     },
-    take: 20,
+    take: searchRequest.limit || 20,
+    skip: searchRequest.offset || 0,
   });
 
   return products.map((product) => ({

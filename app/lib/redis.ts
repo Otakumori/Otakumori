@@ -1,6 +1,5 @@
 // lib/redis.ts
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { assertServer } from './server-only';
 import { env } from '@/env.mjs';
 import type { Redis } from 'ioredis';

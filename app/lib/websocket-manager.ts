@@ -6,7 +6,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { WebSocket } from 'ws';
 import { redisPool } from './redis-connection-pool';
 

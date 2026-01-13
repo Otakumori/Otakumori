@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import type { AvatarConfiguration, AvatarPartType } from '@/app/lib/3d/avatar-parts';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 const CharacterEditor = dynamic(
   () => import('@/app/components/avatar/CharacterEditor'),
@@ -73,6 +77,7 @@ export default function CreatorPage() {
         setAvatarConfig(null);
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Failed to load avatar config:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setAvatarConfig(null);
     } finally {
@@ -110,10 +115,12 @@ export default function CreatorPage() {
         }, 2000);
       } else {
         setSaveStatus('error');
-        logger.error('Failed to save avatar:', result.error);
+        const logger = await getLogger();
+        logger.error('Failed to save avatar:', undefined, undefined, result.error instanceof Error ? result.error : new Error(String(result.error)));
       }
     } catch (error) {
       setSaveStatus('error');
+      const logger = await getLogger();
       logger.error('Failed to save avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }, [avatarConfig, user]);

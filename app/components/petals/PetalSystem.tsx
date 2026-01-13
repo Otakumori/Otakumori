@@ -1,18 +1,25 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, memo } from 'react';
 import FallingPetals from './FallingPetals';
 import AchievementNotification from './AchievementNotification';
 import PetalCounter from './PetalCounter';
-import { usePetalCollection } from '@/app/hooks/usePetalCollection';
+import { usePetalCollectionContext } from '@/app/contexts/PetalCollectionContext';
 
 /**
  * Main orchestrator for the petal collection system
  * Manages falling petals, counter, and achievement notifications
+ * Optimized for performance with memoization and singleton context
  */
-export default function PetalSystem() {
-  const { sessionTotal, showAchievement, collectPetal, dismissAchievement, hasCollectedAny } =
-    usePetalCollection();
+function PetalSystemComponent() {
+  const {
+    sessionTotal,
+    showAchievement,
+    collectPetal,
+    dismissAchievement,
+    hasCollectedAny,
+    lastCollectedValue,
+  } = usePetalCollectionContext();
 
   const handlePetalCollect = useCallback(
     (petalId: number, value: number, x: number, y: number) => {
@@ -23,7 +30,7 @@ export default function PetalSystem() {
 
   return (
     <>
-      {/* Falling petals canvas - z-index: 5 (above starfield at z-0, behind main content at z-index: 10+) */}
+      {/* Falling petals canvas - z-index: 5 */}
       <FallingPetals onPetalCollect={handlePetalCollect} />
 
       {/* Achievement notification - only shows on first collection */}
@@ -32,7 +39,10 @@ export default function PetalSystem() {
       )}
 
       {/* Persistent counter - only shows after first collection */}
-      {hasCollectedAny && <PetalCounter count={sessionTotal} />}
+      {hasCollectedAny && <PetalCounter count={sessionTotal} lastValue={lastCollectedValue} />}
     </>
   );
 }
+
+// Memoize to prevent re-renders when parent updates
+export default memo(PetalSystemComponent);

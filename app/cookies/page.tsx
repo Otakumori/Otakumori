@@ -1,7 +1,10 @@
 'use client';
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export default function CookieSettings() {
   const [analytics, setAnalytics] = useState(false);
@@ -14,7 +17,9 @@ export default function CookieSettings() {
         const prefs = JSON.parse(stored);
         setAnalytics(prefs.analytics || false);
       } catch {
-        logger.warn('Failed to parse cookie preferences');
+        getLogger().then((logger) => {
+          logger.warn('Failed to parse cookie preferences');
+        });
       }
     }
   }, []);

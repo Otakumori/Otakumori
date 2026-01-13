@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import { type Metadata } from 'next';
 import { sanitizeContent } from '../lib/content-sanitizer';
 
 

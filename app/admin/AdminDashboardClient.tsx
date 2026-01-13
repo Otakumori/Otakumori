@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Flower, ShoppingBag, Settings, Sparkles, BarChart3 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { AdminLayout } from '../../components/admin/AdminNav';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface DashboardStats {
   totalUsers: number;
@@ -39,6 +43,7 @@ export function AdminDashboardClient() {
         setStats(data.stats || stats);
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Failed to load dashboard data', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);

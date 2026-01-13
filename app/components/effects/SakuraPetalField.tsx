@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { usePetalCollection } from '@/app/hooks/usePetalCollection';
+import { usePetalCollectionContext } from '@/app/contexts/PetalCollectionContext';
 
 type PetalLayer = 'near' | 'far';
 
@@ -42,7 +42,7 @@ export function SakuraPetalField({ petalCount = 90, zIndex = -5 }: SakuraPetalFi
   const containerRef = useRef<HTMLDivElement | null>(null);
   const petalsRef = useRef<Petal[]>([]);
   const animationFrameRef = useRef<number | null>(null);
-  const { collectPetal } = usePetalCollection();
+  const { collectPetal } = usePetalCollectionContext();
 
   useEffect(() => {
     // Check for reduced motion preference

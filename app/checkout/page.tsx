@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import FooterDark from '../components/FooterDark';

@@ -1,7 +1,11 @@
-import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { communityWS } from '@/lib/websocket/client';
 import PetalParticleBurst from '@/app/components/effects/PetalParticleBurst';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 const GLOBAL_PETAL_KEY = 'global_petals';
 const USER_PETAL_KEY = 'user_petals';
@@ -68,6 +72,7 @@ export default function PetalGameImage() {
           if (cachedGlobal) setGlobalPetals(Number(cachedGlobal));
         }
       } catch (err) {
+        const logger = await getLogger();
         logger.error('Error fetching global petals:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
         // Use cached value on error
         const cachedGlobal = localStorage.getItem(GLOBAL_PETAL_KEY);
@@ -112,7 +117,10 @@ export default function PetalGameImage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount: 1 }),
-          }).catch((err) => logger.error('Failed to sync global petal:', err));
+          }).catch(async (err) => {
+            const logger = await getLogger();
+            logger.error('Failed to sync global petal:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+          });
 
           return newGlobal;
         });

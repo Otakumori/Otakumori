@@ -1,8 +1,12 @@
 'use client';
-import { logger } from '@/app/lib/logger';
 import posthog from 'posthog-js';
 import { useEffect, useRef } from 'react';
 import { clientEnv } from '@/env/client';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 /**
  * PostHogProvider - Single source of truth for PostHog initialization
@@ -37,8 +41,10 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
     const key = clientEnv.NEXT_PUBLIC_POSTHOG_KEY;
     if (!key || typeof key !== 'string' || key.trim().length === 0) {
       // PostHog key is missing - silently skip initialization
-      if (process.env.NODE_ENV === 'development') {
-        logger.warn('[PostHogProvider] NEXT_PUBLIC_POSTHOG_KEY is not set – analytics disabled.');
+      if (clientEnv.NODE_ENV === 'development') {
+        getLogger().then((logger) => {
+          logger.warn('[PostHogProvider] NEXT_PUBLIC_POSTHOG_KEY is not set – analytics disabled.');
+        });
       }
       initializedRef.current = true;
       return;
@@ -89,8 +95,10 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
         initializedRef.current = true;
       } else {
         // Log error but don't crash - analytics is non-critical
-        if (process.env.NODE_ENV === 'development') {
-          logger.error('[PostHogProvider] Failed to initialize PostHog:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        if (clientEnv.NODE_ENV === 'development') {
+          getLogger().then((logger) => {
+            logger.error('[PostHogProvider] Failed to initialize PostHog:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+          });
         }
         // Mark as initialized to prevent retry loops
         initializedRef.current = true;

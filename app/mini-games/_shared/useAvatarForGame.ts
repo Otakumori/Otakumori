@@ -1,7 +1,6 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
 

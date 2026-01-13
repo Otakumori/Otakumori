@@ -1,11 +1,15 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { type GLTF } from 'three-stdlib';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 // Import our systems
 import { AnimeLightingSystem, LIGHTING_PRESETS } from '@/app/lib/3d/lighting-system';
@@ -95,13 +99,13 @@ export default function Avatar3D({
   // Procedural avatar state
   const [proceduralAvatar, setProceduralAvatar] = useState<THREE.Group | null>(null);
 
-  // Quality settings
+  // Quality settings - Enhanced for better than Code Vein quality
   const qualitySettings = useMemo(
     () => ({
-      low: { textureSize: 512, shadowMapSize: 1024, samples: 1 },
-      medium: { textureSize: 1024, shadowMapSize: 2048, samples: 2 },
-      high: { textureSize: 2048, shadowMapSize: 4096, samples: 4 },
-      ultra: { textureSize: 4096, shadowMapSize: 8192, samples: 8 },
+      low: { textureSize: 1024, shadowMapSize: 2048, samples: 2 }, // Upgraded from 512
+      medium: { textureSize: 2048, shadowMapSize: 4096, samples: 4 }, // Upgraded from 1024
+      high: { textureSize: 4096, shadowMapSize: 8192, samples: 8 }, // Upgraded from 2048
+      ultra: { textureSize: 4096, shadowMapSize: 8192, samples: 16 }, // Enhanced samples
     }),
     [],
   );
@@ -170,7 +174,9 @@ export default function Avatar3D({
         onLoad();
       }
     } catch (err) {
-      logger.error('Failed to generate procedural avatar:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      getLogger().then((logger) => {
+        logger.error('Failed to generate procedural avatar:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      });
       setError(err as Error);
       setIsLoading(false);
       if (onError) {
@@ -219,7 +225,9 @@ export default function Avatar3D({
             // Get part definition
             const part = avatarPartManager.getPart(partId);
             if (!part) {
-              logger.warn(`Part not found: ${partId}`);
+              getLogger().then((logger) => {
+                logger.warn(`Part not found: ${partId}`);
+              });
               continue;
             }
 
@@ -229,9 +237,11 @@ export default function Avatar3D({
               configuration.id,
             );
             if (!compatibility.compatible) {
-              logger.warn(
-                `Part incompatible: ${partId}, conflicts: ${compatibility.conflicts.join(', ')}`,
-              );
+              getLogger().then((logger) => {
+                logger.warn(
+                  `Part incompatible: ${partId}, conflicts: ${compatibility.conflicts.join(', ')}`,
+                );
+              });
               continue;
             }
 
@@ -298,7 +308,9 @@ export default function Avatar3D({
 
             setLoadingProgress(((i + 1) / totalParts) * 100);
           } catch (partError) {
-            logger.error(`Failed to load part ${partId}:`, undefined, undefined, partError instanceof Error ? partError : new Error(String(partError)));
+            getLogger().then((logger) => {
+              logger.error(`Failed to load part ${partId}:`, undefined, undefined, partError instanceof Error ? partError : new Error(String(partError)));
+            });
             if (onError) {
               onError(partError as Error);
             }
@@ -312,7 +324,9 @@ export default function Avatar3D({
           onLoad();
         }
       } catch (error) {
-        logger.error('Failed to load avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        getLogger().then((logger) => {
+          logger.error('Failed to load avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        });
         setError(error as Error);
         setIsLoading(false);
         if (onError) {
@@ -374,7 +388,9 @@ export default function Avatar3D({
     if (config.materialOverrides) {
       Object.entries(config.materialOverrides).forEach(([overrideKey, override]) => {
         // Log material override application for debugging
-        logger.warn(`Applying material override for ${overrideKey}:`, undefined, { value: override.type });
+        getLogger().then((logger) => {
+          logger.warn(`Applying material override for ${overrideKey}:`, undefined, { value: override.type });
+        });
 
         switch (override.type) {
           case 'color':
@@ -384,7 +400,9 @@ export default function Avatar3D({
             break;
           case 'texture':
             // Load and apply custom texture
-            logger.warn(`Texture override for ${overrideKey}:`, undefined, { value: override.value });
+            getLogger().then((logger) => {
+              logger.warn(`Texture override for ${overrideKey}:`, undefined, { value: override.value });
+            });
             break;
         }
       });

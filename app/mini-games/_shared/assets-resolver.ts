@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import manifest from '@/public/assets/manifest.json';
 import roles from '@/assets-roles.json';
 

@@ -31,12 +31,14 @@ interface GameAvatarData {
   configuration: AvatarConfiguration;
   isCustom: boolean;
   fallbackSpriteUrl?: string;
+  glbUrl?: string; // GLB model URL if available
   defaultCharacterId?: string;
 }
 
 // 3D Avatar Component for Games
 function GameAvatar3D({
   configuration,
+  glbUrl,
   position = [0, 0, 0],
   scale = [1, 1, 1],
   quality = 'medium',
@@ -46,6 +48,7 @@ function GameAvatar3D({
   onError,
 }: {
   configuration: AvatarConfiguration;
+  glbUrl?: string;
   position?: [number, number, number];
   scale?: [number, number, number];
   quality?: 'low' | 'medium' | 'high' | 'ultra';
@@ -80,6 +83,27 @@ function GameAvatar3D({
       performanceOptimizer.current.updateMetrics(state.gl);
     }
   });
+
+  // Use GLB URL if available, otherwise fall back to procedural Avatar3D
+  if (glbUrl) {
+    // Import GLBAvatarLoader dynamically
+    const GLBAvatarLoader = React.lazy(() => import('./GLBAvatarLoader').then((mod) => ({ default: mod.default })));
+    return (
+      <group ref={groupRef}>
+        <Suspense fallback={null}>
+          <Environment preset="studio" />
+          <GLBAvatarLoader
+            glbUrl={glbUrl}
+            position={position}
+            scale={scale}
+            quality={quality}
+            onLoad={onLoad}
+            onError={onError}
+          />
+        </Suspense>
+      </group>
+    );
+  }
 
   return (
     <group ref={groupRef} position={position} scale={scale}>
@@ -247,6 +271,7 @@ export default function GameAvatarRenderer({
               configuration: transformedConfig,
               isCustom: data.isCustom !== undefined ? data.isCustom : true,
               fallbackSpriteUrl: data.fallbackSpriteUrl || '/assets/default-avatar.png',
+              glbUrl: data.glbUrl, // Include GLB URL if available
             };
           }
         } else {

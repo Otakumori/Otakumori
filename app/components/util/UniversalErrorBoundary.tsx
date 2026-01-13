@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 import { logger } from '@/app/lib/logger';
 
 interface Props {

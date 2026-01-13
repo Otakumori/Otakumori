@@ -1,4 +1,3 @@
-import { newRequestId } from '@/app/lib/requestId';
 import { rateLimit } from '@/app/api/rate-limit';
 import { logger } from '@/app/lib/logger';
 import { prisma } from '@/app/lib/prisma';

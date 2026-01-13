@@ -1,7 +1,11 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useRef, useMemo } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -143,6 +147,7 @@ export default function Navbar() {
         setRealProducts(data.data.products);
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Failed to fetch products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setProductsLoaded(true);
@@ -157,6 +162,7 @@ export default function Navbar() {
         setRealBlogPosts(data.data.posts);
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Failed to fetch blog posts:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setBlogLoaded(true);
@@ -239,15 +245,17 @@ export default function Navbar() {
     <header
       className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${
         isScrolled 
-          ? 'scrolled bg-[#0a0806]/98 shadow-lg shadow-black/80 border-b border-[#1a1815]/30' 
-          : 'bg-[#0a0806]/96 border-b border-[#151310]/20'
-      }`
-}
+          ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' 
+          : 'border-b border-white/5'
+      }`}
       style={{
-        backgroundImage: 'radial-gradient(ellipse at top, rgba(20, 18, 16, 0.2) 0%, rgba(10, 8, 6, 0.98) 100%)',
-        backdropFilter: 'blur(1px)',
-        WebkitBackdropFilter: 'blur(1px)',
-        filter: 'contrast(0.95) saturate(0.7)',
+        // Much more transparent - tree shows through clearly
+        backgroundColor: isScrolled 
+          ? 'rgba(10, 8, 6, 0.65)'  // Slightly more opaque when scrolled for readability
+          : 'rgba(10, 8, 6, 0.4)',  // Very transparent when at top
+        backdropFilter: 'blur(8px)', // Increased blur for readability over tree
+        WebkitBackdropFilter: 'blur(8px)',
+        // Removed heavy gradient overlay - let tree show through
       }}
     >
       {/* Skip to content for accessibility */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { usePetalCollection } from '@/app/hooks/usePetalCollection';
+import { usePetalCollectionContext } from '@/app/contexts/PetalCollectionContext';
 
 /**
  * HomeHeroPetals - Clickable sakura petals falling from left tree canopy
@@ -48,7 +48,7 @@ export default function HomeHeroPetals() {
   const [showCounter, setShowCounter] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasSeenTooltip, setHasSeenTooltip] = useState(false);
-  const { collectPetal, hasCollectedAny, dismissAchievement } = usePetalCollection();
+  const { collectPetal, hasCollectedAny, dismissAchievement } = usePetalCollectionContext();
 
   // Check if user has seen tooltip before
   useEffect(() => {

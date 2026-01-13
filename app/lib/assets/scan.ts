@@ -4,7 +4,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { createHash } from 'crypto';
 import { readFile, writeFile } from 'fs/promises';
 import { glob } from 'glob';

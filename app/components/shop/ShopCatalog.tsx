@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
+import { InteractiveCard } from '../games/InteractiveCard';
 
 type Product = {
   id: string;
@@ -153,30 +154,33 @@ export default function ShopCatalog({
           data-testid="product-grid"
         >
           {products.map((product) => (
-            <GlassPanel key={product.id} className="group overflow-hidden">
+            <InteractiveCard
+              key={product.id}
+              onClick={() => router.push(`/shop/${product.slug}`)}
+            >
               <Link href={`/shop/${product.slug}`} className="block" data-testid="product-card">
-                <div className="relative aspect-[4/5] w-full">
+                <div className="relative aspect-[4/5] w-full -m-6 mb-3">
                   <Image
                     src={product.image}
                     alt={product.name}
                     fill
                     sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                    className="object-cover rounded-t-xl"
                   />
                   {!product.inStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-t-xl">
                       <span className="rounded-xl bg-red-500/90 px-3 py-1 text-sm text-white">
                         {t('shop', 'soldOut')}
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-white line-clamp-2">{product.name}</h3>
+                <div>
+                  <h3 className="text-sm font-medium text-white line-clamp-2 mb-1">{product.name}</h3>
                   <p className="text-xs text-zinc-300/90">${product.price}</p>
                 </div>
               </Link>
-            </GlassPanel>
+            </InteractiveCard>
           ))}
         </div>
       ) : (

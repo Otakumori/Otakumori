@@ -1,7 +1,11 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 /**
  * Enhanced Cherry Blossom Tree Background Component
@@ -66,7 +70,9 @@ export default function TreeBackground() {
       } catch (error) {
         // Defensive: if DOM queries fail, use viewport height
         if (typeof console !== 'undefined' && typeof console.error === 'function') {
-          logger.error('[TreeBackground] Error updating dimensions:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+          getLogger().then((logger) => {
+            logger.error('[TreeBackground] Error updating dimensions:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+          });
         }
         setDimensions({ top: 0, height: window.innerHeight });
       }

@@ -1,6 +1,5 @@
 'use client';
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 

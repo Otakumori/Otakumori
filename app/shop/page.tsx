@@ -2,6 +2,7 @@ import { generateSEO } from '@/app/lib/seo';
 import { Suspense } from 'react';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
 import { ShopGridSkeleton } from '../components/ui/Skeleton';
+import { PullToRefresh } from '../components/animations/PullToRefresh';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -52,7 +53,15 @@ export default async function ShopPage({
               </div>
             }
           >
-            <AdvancedShopCatalog searchParams={searchParams} />
+            <PullToRefresh
+              onRefresh={async () => {
+                // Refresh the page to reload products
+                window.location.reload();
+              }}
+              threshold={80}
+            >
+              <AdvancedShopCatalog searchParams={searchParams} />
+            </PullToRefresh>
           </Suspense>
         </div>
       </main>

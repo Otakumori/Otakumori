@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import BlogIndex from '../components/blog/BlogIndex';
 import { t } from '@/lib/microcopy';

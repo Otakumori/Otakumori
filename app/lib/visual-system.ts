@@ -7,7 +7,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { env } from '@/env.mjs';
 
 // =============================================================================

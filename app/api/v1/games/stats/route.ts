@@ -1,101 +1,143 @@
-
-export const dynamic = 'force-dynamic'; // tells Next this cannot be statically analyzed
-export const runtime = 'nodejs'; // keep on Node runtime (not edge)
-export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
-export const maxDuration = 10; // optional guard
-
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
-import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/app/lib/db';
+import { generateRequestId } from '@/lib/request-id';
+import { withRateLimit } from '@/app/lib/rate-limiting';
 
-export async function GET(request: NextRequest) {
-  try {
-    logger.warn('Game stats requested from:', undefined, { value: request.headers.get('user-agent') });
-    // Verify authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+export const runtime = 'nodejs';
 
-    // Get user
-    const user = await db.user.findUnique({
-      where: { clerkId: userId },
-    });
+export async function GET(req: NextRequest) {
+  return withRateLimit('game-stats-get', async () => {
+    const requestId = generateRequestId();
 
-    if (!user) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
-    }
-
-    // Get user's game runs
-    const gameRuns = await db.gameRun.findMany({
-      where: { userId: user.id },
-      orderBy: { startedAt: 'desc' },
-    });
-
-    type GameStatAccumulator = {
-      gameKey: string;
-      totalRuns: number;
-      totalScore: number;
-      bestScore: number;
-      totalPetalsEarned: number;
-      lastPlayed?: string;
-    };
-
-    const accumulators = new Map<string, GameStatAccumulator>();
-
-    for (const run of gameRuns) {
-      let stats = accumulators.get(run.gameKey);
-      if (!stats) {
-        stats = {
-          gameKey: run.gameKey,
-          totalRuns: 0,
-          totalScore: 0,
-          bestScore: 0,
-          totalPetalsEarned: 0,
-        };
-        accumulators.set(run.gameKey, stats);
+    try {
+      const { userId: clerkId } = await auth();
+      if (!clerkId) {
+        return NextResponse.json(
+          { ok: false, error: 'Authentication required', requestId },
+          { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+        );
       }
 
-      stats.totalRuns += 1;
-      stats.totalScore += run.score;
-      stats.bestScore = Math.max(stats.bestScore, run.score);
-      stats.totalPetalsEarned += run.rewardPetals;
+      // Convert Clerk ID to database user ID
+      const user = await db.user.findUnique({
+        where: { clerkId },
+        select: { id: true },
+      });
 
-      const startedAtIso = run.startedAt.toISOString();
-      if (!stats.lastPlayed || startedAtIso > stats.lastPlayed) {
-        stats.lastPlayed = startedAtIso;
+      if (!user) {
+        return NextResponse.json(
+          { ok: false, error: 'User not found', requestId },
+          { status: 404 },
+        );
       }
+
+      // Get all user's best scores per game
+      const bestScores = await db.leaderboardScore.findMany({
+        where: {
+          userId: user.id,
+        },
+        select: {
+          game: true,
+          score: true,
+          diff: true,
+          createdAt: true,
+        },
+        orderBy: {
+          score: 'desc',
+        },
+      });
+
+      // Get petal transactions for games
+      const petalTransactions = await db.petalTransaction.findMany({
+        where: {
+          userId: user.id,
+          source: {
+            in: ['petal-samurai', 'petal-storm-rhythm', 'memory-match', 'bubble-girl', 'puzzle-reveal'],
+          },
+        },
+        select: {
+          amount: true,
+          source: true,
+          createdAt: true,
+        },
+      });
+
+      // Aggregate stats per game
+      const gameStatsMap = new Map<
+        string,
+        {
+          gameId: string;
+          bestScore: number;
+          petalsEarned: number;
+          gamesPlayed: number;
+        }
+      >();
+
+      // Process best scores
+      for (const score of bestScores) {
+        const gameId = score.game;
+        if (!gameStatsMap.has(gameId)) {
+          gameStatsMap.set(gameId, {
+            gameId,
+            bestScore: score.score,
+            petalsEarned: 0,
+            gamesPlayed: 1,
+          });
+        } else {
+          const stats = gameStatsMap.get(gameId)!;
+          if (score.score > stats.bestScore) {
+            stats.bestScore = score.score;
+          }
+          stats.gamesPlayed++;
+        }
+      }
+
+      // Process petal transactions
+      for (const transaction of petalTransactions) {
+        if (transaction.amount > 0) {
+          // Only count earned petals (positive amounts)
+          const gameId = transaction.source;
+          if (!gameStatsMap.has(gameId)) {
+            gameStatsMap.set(gameId, {
+              gameId,
+              bestScore: 0,
+              petalsEarned: transaction.amount,
+              gamesPlayed: 0,
+            });
+          } else {
+            const stats = gameStatsMap.get(gameId)!;
+            stats.petalsEarned += transaction.amount;
+          }
+        }
+      }
+
+      // Convert to array and format
+      const stats = Array.from(gameStatsMap.values()).map((stat) => ({
+        gameId: stat.gameId,
+        bestScore: stat.bestScore > 0 ? stat.bestScore : undefined,
+        petalsEarned: stat.petalsEarned > 0 ? stat.petalsEarned : undefined,
+        gamesPlayed: stat.gamesPlayed,
+      }));
+
+      return NextResponse.json({
+        ok: true,
+        data: {
+          stats,
+          totalGames: stats.length,
+        },
+        requestId,
+      });
+    } catch (error) {
+      console.error('Game stats error:', error);
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Failed to fetch game stats',
+          requestId,
+        },
+        { status: 500 },
+      );
     }
-
-    const statsList = Array.from(accumulators.values());
-    const responseStats = statsList.map((stat) => {
-      const { totalScore, lastPlayed, ...rest } = stat;
-      const base = {
-        ...rest,
-        averageScore: rest.totalRuns > 0 ? Math.round(totalScore / rest.totalRuns) : 0,
-      };
-      return lastPlayed ? { ...base, lastPlayed } : base;
-    });
-
-    const totalStats = {
-      totalRuns: gameRuns.length,
-      totalPetalsEarned: gameRuns.reduce((sum, run) => sum + run.rewardPetals, 0),
-      favoriteGame: statsList.length
-        ? statsList.reduce((prev, current) => (current.totalRuns > prev.totalRuns ? current : prev))
-            .gameKey
-        : undefined,
-    };
-    return NextResponse.json({
-      ok: true,
-      data: {
-        stats: responseStats,
-        totalStats,
-      },
-    });
-  } catch (error) {
-    logger.error('Error fetching game stats:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
-  }
+  });
 }

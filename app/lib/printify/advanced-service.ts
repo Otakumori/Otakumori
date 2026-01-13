@@ -10,9 +10,12 @@
  * - Webhook event handling
  */
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { getPrintifyService, type PrintifyProduct } from './service';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export interface ProductFilters {
   categories?: string[];
@@ -160,10 +163,11 @@ export class AdvancedPrintifyService {
       this.setCache(cacheKey, result);
       return result;
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('advanced_printify_search_failed', undefined, {
-        options,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('advanced_printify_search_failed', undefined, {
+          options,
+          error: String(error),
+        });
       });
       throw error;
     }
@@ -210,10 +214,11 @@ export class AdvancedPrintifyService {
 
       return inventoryStatuses;
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('printify_inventory_sync_failed', undefined, {
-        productIds,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('printify_inventory_sync_failed', undefined, {
+          productIds,
+          error: String(error),
+        });
       });
       throw error;
     }
@@ -286,10 +291,11 @@ export class AdvancedPrintifyService {
       this.setCache(cacheKey, recommendations);
       return recommendations;
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('printify_recommendations_failed', undefined, {
-        options,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('printify_recommendations_failed', undefined, {
+          options,
+          error: String(error),
+        });
       });
 
       // Fallback to basic recommendations
@@ -368,12 +374,13 @@ export class AdvancedPrintifyService {
 
       return result;
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('printify_order_processing_failed', undefined, {
-        orderId,
-        orderItems,
-        options,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('printify_order_processing_failed', undefined, {
+          orderId,
+          orderItems,
+          options,
+          error: String(error),
+        });
       });
 
       return {
@@ -408,10 +415,11 @@ export class AdvancedPrintifyService {
       this.setCache(cacheKey, analytics);
       return analytics;
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('printify_analytics_failed', undefined, {
-        productId,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('printify_analytics_failed', undefined, {
+          productId,
+          error: String(error),
+        });
       });
 
       // Return default analytics
@@ -443,16 +451,19 @@ export class AdvancedPrintifyService {
           await this.handleInventoryUpdated(event.data);
           break;
         default:
-          logger.warn(`Unhandled webhook event type: ${event.type}`);
+          getLogger().then((logger) => {
+            logger.warn(`Unhandled webhook event type: ${event.type}`);
+          });
       }
 
       // Clear relevant caches
       this.clearRelatedCaches(event.type, event.data);
     } catch (error) {
-      const { logger } = await import('@/app/lib/logger');
-      logger.error('printify_webhook_handling_failed', undefined, {
-        event,
-        error: String(error),
+      getLogger().then((logger) => {
+        logger.error('printify_webhook_handling_failed', undefined, {
+          event,
+          error: String(error),
+        });
       });
     }
   }
@@ -618,28 +629,36 @@ export class AdvancedPrintifyService {
 
   private async handleOrderCreated(orderData: any): Promise<void> {
     // Handle new order webhook
-    logger.warn('Order created:', undefined, { orderId: orderData?.id, status: orderData?.status });
+    getLogger().then((logger) => {
+      logger.warn('Order created:', undefined, { orderId: orderData?.id, status: orderData?.status });
+    });
     // TODO: Update database with order status
   }
 
   private async handleOrderUpdated(orderData: any): Promise<void> {
     // Handle order update webhook
-    logger.warn('Order updated:', undefined, { orderId: orderData?.id, status: orderData?.status });
+    getLogger().then((logger) => {
+      logger.warn('Order updated:', undefined, { orderId: orderData?.id, status: orderData?.status });
+    });
     // TODO: Sync order status to database
   }
 
   private async handleProductUpdated(productData: any): Promise<void> {
     // Handle product update webhook
     this.clearCache(`product:${productData.id}`);
-    logger.warn('Product updated:', undefined, { productId: productData?.id, title: productData?.title });
+    getLogger().then((logger) => {
+      logger.warn('Product updated:', undefined, { productId: productData?.id, title: productData?.title });
+    });
   }
 
   private async handleInventoryUpdated(inventoryData: any): Promise<void> {
     // Handle inventory update webhook
     this.clearCache('inventory:all');
-    logger.warn('Inventory updated:', undefined, {
-      productId: inventoryData?.product_id,
-      available: inventoryData?.available,
+    getLogger().then((logger) => {
+      logger.warn('Inventory updated:', undefined, {
+        productId: inventoryData?.product_id,
+        available: inventoryData?.available,
+      });
     });
   }
 

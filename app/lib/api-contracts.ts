@@ -235,3 +235,75 @@ export const FeaturedProductsResponseSchema = z.object({
 
 export type FeaturedProduct = z.infer<typeof FeaturedProductSchema>;
 export type FeaturedProductsResponse = z.infer<typeof FeaturedProductsResponseSchema>;
+
+// Avatar Export Schemas
+export const AvatarExportFormatSchema = z.enum(['glb', 'fbx', 'obj', 'png', 'jpg', 'svg']);
+export const AvatarExportQualitySchema = z.enum(['low', 'medium', 'high']).default('high');
+
+export const AvatarExportRequestSchema = z.object({
+  format: AvatarExportFormatSchema,
+  quality: AvatarExportQualitySchema.optional(),
+  async: z.boolean().optional().default(false),
+  gameId: z.string().optional(),
+  includeAssets: z.boolean().optional().default(false),
+});
+
+export const AvatarExportSyncResponseSchema = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    downloadUrl: z.string().url(),
+    format: AvatarExportFormatSchema,
+    quality: AvatarExportQualitySchema.optional(),
+    size: z.number().int().positive(),
+    expiresAt: z.string().datetime(),
+  }),
+  requestId: z.string(),
+});
+
+export const AvatarExportAsyncResponseSchema = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    jobId: z.string(), // Internal tracking only
+    jobStatus: z.literal('queued'),
+    message: z.string(),
+    format: AvatarExportFormatSchema,
+    quality: AvatarExportQualitySchema.optional(),
+  }),
+  requestId: z.string(),
+});
+
+export const AvatarExportStatusRequestSchema = z.object({
+  jobId: z.string().optional(),
+  avatarConfigId: z.string().optional(),
+}).refine((data) => data.jobId || data.avatarConfigId, {
+  message: 'Either jobId or avatarConfigId is required',
+});
+
+export const AvatarExportStatusResponseSchema = z.object({
+  ok: z.literal(true),
+  data: z.discriminatedUnion('status', [
+    z.object({
+      status: z.literal('completed'),
+      downloadUrl: z.string().url(),
+      generatedAt: z.string().datetime().nullable(),
+      format: z.literal('glb'),
+    }),
+    z.object({
+      status: z.literal('processing'),
+      message: z.string(),
+      format: z.literal('glb'),
+    }),
+    z.object({
+      status: z.literal('pending'),
+      message: z.string(),
+      format: z.literal('glb'),
+    }),
+  ]),
+  requestId: z.string(),
+});
+
+export type AvatarExportRequest = z.infer<typeof AvatarExportRequestSchema>;
+export type AvatarExportSyncResponse = z.infer<typeof AvatarExportSyncResponseSchema>;
+export type AvatarExportAsyncResponse = z.infer<typeof AvatarExportAsyncResponseSchema>;
+export type AvatarExportStatusRequest = z.infer<typeof AvatarExportStatusRequestSchema>;
+export type AvatarExportStatusResponse = z.infer<typeof AvatarExportStatusResponseSchema>;

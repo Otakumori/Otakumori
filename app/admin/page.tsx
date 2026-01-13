@@ -6,7 +6,7 @@
  */
 
 import { requireAdmin } from '@/app/lib/auth/admin';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 import AdminConsoleClient from './AdminConsoleClient';
 import Link from 'next/link';
 import { Users, Flower, Palette, Ticket, Shield, BarChart3 } from 'lucide-react';
@@ -20,7 +20,7 @@ export default async function AdminPage() {
 
   if (!isClerkConfigured) {
     // In development, allow access; in production, show disabled message
-    if (process.env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development') {
       // Allow dev access but warn
       return (
         <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black p-8">

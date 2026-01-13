@@ -13,33 +13,49 @@ import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 import { getDiscountConfig } from '@/app/config/petalTuning';
 import { logger } from '@/app/lib/logger';
 import { generateRequestId } from '@/lib/requestId';
+import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-10-29.clover',
   typescript: true,
 });
 
-// NOTE: This route should use the proper idempotency middleware instead of manual key creation
-
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
+    const requestId = generateRequestId();
+
     // Check if Stripe is configured
     if (!env.STRIPE_SECRET_KEY) {
       logger.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
       return NextResponse.json(
-        { ok: false, error: 'Checkout temporarily unavailable. Please contact support.' },
+        { ok: false, error: 'Checkout temporarily unavailable. Please contact support.', requestId },
         { status: 503 },
       );
     }
 
-    const idemp = req.headers.get('x-idempotency-key') ?? '';
-    if (!idemp)
-      return NextResponse.json({ ok: false, error: 'Missing idempotency key' }, { status: 400 });
-
+    // Check authentication
     const { userId } = await auth();
-    if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    if (!userId) {
+      return NextResponse.json(
+        { ok: false, error: 'Unauthorized', requestId },
+        { status: 401 },
+      );
+    }
 
-    // TODO: Implement proper idempotency check using the middleware
+    // Check idempotency
+    const idempotencyKey = req.headers.get('x-idempotency-key');
+    if (!idempotencyKey) {
+      return NextResponse.json(
+        { ok: false, error: 'Missing idempotency key', requestId },
+        { status: 400 },
+      );
+    }
+
+    const idempotencyResult = await checkIdempotency(idempotencyKey);
+    if (!idempotencyResult.isNew && idempotencyResult.response) {
+      // Return cached response for duplicate request
+      return idempotencyResult.response;
+    }
 
     const json = await req.json();
     const parsed = CheckoutRequest.safeParse(json);
@@ -346,9 +362,21 @@ export async function POST(req: NextRequest) {
       data: { stripeId: session.id },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       data: { url: session.url, orderId: order.id, orderNumber: order.displayNumber },
+      requestId,
     });
+
+    // Store idempotency response for future duplicate requests
+    if (idempotencyKey) {
+      await storeIdempotencyResponse(idempotencyKey, {
+        ok: true,
+        data: { url: session.url, orderId: order.id, orderNumber: order.displayNumber },
+        requestId,
+      });
+    }
+
+    return response;
   });
 }

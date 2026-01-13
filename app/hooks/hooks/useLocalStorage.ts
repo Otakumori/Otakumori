@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useState } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {

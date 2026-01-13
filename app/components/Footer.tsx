@@ -1,10 +1,16 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { useAuthContext } from '@/app/contexts/AuthContext';
+import { GlowingSocialIcons } from './footer/GlowingSocialIcons';
+import { AnimatedInput } from './ui/AnimatedInput';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export default function Footer() {
   const { user } = useUser();
@@ -43,7 +49,9 @@ export default function Footer() {
       }
     } catch (error) {
       showError('Failed to connect. Try again, chosen undead.');
-      logger.error('Soapstone submit error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      getLogger().then((logger) => {
+        logger.error('Soapstone submit error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -75,31 +83,37 @@ export default function Footer() {
 
   return (
     <footer
-      className="relative backdrop-blur-lg border-t border-white/10"
-      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)', zIndex: 40 }}
+      className="relative backdrop-blur-md border-t border-white/5"
+      style={{ 
+        // Much more transparent - tree grows through footer
+        backgroundColor: 'rgba(57, 5, 40, 0.35)', // Reduced from 0.8 to 0.35
+        zIndex: 40,
+        // Optional gradient fade at top of footer to blend tree
+        backgroundImage: 'linear-gradient(to top, rgba(57, 5, 40, 0.5) 0%, rgba(57, 5, 40, 0.35) 50%, transparent 100%)',
+      }}
     >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Compact Soapstone Input */}
         <section className="mx-auto mt-16 max-w-4xl px-4 pb-10">
           <div className="border border-[var(--om-border-soft)] bg-[var(--om-bg-surface)] px-4 py-4 rounded-xl">
             <form onSubmit={handleSoapstoneSubmit} className="max-w-2xl mx-auto">
-              <label htmlFor="soapstone-input" className="block text-[var(--om-text-ivory)] text-sm mb-2">
-                Leave a sign for fellow travelers
-              </label>
               <div className="flex gap-2">
-                <input
+                <div className="flex-1">
+                  <AnimatedInput
                   id="soapstone-input"
                   type="text"
+                    label="Leave a sign for fellow travelers"
                   value={soapstoneText}
                   onChange={(e) => setSoapstoneText(e.target.value)}
                   placeholder="Compose a sign…"
                   maxLength={140}
-                  className="flex-1 px-4 py-3 bg-[var(--om-bg-root)] border border-[var(--om-border-soft)] rounded-xl text-[var(--om-text-ivory)] placeholder-[var(--om-text-ivory)]/50 focus:outline-none focus:border-[var(--om-accent-pink)] focus:ring-2 focus:ring-[var(--om-accent-pink)]/30 text-sm transition-all"
+                    className="bg-[var(--om-bg-root)] border-[var(--om-border-soft)] text-[var(--om-text-ivory)] placeholder-[var(--om-text-ivory)]/50"
                 />
+                </div>
                 <button
                   type="submit"
                   disabled={!soapstoneText.trim() || isSubmitting}
-                  className="px-8 py-3 bg-[var(--om-bg-surface)] border border-[var(--om-border-strong)] text-[var(--om-text-ivory)] rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold transition-all hover:bg-[var(--om-accent-pink)]/10 hover:border-[var(--om-accent-pink)] active:scale-95"
+                  className="px-8 py-3 bg-[var(--om-bg-surface)] border border-[var(--om-border-strong)] text-[var(--om-text-ivory)] rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold transition-all hover:bg-[var(--om-accent-pink)]/10 hover:border-[var(--om-accent-pink)] active:scale-95 self-end"
                 >
                   {isSubmitting ? 'Carving...' : 'Carve Sign'}
                 </button>
@@ -173,7 +187,7 @@ export default function Footer() {
           </div>
           <div>
             <h4 className="text-white text-sm font-semibold mb-4">Connect</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2 mb-4">
               <li>
                 <a
                   href="/community"
@@ -199,6 +213,8 @@ export default function Footer() {
                 </a>
               </li>
             </ul>
+            {/* Social Media Icons */}
+            <GlowingSocialIcons />
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-white/10">

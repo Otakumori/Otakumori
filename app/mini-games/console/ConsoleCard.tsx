@@ -2,7 +2,6 @@
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
 import { getGameImageBySlug } from '@/app/lib/games';

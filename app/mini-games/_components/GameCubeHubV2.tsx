@@ -1,10 +1,13 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import NextImage from 'next/image';
 import cubeConfig from '../cube.map.json';
 import MemoryCardDock from './MemoryCardDock';
 import AccessibilitySettings, {
@@ -16,6 +19,7 @@ import ErrorBoundary3D from '@/components/ErrorBoundary3D';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
 import StarfieldBackground from '@/app/components/backgrounds/StarfieldBackground';
+import { GameCubeMenu } from '@/app/components/mini-games/GameCubeMenu';
 
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
@@ -177,7 +181,9 @@ export default function GameCubeHubV2() {
       try {
         await router.push(game.href);
       } catch (error) {
-        logger.error('Failed to navigate to game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        getLogger().then((logger) => {
+          logger.error('Failed to navigate to game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        });
         setLoadingGame(null);
       }
     },
@@ -260,6 +266,7 @@ export default function GameCubeHubV2() {
     <div
       ref={containerRef}
       className="relative min-h-screen overflow-hidden"
+      role="navigation"
       aria-roledescription="3D menu"
       data-test="gc-cube"
     >
@@ -268,8 +275,7 @@ export default function GameCubeHubV2() {
 
       {/* Subtle ambient glow overlay (optional, can be removed if starfield is enough) */}
       <div
-        className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none"
-        style={{ zIndex: -9 }}
+        className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none -z-[9]"
       />
 
       {/* Main Layout */}
@@ -319,18 +325,10 @@ export default function GameCubeHubV2() {
                   >
                     {/* Chrome highlights */}
                     <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
-                      }}
+                      className="absolute inset-0 pointer-events-none cube-chrome-overlay"
                     />
                     <div
-                      className="absolute top-1 left-1 right-1 h-px pointer-events-none"
-                      style={{
-                        background:
-                          'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%)',
-                      }}
+                      className="absolute top-1 left-1 right-1 h-px pointer-events-none cube-chrome-highlight"
                     />
                   </div>
                 ))}
@@ -340,14 +338,9 @@ export default function GameCubeHubV2() {
             {/* Central Label */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-16">
               <h1
-                className="text-lg font-bold tracking-wider text-center"
+                className="text-lg font-bold tracking-wider text-center cube-title-gradient"
                 style={{
                   fontFamily: 'Orbitron, monospace',
-                  fontWeight: 900,
-                  background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)',
                 }}
               >
                 OTAKU-MORI
@@ -577,79 +570,21 @@ export default function GameCubeHubV2() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                {allGames.map((game) => (
-                  <button
-                    key={game.id}
-                    onClick={() => handleGameSelect(game)}
-                    disabled={loadingGame === game.id}
-                    className="relative p-5 rounded-xl
-                              bg-gradient-to-br from-white/10 via-white/5 to-transparent
-                              backdrop-blur-md border border-white/20
-                              hover:from-white/15 hover:via-white/10 hover:to-white/5
-                              hover:border-pink-400/40 hover:shadow-lg hover:shadow-pink-500/20
-                              hover:-translate-y-1
-                              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
-                              transition-all duration-300 text-left group
-                              focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black/50"
-                    aria-label={`Play ${game.label}${game.desc ? `: ${game.desc}` : ''}`}
-                  >
-                    {loadingGame === game.id && (
-                      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="animate-spin w-6 h-6 border-2 border-pink-400 border-t-transparent rounded-full" />
-                          <div className="text-white text-sm font-medium">Loading disc...</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Game Thumbnail */}
-                    <div className="w-full h-24 mb-4 flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-lg p-3 group-hover:from-purple-800/30 group-hover:to-pink-800/30 transition-all duration-300">
-                      <NextImage
-                        src={getGameThumbnail(game.slug)}
-                        alt=""
-                        width={80}
-                        height={80}
-                        className="w-16 h-16 object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
-                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                          // Fallback to emoji if image fails to load
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `<div class="text-3xl">${game.icon}</div>`;
-                          }
-                        }}
-                      />
-                    </div>
-
-                    <h3 className="text-white font-semibold text-sm mb-2 group-hover:text-pink-300 transition-colors line-clamp-1">
-                      {game.label}
-                    </h3>
-                    <p className="text-white/70 text-xs leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                      {game.desc}
-                    </p>
-
-                    {/* Status Badge - Games are always available in this implementation */}
-                    {/* Age Rating Badge */}
-                    {game.ageRating && (
-                      <div className="absolute top-3 right-3 text-xs bg-white/10 backdrop-blur-sm text-white/90 px-2.5 py-1 rounded-md font-medium border border-white/20">
-                        {game.ageRating}
-                      </div>
-                    )}
-
-                    {/* NSFW Indicator */}
-                    {game.nsfw && (
-                      <div className="absolute top-3 left-3 text-xs bg-red-500/30 backdrop-blur-sm text-red-200 px-2.5 py-1 rounded-md font-medium border border-red-400/30">
-                        NSFW
-                      </div>
-                    )}
-
-                    {/* Hover glow effect */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500/0 via-pink-500/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  </button>
-                ))}
-              </div>
+              <GameCubeMenu
+                games={allGames.map((game) => ({
+                  id: game.id,
+                  title: game.label,
+                  thumbnail: getGameThumbnail(game.slug),
+                  slug: game.slug,
+                  href: game.href,
+                }))}
+                onGameSelect={(game) => {
+                  const foundGame = allGames.find((g) => g.id === game.id);
+                  if (foundGame) {
+                    handleGameSelect(foundGame);
+                  }
+                }}
+              />
             </div>
           </motion.div>
         )}
@@ -875,6 +810,20 @@ export default function GameCubeHubV2() {
           100% {
             transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
           }
+        }
+        .cube-chrome-overlay {
+          background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+        }
+        .cube-chrome-highlight {
+          background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
+        }
+        .cube-title-gradient {
+          font-weight: 900;
+          background: linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3);
         }
       `}</style>
 

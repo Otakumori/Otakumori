@@ -42,10 +42,12 @@ import { RenderingTab } from './tabs/RenderingTab';
 
 import {
   captureScreenshot,
-  exportGLB,
+  exportAvatar,
   sharePreset,
 } from './utils/export';
+import { ExportModal, type ExportFormat, type ExportQuality } from './ExportModal';
 import { createFilteredPartsFunction } from './utils/filtering';
+import { useToastContext } from '@/app/contexts/ToastContext';
 
 type TabType =
   | 'parts'
@@ -268,6 +270,14 @@ export default function CharacterEditor({
   const [showNsfwContent, setShowNsfwContent] = useState(false);
   const [ageVerified, setAgeVerified] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Export state
+  const [isExportingGLB, setIsExportingGLB] = useState(false);
+  const [exportProgress, setExportProgress] = useState<string>('');
+  const [showExportModal, setShowExportModal] = useState(false);
+  
+  // Toast notifications
+  const { success, error: showError, info } = useToastContext();
 
   const [currentBackground, setCurrentBackground] =
     useState<BackgroundPreset>(BACKGROUND_PRESETS[0]);
@@ -369,8 +379,55 @@ export default function CharacterEditor({
     await captureScreenshot();
   }, []);
 
-  const handleExportGLB = useCallback(async () => {
-    await exportGLB();
+  const handleExport = useCallback(async (
+    format: ExportFormat,
+    quality: ExportQuality,
+    useAsync: boolean
+  ): Promise<{ jobId?: string; downloadUrl?: string }> => {
+    if (isExportingGLB) {
+      throw new Error('Export already in progress');
+    }
+    
+    setIsExportingGLB(true);
+    setExportProgress(`Starting ${format.toUpperCase()} generation...`);
+    
+    try {
+      info(`Generating ${format.toUpperCase()} file, please wait...`);
+      
+      const result = await exportAvatar(format, quality, useAsync);
+      
+      if (useAsync && result.jobId) {
+        // Async export - return job ID for internal status tracking
+        // User doesn't see the job ID
+        info(`Export started. Your file will be ready shortly.`);
+        setExportProgress('');
+        return { jobId: result.jobId };
+      } else if (result.downloadUrl) {
+        // Sync export - download triggered automatically
+        setExportProgress('');
+        success(`${format.toUpperCase()} file generated and downloaded successfully!`);
+        return { downloadUrl: result.downloadUrl };
+      }
+      
+      throw new Error('Invalid export result');
+    } catch (error) {
+      // Log error internally, but show user-friendly message
+      const errorMessage = error instanceof Error ? error.message : 'Failed to export';
+      // Only log to console in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Export failed:', error);
+      }
+      setExportProgress('');
+      showError(errorMessage);
+      throw error; // Re-throw so modal can handle it
+    } finally {
+      setIsExportingGLB(false);
+      setExportProgress('');
+    }
+  }, [isExportingGLB, info, success, showError]);
+
+  const handleExportGLB = useCallback(() => {
+    setShowExportModal(true);
   }, []);
 
   const handleSharePreset = useCallback(async () => {
@@ -762,14 +819,19 @@ export default function CharacterEditor({
           <button
             type="button"
             onClick={handleExportGLB}
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg transition-colors text-sm"
-            title="Export as GLB"
-            aria-label="Export as GLB"
+            disabled={isExportingGLB}
+            className={`${
+              isExportingGLB
+                ? 'bg-blue-400 cursor-not-allowed opacity-70'
+                : 'bg-blue-500 hover:bg-blue-600'
+            } text-white py-2 px-3 rounded-lg transition-colors text-sm flex items-center gap-2 w-full justify-center`}
+            title="Export avatar"
+            aria-label="Export avatar in various formats"
           >
             <span role="img" aria-label="Package">
-              <span role="img" aria-label="emoji">�</span>�
-            </span>{' '}
-            Export GLB
+              📦
+            </span>
+            <span>Export</span>
           </button>
         </div>
         <button
@@ -848,6 +910,14 @@ export default function CharacterEditor({
       handleTouchEnd={handleTouchEnd}
       handleWheel={handleWheel}
       setShowComparison={setShowComparison}
+    />
+
+    {/* Export Modal */}
+    <ExportModal
+      isOpen={showExportModal}
+      onClose={() => setShowExportModal(false)}
+      configuration={configuration}
+      onExport={handleExport}
     />
   </div>
   );

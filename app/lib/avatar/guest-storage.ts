@@ -3,9 +3,12 @@
  * Handles localStorage-based temporary character storage for guests
  */
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export interface GuestCharacter {
   id: string;
@@ -40,7 +43,9 @@ function getGuestCharacterIds(): string[] {
       return JSON.parse(stored) as string[];
     }
   } catch (error) {
-    logger.warn('Failed to load guest character list:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    getLogger().then((logger) => {
+      logger.warn('Failed to load guest character list:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    });
   }
 
   return [];
@@ -55,7 +60,9 @@ function saveGuestCharacterIds(ids: string[]): void {
   try {
     localStorage.setItem(GUEST_CHARACTER_LIST_KEY, JSON.stringify(ids));
   } catch (error) {
-    logger.warn('Failed to save guest character list:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    getLogger().then((logger) => {
+      logger.warn('Failed to save guest character list:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    });
   }
 }
 
@@ -81,7 +88,9 @@ function cleanupExpiredCharacters(): void {
         }
       }
     } catch (error) {
-      logger.warn(`Failed to check character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+      getLogger().then((logger) => {
+        logger.warn(`Failed to check character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+      });
       // Remove invalid entries
     }
   });
@@ -134,7 +143,9 @@ export function saveGuestCharacter(
     ids.push(id);
     saveGuestCharacterIds(ids);
   } catch (error) {
-    logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    getLogger().then((logger) => {
+      logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    });
     throw error;
   }
 
@@ -163,7 +174,9 @@ export function loadGuestCharacter(id: string): GuestCharacter | null {
       return character;
     }
   } catch (error) {
-    logger.warn(`Failed to load guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    getLogger().then((logger) => {
+      logger.warn(`Failed to load guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    });
   }
 
   return null;
@@ -203,7 +216,9 @@ export function deleteGuestCharacter(id: string): boolean {
     saveGuestCharacterIds(ids);
     return true;
   } catch (error) {
-    logger.warn(`Failed to delete guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    getLogger().then((logger) => {
+      logger.warn(`Failed to delete guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    });
     return false;
   }
 }
@@ -229,7 +244,9 @@ export function updateGuestCharacter(
     localStorage.setItem(id, JSON.stringify(updated));
     return updated;
   } catch (error) {
-    logger.warn(`Failed to update guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    getLogger().then((logger) => {
+      logger.warn(`Failed to update guest character ${id}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+    });
     return null;
   }
 }

@@ -8,7 +8,6 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { generateFallbackTexture } from './enhancedTextures';
 
 export interface AssetLoadOptions {

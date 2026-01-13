@@ -3,12 +3,16 @@
 // Force dynamic rendering to avoid static generation issues with context providers
 export const dynamic = 'force-dynamic';
 
-import { logger } from '@/app/lib/logger';
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
 import { useState } from 'react';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/app/components/ui/input';
+import { AnimatedInput } from '@/app/components/ui/AnimatedInput';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
@@ -120,7 +124,9 @@ export default function CheckoutPage() {
       }
     } catch (err) {
       setError('An error occurred while processing your order');
-      logger.error('Checkout error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      getLogger().then((logger) => {
+        logger.error('Checkout error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -175,126 +181,87 @@ export default function CheckoutPage() {
               <h2 className="mb-6 text-2xl font-bold text-white">Shipping Information</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="mb-2 block text-sm text-pink-200">
-                      First Name
-                    </label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={shippingInfo.firstName}
-                      onChange={handleInputChange}
-                      required
-                      className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                      placeholder="First Name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="mb-2 block text-sm text-pink-200">
-                      Last Name
-                    </label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={shippingInfo.lastName}
-                      onChange={handleInputChange}
-                      required
-                      className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                      placeholder="Last Name"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="mb-2 block text-sm text-pink-200">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={shippingInfo.email}
+                  <AnimatedInput
+                    id="firstName"
+                    name="firstName"
+                    label="First Name"
+                    value={shippingInfo.firstName}
                     onChange={handleInputChange}
                     required
                     className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                    placeholder="Email"
                   />
-                </div>
-
-                <div>
-                  <label htmlFor="address" className="mb-2 block text-sm text-pink-200">
-                    Address
-                  </label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={shippingInfo.address}
+                  <AnimatedInput
+                    id="lastName"
+                    name="lastName"
+                    label="Last Name"
+                    value={shippingInfo.lastName}
                     onChange={handleInputChange}
                     required
                     className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                    placeholder="Street Address"
                   />
                 </div>
+
+                <AnimatedInput
+                  id="email"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  value={shippingInfo.email}
+                  onChange={handleInputChange}
+                  required
+                  className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
+                />
+
+                <AnimatedInput
+                  id="address"
+                  name="address"
+                  label="Address"
+                  value={shippingInfo.address}
+                  onChange={handleInputChange}
+                  required
+                  className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
+                  placeholder="Street Address"
+                />
 
                 <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label htmlFor="city" className="mb-2 block text-sm text-pink-200">
-                      City
-                    </label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={shippingInfo.city}
-                      onChange={handleInputChange}
-                      required
-                      className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="state" className="mb-2 block text-sm text-pink-200">
-                      State
-                    </label>
-                    <Input
-                      id="state"
-                      name="state"
-                      value={shippingInfo.state}
-                      onChange={handleInputChange}
-                      required
-                      className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                      placeholder="State"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="zipCode" className="mb-2 block text-sm text-pink-200">
-                      ZIP Code
-                    </label>
-                    <Input
-                      id="zipCode"
-                      name="zipCode"
-                      value={shippingInfo.zipCode}
-                      onChange={handleInputChange}
-                      required
-                      className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                      placeholder="ZIP"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="country" className="mb-2 block text-sm text-pink-200">
-                    Country
-                  </label>
-                  <Input
-                    id="country"
-                    name="country"
-                    value={shippingInfo.country}
+                  <AnimatedInput
+                    id="city"
+                    name="city"
+                    label="City"
+                    value={shippingInfo.city}
                     onChange={handleInputChange}
                     required
                     className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
-                    placeholder="Country"
+                  />
+                  <AnimatedInput
+                    id="state"
+                    name="state"
+                    label="State"
+                    value={shippingInfo.state}
+                    onChange={handleInputChange}
+                    required
+                    className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
+                  />
+                  <AnimatedInput
+                    id="zipCode"
+                    name="zipCode"
+                    label="ZIP Code"
+                    value={shippingInfo.zipCode}
+                    onChange={handleInputChange}
+                    required
+                    className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
                   />
                 </div>
+
+                <AnimatedInput
+                  id="country"
+                  name="country"
+                  label="Country"
+                  value={shippingInfo.country}
+                  onChange={handleInputChange}
+                  required
+                  className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50"
+                />
 
                 {error && (
                   <div className="rounded-lg bg-red-500/20 border border-red-500/30 p-3">

@@ -5,7 +5,6 @@ export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs regio
 export const maxDuration = 10; // optional guard
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';

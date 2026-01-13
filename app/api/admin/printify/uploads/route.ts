@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { getPrintifyUploadService } from '@/app/lib/printify/uploads';
 import { logger } from '@/app/lib/logger';

@@ -2,6 +2,7 @@ import { inngest } from './client';
 import { db } from '@/lib/db';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import type { PrintifyOrderData, PrintifyShippingAddress } from '@/app/lib/printify';
+import { logger } from '@/app/lib/logger';
 
 /**
  * Handle order fulfillment after successful payment
@@ -91,27 +92,73 @@ export const fulfillOrder = inngest.createFunction(
           address_to: shippingAddress,
         };
 
-        // Create order in Printify
+        // Create order in Printify using real API
         const printify = getPrintifyService();
         const result = await printify.createOrder(printifyOrderData);
 
-        // Update order with Printify ID
+        // Update order with Printify ID and status
         await db.order.update({
           where: { id: order.id },
           data: {
+            printifyId: result.id,
             status: 'in_production',
           },
         });
 
+        // Create or update PrintifyOrderSync record
+        await db.printifyOrderSync.upsert({
+          where: { localOrderId: order.id },
+          create: {
+            localOrderId: order.id,
+            printifyOrderId: result.id,
+            status: 'synced',
+            lastSyncAt: new Date(),
+          },
+          update: {
+            printifyOrderId: result.id,
+            status: 'synced',
+            lastSyncAt: new Date(),
+            error: null,
+          },
+        });
+
+        logger.info('Printify order created and synced', undefined, {
+          orderId: order.id,
+          printifyOrderId: result.id,
+          status: result.status,
+        });
+
         return result;
       } catch (error) {
-        console.error('Failed to create Printify order:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        
+        logger.error('Failed to create Printify order', undefined, {
+          orderId: order.id,
+          error: errorMessage,
+        }, error instanceof Error ? error : new Error(errorMessage));
 
         // Update order status to indicate fulfillment failure
         await db.order.update({
           where: { id: order.id },
           data: {
             status: 'cancelled',
+          },
+        });
+
+        // Log failure to PrintifyOrderSync
+        await db.printifyOrderSync.upsert({
+          where: { localOrderId: order.id },
+          create: {
+            localOrderId: order.id,
+            printifyOrderId: 'failed',
+            status: 'failed',
+            error: errorMessage.substring(0, 500), // Limit error length
+            lastSyncAt: new Date(),
+          },
+          update: {
+            status: 'failed',
+            error: errorMessage.substring(0, 500),
+            lastSyncAt: new Date(),
           },
         });
 
@@ -294,41 +341,93 @@ export const sendOrderConfirmationEmail = inngest.createFunction(
 
     return await step.run('send-email', async () => {
       try {
-        // Fetch user data if userId provided
-        let userData = null;
-        if (userId) {
-          userData = await db.user.findUnique({
-            where: { id: userId },
-            select: { id: true, email: true, displayName: true, username: true },
-          });
-        }
-        
-        const recipientEmail = email || userData?.email || 'customer@example.com';
-        const recipientName = userData?.displayName || userData?.username || 'Customer';
-        
-        // TODO: Integrate with email service (Resend, SendGrid, etc.)
-        console.log('Sending order confirmation email:', {
-          to: recipientEmail,
-          recipientName,
-          orderId,
-          orderNumber,
-          totalAmount,
-          itemCount: items.length,
-          userId,
+        // Fetch full order data from database
+        const order = await db.order.findUnique({
+          where: { id: orderId },
+          include: {
+            User: {
+              select: { email: true, displayName: true, username: true },
+            },
+            OrderItem: {
+              include: {
+                Product: {
+                  select: { name: true, primaryImageUrl: true },
+                },
+                ProductVariant: {
+                  select: { previewImageUrl: true },
+                },
+              },
+            },
+          },
         });
 
-        // Placeholder for email service integration
-        // await emailService.send({
-        //   to: email,
-        //   template: 'order-confirmation',
-        //   data: { orderNumber, totalAmount, items },
-        // });
+        if (!order) {
+          throw new Error(`Order ${orderId} not found`);
+        }
+        
+        const recipientEmail = email || order.User?.email || 'customer@example.com';
+        const recipientName = order.User?.displayName || order.User?.username || 'Customer';
+        
+        // Prepare email data
+        const emailData = {
+          orderNumber: orderNumber || order.displayNumber || order.id,
+          customerName: recipientName,
+          customerEmail: recipientEmail,
+          items: order.OrderItem.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.unitAmount,
+            imageUrl: (item.Product as any)?.primaryImageUrl || (item.ProductVariant as any)?.previewImageUrl,
+          })),
+          subtotal: order.subtotalCents || (order.OrderItem as any[]).reduce((sum: number, item: any) => sum + (item.unitAmount * item.quantity), 0),
+          shipping: 0, // Shipping amount not stored separately in Order model, can be calculated if needed
+          total: order.totalAmount,
+          shippingAddress: {
+            name: recipientName,
+            line1: 'Address information', // Shipping address not stored in Order model
+            line2: undefined,
+            city: 'City',
+            state: 'State',
+            postalCode: '00000',
+            country: 'US',
+          },
+        };
+
+        // Import and use Resend email function
+        const { sendOrderConfirmation } = await import('@/lib/email');
+        const result = await sendOrderConfirmation(emailData);
+
+        // Log email sent (EmailLog table exists)
+        try {
+          await db.emailLog.create({
+            data: {
+              userId: order.userId,
+              orderId: order.id,
+              to: recipientEmail,
+              provider: 'resend',
+              template: 'order-confirmation',
+              status: 'sent',
+              sentAt: new Date(),
+            },
+          });
+        } catch (logError) {
+          // Logging failure shouldn't break email sending
+          logger.warn('Failed to log email to EmailLog', undefined, undefined);
+        }
+
+        logger.info('Order confirmation email sent', undefined, {
+          orderId,
+          orderNumber: emailData.orderNumber,
+          recipientEmail,
+          emailId: result.emailId,
+        });
 
         return {
           success: true,
-          email,
+          email: recipientEmail,
           orderId,
-          orderNumber,
+          orderNumber: emailData.orderNumber,
+          emailId: result.emailId,
         };
       } catch (error) {
         console.error('Failed to send order confirmation email:', error);

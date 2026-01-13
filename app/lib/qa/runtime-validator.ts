@@ -4,8 +4,11 @@
  * Logs warnings/errors to console and can show debug overlay
  */
 
-import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
 import { validateCelShadedCompliance, logStyleViolations } from '@om/avatar-engine/validation';
 import { env } from '@/env.mjs';
 import type * as THREE from 'three';
@@ -31,7 +34,9 @@ export function validateGameRuntime(
   const { checkMaterials = true, checkAvatar = true, showOverlay = false } = options;
 
   if (!scene) {
-    logger.warn(`[QA] ${gameSlug}: Scene not available for validation`);
+    getLogger().then((logger) => {
+      logger.warn(`[QA] ${gameSlug}: Scene not available for validation`);
+    });
     return;
   }
 
@@ -40,13 +45,19 @@ export function validateGameRuntime(
     try {
       const violations = validateCelShadedCompliance(scene);
       if (violations.length > 0) {
-        logger.warn(`[QA] ${gameSlug}: Material style violations detected:`);
+        getLogger().then((logger) => {
+          logger.warn(`[QA] ${gameSlug}: Material style violations detected:`);
+        });
         logStyleViolations(violations);
       } else {
-        logger.warn(`[QA] ${gameSlug}: ✅ Material compliance passed`);
+        getLogger().then((logger) => {
+          logger.warn(`[QA] ${gameSlug}: ✅ Material compliance passed`);
+        });
       }
     } catch (error) {
-      logger.error(`[QA] ${gameSlug}: Error validating materials:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      getLogger().then((logger) => {
+        logger.error(`[QA] ${gameSlug}: Error validating materials:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      });
     }
   }
 

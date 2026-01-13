@@ -63,6 +63,8 @@ model AvatarConfiguration {
   physicsConfig            Json?
   nsfwAnatomyConfig        Json?
   advancedMaterialSettings Json?
+  glbUrl                   String? // URL to generated GLB file in Vercel Blob storage
+  glbGeneratedAt           DateTime? // Timestamp when GLB was generated
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
   User                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -71,6 +73,7 @@ model AvatarConfiguration {
   AvatarMorphTarget        AvatarMorphTarget[]
 
   @@index([userId])
+  @@index([glbUrl])
 }
 
 model AvatarConfigurationPart {
@@ -547,6 +550,28 @@ model EmailLog {
   @@index([userId])
 }
 
+model FinancialTransaction {
+  id             String   @id @default(cuid())
+  orderId        String?
+  type           String // 'sale', 'refund', 'fee', 'adjustment', 'shipping', 'tax'
+  amount         Int // Amount in cents (negative for expenses/refunds)
+  currency       String   @default("USD")
+  description    String
+  category       String? // 'product_sale', 'shipping', 'tax', 'refund', 'payment_processing', 'adjustment', etc.
+  stripeChargeId String?
+  stripeRefundId String?
+  metadata       Json? // Additional transaction metadata
+  createdAt      DateTime @default(now())
+  Order          Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([type])
+  @@index([category])
+  @@index([createdAt])
+  @@index([stripeChargeId])
+  @@index([stripeRefundId])
+}
+
 model Follow {
   followerId                   String
   followeeId                   String
@@ -862,35 +887,43 @@ model Notification {
 }
 
 model Order {
-  id                 String             @id @default(cuid())
-  userId             String
-  stripeId           String             @unique
-  paymentIntentId    String?
-  chargeId           String?
-  status             OrderStatus        @default(pending)
-  totalAmount        Int
-  currency           String             @default("USD")
-  shippedAt          DateTime?
-  trackingUrl        String?
-  carrier            String?
-  trackingNumber     String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  paidAt             DateTime?
-  petalsAwarded      Int                @default(0)
-  printifyId         String?
-  memoryCardKey      String?
-  displayNumber      Int                @unique @default(autoincrement())
-  primaryItemName    String?            @default("")
-  label              String?            @default("")
-  subtotalCents      Int                @default(0)
-  appliedCouponCodes String[]           @default([])
-  EmailLog           EmailLog[]
-  User               User               @relation(fields: [userId], references: [id])
-  OrderItem          OrderItem[]
-  PrintifyOrderSync  PrintifyOrderSync?
-  RewardLedger       RewardLedger[]
-  UserRune           UserRune[]
+  id                   String                 @id @default(cuid())
+  userId               String
+  stripeId             String                 @unique
+  paymentIntentId      String?
+  chargeId             String?
+  status               OrderStatus            @default(pending)
+  totalAmount          Int
+  currency             String                 @default("USD")
+  shippedAt            DateTime?
+  trackingUrl          String?
+  carrier              String?
+  trackingNumber       String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  paidAt               DateTime?
+  petalsAwarded        Int                    @default(0)
+  printifyId           String?
+  memoryCardKey        String?
+  displayNumber        Int                    @unique @default(autoincrement())
+  primaryItemName      String?                @default("")
+  label                String?                @default("")
+  subtotalCents        Int                    @default(0)
+  appliedCouponCodes   String[]               @default([])
+  // Financial tracking fields
+  taxAmount            Int?                   @default(0) // Tax in cents
+  shippingAmount       Int?                   @default(0) // Shipping in cents
+  discountAmount       Int?                   @default(0) // Discount in cents
+  refundAmount         Int?                   @default(0) // Refund amount in cents
+  refundedAt           DateTime? // When refunded
+  notes                String? // Admin notes for order tracking
+  EmailLog             EmailLog[]
+  User                 User                   @relation(fields: [userId], references: [id])
+  OrderItem            OrderItem[]
+  PrintifyOrderSync    PrintifyOrderSync?
+  RewardLedger         RewardLedger[]
+  UserRune             UserRune[]
+  FinancialTransaction FinancialTransaction[]
 }
 
 model OrderItem {

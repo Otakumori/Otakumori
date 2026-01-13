@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
