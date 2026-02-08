@@ -171,7 +171,11 @@ class AssetOptimizer {
 
     return new Promise((resolve, reject) => {
       // Use gltf-pipeline for Draco compression
-      const gltfPipeline = spawn('npx', [
+      // On Windows, use npx.cmd or shell option
+      const isWindows = process.platform === 'win32';
+      const command = isWindows ? 'npx.cmd' : 'npx';
+      
+      const gltfPipeline = spawn(command, [
         'gltf-pipeline',
         '-i',
         inputPath,
@@ -187,7 +191,9 @@ class AssetOptimizer {
         CONFIG.draco.quantizationBits.color.toString(),
         '--draco.quantizeTexcoordBits',
         CONFIG.draco.quantizationBits.texCoord.toString(),
-      ]);
+      ], {
+        shell: isWindows,
+      });
 
       gltfPipeline.on('close', (code) => {
         if (code === 0) {
@@ -229,7 +235,11 @@ class AssetOptimizer {
 
   async simplifyMesh(inputPath, outputPath, ratio) {
     return new Promise((resolve, reject) => {
-      const simplify = spawn('npx', [
+      // On Windows, use npx.cmd or shell option
+      const isWindows = process.platform === 'win32';
+      const command = isWindows ? 'npx.cmd' : 'npx';
+      
+      const simplify = spawn(command, [
         'gltf-pipeline',
         '-i',
         inputPath,
@@ -238,7 +248,9 @@ class AssetOptimizer {
         '--meshopt.simplify',
         '--meshopt.simplifyRatio',
         ratio.toString(),
-      ]);
+      ], {
+        shell: isWindows,
+      });
 
       simplify.on('close', (code) => {
         if (code === 0) {
@@ -343,7 +355,12 @@ Examples:
 }
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Check if this module is being run directly (not imported)
+const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
+                     import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/')) ||
+                     process.argv[1] && import.meta.url.includes(process.argv[1].replace(/\\/g, '/'));
+
+if (isMainModule || process.argv[1]?.includes('optimize-3d-assets.mjs')) {
   main().catch(console.error);
 }
 

@@ -37,7 +37,7 @@ export function deserializeAvatar(data: string): AvatarSpecV15Type | null {
 export function createDefaultAvatarSpec(): AvatarSpecV15Type {
   return {
     version: '1.5',
-    baseMeshUrl: 'https://assets.otakumori.com/default-avatar.glb',
+    baseMeshUrl: '/assets/optimized/base_mesh_rigged/human_malefemale_basemesh_rigged.glb',
     rig: {
       root: 'Hips',
       bones: [
@@ -56,8 +56,8 @@ export function createDefaultAvatarSpec(): AvatarSpecV15Type {
     morphWeights: {},
     equipment: {},
     palette: {
-      primary: '#8b5cf6',
-      secondary: '#ec4899',
+      primary: '#8b5cf6', // Purple from design system
+      secondary: '#ec4899', // Pink from design system
     },
     nsfwPolicy: {
       allowNudity: false,

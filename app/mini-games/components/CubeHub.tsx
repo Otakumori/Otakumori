@@ -9,6 +9,7 @@ import { useGamesStore, type HubPanel } from '@/app/lib/state/games';
 import { COPY } from '@/app/lib/copy';
 import Link from 'next/link';
 import type { Mesh } from 'three';
+import { useMediaQuery } from '@/app/hooks/useMediaQuery';
 
 // Cube component with labels
 function Cube() {
@@ -297,9 +298,149 @@ function ProfilePanel() {
   );
 }
 
+// Simplified 2D Mobile Hub Component
+function MobileHubList() {
+  const { activePanel, isPanelOpen, openPanel, closePanel } = useGamesStore();
+
+  const hubOptions = [
+    {
+      id: 'mini-games' as HubPanel,
+      title: 'Mini-Games',
+      description: 'Challenge yourself with exciting games',
+      icon: '🎮',
+    },
+    {
+      id: 'trade-hall' as HubPanel,
+      title: 'Trade Hall',
+      description: 'Exchange goods with other players',
+      icon: '🏪',
+    },
+    {
+      id: 'achievements' as HubPanel,
+      title: 'Achievements',
+      description: 'Track your progress and unlock rewards',
+      icon: '🏆',
+    },
+    {
+      id: 'profile' as HubPanel,
+      title: 'Profile',
+      description: 'View your journey and statistics',
+      icon: '👤',
+    },
+  ];
+
+  const handleOptionClick = (panel: HubPanel) => {
+    if (activePanel === panel) {
+      closePanel();
+    } else {
+      openPanel(panel);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Hub Navigation</h2>
+      
+      {/* Hub Options List */}
+      <div className="space-y-4">
+        {hubOptions.map((option) => (
+          <motion.button
+            key={option.id}
+            onClick={() => handleOptionClick(option.id)}
+            className={`w-full min-h-[44px] flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+              activePanel === option.id && isPanelOpen
+                ? 'bg-pink-500/20 border-pink-500 text-pink-700'
+                : 'bg-white/10 backdrop-blur-sm border-white/20 text-gray-900 hover:bg-white/20'
+            }`}
+            whileTap={{ scale: 0.98 }}
+            aria-label={`${option.title} - ${option.description}`}
+          >
+            <span className="text-3xl" aria-hidden="true">
+              {option.icon}
+            </span>
+            <div className="flex-1 text-left">
+              <h3 className="text-lg font-semibold">{option.title}</h3>
+              <p className="text-sm text-gray-600">{option.description}</p>
+            </div>
+            <svg
+              className="w-5 h-5 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Panel Content Overlay */}
+      <AnimatePresence>
+        {isPanelOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={closePanel}
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white/95 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Panel Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {activePanel === 'mini-games' && 'Mini-Games'}
+                  {activePanel === 'trade-hall' && 'Trade Hall'}
+                  {activePanel === 'achievements' && 'Achievements'}
+                  {activePanel === 'profile' && 'Profile'}
+                </h2>
+                <button
+                  onClick={closePanel}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-full"
+                  aria-label="Close panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Panel Content */}
+              <div className="space-y-4">
+                {activePanel === 'mini-games' && <MiniGamesPanel />}
+                {activePanel === 'trade-hall' && <TradeHallPanel />}
+                {activePanel === 'achievements' && <AchievementsPanel />}
+                {activePanel === 'profile' && <ProfilePanel />}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // Main CubeHub component
 export default function CubeHub() {
   const [mounted, setMounted] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 640px)');
 
   useEffect(() => {
     setMounted(true);
@@ -310,12 +451,18 @@ export default function CubeHub() {
       <div className="h-96 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading 3D Hub...</p>
+          <p className="text-gray-600">Loading Hub...</p>
         </div>
       </div>
     );
   }
 
+  // Render simplified 2D list on mobile devices
+  if (isMobile) {
+    return <MobileHubList />;
+  }
+
+  // Render 3D cube on desktop
   return (
     <div className="relative h-96 w-full max-w-4xl mx-auto">
       {/* 3D Canvas */}

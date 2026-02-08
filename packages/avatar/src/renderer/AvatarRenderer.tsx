@@ -41,7 +41,7 @@ export function AvatarRenderer({
   // Load base mesh (useGLTF suspends on error, no error prop)
   const { scene: baseScene } = useGLTF(spec.baseMeshUrl);
 
-  // Apply morph targets when scene loads
+  // Apply morph targets and design system colors when scene loads
   useEffect(() => {
     if (!baseScene) return;
 
@@ -62,6 +62,36 @@ export function AvatarRenderer({
               influences[index] = weight;
             }
           });
+
+          // Apply design system colors to materials
+          if (mesh.material) {
+            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            materials.forEach((material) => {
+              if (material instanceof THREE.MeshStandardMaterial) {
+                // Apply palette colors from spec
+                if (spec.palette?.primary) {
+                  // Use primary color as base tint, preserving original material properties
+                  const primaryColor = new THREE.Color(spec.palette.primary);
+                  // Blend with existing color to maintain texture details
+                  if (material.color) {
+                    material.color.lerp(primaryColor, 0.3); // 30% blend
+                  } else {
+                    material.color = primaryColor;
+                  }
+                }
+
+                // Apply secondary color as emissive accent (subtle glow)
+                if (spec.palette?.secondary) {
+                  const secondaryColor = new THREE.Color(spec.palette.secondary);
+                  material.emissive = secondaryColor;
+                  material.emissiveIntensity = 0.1; // Subtle glow
+                }
+
+                // Ensure material is updated
+                material.needsUpdate = true;
+              }
+            });
+          }
         }
       });
 
@@ -74,7 +104,7 @@ export function AvatarRenderer({
         onError(error as Error);
       }
     }
-  }, [baseScene, spec.morphWeights, onLoad, onError]);
+  }, [baseScene, spec.morphWeights, spec.palette, onLoad, onError]);
 
   // Idle animation (if not reduced motion)
   useFrame((state) => {

@@ -195,5 +195,16 @@
         "description": "Achievement unlock fanfare"
       }
     }
+  },
+  "avatars": {
+    "baseMesh": {
+      "path": "/assets/optimized/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+      "format": "glb",
+      "description": "Optimized base human mesh with male/female morph targets and rigging",
+      "source": "public/assets/external/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+      "optimized": true,
+      "morphTargets": ["male", "female"],
+      "rigged": true
+    }
   }
 }

@@ -44,6 +44,8 @@ export default function ProductCard({ product }: { product: Product }) {
           fill
           sizes="(min-width:1024px) 25vw, (min-width:640px) 45vw, 90vw"
           className="object-cover"
+          loading="lazy"
+          quality={85}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
         {tag && (

@@ -109,6 +109,8 @@ export default async function BlogIndex() {
                     fill
                     sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                    quality={85}
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-gradient-to-br from-fuchsia-500/20 to-purple-500/20">

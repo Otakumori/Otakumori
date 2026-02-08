@@ -83,13 +83,14 @@ export default function Footer() {
 
   return (
     <footer
-      className="relative backdrop-blur-md border-t border-white/5"
+      className="relative backdrop-blur-md border-t"
       style={{ 
-        // Much more transparent - tree grows through footer
-        backgroundColor: 'rgba(57, 5, 40, 0.35)', // Reduced from 0.8 to 0.35
+        // Use design system footer color with transparency
+        backgroundColor: 'var(--color-footer-muted)',
+        borderColor: 'var(--color-border-muted)',
         zIndex: 40,
-        // Optional gradient fade at top of footer to blend tree
-        backgroundImage: 'linear-gradient(to top, rgba(57, 5, 40, 0.5) 0%, rgba(57, 5, 40, 0.35) 50%, transparent 100%)',
+        // Gradient fade at top of footer to blend tree using design system colors
+        backgroundImage: `linear-gradient(to top, var(--color-footer-muted) 0%, var(--color-footer-muted) 50%, transparent 100%)`,
       }}
     >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

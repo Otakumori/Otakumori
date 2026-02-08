@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-02-07T19:20:18.316Z",
+  "stats": {
+    "processed": 1,
+    "errors": 0,
+    "warnings": 3,
+    "sizeReduction": 57.31282530742086
+  },
+  "config": {
+    "inputDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\public\\assets\\external\\base_mesh_rigged",
+    "outputDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\public\\assets\\optimized\\base_mesh_rigged",
+    "tempDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\.temp\\asset-optimization",
+    "draco": {
+      "compressionLevel": 7,
+      "quantizationBits": {
+        "position": 14,
+        "normal": 10,
+        "color": 8,
+        "texCoord": 12
+      }
+    },
+    "textures": {
+      "maxSize": 2048,
+      "formats": [
+        "webp",
+        "ktx2"
+      ],
+      "quality": 85
+    },
+    "lod": {
+      "levels": [
+        0.8,
+        0.5,
+        0.2
+      ],
+      "distances": [
+        5,
+        15,
+        30
+      ]
+    }
+  },
+  "summary": {
+    "totalProcessed": 1,
+    "successRate": "100.0",
+    "averageSizeReduction": "57.3"
+  }
+}

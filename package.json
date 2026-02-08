@@ -399,6 +399,7 @@
     "eslint-plugin-unused-imports": "^4.3.0",
     "glob": "^11.0.3",
     "globby": "^14.1.0",
+    "gltf-pipeline": "^4.3.0",
     "husky": "^9.1.7",
     "is-ci": "^4.1.0",
     "jest": "^30.2.0",

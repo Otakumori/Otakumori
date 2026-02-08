@@ -1062,24 +1062,24 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
   if (!gameKey) return <div className="text-pink-200">No game selected.</div>;
 
   const Map: Record<string, React.ComponentType<any>> = {
-    'petal-collection': dynamic(() => import('../petal-collection/Scene'), { ssr: false }),
-    'memory-match': dynamic(() => import('../memory-match/InCard'), { ssr: false }),
-    'otaku-beat-em-up': dynamic(() => import('../otaku-beat-em-up/Scene'), { ssr: false }),
-    'bubble-girl': dynamic(() => import('../bubble-girl/InCard'), { ssr: false }),
+    'petal-collection': dynamic(() => import('../(games)/petal-collection/Scene'), { ssr: false }),
+    'memory-match': dynamic(() => import('../(games)/memory-match/InCard'), { ssr: false }),
+    'otaku-beat-em-up': dynamic(() => import('../(games)/otaku-beat-em-up/Scene'), { ssr: false }),
+    'bubble-girl': dynamic(() => import('../(games)/bubble-girl/InCard'), { ssr: false }),
     'quick-math': dynamic(
-      () => import('../quick-math/QuickMathWrapper').then((m) => m.QuickMathWrapper),
+      () => import('../(games)/quick-math/QuickMathWrapper').then((m) => m.QuickMathWrapper),
       { ssr: false },
     ),
-    'puzzle-reveal': dynamic(() => import('../puzzle-reveal/InCard'), { ssr: false }),
-    'petal-samurai': dynamic(() => import('../petal-samurai/InCard'), { ssr: false }),
-    'petal-storm-rhythm': dynamic(() => import('../petal-storm-rhythm/InCard'), { ssr: false }),
-    'bubble-ragdoll': dynamic(() => import('../bubble-ragdoll/Scene'), { ssr: false }),
-    'samurai-petal-slice': dynamic(() => import('../samurai-petal-slice/Scene'), { ssr: false }),
-    blossomware: dynamic(() => import('../blossomware/InCard'), { ssr: false }),
-    'dungeon-of-desire': dynamic(() => import('../dungeon-of-desire/InCard'), { ssr: false }),
-    'maid-cafe-manager': dynamic(() => import('../maid-cafe-manager/InCard'), { ssr: false }),
-    'thigh-coliseum': dynamic(() => import('../thigh-coliseum/InCard'), { ssr: false }),
-    'anime-arena': dynamic(() => import('../anime-arena/Scene'), { ssr: false }),
+    'puzzle-reveal': dynamic(() => import('../(games)/puzzle-reveal/InCard'), { ssr: false }),
+    'petal-samurai': dynamic(() => import('../(games)/petal-samurai/InCard'), { ssr: false }),
+    'petal-storm-rhythm': dynamic(() => import('../(games)/petal-storm-rhythm/InCard'), { ssr: false }),
+    'bubble-ragdoll': dynamic(() => import('../(games)/bubble-ragdoll/Scene'), { ssr: false }),
+    'samurai-petal-slice': dynamic(() => import('../(games)/samurai-petal-slice/Scene'), { ssr: false }),
+    blossomware: dynamic(() => import('../(games)/blossomware/InCard'), { ssr: false }),
+    'dungeon-of-desire': dynamic(() => import('../(games)/dungeon-of-desire/InCard'), { ssr: false }),
+    'maid-cafe-manager': dynamic(() => import('../(games)/maid-cafe-manager/InCard'), { ssr: false }),
+    'thigh-coliseum': dynamic(() => import('../(games)/thigh-coliseum/InCard'), { ssr: false }),
+    'anime-arena': dynamic(() => import('../(games)/anime-arena/Scene'), { ssr: false }),
   } as const;
 
   const Comp = Map[gameKey];

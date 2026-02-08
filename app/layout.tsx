@@ -1,5 +1,6 @@
 import 'server-only';
 import './globals.css';
+import './styles/designSystem.css';
 import './styles/glassmorphic-effects.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';

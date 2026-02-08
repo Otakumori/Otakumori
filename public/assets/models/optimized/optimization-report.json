@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-02-07T19:19:32.468Z",
+  "stats": {
+    "processed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "sizeReduction": 0
+  },
+  "config": {
+    "inputDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\public\\assets\\models",
+    "outputDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\public\\assets\\models\\optimized",
+    "tempDir": "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\.temp\\asset-optimization",
+    "draco": {
+      "compressionLevel": 7,
+      "quantizationBits": {
+        "position": 14,
+        "normal": 10,
+        "color": 8,
+        "texCoord": 12
+      }
+    },
+    "textures": {
+      "maxSize": 2048,
+      "formats": [
+        "webp",
+        "ktx2"
+      ],
+      "quality": 85
+    },
+    "lod": {
+      "levels": [
+        0.8,
+        0.5,
+        0.2
+      ],
+      "distances": [
+        5,
+        15,
+        30
+      ]
+    }
+  },
+  "summary": {
+    "totalProcessed": 0,
+    "successRate": "NaN",
+    "averageSizeReduction": "NaN"
+  }
+}

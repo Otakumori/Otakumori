@@ -1,0 +1,288 @@
+/**
+ * Design System - Dark Fantasy Theme
+ * Cherry blossom accents with deep fantasy palette
+ * Consistent spacing and typography scale
+ */
+
+:root {
+  /* ========================================
+     DARK FANTASY COLOR PALETTE
+     ======================================== */
+
+  /* Deep Background */
+  --color-background: #1b1a17;
+  --color-background-alt: #0f0e0c; /* Even darker variant */
+
+  /* Primary Surfaces (Dark Violet/Grey) */
+  --color-surface-primary: #413f4f;
+  --color-surface-primary-hover: #4d4a5f;
+  --color-surface-primary-active: #353342;
+
+  /* Secondary Surfaces (Medium Violet/Grey) */
+  --color-surface-secondary: #5b5673;
+  --color-surface-secondary-hover: #6a6580;
+  --color-surface-secondary-active: #4c475f;
+
+  /* Tertiary Surfaces (Lighter Violet/Grey) */
+  --color-surface-tertiary: #6f6a85;
+  --color-surface-tertiary-hover: #7d7895;
+  --color-surface-tertiary-active: #615c77;
+
+  /* Lavender Highlight for Inputs/Hover States */
+  --color-accent: #ebe8f7;
+  --color-accent-hover: #f5f3ff;
+  --color-accent-active: #e0dcef;
+  --color-accent-muted: rgba(235, 232, 247, 0.5);
+
+  /* Off-White for Text */
+  --color-text: #f2f2e8;
+  --color-text-secondary: #d4d0c8;
+  --color-text-muted: rgba(242, 242, 232, 0.6);
+  --color-text-disabled: rgba(242, 242, 232, 0.4);
+
+  /* Cherry Blossom Pink for Petals and Small Highlights */
+  --color-petal: #eac8d6;
+  --color-petal-hover: #f2d4e2;
+  --color-petal-active: #e0b8ca;
+  --color-petal-muted: rgba(234, 200, 214, 0.5);
+  --color-petal-glow: rgba(234, 200, 214, 0.3);
+
+  /* Deep Plum for Footer and Header Accents */
+  --color-footer: #b06fa1;
+  --color-footer-hover: #c17fb1;
+  --color-footer-active: #9f5f91;
+  --color-footer-muted: rgba(176, 111, 161, 0.5);
+
+  /* Border Colors */
+  --color-border: rgba(235, 232, 247, 0.2);
+  --color-border-hover: rgba(235, 232, 247, 0.4);
+  --color-border-active: rgba(234, 200, 214, 0.6);
+  --color-border-muted: rgba(235, 232, 247, 0.1);
+
+  /* Status Colors (Fantasy Theme) */
+  --color-success: #7fb069; /* Muted green */
+  --color-success-hover: #8fc079;
+  --color-warning: #d4a574; /* Muted amber */
+  --color-warning-hover: #e4b584;
+  --color-error: #c97a7a; /* Muted red */
+  --color-error-hover: #d98a8a;
+  --color-info: #7a9fc9; /* Muted blue */
+  --color-info-hover: #8aafd9;
+
+  /* ========================================
+     SPACING SCALE
+     ======================================== */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ========================================
+     TYPOGRAPHY SCALE
+     ======================================== */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-body: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-heading: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+  --font-size-5xl: 48px;
+  --font-size-6xl: 60px;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ========================================
+     SHADOWS (Dark Fantasy Theme)
+     ======================================== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+
+  /* Glow Effects (Cherry Blossom Theme) */
+  --glow-petal: 0 0 10px var(--color-petal-glow);
+  --glow-petal-lg: 0 0 20px var(--color-petal-glow);
+  --glow-accent: 0 0 10px rgba(235, 232, 247, 0.3);
+  --glow-footer: 0 0 15px rgba(176, 111, 161, 0.4);
+
+  /* ========================================
+     Z-INDEX SCALE
+     ======================================== */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+
+  /* ========================================
+     COMPATIBILITY ALIASES
+     Map to existing Otaku-mori color system
+     ======================================== */
+  /* Map design system background to existing system */
+  --om-bg-root: var(--color-background);
+  --om-bg-surface: var(--color-surface-primary);
+  
+  /* Map text colors */
+  --om-text-ivory: var(--color-text);
+  --om-text-secondary: var(--color-text-secondary);
+  
+  /* Map petal colors */
+  --om-accent-pink: var(--color-petal);
+  --color-petal-primary: var(--color-petal);
+  
+  /* Map footer color */
+  --om-footer-color: var(--color-footer);
+}
+
+/* ========================================
+   DARK MODE OVERRIDES (if needed)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode is the default, so these are already set */
+    /* Add any dark mode specific overrides here if needed */
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Background Colors */
+.bg-fantasy-background {
+  background-color: var(--color-background);
+}
+
+.bg-fantasy-surface-primary {
+  background-color: var(--color-surface-primary);
+}
+
+.bg-fantasy-surface-secondary {
+  background-color: var(--color-surface-secondary);
+}
+
+.bg-fantasy-petal {
+  background-color: var(--color-petal);
+}
+
+.bg-fantasy-footer {
+  background-color: var(--color-footer);
+}
+
+/* Text Colors */
+.text-fantasy {
+  color: var(--color-text);
+}
+
+.text-fantasy-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-fantasy-muted {
+  color: var(--color-text-muted);
+}
+
+.text-fantasy-petal {
+  color: var(--color-petal);
+}
+
+.text-fantasy-footer {
+  color: var(--color-footer);
+}
+
+/* Border Colors */
+.border-fantasy {
+  border-color: var(--color-border);
+}
+
+.border-fantasy-petal {
+  border-color: var(--color-petal);
+}
+
+.border-fantasy-footer {
+  border-color: var(--color-footer);
+}
+
+/* Spacing Utilities */
+.space-fantasy-1 { margin: var(--space-1); }
+.space-fantasy-2 { margin: var(--space-2); }
+.space-fantasy-3 { margin: var(--space-3); }
+.space-fantasy-4 { margin: var(--space-4); }
+
+.p-fantasy-1 { padding: var(--space-1); }
+.p-fantasy-2 { padding: var(--space-2); }
+.p-fantasy-3 { padding: var(--space-3); }
+.p-fantasy-4 { padding: var(--space-4); }
+
+/* Typography Utilities */
+.text-fantasy-xs { font-size: var(--font-size-xs); }
+.text-fantasy-sm { font-size: var(--font-size-sm); }
+.text-fantasy-body { font-size: var(--font-size-body); }
+.text-fantasy-lg { font-size: var(--font-size-lg); }
+.text-fantasy-heading { font-size: var(--font-size-heading); }
+
+/* Glow Effects */
+.glow-petal {
+  box-shadow: var(--glow-petal);
+}
+
+.glow-petal-lg {
+  box-shadow: var(--glow-petal-lg);
+}
+
+.glow-accent {
+  box-shadow: var(--glow-accent);
+}
+
+.glow-footer {
+  box-shadow: var(--glow-footer);
+}
+
