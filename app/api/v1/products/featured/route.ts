@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
@@ -301,6 +300,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!validated.success) {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('[API] Response validation failed:', undefined, { error: validated.error }, undefined);
         // Return safe fallback
         return NextResponse.json(
@@ -346,6 +346,7 @@ export async function GET(request: NextRequest) {
           });
 
           if (!validated.success) {
+            const { logger } = await import('@/app/lib/logger');
             logger.error('[API] Printify response validation failed:', undefined, { error: validated.error }, undefined);
             return NextResponse.json(
               createApiSuccess({ products: [], pagination: undefined }, requestId),
@@ -356,6 +357,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json(validated.data);
         }
       } catch (error) {
+        const { logger } = await import('@/app/lib/logger');
         logger.warn('[API] Printify fetch failed:', undefined, { value: error });
         // Fall through to empty response
       }
@@ -372,6 +374,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(validated.success ? validated.data : emptyResponse);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('[API] Featured products endpoint error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch featured products', requestId),

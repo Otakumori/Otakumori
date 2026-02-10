@@ -3,7 +3,6 @@
  * Run with: pnpm assets:scan
  */
 
-import { logger } from '@/app/lib/logger';
 import { createHash } from 'crypto';
 import { readFile, writeFile } from 'fs/promises';
 import { glob } from 'glob';
@@ -33,6 +32,7 @@ const ASSET_ROOT = 'public/assets';
  * Main scan function
  */
 async function scanAssets(): Promise<ScanResults> {
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('🔍 Scanning assets...');
 
   // Find all supported files
@@ -51,6 +51,7 @@ async function scanAssets(): Promise<ScanResults> {
         assets.push(asset);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error(`Error processing ${filePath}:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -116,6 +117,7 @@ function detectSlot(filename: string): string | null {
  * Save scan results
  */
 async function saveScanResults(results: ScanResults): Promise<void> {
+  const { logger } = await import('@/app/lib/logger');
   const outputPath = 'app/lib/assets/scan-results.json';
   await writeFile(outputPath, JSON.stringify(results, null, 2));
   logger.warn(`✅ Scan results saved to ${outputPath}`);
@@ -132,6 +134,7 @@ async function main() {
     const results = await scanAssets();
     await saveScanResults(results);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('❌ Scan failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   }

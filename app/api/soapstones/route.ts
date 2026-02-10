@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 
 async function getDb() {
@@ -16,6 +15,7 @@ export async function GET() {
     });
     return NextResponse.json({ items });
   } catch (e) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'soapstones:get',
       undefined,

@@ -10,7 +10,7 @@
  */
 
 import { trackError } from '@/app/lib/monitoring';
-import { logger, type LogCtx } from '@/app/lib/logger';
+import type { LogCtx } from '@/app/lib/logger';
 
 export interface ServerErrorContext {
   section: string;
@@ -74,10 +74,27 @@ export function handleServerError(
     });
   } catch (sentryError) {
     // Silently fail if Sentry tracking fails - don't crash the app
-    // Fallback to console.error in case Sentry is unavailable
+    // Fallback to console.error and best-effort structured logger via dynamic import
     if (typeof console !== 'undefined' && typeof console.error === 'function') {
-      logger.error('[handleServerError] Failed to track error in Sentry:', undefined, undefined, sentryError instanceof Error ? sentryError : new Error(String(sentryError)));
+      console.error('[handleServerError] Failed to track error in Sentry:', sentryError);
     }
+
+    // Fire-and-forget structured log - never awaited to keep this function sync
+    (async () => {
+      try {
+        const { logger } = await import('@/app/lib/logger');
+        logger.error(
+          '[handleServerError] Failed to track error in Sentry:',
+          undefined,
+          undefined,
+          sentryError instanceof Error
+            ? sentryError
+            : new Error(String(sentryError)),
+        );
+      } catch {
+        // Ignore logger failures to avoid cascading errors
+      }
+    })();
   }
 
   // Log to structured logger (defensive - never throw)
@@ -91,7 +108,10 @@ export function handleServerError(
     },
   };
 
+  // Fire-and-forget structured logging via dynamic import
+  (async () => {
   try {
+      const { logger } = await import('@/app/lib/logger');
     switch (logLevel) {
       case 'warn':
         logger.warn(
@@ -117,12 +137,12 @@ export function handleServerError(
     }
   } catch (loggerError) {
     // Silently fail if logger fails - don't crash the app
-    // Fallback to console.error in case logger is unavailable
     if (typeof console !== 'undefined' && typeof console.error === 'function') {
-      logger.error('[handleServerError] Failed to log error:', undefined, undefined, loggerError instanceof Error ? loggerError : new Error(String(loggerError)));
-      logger.error('[handleServerError] Original error:', undefined, undefined, errorDetails instanceof Error ? errorDetails : new Error(String(errorDetails)));
+        console.error('[handleServerError] Failed to log error:', loggerError);
+        console.error('[handleServerError] Original error details:', errorDetails);
     }
   }
+  })();
 
   // Re-throw if requested (for critical errors)
   if (throwAfterLogging) {

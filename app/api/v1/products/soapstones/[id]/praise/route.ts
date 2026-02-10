@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -21,6 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     
     // Use message if provided (for future praise message feature)
     if (message) {
+      const { logger } = await import('@/app/lib/logger');
       logger.info('Praise with message', {
         extra: { soapstoneId: params.id, messageLength: message.length },
       });
@@ -135,6 +135,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to praise soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to process praise' }, { status: 500 });
   }

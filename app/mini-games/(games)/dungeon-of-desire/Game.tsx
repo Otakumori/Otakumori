@@ -56,7 +56,7 @@ export default function DungeonOfDesireGameWrapper() {
     <GameStateMachine
       gameId="dungeon-of-desire"
       gameTitle="Dungeon of Desire"
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

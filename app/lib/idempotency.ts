@@ -2,7 +2,6 @@
  * Idempotency utilities for API endpoints
  */
 
-import { logger } from '@/app/lib/logger';
 import { getRedis } from './redis';
 import { generateRequestId } from './request-id';
 
@@ -36,6 +35,7 @@ export async function checkIdempotency<T = any>(key: string): Promise<Idempotenc
       requestId: generateRequestId(),
     };
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Idempotency check failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     // Fail open - treat as new request if Redis is down
     return {
@@ -52,6 +52,7 @@ export async function storeIdempotencyResponse<T = any>(key: string, response: T
   try {
     await redis.setex(idempotencyKey, IDEMPOTENCY_TTL, JSON.stringify(response));
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to store idempotency response:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     // Don't throw - this is not critical
   }

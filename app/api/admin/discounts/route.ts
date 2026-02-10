@@ -1,9 +1,7 @@
-import { logger } from '@/app/lib/logger';
 import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { z } from 'zod';
-import { requireAdmin } from '@/app/lib/authz';
 
 export const runtime = 'nodejs';
 
@@ -29,6 +27,7 @@ const DiscountRewardSchema = z.object({
 // GET - List all discount rewards
 export async function GET() {
   try {
+    const { requireAdmin } = await import('@/app/lib/authz');
     await requireAdmin();
 
     const rewards = await db.discountReward.findMany({
@@ -78,6 +77,7 @@ export async function GET() {
     if (error.message === 'FORBIDDEN') {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error fetching discount rewards:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
@@ -86,6 +86,7 @@ export async function GET() {
 // POST - Create or update discount reward
 export async function POST(req: Request) {
   try {
+    const { requireAdmin } = await import('@/app/lib/authz');
     await requireAdmin();
 
     const user = await currentUser();
@@ -160,6 +161,7 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error saving discount reward:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
@@ -168,6 +170,7 @@ export async function POST(req: Request) {
 // DELETE - Archive/disable discount reward
 export async function DELETE(req: Request) {
   try {
+    const { requireAdmin } = await import('@/app/lib/authz');
     await requireAdmin();
 
     const { searchParams } = new URL(req.url);
@@ -191,6 +194,7 @@ export async function DELETE(req: Request) {
     if (error.message === 'FORBIDDEN') {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error deleting discount reward:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }

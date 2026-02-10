@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { Suspense, useRef, useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { logger } from '@/app/lib/logger';

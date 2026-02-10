@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React from 'react';
 import * as Sentry from '@sentry/nextjs';
 
@@ -14,7 +13,7 @@ export default function ErrorTestButton() {
     throw new Error('Sentry Frontend Error: This is an asynchronous test error!');
   };
 
-  const captureCustomError = () => {
+  const captureCustomError = async () => {
     try {
       // Simulate an error that might not be caught by React's error boundary
       // or is a non-fatal issue we still want to track.
@@ -23,6 +22,7 @@ export default function ErrorTestButton() {
       data.property; // This will throw a TypeError
     } catch (error) {
       Sentry.captureException(error);
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Custom error captured by Sentry:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Custom error captured by Sentry. Check your Sentry dashboard.');
     }

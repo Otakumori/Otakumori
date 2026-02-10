@@ -33,13 +33,13 @@ export default function TestGamePage() {
     // Set up callbacks
     rt.setCallbacks({
       onStateChange: (state) => {
-        console.log('[TestGame] State:', state);
+        console.warn('[TestGame] State:', state);
       },
       onProgress: (progress) => {
-        console.log('[TestGame] Progress:', progress.percentage.toFixed(1) + '%');
+        console.warn('[TestGame] Progress:', progress.percentage.toFixed(1) + '%');
       },
       onResults: (results) => {
-        console.log('[TestGame] Results:', results);
+        console.warn('[TestGame] Results:', results);
       },
     });
 
@@ -106,10 +106,10 @@ export default function TestGamePage() {
             runtime={runtime}
             title="Test Game"
             onStart={() => {
-              console.log('[TestGame] Game started');
+              console.warn('[TestGame] Game started');
             }}
             onRestart={() => {
-              console.log('[TestGame] Game restarted');
+              console.warn('[TestGame] Game restarted');
             }}
             onQuit={() => {
               router.push('/mini-games');

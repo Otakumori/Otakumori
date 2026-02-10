@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { env } from '@/env';
 
@@ -56,6 +55,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     return NextResponse.json({ product: transformedProduct });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching product:',
       undefined,

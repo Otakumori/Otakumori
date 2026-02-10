@@ -18,7 +18,6 @@ import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
-import { GameOverlay } from '../../_shared/GameOverlay';
 import { useGameHud } from '../../_shared/useGameHud';
 import { useGameProgress } from '@/app/lib/games/progress';
 import { getGameVisualProfile, applyVisualProfile } from '../../_shared/gameVisuals';
@@ -214,8 +213,8 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
           if (onGameEnd) {
             onGameEnd({
               score: gameRef.current.getScore(),
-              combo: game.getCombo(),
-              misses: game.getMisses(),
+              combo: gameRef.current.getCombo(),
+              misses: gameRef.current.getMisses(),
               didWin,
             });
           }
@@ -257,7 +256,7 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
 
     return () => {
       cancelAnimationFrame(animationId);
-      game.destroy();
+      gameRef.current?.destroy();
     };
   }, [mode, difficulty, recordResult, onGameEnd, onStatsUpdate]);
 

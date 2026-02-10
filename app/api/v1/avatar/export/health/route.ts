@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { generateRequestId } from '../../../../../lib/request-id';
 import { logger } from '@/app/lib/logger';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       blobStorage: { status: 'unknown' as 'ok' | 'error' | 'unknown' },
       recentExports: { status: 'unknown' as 'ok' | 'error' | 'unknown', successRate: 0 },
     },
-    version: process.env.npm_package_version || '1.0.0',
+    version: env.NEXT_PUBLIC_APP_VERSION ?? '1.0.0',
     requestId,
   };
 

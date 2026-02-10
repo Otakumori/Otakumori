@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -15,6 +14,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     // Log orders request for analytics
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Orders requested from:', undefined, {
       userAgent: req.headers.get('user-agent'),
     });
@@ -88,6 +88,7 @@ export async function GET(req: NextRequest) {
       data: { orders: transformedOrders },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching orders:',
       undefined,

@@ -69,7 +69,7 @@ export default function PetalStormRhythmGameWrapper({ track }: PetalStormRhythmG
     <GameStateMachine
       gameId="petal-storm-rhythm"
       gameTitle={`Petal Storm Rhythm - ${track.title}`}
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
@@ -95,6 +94,7 @@ export async function POST(request: NextRequest) {
       url: session.url,
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Checkout API error:',
       undefined,

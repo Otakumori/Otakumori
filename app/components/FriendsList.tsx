@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -31,9 +30,11 @@ export default function FriendsList({ className = '' }: FriendsListProps) {
       if (result.ok) {
         setFriends(result.data.friends);
       } else {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Failed to load friends:', result.error);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Friends load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);

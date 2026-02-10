@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -105,6 +104,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (analyticsError) {
       // Don't fail achievement unlock if analytics fails
+      const { logger } = await import('@/app/lib/logger');
       logger.warn(
         'Failed to track achievement unlock analytics:',
         undefined,
@@ -144,6 +144,7 @@ export async function POST(request: NextRequest) {
 
           if (!petalResult.success) {
             // Log but don't fail the achievement unlock
+            const { logger } = await import('@/app/lib/logger');
             logger.error(
               'Failed to award achievement petals:',
               undefined,
@@ -215,6 +216,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error unlocking achievement:',
       undefined,

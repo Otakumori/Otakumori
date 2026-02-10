@@ -7,7 +7,6 @@
  *
  * Not meant for production use.
  */
-import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { inngest } from '../../../inngest/client';
 import { env } from '@/env';
@@ -38,6 +37,7 @@ export async function GET() {
       result: result || 'Event sent',
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error testing Inngest:',
       undefined,
@@ -84,6 +84,7 @@ export async function POST(request: Request) {
       result: result || 'Event sent',
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error sending custom event:',
       undefined,

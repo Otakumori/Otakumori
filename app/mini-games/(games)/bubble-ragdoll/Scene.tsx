@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { getAsset } from '../../_shared/assets-resolver';
 import { play } from '../../_shared/audio-bus';
 import { useAvatarForGame } from '../../_shared/useAvatarForGame';

@@ -7,7 +7,6 @@
 import { generateComprehensiveGLB, type ComprehensiveGLBOptions } from './comprehensive-glb-generator';
 import { avatarConfigToCreatorConfig } from './character-config-bridge';
 import { putBlobFile } from '@/app/lib/blob/client';
-import { logger } from '@/app/lib/logger';
 import type { AvatarConfiguration } from './avatar-parts';
 import { getGameTranslationConfig } from './character-translator';
 
@@ -36,6 +35,7 @@ export async function generateGameGLB(
   options: GenerateGameGLBOptions = {}
 ): Promise<{ glbUrl: string; fileSize: number } | null> {
   try {
+    const { logger } = await import('@/app/lib/logger');
     const { gameId, quality = 'medium', userId } = options;
 
     logger.info('Generating game GLB', undefined, {
@@ -100,6 +100,7 @@ export async function generateGameGLB(
       fileSize: result.glbBuffer.byteLength,
     };
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Game GLB generation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
@@ -115,6 +116,7 @@ export async function generateGameGLBs(
   quality: 'low' | 'medium' | 'high' | 'ultra' = 'medium',
   userId?: string
 ): Promise<Record<string, { glbUrl: string; fileSize: number } | null>> {
+  const { logger } = await import('@/app/lib/logger');
   const results: Record<string, { glbUrl: string; fileSize: number } | null> = {};
 
   // Generate GLBs in parallel for efficiency

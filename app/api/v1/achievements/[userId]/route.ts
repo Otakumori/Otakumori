@@ -5,7 +5,6 @@
  * database schema is in place.
  */
 
-import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -58,8 +57,9 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
     const { userId: currentUserId } = await auth();
 
     // Log request timing
-    const logTiming = () => {
+    const logTiming = async () => {
       const duration = Date.now() - startTime;
+      const { logger } = await import('@/app/lib/logger');
       logger.warn(`Achievement request completed in ${duration}ms`);
     };
 
@@ -231,6 +231,7 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
     return NextResponse.json({ ok: false, error: 'Method not allowed' }, { status: 405 });
   } catch (error) {
     const duration = Date.now() - startTime;
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Achievement error after ms:',
       undefined,

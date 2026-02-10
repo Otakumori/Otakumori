@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { generateComprehensiveGLB, type ComprehensiveGLBOptions } from '@/app/lib/3d/comprehensive-glb-generator';
+import { generateComprehensiveGLB } from '@/app/lib/3d/comprehensive-glb-generator';
 import type { FullCharacterConfig } from '@/app/test/character-creator/types';
 
 describe('Comprehensive GLB Generator', () => {

@@ -11,7 +11,6 @@ import { CheckoutRequest } from '@/app/lib/contracts';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
 import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 import { getDiscountConfig } from '@/app/config/petalTuning';
-import { logger } from '@/app/lib/logger';
 import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 
@@ -26,6 +25,7 @@ export async function POST(req: NextRequest) {
 
     // Check if Stripe is configured
     if (!env.STRIPE_SECRET_KEY) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
       return NextResponse.json(
         { ok: false, error: 'Checkout temporarily unavailable. Please contact support.', requestId },
@@ -105,14 +105,17 @@ export async function POST(req: NextRequest) {
       // Filter NSFW discounts if NSFW not allowed
       const validGrantRows = grantRows.filter((grant) => {
         if (grant.nsfwOnly && !nsfwAllowed) {
-          logger.info('NSFW discount filtered out at checkout', {
-            userId: user.id,
-            extra: {
-              couponCode: grant.code,
-              discountRewardId: grant.discountRewardId,
-              nsfwAllowed,
-            },
-          });
+          (async () => {
+            const { logger } = await import('@/app/lib/logger');
+            logger.info('NSFW discount filtered out at checkout', {
+              userId: user.id,
+              extra: {
+                couponCode: grant.code,
+                discountRewardId: grant.discountRewardId,
+                nsfwAllowed,
+              },
+            });
+          })();
           return false;
         }
         return true;
@@ -193,6 +196,7 @@ export async function POST(req: NextRequest) {
       // Safety guard: Ensure discount never exceeds 100% of subtotal
       const maxAllowedDiscount = subtotalCents;
       if (discountTotalCents > maxAllowedDiscount) {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Discount exceeds subtotal - capping discount', undefined, {
           userId: user.id,
           extra: {
@@ -208,6 +212,7 @@ export async function POST(req: NextRequest) {
       // Log discount application
       if (appliedCodes.length > 0) {
         const requestId = generateRequestId();
+        const { logger } = await import('@/app/lib/logger');
         logger.info('Discount applied at checkout', {
           requestId,
           userId: user.id,

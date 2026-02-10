@@ -2,7 +2,6 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
@@ -15,6 +14,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to fetch from v1 Printify API:', undefined, {
         status: response.status,
       });
@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     if (!data.ok) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Printify API returned error:', undefined, { error: data.error }, undefined);
       throw new Error(data.error || 'Failed to fetch products');
     }
@@ -69,6 +70,7 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Shop products API error:',
       undefined,

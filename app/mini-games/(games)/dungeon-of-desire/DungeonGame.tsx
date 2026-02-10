@@ -738,14 +738,14 @@ export default function DungeonGame({
       ctx.translate(-camera.x, -camera.y);
 
       // Draw ground using CSS variables
-      const bgColor = typeof window !== 'undefined'
+      const groundBgColor = typeof window !== 'undefined'
         ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() || '#1a1816'
         : '#1a1816';
       const borderColor = typeof window !== 'undefined'
         ? getComputedStyle(document.documentElement).getPropertyValue('--om-border-soft').trim() || 'rgba(229, 224, 216, 0.15)'
         : 'rgba(229, 224, 216, 0.15)';
       
-      ctx.fillStyle = bgColor;
+      ctx.fillStyle = groundBgColor;
       ctx.fillRect(0, GROUND_Y, WORLD_WIDTH, canvasHeight - GROUND_Y);
 
       // Ground detail

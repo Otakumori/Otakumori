@@ -13,10 +13,16 @@ export default [
       // build + deps
       'node_modules/',
       '.next/',
+      'packages/**',
       'out/',
       'coverage/',
       'dist/',
       '**/dist/**',
+      // backups, scripts, tests
+      '.backup-logger-fixes*/**',
+      'scripts/**',
+      '__tests__/**',
+      '**/__tests__/**',
       // assets & third-party stuff
       'public/',
       'public/**',
@@ -208,6 +214,7 @@ export default [
     rules: {
       // Relaxed rules for scripts and tests
       'no-console': 'off', // Allow console in scripts
+      'unused-imports/no-unused-imports': 'warn', // Do not error on unused imports in tests/scripts
       'unused-imports/no-unused-vars': 'warn', // Warn instead of error
       '@typescript-eslint/no-var-requires': 'off', // Allow require() in scripts
       '@typescript-eslint/no-unused-vars': 'warn',

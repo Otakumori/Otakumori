@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -42,6 +41,7 @@ export default function CommentsSection({
         setComments(data.data.comments || []);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to load comments:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
@@ -72,6 +72,7 @@ export default function CommentsSection({
         setNewComment('');
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to submit comment:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsSubmitting(false);
@@ -99,6 +100,7 @@ export default function CommentsSection({
         );
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to like comment:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
@@ -120,6 +122,7 @@ export default function CommentsSection({
         alert('Comment reported successfully');
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to report comment:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };

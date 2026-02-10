@@ -43,8 +43,8 @@ export function createGameWrapper<T extends Record<string, any>>(
 
     // Collect assets for preloading
     const gameAssets: AssetManifest = {
-      images: config.assetKeys?.images?.map(key => getAsset(config.gameId, key)).filter(Boolean) || [],
-      audio: config.assetKeys?.audio?.map(key => getAsset(config.gameId, key)).filter(Boolean) || [],
+      images: config.assetKeys?.images?.map(key => getAsset(config.gameId, key)).filter((url): url is string => Boolean(url)) || [],
+      audio: config.assetKeys?.audio?.map(key => getAsset(config.gameId, key)).filter((url): url is string => Boolean(url)) || [],
     };
 
     const handleGameEnd = useCallback((results: any) => {
@@ -53,14 +53,20 @@ export function createGameWrapper<T extends Record<string, any>>(
     }, []);
 
     const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer?: number; lives?: number; progress?: number }) => {
-      setGameStats(stats);
+      setGameStats({
+        score: stats.score,
+        combo: stats.combo,
+        timer: stats.timer ?? undefined,
+        lives: stats.lives ?? undefined,
+        progress: stats.progress ?? 0,
+      });
     }, []);
 
     return (
       <GameStateMachine
         gameId={config.gameId}
         gameTitle={config.gameTitle}
-        assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+        assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
         onStateChange={setGameState}
       >
         {(state, transitionTo) => {

@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -76,6 +75,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error earning petals:',
       undefined,
@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Log petal balance request for analytics
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Petal balance requested from:', undefined, {
       userAgent: request.headers.get('user-agent'),
     });
@@ -147,6 +148,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching petal data:',
       undefined,

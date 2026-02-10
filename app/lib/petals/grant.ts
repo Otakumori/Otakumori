@@ -25,7 +25,6 @@
  */
 
 import { db } from '@/lib/db';
-import { logger } from '@/app/lib/logger';
 import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
 import type { NextRequest } from 'next/server';
 
@@ -169,6 +168,7 @@ const MAX_PETALS_PER_GRANT = 1000;
  * - Returns detailed result for UI feedback
  */
 export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsResult> {
+  const { logger } = await import('@/app/lib/logger');
   const { userId, amount, source, metadata: _metadata, description, requestId, req } = input;
   // metadata is stored in PetalTransaction but not used in validation logic
 

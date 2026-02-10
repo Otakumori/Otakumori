@@ -20,7 +20,6 @@ import {
   createApiError,
   createApiSuccess,
 } from '@/app/lib/api-contracts';
-import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';
 
@@ -237,6 +236,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Products API error', { requestId, route: '/api/v1/products' }, undefined, err);
     return NextResponse.json(
       createApiError(

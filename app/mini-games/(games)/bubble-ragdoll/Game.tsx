@@ -44,7 +44,7 @@ export default function BubbleRagdollGame() {
     <GameStateMachine
       gameId="bubble-ragdoll"
       gameTitle="Bubble Ragdoll"
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

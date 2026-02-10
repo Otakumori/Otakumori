@@ -1,7 +1,6 @@
 'use client';
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -34,9 +33,11 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
         setNotifications(result.data.notifications);
         setUnreadCount(result.data.unreadCount);
       } else {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Failed to load notifications:', result.error);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Notifications error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
@@ -63,6 +64,7 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
         setUnreadCount((prev) => Math.max(0, prev - notificationIds.length));
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Mark as read error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };

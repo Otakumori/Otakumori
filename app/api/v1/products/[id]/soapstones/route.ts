@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -60,6 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
+      const { logger } = await import('@/app/lib/logger');
       logger.warn('ProductSoapstone table missing. Returning empty soapstone list.');
       return NextResponse.json({
         ok: true,
@@ -69,6 +69,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         },
       });
     }
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to fetch product soapstones:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to fetch soapstones' }, { status: 500 });
   }
@@ -189,8 +190,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         },
       },
     });
-  } catch (error) {
+    } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
+      const { logger } = await import('@/app/lib/logger');
       logger.warn('ProductSoapstone table missing. Unable to create soapstone.');
       return NextResponse.json(
         {
@@ -200,6 +202,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         { status: 503 },
       );
     }
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to create product soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to create soapstone' }, { status: 500 });
   }

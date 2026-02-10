@@ -8,7 +8,6 @@
  * NSFW assets (nsfw: true) → private access (proxy URLs)
  */
 
-import { logger } from '@/app/lib/logger';
 import fs from 'node:fs';
 import path from 'node:path';
 import { putBlobFile } from '@/app/lib/blob/client';
@@ -35,7 +34,8 @@ const ASSET_ROOT = path.join(process.cwd(), 'public/assets');
 /**
  * Exit with error message
  */
-function exitWith(message: string): never {
+async function exitWith(message: string): Promise<never> {
+  const { logger } = await import('@/app/lib/logger');
   logger.error(`❌ ${message}`);
   process.exit(1);
 }
@@ -98,12 +98,13 @@ function findAssetFile(entry: AssetEntry): string | null {
  * Main upload function
  */
 async function main() {
+  const { logger } = await import('@/app/lib/logger');
    
   logger.info('📤 Starting asset upload to Vercel Blob...\n');
 
   // Check registry exists
   if (!fs.existsSync(REGISTRY_PATH)) {
-    exitWith(`Missing registry: ${REGISTRY_PATH}. Run 'pnpm assets:curate' first.`);
+    await exitWith(`Missing registry: ${REGISTRY_PATH}. Run 'pnpm assets:curate' first.`);
   }
 
   // Load registry
@@ -168,7 +169,7 @@ async function main() {
     } catch (err: unknown) {
       const error = err as Error;
       if (error.message?.includes('Missing required env')) {
-        exitWith(
+        await exitWith(
           'Set BLOB_READ_WRITE_TOKEN and BLOB_PUBLIC_BASE_URL in .env.local.\n' +
             'Vercel: Storage → Blob → Create Token → Read-Write.',
         );
@@ -203,7 +204,8 @@ async function main() {
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+  main().catch(async (error) => {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('❌ Upload failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   });

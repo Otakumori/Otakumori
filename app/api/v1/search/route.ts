@@ -2,7 +2,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { logger } from '@/app/lib/logger';
 import {
   SearchRequestSchema,
   // SearchResponseSchema,
@@ -23,6 +22,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const searchRequest = SearchRequestSchema.parse(body);
 
+    const { logger } = await import('@/app/lib/logger');
     logger.info('Search request received', {
       userId,
       extra: { query: searchRequest.query, searchType: searchRequest.searchType },
@@ -74,7 +74,8 @@ export async function POST(request: NextRequest) {
       filters: searchRequest.filters,
     };
 
-    logger.info('Search completed', {
+    const { logger: loggerInfo } = await import('@/app/lib/logger');
+    loggerInfo.info('Search completed', {
       userId,
       extra: {
         query: searchRequest.query,
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Search request failed', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
     }, undefined);
@@ -264,6 +266,7 @@ async function searchContent(
   const results: SearchResult[] = [];
 
   // Log search for analytics
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('Search query:', undefined, { query, userId: currentUserId, filters: filters || {} });
 
   // Search comments
@@ -440,6 +443,7 @@ async function saveSearchHistory(
     });
   } catch (error) {
     // Don't fail the search if history saving fails
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Failed to save search history', undefined, {
       userId,
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
@@ -459,6 +463,7 @@ async function getSearchSuggestions(query: string, searchType: string) {
 
     return suggestions;
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Failed to get search suggestions', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
     });

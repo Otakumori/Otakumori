@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { CommentReportSchema } from '@/app/lib/contracts';
@@ -83,6 +82,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { success: true, reportCount } });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Comment report error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {

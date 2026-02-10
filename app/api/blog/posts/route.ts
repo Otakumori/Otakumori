@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 
 async function getDb() {
@@ -15,6 +14,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
     const category = searchParams.get('category');
+    const { logger } = await import('@/app/lib/logger');
     logger.warn(`Blog posts requested for category: ${category || 'all'}`);
     const published = searchParams.get('published') !== 'false'; // Default to true
 
@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching blog posts:',
       undefined,

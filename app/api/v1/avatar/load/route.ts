@@ -1,10 +1,9 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { generateRequestId } from '@/app/lib/request-id';
 import { createRateLimitMiddleware, RATE_LIMITS } from '@/app/lib/rate-limit';
-import { AvatarConfigSchema, validateAvatarConfig, filterNSFWParts, DEFAULT_AVATAR_CONFIG } from '@/app/lib/avatar/schema';
+import { validateAvatarConfig, filterNSFWParts, DEFAULT_AVATAR_CONFIG } from '@/app/lib/avatar/schema';
 
 /**
  * GET /api/v1/avatar/load
@@ -113,6 +112,7 @@ export async function GET(request: NextRequest) {
       requestId,
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Avatar load error',
       undefined,

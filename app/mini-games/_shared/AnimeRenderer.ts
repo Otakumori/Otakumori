@@ -79,7 +79,7 @@ export class AnimeRenderer {
 
     // Detect GPU capabilities
     const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
     
     if (!gl) return 'low';
 
@@ -99,9 +99,9 @@ export class AnimeRenderer {
 
     // Check for high-end features
     const hasHighEndFeatures =
-      gl.getExtension('OES_texture_float') &&
-      gl.getExtension('WEBGL_draw_buffers') &&
-      gl.getExtension('OES_standard_derivatives');
+      !!gl.getExtension('OES_texture_float') &&
+      !!gl.getExtension('WEBGL_draw_buffers') &&
+      !!gl.getExtension('OES_standard_derivatives');
 
     return hasHighEndFeatures ? 'high' : 'medium';
   }

@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -103,6 +102,7 @@ export async function POST(req: NextRequest) {
           },
         });
         isInWishlist = true;
+        const { logger } = await import('@/app/lib/logger');
         logger.warn('Added to wishlist:', undefined, { itemId: wishlistItem.id, productId });
       }
 
@@ -131,6 +131,7 @@ export async function POST(req: NextRequest) {
 
     return rateLimitedHandler(req);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error toggling wishlist item:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to toggle wishlist item', requestId),
@@ -208,6 +209,7 @@ export async function GET(req: NextRequest) {
       ),
     );
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error fetching wishlist:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch wishlist', requestId),

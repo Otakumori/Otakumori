@@ -3,7 +3,6 @@
  * Run with: pnpm assets:curate
  */
 
-import { logger } from '@/app/lib/logger';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import type { ScanResults, ScannedAsset } from './scan';
@@ -28,6 +27,7 @@ interface AssetRegistry {
  * Main curate function
  */
 async function curateAssets(): Promise<AssetRegistry> {
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('🎨 Curating assets...');
 
   // Load scan results
@@ -65,7 +65,7 @@ async function curateAssets(): Promise<AssetRegistry> {
   const fallbacks = findFallbacks(assets);
 
   // Validate fallbacks
-  validateFallbacks(fallbacks);
+  await validateFallbacks(fallbacks);
 
   const registry: AssetRegistry = {
     version: 1,
@@ -116,7 +116,7 @@ function findFallbacks(assets: Record<string, AssetMeta>): Record<string, string
 /**
  * Validate fallbacks exist and are safe
  */
-function validateFallbacks(fallbacks: Record<string, string>): void {
+async function validateFallbacks(fallbacks: Record<string, string>): Promise<void> {
   const slots = ['Head', 'Torso', 'Legs', 'Accessory'];
   const missing: string[] = [];
 
@@ -127,6 +127,7 @@ function validateFallbacks(fallbacks: Record<string, string>): void {
   }
 
   if (missing.length > 0) {
+    const { logger } = await import('@/app/lib/logger');
     logger.warn(`⚠️  Missing safe fallbacks for slots: ${missing.join(', ')}`);
     logger.warn('   Assets in these slots will not be usable without fallbacks.');
   }
@@ -168,6 +169,7 @@ function generateSVGThumbnail(asset: AssetMeta): string {
  * Save registry and generate thumbnails
  */
 async function saveRegistry(registry: AssetRegistry): Promise<void> {
+  const { logger } = await import('@/app/lib/logger');
   // Save registry JSON
   const registryPath = 'app/lib/assets/registry.json';
   await writeFile(registryPath, JSON.stringify(registry, null, 2));
@@ -198,8 +200,10 @@ async function main() {
   try {
     const registry = await curateAssets();
     await saveRegistry(registry);
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('\n✨ Asset curation complete!');
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('❌ Curation failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   }

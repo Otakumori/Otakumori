@@ -7,7 +7,6 @@
  * TODO: Consider migrating to Sentry client-side SDK for better error tracking
  */
 
-import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -89,12 +88,14 @@ export async function POST(req: NextRequest) {
     };
 
     // Log to console with structured format
+    const { logger } = await import('@/app/lib/logger');
     logger.error('[ClientError]', undefined, logEntry);
 
     // Return success response
     return NextResponse.json({ ok: true });
   } catch (error) {
     // Log parsing/processing errors but don't expose details to client
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       '[CLIENT-ERROR-API] Failed to process error log:',
       undefined,

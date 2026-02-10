@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 
 interface ScrollSelectProps {
   items: Array<{ id: string; label: string; value: any }>;

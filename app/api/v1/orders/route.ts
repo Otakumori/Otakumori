@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -98,6 +97,7 @@ export async function POST(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Order creation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof z.ZodError) {
@@ -143,6 +143,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status'); // Filter by order status
 
     // Log order query params
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Orders requested with filters:', undefined, { limit, offset, status: status || 'all' });
 
     // TODO: Implement order history retrieval
@@ -179,6 +180,7 @@ export async function GET(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Order history error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(

@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 
 const mockPosts = [
@@ -94,6 +93,7 @@ export async function GET() {
 
     return NextResponse.json(mockPosts);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching community posts:',
       undefined,

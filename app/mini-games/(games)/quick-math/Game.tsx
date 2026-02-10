@@ -45,7 +45,7 @@ export default function QuickMathGame() {
     <GameStateMachine
       gameId="quick-math"
       gameTitle="Quick Math"
-      assets={gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

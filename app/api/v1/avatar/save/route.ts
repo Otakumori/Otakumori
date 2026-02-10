@@ -1,12 +1,10 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { z } from 'zod';
 import { db } from '@/lib/db';
 import { generateRequestId } from '@/app/lib/request-id';
 import { createRateLimitMiddleware, RATE_LIMITS } from '@/app/lib/rate-limit';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
-import { AvatarConfigSchema, validateAvatarConfig, filterNSFWParts } from '@/app/lib/avatar/schema';
+import { AvatarConfigSchema, filterNSFWParts } from '@/app/lib/avatar/schema';
 
 /**
  * POST /api/v1/avatar/save
@@ -175,6 +173,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Avatar save error',
       undefined,

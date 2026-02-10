@@ -103,6 +103,9 @@ export default function ThighChaseGame({
 
   const { saveOnExit, autoSave } = useGameSave('thigh-coliseum');
 
+  // Get container size for responsive canvas
+  const containerSize = useResizeObserverHook(containerRef, 100);
+
   // Initialize canvas with DPI scaling
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -153,9 +156,6 @@ export default function ThighChaseGame({
       }
     };
   }, []);
-
-  // Get container size for responsive canvas
-  const containerSize = useResizeObserverHook(containerRef, 100);
 
   // Update canvas dimensions when container size changes
   useEffect(() => {

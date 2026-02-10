@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -74,6 +73,7 @@ export async function POST(req: NextRequest) {
       data: { sessionId: session.id },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Session analytics error:',
       undefined,
@@ -145,6 +145,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Session stats error:',
       undefined,

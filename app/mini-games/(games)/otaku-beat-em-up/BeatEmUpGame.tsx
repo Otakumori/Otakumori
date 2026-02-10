@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import {
@@ -16,10 +15,7 @@ import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hi
 
 // Dynamically import AnimeRenderer for heavy 3D rendering (only when needed)
 // This will be used for high-fidelity 3D character models in future updates
-const AnimeRendererModule = dynamic(
-  () => import('../../_shared/AnimeRenderer').then((mod) => ({ default: mod.AnimeRenderer })),
-  { ssr: false },
-);
+// Note: AnimeRenderer is a class, not a React component, so we import it directly when needed
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
@@ -1069,10 +1065,10 @@ export default function BeatEmUpGame({
     });
 
     // Render beat track (top bar) using design system colors
-    const borderColor = typeof window !== 'undefined'
+    const beatTrackBorderColor = typeof window !== 'undefined'
       ? getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim() || 'rgba(235, 232, 247, 0.2)'
       : 'rgba(235, 232, 247, 0.2)';
-    ctx.fillStyle = borderColor;
+    ctx.fillStyle = beatTrackBorderColor;
     ctx.fillRect(canvasWidth - 120, 10, 100, 40);
     ctx.strokeStyle = petalColor;
     ctx.lineWidth = 2;

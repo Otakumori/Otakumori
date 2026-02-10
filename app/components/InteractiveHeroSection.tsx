@@ -1,5 +1,4 @@
 'use client';
-import { logger } from '@/app/lib/logger';
 import Image from 'next/image';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
@@ -26,8 +25,11 @@ const SEASON_VARIANTS: Record<string, PetalTypeKey[]> = {
   winter: ['normal', 'blackLotus'],
 };
 
-// Log season variants for debugging
-logger.warn('Season variants loaded:', undefined, Object.keys(SEASON_VARIANTS));
+// Log season variants for debugging (async IIFE)
+(async () => {
+  const { logger } = await import('@/app/lib/logger');
+  logger.warn('Season variants loaded:', undefined, Object.keys(SEASON_VARIANTS));
+})();
 
 const PETAL_TYPE_PROPS: Record<PetalTypeKey, { img: string; min: number; max: number }> = {
   normal: { img: '/assets/petal.svg', min: 1, max: 3 },
@@ -419,9 +421,11 @@ const InteractiveHeroSection: React.FC = () => {
         });
 
         if (!response.ok) {
+          const { logger } = await import('@/app/lib/logger');
           logger.warn('Failed to persist petal collection');
         }
       } catch (error) {
+        const { logger } = await import('@/app/lib/logger');
         logger.warn('Petal collection API error:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       }
 

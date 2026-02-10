@@ -1,4 +1,3 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { redis } from './redis';
 
@@ -33,6 +32,7 @@ class RateLimiter {
         return this.checkMemoryLimit(key, config, windowStart);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Rate limiting error, falling back to memory store:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return this.checkMemoryLimit(key, config, windowStart);
     }
@@ -70,6 +70,7 @@ class RateLimiter {
         retryAfter: overLimit ? Math.ceil((reset - Date.now()) / 1000) : 0,
       };
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Redis rate limiting error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       throw error;
     }

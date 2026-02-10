@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -22,12 +21,14 @@ export default function EnhancedLeaderboard({
   const [scope, setScope] = useState<'global' | 'friends'>('global');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'all'>('daily');
 
-  // Log current user for highlighting in leaderboard
-  logger.warn('EnhancedLeaderboard current user:', undefined, { value: user?.id || 'anonymous' });
-
   useEffect(() => {
     loadLeaderboard();
-  }, [gameCode, scope, period]);
+    // Log current user for highlighting in leaderboard
+    (async () => {
+      const { logger } = await import('@/app/lib/logger');
+      logger.warn('EnhancedLeaderboard current user:', undefined, { value: user?.id || 'anonymous' });
+    })();
+  }, [gameCode, scope, period, user?.id]);
 
   const loadLeaderboard = async () => {
     try {
@@ -44,9 +45,11 @@ export default function EnhancedLeaderboard({
       if (result.ok) {
         setLeaderboard(result.data);
       } else {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Failed to load leaderboard:', result.error);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Leaderboard error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);

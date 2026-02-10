@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -14,6 +13,7 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     // Log request for analytics
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Gacha pull requested from:', undefined, {
       userAgent: request.headers.get('user-agent'),
     });
@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error in gacha:',
       undefined,

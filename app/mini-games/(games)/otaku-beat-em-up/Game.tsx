@@ -71,7 +71,7 @@ export default function OtakuBeatEmUpGameWrapper({ mode }: OtakuBeatEmUpGameWrap
     <GameStateMachine
       gameId="otaku-beat-em-up"
       gameTitle={`Otaku Beat-Em-Up - ${modeTitle}`}
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

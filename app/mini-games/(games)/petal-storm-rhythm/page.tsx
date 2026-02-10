@@ -35,6 +35,7 @@ import { getGameAvatarUsage } from '../../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { createPetalBurst, updatePetalParticles, type PetalParticle } from '../../_shared/vfx';
+import PetalStormRhythmGameWrapper from './Game';
 
 interface Note {
   id: string;

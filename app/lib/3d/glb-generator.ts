@@ -8,8 +8,8 @@
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import * as THREE from 'three';
 import { EnhancedProceduralMesh } from './enhanced-procedural-mesh';
-import { logger } from '@/app/lib/logger';
 import type { FullCharacterConfig } from '@/app/test/character-creator/types';
+import { logger } from '@/app/lib/logger';
 
 export interface GLBGenerationOptions {
   quality?: 'low' | 'medium' | 'high' | 'ultra';
@@ -76,6 +76,7 @@ export async function generateGLBFromConfig(
   config: FullCharacterConfig,
   options: GLBGenerationOptions = {}
 ): Promise<GLBGenerationResult> {
+  const { logger } = await import('@/app/lib/logger');
   const startTime = performance.now();
   
   try {
@@ -146,6 +147,7 @@ export async function generateGLBFromConfig(
       },
     };
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('GLB generation failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     
     return {
@@ -163,6 +165,7 @@ async function buildCharacterFromConfig(
   config: FullCharacterConfig,
   options: GLBGenerationOptions & { qualityPreset: typeof QUALITY_PRESETS[keyof typeof QUALITY_PRESETS] }
 ): Promise<THREE.Group | null> {
+  const { logger } = await import('@/app/lib/logger');
   try {
     const group = new THREE.Group();
     group.name = 'Character';
@@ -821,6 +824,7 @@ async function buildCharacterFromConfig(
 
     return group;
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to build character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
@@ -1086,6 +1090,7 @@ async function exportToGLB(
   group: THREE.Group,
   options: GLBGenerationOptions
 ): Promise<ArrayBuffer> {
+  const { logger } = await import('@/app/lib/logger');
   return new Promise((resolve, reject) => {
     try {
       const exporter = new GLTFExporter();
@@ -1286,6 +1291,7 @@ export async function generateAndDownloadGLB(
       URL.revokeObjectURL(url);
     }, 1000);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to trigger download:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }

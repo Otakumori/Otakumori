@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -9,6 +8,7 @@ import { CartUpdateSchema } from '@/app/lib/contracts';
 export async function GET(req: NextRequest) {
   try {
     // Log cart request for analytics
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Cart GET requested from:', undefined, { userAgent: req.headers.get('user-agent') });
 
     const { userId } = await auth();
@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error fetching cart:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
@@ -142,6 +143,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Error updating cart:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }

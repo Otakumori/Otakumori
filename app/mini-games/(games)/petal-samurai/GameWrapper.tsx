@@ -8,7 +8,6 @@ import { GameUI } from '../../_shared/GameUI';
 import Game from './Game';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
-import type { DifficultyLevel } from '../../_shared/GameEntryFlow';
 
 interface PetalSamuraiGameWrapperProps {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
@@ -48,14 +47,20 @@ export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }:
   }, []);
 
   const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer: number; progress: number; lives?: number }) => {
-    setGameStats(stats);
+    setGameStats({
+      score: stats.score,
+      combo: stats.combo,
+      timer: stats.timer,
+      progress: stats.progress,
+      lives: stats.lives ?? 3,
+    });
   }, []);
 
   return (
     <GameStateMachine
       gameId="petal-samurai"
       gameTitle="Petal Samurai"
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

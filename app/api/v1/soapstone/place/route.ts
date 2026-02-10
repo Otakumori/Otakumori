@@ -10,7 +10,6 @@
  * - Petal economy integration
  */
 
-import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -275,6 +274,7 @@ async function handler(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Soapstone placement error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     await metricsCollector.track('soapstone_placement_error', {
@@ -346,6 +346,7 @@ async function checkUserRateLimits(userId: string) {
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   // Log rate limit check for debugging
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('Checking rate limits for user:', undefined, { userId, oneHourAgo, oneDayAgo });
 
   // Mock counts for now - in production would query soapstones by userId and time range
@@ -375,6 +376,7 @@ async function checkUserRateLimits(userId: string) {
 
 async function checkForDuplicates(userId: string, message: string, page: string) {
   // Log duplicate check for debugging
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('Checking for duplicates:', undefined, { userId, messagelength: message.length, page });
 
   // Mock implementation - in production would query recent soapstones
@@ -386,6 +388,7 @@ async function checkForDuplicates(userId: string, message: string, page: string)
 
 async function checkLocationCooldown(userId: string, page: string, section?: string) {
   // Log cooldown check for debugging
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('Checking location cooldown:', undefined, { userId, page, section: section || 'none' });
 
   // Mock implementation - in production would check recent soapstones at this location
@@ -432,6 +435,7 @@ function calculatePetalReward(message: string, tags: string[], score: number): n
 
 async function updateUserSoapstoneStats(userId: string) {
   // Log user stats update
+  const { logger } = await import('@/app/lib/logger');
   logger.warn(`Updated soapstone stats for user ${userId}`);
 
   // Simplified user update - removing updatedAt since it may not exist
@@ -445,6 +449,7 @@ async function updateUserSoapstoneStats(userId: string) {
 
 async function getSoapstoneCount(userId: string): Promise<number> {
   // Log soapstone count query
+  const { logger } = await import('@/app/lib/logger');
   logger.warn('Getting soapstone count for user:', undefined, { value: userId });
 
   // Mock implementation - in production would query soapstones table
@@ -460,6 +465,7 @@ function getQualityTier(score: number): string {
 
 async function checkSoapstoneAchievements(userId: string, message: any) {
   // Check achievements for soapstone milestones
+  const { logger } = await import('@/app/lib/logger');
   logger.warn(
     `Soapstone message placed by user ${userId}, checking achievements for message:`,
     message.text?.substring(0, 50),

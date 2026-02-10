@@ -1,5 +1,4 @@
 
-import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { monitor } from '@/lib/monitor';
 // import { redis } from '../../lib/redis';
@@ -9,6 +8,7 @@ export async function GET() {
   try {
     // Get metrics from Redis
     const metrics = await monitor.getMetrics();
+    const { logger } = await import('@/app/lib/logger');
     logger.warn(`Metrics requested: ${Object.keys(metrics).length} metric types`);
 
     // Get historical metrics (last 24 hours)
@@ -33,6 +33,7 @@ export async function GET() {
       historicalCount: historicalMetrics.length,
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching metrics:',
       undefined,
@@ -46,6 +47,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
+    const { logger } = await import('@/app/lib/logger');
     logger.warn('Metrics POST received:', undefined, { metricCount: Object.keys(data).length });
 
     // TODO: Integrate HTTP-based Redis client to store metrics
@@ -60,6 +62,7 @@ export async function POST(req: Request) {
       timestamp: Date.now(),
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error storing metrics:',
       undefined,

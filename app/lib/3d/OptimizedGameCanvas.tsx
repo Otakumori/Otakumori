@@ -6,7 +6,6 @@
 
 'use client';
 
-import * as THREE from 'three';
 import { Canvas, type CanvasProps } from '@react-three/fiber';
 import {
   PerformanceMonitor,

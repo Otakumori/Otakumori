@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useEffect } from 'react';
 import { FEATURE_FLAGS } from '@/constants.client';
 
@@ -17,6 +16,7 @@ export default function PerformanceMonitor() {
         const { initializePerformanceMonitoring } = await import('../lib/performance');
         initializePerformanceMonitoring();
       } catch (error) {
+        const { logger } = await import('@/app/lib/logger');
         logger.warn('Performance monitoring failed to initialize:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       }
     };

@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Users, Gamepad2, MessageSquare, Settings } from 'lucide-react';
@@ -37,9 +36,11 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
       if (result.ok) {
         setParties(result.data.parties);
       } else {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Failed to load parties:', result.error);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Error loading parties:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
@@ -69,9 +70,11 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
           gameMode: 'mini-games',
         });
       } else {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('Failed to create party:', result.error);
       }
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Error creating party:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };

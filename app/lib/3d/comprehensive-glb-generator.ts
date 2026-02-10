@@ -8,8 +8,8 @@
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import * as THREE from 'three';
 import { EnhancedProceduralMesh } from './enhanced-procedural-mesh';
-import { logger } from '@/app/lib/logger';
 import type { FullCharacterConfig } from '@/app/test/character-creator/types';
+import { logger } from '@/app/lib/logger';
 import { createAdvancedCelShadedMaterial, CODE_VEIN_PRESET } from './advanced-cel-shading';
 import { getGameTranslationConfig, type GameTranslationConfig } from './character-translator';
 
@@ -195,6 +195,7 @@ export async function generateComprehensiveGLB(
   config: FullCharacterConfig,
   options: ComprehensiveGLBOptions = {}
 ): Promise<GenerationResult> {
+  const { logger } = await import('@/app/lib/logger');
   const startTime = performance.now();
   const buildStartTime = performance.now();
   let parameterCount = 0;
@@ -375,6 +376,7 @@ export async function generateComprehensiveGLB(
       },
     };
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Comprehensive GLB generation failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
@@ -400,6 +402,7 @@ async function buildComprehensiveCharacter(
     onParameterApplied: () => void;
   }
 ): Promise<BuildResult> {
+  const { logger } = await import('@/app/lib/logger');
   const failedParts: string[] = [];
   const partTimings: Record<string, number> = {};
 
@@ -598,6 +601,7 @@ async function buildComprehensiveCharacter(
 
     return { group, failedParts, partTimings };
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to build comprehensive character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return { group: null, failedParts: ['all'], partTimings };
   }
@@ -731,6 +735,7 @@ async function buildDetailedHead(
 
     return group;
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to build detailed head:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
@@ -842,6 +847,7 @@ async function buildDetailedEyes(
 
     return group;
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to build detailed eyes:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
@@ -1098,6 +1104,7 @@ export async function generateAndDownloadComprehensiveGLB(
       URL.revokeObjectURL(url);
     }, 1000);
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('Failed to trigger download:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
@@ -1151,14 +1158,18 @@ async function exportToGLB(
             reject(error instanceof Error ? error : new Error(String(error)));
           }
         },
-        (error) => {
+        async (error) => {
+          const { logger } = await import('@/app/lib/logger');
           logger.error('GLTFExporter error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           reject(error instanceof Error ? error : new Error('GLB export failed'));
         },
         exportOptions
       );
     } catch (error) {
-      logger.error('Failed to initialize GLTFExporter:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      (async () => {
+        const { logger } = await import('@/app/lib/logger');
+        logger.error('Failed to initialize GLTFExporter:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      })();
       reject(error instanceof Error ? error : new Error('Failed to initialize GLB exporter'));
     }
   });

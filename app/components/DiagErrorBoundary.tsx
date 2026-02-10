@@ -1,5 +1,4 @@
 'use client';
-import { logger } from '@/app/lib/logger';
 import React from 'react';
 
 type Props = { children: React.ReactNode };
@@ -10,7 +9,8 @@ export default class DiagErrorBoundary extends React.Component<Props, State> {
   static getDerivedStateFromError(err: any) {
     return { hasError: true, msg: String(err?.message || err) };
   }
-  componentDidCatch(error: any, info: any) {
+  async componentDidCatch(error: any, info: any) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error('[DiagErrorBoundary] caught', undefined, { error, info }, undefined);
   }
   render() {

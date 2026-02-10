@@ -1,6 +1,5 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -38,7 +37,10 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
   // Redirect to sign-in if user is not authenticated
   useEffect(() => {
     if (isOpen && !user) {
-      logger.warn('User not authenticated - friends feature requires sign-in');
+      (async () => {
+        const { logger } = await import('@/app/lib/logger');
+        logger.warn('User not authenticated - friends feature requires sign-in');
+      })();
       onClose();
     }
   }, [isOpen, user, onClose]);
@@ -75,6 +77,7 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
       // TODO: Load friend requests when that API is implemented
       setFriendRequests([]);
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('Failed to load friends:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);

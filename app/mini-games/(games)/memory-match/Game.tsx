@@ -43,14 +43,19 @@ export default function MemoryMatchGameWrapper() {
   }, []);
 
   const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer?: number; progress: number }) => {
-    setGameStats(stats);
+    setGameStats({
+      score: stats.score,
+      combo: stats.combo,
+      timer: stats.timer ?? undefined,
+      progress: stats.progress,
+    });
   }, []);
 
   return (
     <GameStateMachine
       gameId="memory-match"
       gameTitle="Memory Match"
-      assets={gameAssets.images.length > 0 || gameAssets.audio.length > 0 ? gameAssets : undefined}
+      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
       {(state, transitionTo) => {

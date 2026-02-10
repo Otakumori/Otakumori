@@ -10,7 +10,7 @@ import { PerspectiveCamera, Environment } from '@react-three/drei';
 import { Suspense, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { AnimeToonMaterial } from '../../test/shaders/AnimeToonShader';
+import { AnimeToonMaterial } from '@/app/test/shaders/AnimeToonShader';
 
 interface Character3DProps {
   className?: string;
