@@ -5,7 +5,7 @@ import { getAsset } from '../../_shared/assets-resolver';
 import { play } from '../../_shared/audio-bus';
 import { useAvatarForGame } from '../../_shared/useAvatarForGame';
 import { useGameAvatar } from '../../_shared/GameAvatarRenderer';
-import '../_shared/cohesion.css';
+import '../../_shared/cohesion.css';
 
 const ROUND_MS = 60_000;
 const MAX_BUBBLES = 24;

@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getAsset } from '../../_shared/assets-resolver';
 import { play } from '../../_shared/audio-bus';
-import '../_shared/cohesion.css';
+import '../../_shared/cohesion.css';
 
 const ROUND_MS = 60_000;
 const EMIT_EVERY_MS = 220; // emission cadence

@@ -7,7 +7,7 @@ import { getAsset } from '../../_shared/assets-resolver';
 import { play } from '../../_shared/audio-bus';
 import { useGameSave } from '../../_shared/SaveSystem';
 import { useGameAvatarData } from '../../_shared/GameAvatarIntegration';
-import '../_shared/cohesion.css';
+import '../../_shared/cohesion.css';
 
 // --- tunables (env/admin later) ---
 const PETALS_START = 28;
