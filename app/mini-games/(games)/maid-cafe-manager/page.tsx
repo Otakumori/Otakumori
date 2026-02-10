@@ -1,17 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
-import dynamic from 'next/dynamic';
-
-const MaidCafeManagerGame = dynamic(() => import('./Game'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--color-bg-base)' }}>
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p style={{ color: 'var(--color-text-secondary)' }}>Loading Maid Café Manager...</p>
-      </div>
-    </div>
-  ),
-});
+import MaidCafeManagerClient from './MaidCafeManagerClient';
 
 export function generateMetadata() {
   return generateSEO({
@@ -22,5 +10,5 @@ export function generateMetadata() {
 }
 
 export default function MaidCafeManagerPage() {
-  return <MaidCafeManagerGame />;
+  return <MaidCafeManagerClient />;
 }
