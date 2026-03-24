@@ -56,7 +56,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           />
         </head>
         <body className="flex min-h-screen flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
-          {/* Skip to main content link for accessibility */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-pink-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-black"
@@ -64,11 +63,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             Skip to main content
           </a>
           <ScrollRestoration />
-          <CherryBlossomEffect density="site" />
-          {isCursorGlowEnabled() && <CursorGlow />}
-          <PetalHUD />
-          <Konami />
-          <PetalProgressBar />
+
+          {/* TEMP: Disabled heavy global effects to isolate OOM */}
+          {/* <CherryBlossomEffect density="site" /> */}
+          {/* {isCursorGlowEnabled() && <CursorGlow />} */}
+          {/* <PetalHUD /> */}
+          {/* <Konami /> */}
+          {/* <PetalProgressBar /> */}
+
           <Sentry.ErrorBoundary
             fallback={
               <div className="p-8 text-center">
