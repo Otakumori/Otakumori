@@ -34,9 +34,27 @@ const QueryParamsSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
+function isRenderableListingImage(url: string | null | undefined): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const normalized = url.trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized.includes('seller.merchize.com/login')) return false;
+  if (normalized.includes('drive.google.com/drive/folders')) return false;
+  if (normalized.includes('drive.google.com/drive/u/')) return false;
+  if (normalized.includes('docs.google.com')) return false;
+  if (normalized.includes('placeholder') || normalized.includes('seed:')) return false;
+  if (normalized.startsWith('/')) return true;
+  if (normalized.includes('images-api.printify.com')) return true;
+  return /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(normalized);
+}
+
+function normalizeListingImages(images: string[]): string[] {
+  return images.filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index).slice(0, 2);
+}
+
 function toMerchizeCatalogProduct(product: Awaited<ReturnType<ReturnType<typeof getMerchizeService>['getProducts']>>[number]): CatalogProduct {
   const priceCents = product.price != null ? Math.round(product.price * 100) : null;
-  const images = product.images.map((image) => image.url).filter(Boolean);
+  const images = normalizeListingImages(product.images.map((image) => image.url).filter(Boolean));
   return {
     id: `merchize:${product.id}`,
     title: product.title,
@@ -71,6 +89,34 @@ function toMerchizeCatalogProduct(product: Awaited<ReturnType<ReturnType<typeof 
     blueprintId: null,
     printProviderId: null,
     lastSyncedAt: null,
+  };
+}
+
+function toListingProduct(product: CatalogProduct): CatalogProduct {
+  const images = normalizeListingImages(product.images || []);
+  const primaryImage = isRenderableListingImage(product.image) ? product.image : images[0] ?? null;
+  const trimmedVariants = (product.variants || [])
+    .filter((variant) => variant.isEnabled)
+    .slice(0, 12)
+    .map((variant) => ({
+      id: variant.id,
+      title: variant.title,
+      sku: variant.sku,
+      price: variant.price,
+      priceCents: variant.priceCents,
+      inStock: variant.inStock,
+      isEnabled: variant.isEnabled,
+      printifyVariantId: variant.printifyVariantId,
+      optionValues: (variant.optionValues || []).slice(0, 6),
+      previewImageUrl: isRenderableListingImage(variant.previewImageUrl) ? variant.previewImageUrl : null,
+    }));
+
+  return {
+    ...product,
+    description: (product.description || '').slice(0, 400),
+    image: primaryImage,
+    images: primaryImage ? [primaryImage, ...images.filter((image) => image !== primaryImage)].slice(0, 2) : images,
+    variants: trimmedVariants,
   };
 }
 
@@ -129,21 +175,25 @@ export async function GET(request: NextRequest) {
       db.product.findMany({
         where: { active: true, visible: true },
         include: { ProductVariant: true, ProductImage: { orderBy: { position: 'asc' } } },
-        take: 200,
+        take: 120,
         orderBy: { updatedAt: 'desc' },
       }),
-      getMerchizeService().getProducts({ limit: 50, page: 1 }),
+      getMerchizeService().getProducts({ limit: 30, page: 1 }),
     ]);
 
     const merged = [
-      ...prismaProducts.map(serializeProduct),
-      ...merchizeProducts.map(toMerchizeCatalogProduct),
-    ];
+      ...prismaProducts.map(serializeProduct).map(toListingProduct),
+      ...merchizeProducts.map(toMerchizeCatalogProduct).map(toListingProduct),
+    ].filter((product) => Boolean(product.image));
 
     const filtered = sortProducts(filterProducts(merged, params), params);
     const total = filtered.length;
     const totalPages = Math.ceil(total / limit);
     const paginated = filtered.slice((page - 1) * limit, page * limit);
+
+    const pricedProducts = merged.filter((product) => typeof product.price === 'number');
+    const minPrice = pricedProducts.length > 0 ? Math.min(...pricedProducts.map((product) => product.price as number)) : 0;
+    const maxPrice = pricedProducts.length > 0 ? Math.max(...pricedProducts.map((product) => product.price as number)) : 0;
 
     return NextResponse.json(createApiSuccess({
       products: paginated,
@@ -155,10 +205,7 @@ export async function GET(request: NextRequest) {
       },
       filters: {
         availableCategories: Array.from(new Set(merged.map((product) => product.categorySlug || product.category).filter(Boolean))) as string[],
-        priceRange: {
-          min: merged.reduce((min, product) => product.price != null ? Math.min(min, product.price) : min, Number.POSITIVE_INFINITY),
-          max: merged.reduce((max, product) => product.price != null ? Math.max(max, product.price) : max, 0),
-        },
+        priceRange: { min: minPrice, max: maxPrice },
         availableColors: [],
         availableSizes: [],
       },
