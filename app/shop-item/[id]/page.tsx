@@ -1,5 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
-import ProviderProductDetailClient from '@/app/components/shop/ProviderProductDetailClient';
+import ProofProviderProductDetailClient from '@/app/components/shop/ProofProviderProductDetailClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,7 @@ export default async function ShopItemPage({ params }: { params: Promise<{ id: s
   return (
     <main className="relative min-h-screen vignette">
       <div className="relative z-40 container mx-auto px-4 py-8">
-        <ProviderProductDetailClient productId={id} />
+        <ProofProviderProductDetailClient productId={id} />
       </div>
     </main>
   );
