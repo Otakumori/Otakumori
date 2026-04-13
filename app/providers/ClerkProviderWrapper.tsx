@@ -14,11 +14,9 @@ interface ClerkProviderWrapperProps {
 }
 
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
-  // Use the environment-specific publishable key from Vercel environment variables
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
-    // Log error asynchronously (non-blocking)
     getLogger().then((logger) => {
       logger.error(' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
     }).catch(() => {
@@ -27,14 +25,8 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     return <div>Authentication configuration error</div>;
   }
 
-  // Environment-specific configuration - use the actual env var that's set
   const isProduction = clientEnv.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-  const _isDevelopment =
-    typeof window !== 'undefined'
-      ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      : !isProduction;
 
-  // Dynamic props based on environment
   const clerkProps: any = {
     publishableKey,
     signInUrl: '/sign-in',
@@ -45,15 +37,15 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  // Production: use main domain (not subdomain), no proxy
+  const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
+  const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
+
   if (isProduction) {
-    clerkProps.domain = 'otaku-mori.com';
-  }
-  // Development/Preview: use proxy, no domain
-  else {
-    if (clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL) {
-      clerkProps.proxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL;
+    if (configuredDomain) {
+      clerkProps.domain = configuredDomain;
     }
+  } else if (configuredProxyUrl) {
+    clerkProps.proxyUrl = configuredProxyUrl;
   }
 
   return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;
