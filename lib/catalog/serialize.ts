@@ -28,7 +28,8 @@ export interface CatalogProduct {
   available: boolean;
   visible: boolean;
   active: boolean;
-  isLocked?: boolean; // Printify "Publishing" status
+  isLocked?: boolean;
+  provider?: 'internal' | 'printify' | 'merchize';
   variants: Array<{
     id: string;
     title: string | null;
@@ -94,10 +95,11 @@ function coerceOptionValues(value: unknown): OptionValue[] {
 export function serializeProduct(product: ProductWithRelations): CatalogProduct {
   const priceRange = computePriceRange(product.ProductVariant);
   const slugSource = product.printifyProductId ?? product.id;
-
-  // Extract is_locked from specs JSON if it exists
   const specs = (product.specs as any) ?? {};
   const isLocked = specs.is_locked ?? false;
+  const provider: CatalogProduct['provider'] = product.printifyProductId || product.integrationRef === 'printify'
+    ? 'printify'
+    : 'internal';
 
   return {
     id: product.id,
@@ -116,6 +118,7 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     visible: product.visible ?? true,
     active: product.active ?? true,
     isLocked,
+    provider,
     variants: product.ProductVariant.map((variant) => ({
       id: variant.id,
       title: variant.title ?? null,
