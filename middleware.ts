@@ -104,6 +104,7 @@ export default clerkMiddleware(async (auth, req) => {
     const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
+    const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
     const { userId, sessionClaims } = await auth();
 
     const reqId =
@@ -137,7 +138,7 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(url, 308);
     }
 
-    if (isAdmin(req)) {
+    if (isAdmin(req) && !isMerchizeAdminProbe) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
@@ -149,7 +150,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    if (isProtected(req)) {
+    if (isProtected(req) && !isMerchizeAdminProbe) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
