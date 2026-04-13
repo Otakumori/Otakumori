@@ -2,10 +2,9 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 
-// Avoid throwing in middleware for missing env at Edge runtime; Clerk SDK handles configuration
+const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 
 const isProtected = createRouteMatcher([
-  // User account pages
   '/account(.*)',
   '/profile(.*)',
   '/orders(.*)',
@@ -14,19 +13,13 @@ const isProtected = createRouteMatcher([
   '/prefs(.*)',
   '/data-deletion(.*)',
   '/cookies(.*)',
-
-  // Interactive features requiring auth
   '/trade(.*)',
   '/soapstone(.*)',
   '/character-editor(.*)',
   '/starter-pack(.*)',
   '/thank-you(.*)',
-
-  // Admin pages
   '/admin(.*)',
   '/panel(.*)',
-
-  // API routes requiring auth
   '/api/account(.*)',
   '/api/orders(.*)',
   '/api/wishlist(.*)',
@@ -96,6 +89,14 @@ const isProtected = createRouteMatcher([
 
 const isAdmin = createRouteMatcher(['/admin(.*)', '/panel(.*)', '/api/admin(.*)']);
 
+function buildAccountsUrl(path: string, redirectUrl?: string) {
+  const url = new URL(path, ACCOUNTS_BASE_URL);
+  if (redirectUrl) {
+    url.searchParams.set('redirect_url', redirectUrl);
+  }
+  return url;
+}
+
 export default clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
@@ -105,13 +106,11 @@ export default clerkMiddleware(async (auth, req) => {
     const isIngest = url.pathname.startsWith('/ingest');
     const { userId, sessionClaims } = await auth();
 
-    // Correlation ID for request tracking
     const reqId =
       req.headers.get('x-request-id') ||
       req.headers.get('x-correlation-id') ||
       `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // API routes: CORS + diagnostics headers
     if (isApi || isIngest) {
       if (req.method === 'OPTIONS') {
         return handleCorsPreflight(req);
@@ -125,46 +124,37 @@ export default clerkMiddleware(async (auth, req) => {
       });
     }
 
-    // Canonical redirect (avoid redirect loops and subdomains)
     const isApex = host === 'otaku-mori.com';
     const isAccounts = host.startsWith('accounts.');
     if (!isAccounts && isApex) {
-      url.host = `www.otaku-mori.com`;
+      url.host = 'www.otaku-mori.com';
       return NextResponse.redirect(url, 308);
     }
 
-    // Enforce HTTPS on primary domain
     const isPrimary = host.endsWith('otaku-mori.com');
     if (isPrimary && proto !== 'https') {
       url.protocol = 'https:';
       return NextResponse.redirect(url, 308);
     }
 
-    // Admin gates
     if (isAdmin(req)) {
       if (!userId) {
-        const signInUrl = new URL('/sign-in', req.url);
-        signInUrl.searchParams.set('redirect_url', req.url);
-        return NextResponse.redirect(signInUrl);
+        return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
       const isAdminUser =
         (sessionClaims as any)?.metadata?.role === 'admin' ||
         (sessionClaims as any)?.public_metadata?.role === 'admin';
       if (!isAdminUser) {
-        return NextResponse.redirect(new URL('/unauthorized', req.url));
+        return NextResponse.redirect(buildAccountsUrl('/unauthorized-sign-in', req.url));
       }
     }
 
-    // Protected gates
     if (isProtected(req)) {
       if (!userId) {
-        const signInUrl = new URL('/sign-in', req.url);
-        signInUrl.searchParams.set('redirect_url', req.url);
-        return NextResponse.redirect(signInUrl);
+        return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
     }
 
-    // Public route: add security headers
     const res = NextResponse.next();
     res.headers.set('X-Request-ID', reqId);
     res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
@@ -174,14 +164,12 @@ export default clerkMiddleware(async (auth, req) => {
     if (userId) res.headers.set('X-User-ID', userId);
     return res;
   } catch {
-    // Fail-open to avoid user-facing 500s from middleware
     return NextResponse.next();
   }
 });
 
 export const config = {
   matcher: [
-    // Exclude Next internals, static assets, and most API routes from middleware
     '/((?!_next|_vercel|favicon.ico|robots.txt|sitemap.xml|public/|assets/|.*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
   ],
 };
