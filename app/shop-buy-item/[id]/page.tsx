@@ -1,5 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
-import BuyReadyProductDetailClient from '@/app/components/shop/BuyReadyProductDetailClient';
+import ProofProviderProductDetailClient from '@/app/components/shop/ProofProviderProductDetailClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,7 +7,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   return generateSEO({
     title: 'Product Options',
-    description: 'Provider-backed product detail page with add-to-cart and checkout actions.',
+    description: 'Provider-backed product detail page.',
     url: `/shop-buy-item/${id}`,
   });
 }
@@ -18,7 +18,7 @@ export default async function ShopBuyItemPage({ params }: { params: Promise<{ id
   return (
     <main className="relative min-h-screen vignette">
       <div className="relative z-40 container mx-auto px-4 py-8">
-        <BuyReadyProductDetailClient productId={id} />
+        <ProofProviderProductDetailClient productId={id} />
       </div>
     </main>
   );
