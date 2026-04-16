@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import AuthProvider from './_components/auth/AuthProvider';
+import { CartProvider } from './components/cart/CartProvider';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -16,7 +17,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <ClerkProviderWrapper nonce={nonce || undefined}>
       <html lang="en">
         <body>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <CartProvider>{children}</CartProvider>
+          </AuthProvider>
         </body>
       </html>
     </ClerkProviderWrapper>
