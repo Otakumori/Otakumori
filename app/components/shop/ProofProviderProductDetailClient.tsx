@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
+import { useCart } from '@/app/components/cart/CartProvider';
 
 type CatalogVariant = CatalogProduct['variants'][number];
 
@@ -26,10 +27,13 @@ function getPrice(product: CatalogProduct, variant: CatalogVariant | null) {
 }
 
 export default function ProofProviderProductDetailClient({ productId }: { productId: string }) {
+  const { addItem } = useCart();
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<CatalogVariant | null>(null);
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,13 +83,34 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
       <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-200">
         <h1 className="text-2xl font-semibold mb-2">Proof detail page failed</h1>
         <p>{error || 'Unknown error'}</p>
-        <Link href="/shop-proof" className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to proof shop</Link>
+        <Link href="/shop-cart-ready" className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to shop</Link>
       </div>
     );
   }
 
   const image = product.image ?? product.images?.[0] ?? '';
   const price = getPrice(product, selectedVariant);
+
+  const handleAddToCart = () => {
+    if (!selectedVariant) {
+      setNotice('Select a variant first.');
+      return;
+    }
+
+    addItem({
+      id: product.id,
+      name: product.title,
+      price,
+      quantity,
+      image,
+      selectedVariant: {
+        id: selectedVariant.id,
+        title: selectedVariant.title ?? selectedVariant.sku ?? 'Default variant',
+      },
+    });
+
+    setNotice(`${product.title} added to cart.`);
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -113,6 +138,7 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
               onChange={(e) => {
                 const nextVariant = product.variants.find((variant) => variant.id === e.target.value) ?? null;
                 setSelectedVariant(nextVariant);
+                setNotice(null);
               }}
               className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
             >
@@ -128,13 +154,31 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
           </div>
         )}
 
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <label htmlFor="proof-quantity" className="mb-2 block text-sm font-medium text-pink-200">Quantity</label>
+          <input
+            id="proof-quantity"
+            type="number"
+            min="1"
+            max="99"
+            value={quantity}
+            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value || '1', 10) || 1))}
+            className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button onClick={handleAddToCart} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-5 py-3 text-sm text-white hover:bg-pink-500 transition-colors">Add to cart</button>
+          <Link href="/shop-cart-ready" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
+        </div>
+
+        {notice ? <p className="text-sm text-pink-200">{notice}</p> : null}
+
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-zinc-300">
           <p><span className="font-medium text-pink-200">Product ID:</span> {product.id}</p>
           <p><span className="font-medium text-pink-200">SKU:</span> {selectedVariant?.sku || 'N/A'}</p>
           <p><span className="font-medium text-pink-200">Category:</span> {product.category || 'N/A'}</p>
         </div>
-
-        <Link href="/shop-proof" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to proof shop</Link>
       </div>
     </div>
   );
