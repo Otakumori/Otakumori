@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
@@ -27,6 +28,7 @@ function getPrice(product: CatalogProduct, variant: CatalogVariant | null) {
 }
 
 export default function ProofProviderProductDetailClient({ productId }: { productId: string }) {
+  const router = useRouter();
   const { addItem } = useCart();
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<CatalogVariant | null>(null);
@@ -91,10 +93,10 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
   const image = product.image ?? product.images?.[0] ?? '';
   const price = getPrice(product, selectedVariant);
 
-  const handleAddToCart = () => {
+  const addCurrentSelectionToCart = () => {
     if (!selectedVariant) {
       setNotice('Select a variant first.');
-      return;
+      return false;
     }
 
     addItem({
@@ -110,6 +112,13 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
     });
 
     setNotice(`${product.title} added to cart.`);
+    return true;
+  };
+
+  const handleBuyNow = () => {
+    const added = addCurrentSelectionToCart();
+    if (!added) return;
+    router.push('/checkout');
   };
 
   return (
@@ -168,7 +177,9 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button onClick={handleAddToCart} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-5 py-3 text-sm text-white hover:bg-pink-500 transition-colors">Add to cart</button>
+          <button onClick={addCurrentSelectionToCart} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-5 py-3 text-sm text-white hover:bg-pink-500 transition-colors">Add to cart</button>
+          <button onClick={handleBuyNow} className="inline-flex items-center justify-center rounded-xl border border-pink-300/30 bg-white/5 px-5 py-3 text-sm text-pink-100 hover:bg-white/10 transition-colors">Buy now</button>
+          <Link href="/checkout" className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">Go to checkout</Link>
           <Link href="/shop-cart-ready" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
         </div>
 
