@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import AuthProvider from './_components/auth/AuthProvider';
 import { CartProvider } from './components/cart/CartProvider';
+import Navbar from './components/layout/Navbar';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -18,7 +19,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang="en">
         <body>
           <AuthProvider>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+              <Navbar />
+              {children}
+            </CartProvider>
           </AuthProvider>
         </body>
       </html>
