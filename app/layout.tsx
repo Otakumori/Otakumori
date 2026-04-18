@@ -2,7 +2,7 @@ import './globals.css';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
-import AuthProvider from './_components/auth/AuthProvider';
+import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './components/cart/CartProvider';
 import Navbar from './components/layout/Navbar';
 
