@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
+import { paths } from '@/lib/paths';
 import { useCart } from '@/app/components/cart/CartProvider';
 
 type CatalogVariant = CatalogProduct['variants'][number];
@@ -118,7 +119,7 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
   const handleBuyNow = () => {
     const added = addCurrentSelectionToCart();
     if (!added) return;
-    router.push('/checkout');
+    router.push(paths.checkout());
   };
 
   return (
@@ -179,7 +180,8 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
         <div className="flex flex-wrap gap-3">
           <button onClick={addCurrentSelectionToCart} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-5 py-3 text-sm text-white hover:bg-pink-500 transition-colors">Add to cart</button>
           <button onClick={handleBuyNow} className="inline-flex items-center justify-center rounded-xl border border-pink-300/30 bg-white/5 px-5 py-3 text-sm text-pink-100 hover:bg-white/10 transition-colors">Buy now</button>
-          <Link href="/checkout" className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">Go to checkout</Link>
+          <Link href={paths.checkout()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">Go to checkout</Link>
+          <Link href={paths.cart()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">View cart</Link>
           <Link href="/shop-cart-ready" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
         </div>
 
