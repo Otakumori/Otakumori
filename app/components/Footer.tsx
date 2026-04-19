@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { useAuthContext } from '@/app/contexts/AuthContext';
+import { paths } from '@/lib/paths';
 import { GlowingSocialIcons } from './footer/GlowingSocialIcons';
 import { AnimatedInput } from './ui/AnimatedInput';
 
@@ -23,10 +25,8 @@ export default function Footer() {
     e.preventDefault();
     if (!soapstoneText.trim() || isSubmitting) return;
 
-    // Check auth before submitting
     if (!user) {
       requireAuthForSoapstone(() => {
-        // After sign-in, user can try again
       });
       return;
     }
@@ -57,7 +57,6 @@ export default function Footer() {
     }
   };
 
-  // Hide footer during GameCube boot animation
   const [hideFooter, setHideFooter] = useState(false);
   
   useEffect(() => {
@@ -67,10 +66,8 @@ export default function Footer() {
       setHideFooter(shouldHide);
     };
     
-    // Check initially
     checkBootAnimation();
     
-    // Watch for boot animation changes
     const observer = new MutationObserver(checkBootAnimation);
     observer.observe(document.body, { childList: true, subtree: true });
     
@@ -85,31 +82,28 @@ export default function Footer() {
     <footer
       className="relative backdrop-blur-md border-t"
       style={{ 
-        // Use design system footer color with transparency
         backgroundColor: 'var(--color-footer-muted)',
         borderColor: 'var(--color-border-muted)',
         zIndex: 40,
-        // Gradient fade at top of footer to blend tree using design system colors
         backgroundImage: `linear-gradient(to top, var(--color-footer-muted) 0%, var(--color-footer-muted) 50%, transparent 100%)`,
       }}
     >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Compact Soapstone Input */}
         <section className="mx-auto mt-16 max-w-4xl px-4 pb-10">
           <div className="border border-[var(--om-border-soft)] bg-[var(--om-bg-surface)] px-4 py-4 rounded-xl">
             <form onSubmit={handleSoapstoneSubmit} className="max-w-2xl mx-auto">
               <div className="flex gap-2">
                 <div className="flex-1">
                   <AnimatedInput
-                  id="soapstone-input"
-                  type="text"
+                    id="soapstone-input"
+                    type="text"
                     label="Leave a sign for fellow travelers"
-                  value={soapstoneText}
-                  onChange={(e) => setSoapstoneText(e.target.value)}
-                  placeholder="Compose a sign…"
-                  maxLength={140}
+                    value={soapstoneText}
+                    onChange={(e) => setSoapstoneText(e.target.value)}
+                    placeholder="Compose a sign…"
+                    maxLength={140}
                     className="bg-[var(--om-bg-root)] border-[var(--om-border-soft)] text-[var(--om-text-ivory)] placeholder-[var(--om-text-ivory)]/50"
-                />
+                  />
                 </div>
                 <button
                   type="submit"
@@ -132,28 +126,19 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Explore</h4>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="/shop"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.shop()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Shop
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/mini-games"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.games()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Mini-Games
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/blog"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.blogIndex()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Blog: Read the lore
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -161,28 +146,19 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="/help"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.help()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/privacy"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.privacy()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/terms"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.terms()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -190,31 +166,21 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Connect</h4>
             <ul className="space-y-2 mb-4">
               <li>
-                <a
-                  href="/community"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.community()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Community
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/community/soapstones"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.soapstones()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   View All Signs
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/cookies"
-                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                >
+                <Link href={paths.cookies()} className="text-gray-300 hover:text-white text-sm transition-colors">
                   Cookie Settings
-                </a>
+                </Link>
               </li>
             </ul>
-            {/* Social Media Icons */}
             <GlowingSocialIcons />
           </div>
         </div>
