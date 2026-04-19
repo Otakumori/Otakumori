@@ -36,8 +36,6 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     publishableKey,
     signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
     signUpUrl: `${ACCOUNTS_BASE_URL}/sign-up`,
-    afterSignInUrl: '/',
-    afterSignUpUrl: '/',
     fallbackRedirectUrl: '/',
     nonce,
   };
