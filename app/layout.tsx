@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { NSFWProvider } from './contexts/NSFWContext';
 import Navbar from './components/layout/Navbar';
 
 interface RootLayoutProps {
@@ -20,8 +21,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <body>
           <AuthProvider>
             <ToastProvider>
-              <Navbar />
-              {children}
+              <NSFWProvider>
+                <Navbar />
+                {children}
+              </NSFWProvider>
             </ToastProvider>
           </AuthProvider>
         </body>
