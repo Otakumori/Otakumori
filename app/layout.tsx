@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { AuthProvider } from './contexts/AuthContext';
-import { CartProvider } from './components/cart/CartProvider';
 import Navbar from './components/layout/Navbar';
 
 interface RootLayoutProps {
@@ -19,10 +18,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang="en">
         <body>
           <AuthProvider>
-            <CartProvider>
-              <Navbar />
-              {children}
-            </CartProvider>
+            <Navbar />
+            {children}
           </AuthProvider>
         </body>
       </html>
