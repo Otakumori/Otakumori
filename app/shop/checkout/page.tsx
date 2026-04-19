@@ -1,6 +1,5 @@
 'use client';
 
-// Force dynamic rendering to avoid static generation issues with context providers
 export const dynamic = 'force-dynamic';
 
 async function getLogger() {
@@ -8,7 +7,7 @@ async function getLogger() {
   return logger;
 }
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -16,7 +15,7 @@ import { AnimatedInput } from '@/app/components/ui/AnimatedInput';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 import { PetalBalanceDisplay } from '@/app/components/shop/PetalBalanceDisplay';
 import { paths } from '@/lib/paths';
 
@@ -44,8 +43,9 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const { items: cart, clearCart: _clearCart, total } = useCart();
-  const { isSignedIn, userId: _userId } = useAuth();
+  const { items: cart, total } = useCart();
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',
@@ -58,6 +58,16 @@ export default function CheckoutPage() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    setShippingInfo((prev) => ({
+      ...prev,
+      firstName: prev.firstName || user.firstName || '',
+      lastName: prev.lastName || user.lastName || '',
+      email: prev.email || user.primaryEmailAddress?.emailAddress || '',
+    }));
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -225,9 +235,9 @@ export default function CheckoutPage() {
 
                 <div className="border-t border-pink-500/30 pt-4 space-y-2">
                   <div className="flex justify-between text-pink-200"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-pink-200"><span>Shipping</span><span>$5.00</span></div>
-                  <div className="flex justify-between text-pink-200"><span>Tax</span><span>Calculated at checkout</span></div>
-                  <div className="flex justify-between border-t border-pink-500/30 pt-2 font-semibold text-white"><span>Total</span><span>${(total + 5).toFixed(2)}</span></div>
+                  <div className="flex justify-between text-pink-200"><span>Shipping</span><span>Calculated at payment</span></div>
+                  <div className="flex justify-between text-pink-200"><span>Tax</span><span>Calculated at payment</span></div>
+                  <div className="flex justify-between border-t border-pink-500/30 pt-2 font-semibold text-white"><span>Total</span><span>${total.toFixed(2)} + shipping</span></div>
                 </div>
               </div>
             </Card>
