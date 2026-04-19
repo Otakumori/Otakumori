@@ -19,7 +19,6 @@ import { useCart } from '@/app/components/cart/CartProvider';
 import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide-react';
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 
-// Safely get featured games from registry with defensive checks
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
     id?: string;
@@ -40,9 +39,6 @@ const FEATURED_GAMES = (gamesRegistry?.games || [])
     status: game?.ageRating === 'M' ? 'beta' : 'ready',
   }));
 
-// Real data will be fetched from APIs
-
-// Search suggestions with easter eggs (unused - reserved for future use)
 const _SEARCH_SUGGESTIONS = [
   'sakura',
   'gaming',
@@ -62,25 +58,27 @@ const _EASTER_EGGS: Record<string, string> = {
   gamecube: 'Ready for some nostalgic gaming?',
 };
 
+const buildShopCategoryHref = (category: string) => `${paths.shop()}?category=${encodeURIComponent(category)}`;
+
 const SHOP_CATEGORY_LINKS = [
   {
     label: 'Pins & Badges',
-    href: '/shop?category=pins',
+    href: buildShopCategoryHref('pins'),
     description: 'Limited-run enamel drops and badge sets.',
   },
   {
     label: 'Apparel',
-    href: '/shop?category=apparel',
+    href: buildShopCategoryHref('apparel'),
     description: 'Tees, hoodies, and jackets with otaku flair.',
   },
   {
     label: 'Accessories',
-    href: '/shop?category=accessories',
+    href: buildShopCategoryHref('accessories'),
     description: 'Keychains, charms, and everyday carry.',
   },
   {
     label: 'Wall Art',
-    href: '/shop?category=prints',
+    href: buildShopCategoryHref('prints'),
     description: 'Poster prints and canvas collabs.',
   },
 ];
@@ -116,66 +114,19 @@ export default function Navbar() {
   const { requireAuthForSoapstone, requireAuthForWishlist, signOut } = useAuthContext();
   const { itemCount } = useCart();
 
-  // State for mega-menu
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // Computed ARIA values (using useMemo to satisfy accessibility checker)
   const userMenuAriaExpanded = useMemo(() => showUserMenu, [showUserMenu]);
   const mobileMenuAriaExpanded = useMemo(() => isMenuOpen, [isMenuOpen]);
 
-  // Scroll state for navbar effects
   const [isScrolled, setIsScrolled] = useState(false);
   const [_scrollY, setScrollY] = useState(0);
-
-  // State for real data
-  const [realProducts, setRealProducts] = useState<any[]>([]);
-  const [realBlogPosts, setRealBlogPosts] = useState<any[]>([]);
-  const [productsLoaded, setProductsLoaded] = useState(false);
-  const [blogLoaded, setBlogLoaded] = useState(false);
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Fetch real data from APIs
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('/api/v1/printify/products?per_page=4');
-      const data = await response.json();
-      if (data.ok && data.data?.products) {
-        setRealProducts(data.data.products);
-      }
-    } catch (error) {
-      const logger = await getLogger();
-      logger.error('Failed to fetch products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    } finally {
-      setProductsLoaded(true);
-    }
-  };
-
-  const fetchBlogPosts = async () => {
-    try {
-      const response = await fetch('/api/v1/content/blog?limit=3');
-      const data = await response.json();
-      if (data.ok && data.data?.posts) {
-        setRealBlogPosts(data.data.posts);
-      }
-    } catch (error) {
-      const logger = await getLogger();
-      logger.error('Failed to fetch blog posts:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    } finally {
-      setBlogLoaded(true);
-    }
-  };
-
-  // Load data when component mounts
-  useEffect(() => {
-    fetchProducts();
-    fetchBlogPosts();
-  }, []);
-
-  // Handle scroll effects
   useEffect(() => {
     let ticking = false;
 
@@ -195,8 +146,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (megaMenuRef.current && !megaMenuRef.current.contains(event.target as Node)) {
@@ -211,14 +160,12 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close dropdowns when navigating to a new page
   useEffect(() => {
     setActiveDropdown(null);
     setIsMenuOpen(false);
     setShowUserMenu(false);
   }, [pathname]);
 
-  // Handle protected link clicks
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isSignedIn) {
@@ -249,15 +196,12 @@ export default function Navbar() {
           : 'border-b border-white/5'
       }`}
       style={{
-        // Use design system background colors with transparency
         backgroundColor: 'var(--color-background)',
         opacity: isScrolled ? 0.9 : 0.7,
-        backdropFilter: 'blur(8px)', // Increased blur for readability over tree
+        backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        // Removed heavy gradient overlay - let tree show through
       }}
     >
-      {/* Skip to content for accessibility */}
       <a
         href="#main-content"
         className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only"
@@ -265,7 +209,6 @@ export default function Navbar() {
         Skip to main content
       </a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
-        {/* Logo */}
         <Link href={paths.home()} className="flex items-center group py-1">
           <div className="relative w-32 h-32 md:w-36 md:h-36">
             <Image
@@ -277,9 +220,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation - Hidden below 640px (sm) */}
         <div className="hidden sm:flex items-center gap-8" ref={megaMenuRef}>
-          {/* Home */}
           <Link
             href={paths.home()}
             className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${
@@ -289,7 +230,6 @@ export default function Navbar() {
             Home
           </Link>
 
-          {/* Shop with Mega Menu */}
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'shop' ? null : 'shop')}
@@ -306,7 +246,6 @@ export default function Navbar() {
               />
             </button>
 
-            {/* Shop Mega Menu */}
             {activeDropdown === 'shop' && (
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
@@ -320,43 +259,23 @@ export default function Navbar() {
                 <div className="space-y-5">
                   <div>
                     <h3 className="text-white font-semibold mb-3">Featured Products</h3>
-                    {productsLoaded && realProducts.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {realProducts.slice(0, 4).map((product) => (
-                          <Link
-                            key={product.id}
-                            href={`/shop/product/${product.id}`}
-                            className="flex items-center gap-3 rounded-lg p-3 min-h-[44px] transition-colors hover:bg-white/10"
-                          >
-                            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-white/15 bg-white/5">
-                              {product.image ? (
-                                <Image
-                                  src={product.image}
-                                  alt={product.title}
-                                  width={48}
-                                  height={48}
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <span className="text-xs text-white/70">IMG</span>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-white">
-                                {product.title}
-                              </p>
-                              <p className="text-xs text-text-link-hover">
-                                ${product.price.toFixed(2)}
-                              </p>
-                            </div>
-                          </Link>
-                        ))}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link
+                        href={paths.product('featured-1')}
+                        className="flex items-center gap-3 rounded-lg p-3 min-h-[44px] transition-colors hover:bg-white/10"
+                      >
+                        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-white/15 bg-white/5 text-xs text-white/70">
+                          ✦
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-white">Featured Drop</p>
+                          <p className="text-xs text-text-link-hover">View spotlight item</p>
+                        </div>
+                      </Link>
+                      <div className="col-span-1 flex items-center rounded-lg p-3 text-sm text-white/60">
+                        Browse categories to explore live merch without extra navbar fetches.
                       </div>
-                    ) : (
-                      <p className="text-sm text-white/60">
-                        Live products are syncing. Browse categories to start exploring merch.
-                      </p>
-                    )}
+                    </div>
                   </div>
 
                   <div className="border-t border-white/10 pt-4">
@@ -389,7 +308,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mini-Games with Mega Menu */}
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'games' ? null : 'games')}
@@ -408,7 +326,6 @@ export default function Navbar() {
               />
             </button>
 
-            {/* Games Mega Menu */}
             {activeDropdown === 'games' && (
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
@@ -475,64 +392,15 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Blog with Mega Menu */}
-          <div className="relative">
-            <button
-              onClick={() => setActiveDropdown(activeDropdown === 'blog' ? null : 'blog')}
-              className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${
-                pathname.startsWith('/blog') ? 'text-text-link-hover border-b-2 border-primary' : ''
-              }`}
-              aria-expanded={activeDropdown === 'blog'}
-              aria-label="Blog menu"
-            >
-              Blog
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${activeDropdown === 'blog' ? 'rotate-180' : ''}`}
-                aria-hidden="true"
-              />
-            </button>
+          <Link
+            href={paths.blogIndex()}
+            className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${
+              pathname.startsWith('/blog') ? 'text-text-link-hover border-b-2 border-primary' : ''
+            }`}
+          >
+            Blog
+          </Link>
 
-            {/* Blog Mega Menu */}
-            {activeDropdown === 'blog' && blogLoaded && realBlogPosts.length > 0 && (
-              <div
-                className="absolute top-full left-0 mt-2 w-80 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') setActiveDropdown(null);
-                }}
-                role="dialog"
-                aria-label="Blog menu"
-                tabIndex={-1}
-              >
-                <h3 className="text-white font-semibold mb-4">Latest Posts</h3>
-                <div className="space-y-3 mb-4">
-                  {realBlogPosts.slice(0, 3).map((post) => (
-                    <Link
-                      key={post.id}
-                      href={`/blog/${post.slug}`}
-                      className="block p-4 min-h-[44px] rounded-lg hover:bg-white/10 transition-colors"
-                    >
-                      <p className="text-white text-sm font-medium line-clamp-2">{post.title}</p>
-                      <p className="text-gray-400 text-xs mt-1">
-                        {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-                <Link
-                  href="/blog"
-                  className="block text-center text-text-link-hover hover:text-primary-hover text-sm font-medium"
-                >
-                  View All Posts →
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* About */}
           <Link
             href="/about"
             className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${
@@ -542,7 +410,6 @@ export default function Navbar() {
             About
           </Link>
 
-          {/* Protected Links */}
           <button
             onClick={handleWishlistClick}
             className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${
@@ -551,15 +418,6 @@ export default function Navbar() {
             aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
           >
             <Heart className="w-5 h-5" aria-hidden="true" />
-            {!isSignedIn && (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
           </button>
 
           <button
@@ -572,24 +430,12 @@ export default function Navbar() {
             aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
           >
             <MessageCircle className="w-5 h-5" aria-hidden="true" />
-            {!isSignedIn && (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
           </button>
         </div>
 
-        {/* Search and Auth */}
         <div className="flex items-center gap-4">
-          {/* Global Search with Cmd/Ctrl+K - Hidden below 640px */}
           <GlobalSearch className="hidden sm:block" />
 
-          {/* Cart Icon - 44x44px minimum touch target */}
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
@@ -603,7 +449,6 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Auth - Hidden below 640px (shown in mobile panel) */}
           <div className="hidden sm:block relative" ref={userMenuRef}>
             {isSignedIn ? (
               <>
@@ -627,10 +472,7 @@ export default function Navbar() {
                     </div>
                   )}
                   <span className="hidden sm:inline text-sm text-white">
-                    {user?.fullName ||
-                      user?.firstName ||
-                      user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] ||
-                      'User'}
+                    {user?.fullName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'User'}
                   </span>
                   <ChevronDown
                     className={`w-4 h-4 text-white transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
@@ -638,7 +480,6 @@ export default function Navbar() {
                   />
                 </button>
 
-                {/* User Menu Dropdown */}
                 {showUserMenu && (
                 <div
                   className="absolute right-0 top-full mt-2 w-56 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg shadow-lg z-50"
@@ -650,7 +491,6 @@ export default function Navbar() {
                   tabIndex={-1}
                 >
                   <div className="p-2">
-                    {/* User Info */}
                     <div className="px-4 py-3 border-b border-white/10">
                       <p className="text-sm font-medium text-white truncate">
                         {user?.fullName || user?.firstName || 'User'}
@@ -660,7 +500,6 @@ export default function Navbar() {
                       </p>
                     </div>
 
-                    {/* Menu Items - 44x44px minimum */}
                     <Link
                       href={paths.profile()}
                       className="block min-h-[44px] px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -690,7 +529,6 @@ export default function Navbar() {
                       Wishlist
                     </Link>
 
-                    {/* Sign Out */}
                     <button
                       onClick={async () => {
                         setShowUserMenu(false);
@@ -714,7 +552,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu Button - 44x44px minimum touch target */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="sm:hidden min-h-[44px] min-w-[44px] flex items-center justify-center text-white p-2"
@@ -729,19 +566,15 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile Slide-Out Panel - Below 640px (sm) */}
       {isMenuOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="sm:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
             onClick={() => setIsMenuOpen(false)}
             aria-hidden="true"
           />
-          {/* Slide-out panel */}
           <div className="sm:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-black/95 backdrop-blur-lg border-l border-white/20 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto">
             <div className="flex flex-col h-full">
-              {/* Panel Header */}
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h2 className="text-lg font-semibold text-white">Menu</h2>
                 <button
@@ -753,7 +586,6 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {/* Navigation Links */}
               <nav className="flex-1 p-4 space-y-1">
                 <Link
                   href={paths.home()}
@@ -763,7 +595,6 @@ export default function Navbar() {
                   Home
                 </Link>
 
-                {/* Shop with expandable submenu */}
                 <div>
                   <button
                     onClick={() => setActiveDropdown(activeDropdown === 'shop' ? null : 'shop')}
@@ -807,7 +638,6 @@ export default function Navbar() {
                   )}
                 </div>
 
-                {/* Mini-Games with expandable submenu */}
                 <div>
                   <button
                     onClick={() => setActiveDropdown(activeDropdown === 'games' ? null : 'games')}
@@ -851,7 +681,6 @@ export default function Navbar() {
                   )}
                 </div>
 
-                {/* Blog */}
                 <Link
                   href={paths.blogIndex()}
                   onClick={() => setIsMenuOpen(false)}
@@ -860,7 +689,6 @@ export default function Navbar() {
                   Blog
                 </Link>
 
-                {/* About */}
                 <Link
                   href="/about"
                   onClick={() => setIsMenuOpen(false)}
@@ -869,7 +697,6 @@ export default function Navbar() {
                   About
                 </Link>
 
-                {/* Protected Links */}
                 <button
                   onClick={(e) => {
                     setIsMenuOpen(false);
@@ -880,15 +707,6 @@ export default function Navbar() {
                 >
                   <Heart className="w-5 h-5" aria-hidden="true" />
                   <span>Wishlist</span>
-                  {!isSignedIn && (
-                    <svg className="w-4 h-4 ml-auto" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path
-                        fillRule="evenodd"
-                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
                 </button>
 
                 <button
@@ -901,18 +719,8 @@ export default function Navbar() {
                 >
                   <MessageCircle className="w-5 h-5" aria-hidden="true" />
                   <span>Community</span>
-                  {!isSignedIn && (
-                    <svg className="w-4 h-4 ml-auto" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path
-                        fillRule="evenodd"
-                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
                 </button>
 
-                {/* Cart */}
                 <Link
                   href={paths.cart()}
                   onClick={() => setIsMenuOpen(false)}
@@ -929,7 +737,6 @@ export default function Navbar() {
                 </Link>
               </nav>
 
-              {/* Panel Footer */}
               <div className="p-4 border-t border-white/10">
                 {isSignedIn ? (
                   <div className="space-y-2">
