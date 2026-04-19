@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
+import { paths } from '@/lib/paths';
 
 interface ApiResponse {
   ok?: boolean;
@@ -99,9 +100,10 @@ export default function BuyReadyShopCatalog() {
         const image = product.image ?? product.images?.[0] ?? '';
         const summary = cleanSummary(product.description || '');
         const hasMultipleOptions = Boolean(product.variants?.length && product.variants.length > 1);
+        const productHref = paths.product(product.id);
         return (
           <article key={product.id} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-lg">
-            <Link href={`/shop-buy-item/${encodeURIComponent(product.id)}`} className="block">
+            <Link href={productHref} className="block">
               <div className="relative aspect-[4/5] bg-black/20">
                 <Image src={image} alt={product.title} fill className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" unoptimized />
                 <div className="absolute right-3 top-3 rounded-lg bg-black/70 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-white">{product.provider}</div>
@@ -109,7 +111,7 @@ export default function BuyReadyShopCatalog() {
             </Link>
             <div className="space-y-3 p-5">
               <div>
-                <Link href={`/shop-buy-item/${encodeURIComponent(product.id)}`} className="block">
+                <Link href={productHref} className="block">
                   <h2 className="line-clamp-2 text-lg font-semibold text-white hover:text-pink-200 transition-colors">{product.title}</h2>
                 </Link>
                 <div className="mt-1">
@@ -118,7 +120,7 @@ export default function BuyReadyShopCatalog() {
                 </div>
               </div>
               <p className="line-clamp-3 text-sm leading-6 text-zinc-300">{summary || 'No description available.'}</p>
-              <Link href={`/shop-buy-item/${encodeURIComponent(product.id)}`} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-4 py-2 text-sm text-white hover:bg-pink-500 transition-colors">Choose options</Link>
+              <Link href={productHref} className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-4 py-2 text-sm text-white hover:bg-pink-500 transition-colors">Choose options</Link>
             </div>
           </article>
         );
