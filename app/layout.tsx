@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Navbar from './components/layout/Navbar';
 
 interface RootLayoutProps {
@@ -18,8 +19,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang="en">
         <body>
           <AuthProvider>
-            <Navbar />
-            {children}
+            <ToastProvider>
+              <Navbar />
+              {children}
+            </ToastProvider>
           </AuthProvider>
         </body>
       </html>
