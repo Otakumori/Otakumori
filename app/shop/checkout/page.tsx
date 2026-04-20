@@ -7,7 +7,7 @@ async function getLogger() {
   return logger;
 }
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,6 +42,20 @@ interface CartItem {
   };
 }
 
+const COUNTRY_OPTIONS = [
+  { value: 'US', label: 'United States' },
+  { value: 'CA', label: 'Canada' },
+  { value: 'GB', label: 'United Kingdom' },
+  { value: 'AU', label: 'Australia' },
+  { value: 'DE', label: 'Germany' },
+  { value: 'FR', label: 'France' },
+  { value: 'JP', label: 'Japan' },
+] as const;
+
+const US_STATE_OPTIONS = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'
+];
+
 export default function CheckoutPage() {
   const { items: cart, total } = useCart();
   const { isSignedIn } = useAuth();
@@ -54,10 +68,13 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zipCode: '',
-    country: '',
+    country: 'US',
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isUS = shippingInfo.country === 'US';
+  const zipPlaceholder = useMemo(() => (isUS ? 'ZIP Code' : 'Postal Code'), [isUS]);
 
   useEffect(() => {
     if (!user) return;
@@ -69,8 +86,21 @@ export default function CheckoutPage() {
     }));
   }, [user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name === 'zipCode') {
+      const cleaned = shippingInfo.country === 'US' ? value.replace(/[^0-9-]/g, '').slice(0, 10) : value.slice(0, 12);
+      setShippingInfo((prev) => ({ ...prev, zipCode: cleaned }));
+      return;
+    }
+    if (name === 'state' && shippingInfo.country === 'US') {
+      setShippingInfo((prev) => ({ ...prev, state: value.toUpperCase() }));
+      return;
+    }
+    if (name === 'country') {
+      setShippingInfo((prev) => ({ ...prev, country: value, state: value === 'US' ? prev.state : '' }));
+      return;
+    }
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -79,6 +109,16 @@ export default function CheckoutPage() {
 
     if (!isSignedIn) {
       setError('Please sign in to complete your purchase');
+      return;
+    }
+
+    if (shippingInfo.country === 'US' && !US_STATE_OPTIONS.includes(shippingInfo.state.toUpperCase())) {
+      setError('Please select a valid U.S. state.');
+      return;
+    }
+
+    if (!shippingInfo.country) {
+      setError('Please select a country.');
       return;
     }
 
@@ -191,17 +231,38 @@ export default function CheckoutPage() {
                 <AnimatedInput id="email" name="email" label="Email" type="email" value={shippingInfo.email} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
                 <AnimatedInput id="address" name="address" label="Address" value={shippingInfo.address} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" placeholder="Street Address" />
 
-                <div className="grid grid-cols-3 gap-4">
-                  <AnimatedInput id="city" name="city" label="City" value={shippingInfo.city} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
-                  <AnimatedInput id="state" name="state" label="State" value={shippingInfo.state} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
-                  <AnimatedInput id="zipCode" name="zipCode" label="ZIP Code" value={shippingInfo.zipCode} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
+                <div className="space-y-2">
+                  <label htmlFor="country" className="block text-sm font-medium text-pink-100">Country</label>
+                  <select id="country" name="country" value={shippingInfo.country} onChange={handleInputChange} required className="w-full rounded-xl border border-pink-500/30 bg-white/10 px-4 py-3 text-white outline-none focus:border-pink-400">
+                    {COUNTRY_OPTIONS.map((country) => (
+                      <option key={country.value} value={country.value} className="bg-[#2b1738] text-white">{country.label}</option>
+                    ))}
+                  </select>
                 </div>
 
-                <AnimatedInput id="country" name="country" label="Country" value={shippingInfo.country} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
+                <div className="grid grid-cols-3 gap-4">
+                  <AnimatedInput id="city" name="city" label="City" value={shippingInfo.city} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
+
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="block text-sm font-medium text-pink-100">{isUS ? 'State' : 'State / Province / Region'}</label>
+                    {isUS ? (
+                      <select id="state" name="state" value={shippingInfo.state} onChange={handleInputChange} required className="w-full rounded-xl border border-pink-500/30 bg-white/10 px-4 py-3 text-white outline-none focus:border-pink-400">
+                        <option value="" className="bg-[#2b1738] text-white">Select state</option>
+                        {US_STATE_OPTIONS.map((state) => (
+                          <option key={state} value={state} className="bg-[#2b1738] text-white">{state}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input id="state" name="state" value={shippingInfo.state} onChange={handleInputChange} required className="w-full rounded-xl border border-pink-500/30 bg-white/10 px-4 py-3 text-white outline-none focus:border-pink-400" placeholder="Province / Region" />
+                    )}
+                  </div>
+
+                  <AnimatedInput id="zipCode" name="zipCode" label={zipPlaceholder} value={shippingInfo.zipCode} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" placeholder={zipPlaceholder} />
+                </div>
 
                 {error && (
-                  <div className="rounded-lg bg-red-500/20 border border-red-500/30 p-3">
-                    <p className="text-red-300 text-sm">{error}</p>
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/20 p-3">
+                    <p className="text-sm text-red-300">{error}</p>
                   </div>
                 )}
 
