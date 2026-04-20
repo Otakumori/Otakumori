@@ -5,6 +5,7 @@ import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { NSFWProvider } from './contexts/NSFWContext';
+import AppQueryProvider from './providers/AppQueryProvider';
 import Navbar from './components/layout/Navbar';
 
 interface RootLayoutProps {
@@ -22,8 +23,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <AuthProvider>
             <ToastProvider>
               <NSFWProvider>
-                <Navbar />
-                {children}
+                <AppQueryProvider>
+                  <Navbar />
+                  {children}
+                </AppQueryProvider>
               </NSFWProvider>
             </ToastProvider>
           </AuthProvider>
