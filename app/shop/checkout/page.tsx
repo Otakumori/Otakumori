@@ -53,8 +53,15 @@ const COUNTRY_OPTIONS = [
 ] as const;
 
 const US_STATE_OPTIONS = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+  'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+  'VA', 'WA', 'WV', 'WI', 'WY',
 ];
+
+function getLineKey(item: CartItem) {
+  return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
+}
 
 export default function CheckoutPage() {
   const { items: cart, total } = useCart();
@@ -89,7 +96,9 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === 'zipCode') {
-      const cleaned = shippingInfo.country === 'US' ? value.replace(/[^0-9-]/g, '').slice(0, 10) : value.slice(0, 12);
+      const cleaned = shippingInfo.country === 'US'
+        ? value.replace(/[^0-9-]/g, '').slice(0, 10)
+        : value.slice(0, 12);
       setShippingInfo((prev) => ({ ...prev, zipCode: cleaned }));
       return;
     }
@@ -122,13 +131,20 @@ export default function CheckoutPage() {
       return;
     }
 
+    const missingVariantItem = cart.find((item) => !item.selectedVariant?.id);
+    if (missingVariantItem) {
+      setError(`A valid variant is required before checkout for: ${missingVariantItem.name}. Please return to the product page and re-add it.`);
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
     try {
       const orderItems = cart.map((item) => ({
+        lineKey: getLineKey(item),
         productId: item.id,
-        variantId: item.selectedVariant?.id || item.id,
+        variantId: item.selectedVariant!.id,
         name: item.name,
         quantity: item.quantity,
         priceCents: Math.round(item.price * 100),
@@ -136,7 +152,7 @@ export default function CheckoutPage() {
         description: item.name,
         images: item.image ? [item.image] : [],
         printifyProductId: item.id,
-        printifyVariantId: item.selectedVariant?.id || 1,
+        printifyVariantId: item.selectedVariant!.id,
       }));
 
       const idempotencyKey = `checkout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -160,14 +176,15 @@ export default function CheckoutPage() {
       if (data.ok && data.data?.url) {
         window.location.href = data.data.url;
       } else {
+        console.error('Checkout session error:', data);
         if (response.status === 503) {
           setError('Checkout is temporarily unavailable. Please contact support or try again later.');
         } else {
-          setError(data.error || 'Failed to create checkout session. Please try again.');
+          setError(`${data.error || 'Failed to create checkout session.'}${data.requestId ? ` Request ID: ${data.requestId}` : ''}`);
         }
       }
     } catch (err) {
-      setError('An error occurred while processing your order');
+      setError(`An error occurred while processing your order${err instanceof Error ? `: ${err.message}` : ''}`);
       getLogger().then((logger) => {
         logger.error('Checkout error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       });
@@ -227,7 +244,6 @@ export default function CheckoutPage() {
                   <AnimatedInput id="firstName" name="firstName" label="First Name" value={shippingInfo.firstName} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
                   <AnimatedInput id="lastName" name="lastName" label="Last Name" value={shippingInfo.lastName} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
                 </div>
-
                 <AnimatedInput id="email" name="email" label="Email" type="email" value={shippingInfo.email} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
                 <AnimatedInput id="address" name="address" label="Address" value={shippingInfo.address} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" placeholder="Street Address" />
 
@@ -242,7 +258,6 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <AnimatedInput id="city" name="city" label="City" value={shippingInfo.city} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" />
-
                   <div className="space-y-2">
                     <label htmlFor="state" className="block text-sm font-medium text-pink-100">{isUS ? 'State' : 'State / Province / Region'}</label>
                     {isUS ? (
@@ -256,12 +271,11 @@ export default function CheckoutPage() {
                       <input id="state" name="state" value={shippingInfo.state} onChange={handleInputChange} required className="w-full rounded-xl border border-pink-500/30 bg-white/10 px-4 py-3 text-white outline-none focus:border-pink-400" placeholder="Province / Region" />
                     )}
                   </div>
-
                   <AnimatedInput id="zipCode" name="zipCode" label={zipPlaceholder} value={shippingInfo.zipCode} onChange={handleInputChange} required className="border-pink-500/30 bg-white/10 text-white placeholder:text-pink-200/50" placeholder={zipPlaceholder} />
                 </div>
 
                 {error && (
-                  <div className="rounded-lg border border-red-500/30 bg-red-500/20 p-3">
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/20 p-3 whitespace-pre-wrap">
                     <p className="text-sm text-red-300">{error}</p>
                   </div>
                 )}
@@ -279,7 +293,7 @@ export default function CheckoutPage() {
               <h2 className="mb-6 text-2xl font-bold text-white">Order Summary</h2>
               <div className="space-y-4">
                 {cart.map((item: CartItem) => (
-                  <div key={item.id} className="flex items-center gap-4">
+                  <div key={getLineKey(item)} className="flex items-center gap-4">
                     <div className="relative h-16 w-16">
                       <Image src={item.image} alt={item.name} fill className="rounded-lg object-cover" />
                     </div>
@@ -293,7 +307,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 ))}
-
                 <div className="border-t border-pink-500/30 pt-4 space-y-2">
                   <div className="flex justify-between text-pink-200"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
                   <div className="flex justify-between text-pink-200"><span>Shipping</span><span>Calculated at payment</span></div>
