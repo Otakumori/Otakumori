@@ -21,12 +21,16 @@ interface CartContextType {
   total: number;
   itemCount: number;
   addItem: (_item: CartItem) => void;
-  removeItem: (_id: string) => void;
-  updateQuantity: (_id: string, _quantity: number) => void;
+  removeItem: (_lineKey: string) => void;
+  updateQuantity: (_lineKey: string, _quantity: number) => void;
   clearCart: () => void;
-  }
+}
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+function getLineKey(item: CartItem) {
+  return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -35,7 +39,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { isSignedIn, userId } = useAuth();
 
   useEffect(() => {
-    // Load cart from localStorage on mount (client-side only)
     if (typeof window !== 'undefined') {
       const savedCart = localStorage.getItem('cart');
       if (savedCart) {
@@ -51,7 +54,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Sync cart to Prisma on sign-in
   useEffect(() => {
     if (isSignedIn && userId && items.length > 0) {
       syncCartToPrisma(userId, items).catch((error) => {
@@ -61,7 +63,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [isSignedIn, userId, items.length]);
 
   useEffect(() => {
-    // Save cart to localStorage whenever it changes (client-side only)
     if (typeof window !== 'undefined') {
       localStorage.setItem('cart', JSON.stringify(items));
     }
@@ -77,19 +78,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (newItem: CartItem) => {
     setItems((currentItems) => {
-      const existingItem = currentItems.find(
-        (item) =>
-          item.id === newItem.id &&
-          (!item.selectedVariant ||
-            !newItem.selectedVariant ||
-            item.selectedVariant.id === newItem.selectedVariant.id),
-      );
+      const newLineKey = getLineKey(newItem);
+      const existingItem = currentItems.find((item) => getLineKey(item) === newLineKey);
 
       if (existingItem) {
         return currentItems.map((item) =>
-          item.id === existingItem.id
-            ? { ...item, quantity: item.quantity + newItem.quantity }
-            : item,
+          getLineKey(item) === newLineKey ? { ...item, quantity: item.quantity + newItem.quantity } : item,
         );
       }
 
@@ -97,18 +91,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const removeItem = (id: string) => {
-    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+  const removeItem = (lineKey: string) => {
+    setItems((currentItems) => currentItems.filter((item) => getLineKey(item) !== lineKey));
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (lineKey: string, quantity: number) => {
     if (quantity < 1) {
-      removeItem(id);
+      removeItem(lineKey);
       return;
     }
 
     setItems((currentItems) =>
-      currentItems.map((item) => (item.id === id ? { ...item, quantity } : item)),
+      currentItems.map((item) => (getLineKey(item) === lineKey ? { ...item, quantity } : item)),
     );
   };
 
@@ -148,7 +142,6 @@ export function useCart() {
   return context;
 }
 
-// Sync cart items to Prisma database
 async function syncCartToPrisma(userId: string, cartItems: CartItem[]) {
   try {
     const response = await fetch('/api/v1/cart/sync', {
@@ -174,7 +167,6 @@ async function syncCartToPrisma(userId: string, cartItems: CartItem[]) {
       throw new Error(result.error || 'Failed to sync cart');
     }
   } catch (error) {
-    // Silently fail - cart will remain in localStorage
     logger.error('Cart sync error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
   }
 }
