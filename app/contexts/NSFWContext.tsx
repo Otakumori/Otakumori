@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 async function getLogger() {
@@ -34,7 +36,6 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('otakumori_nsfw_allowed', 'true');
       setShowModal(false);
 
-      // Set server-side HTTP-only cookie for asset access
       try {
         await fetch('/api/policy/age', { method: 'POST' });
       } catch (error) {
@@ -53,7 +54,6 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('otakumori_nsfw_allowed', 'false');
     setShowModal(true);
 
-    // Clear server-side HTTP-only cookie
     try {
       await fetch('/api/policy/age', { method: 'DELETE' });
     } catch (error) {
