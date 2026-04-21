@@ -34,6 +34,17 @@ function formatProductDescription(description: string | null | undefined): strin
     .filter(Boolean);
 }
 
+function resolveDisplayImage(product: CatalogProduct | null, variant: CatalogVariant | null): string | null {
+  if (variant?.previewImageUrl && variant.previewImageUrl.trim()) {
+    return variant.previewImageUrl;
+  }
+  if (product?.image && product.image.trim()) {
+    return product.image;
+  }
+  const firstGallery = product?.images?.find((entry) => typeof entry === 'string' && entry.trim());
+  return firstGallery ?? null;
+}
+
 export default function ProductClient({ productId }: { productId: string }) {
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +58,7 @@ export default function ProductClient({ productId }: { productId: string }) {
     () => formatProductDescription(product?.description),
     [product?.description],
   );
+  const displayImageUrl = useMemo(() => resolveDisplayImage(product, selectedVariant), [product, selectedVariant]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -98,9 +110,17 @@ export default function ProductClient({ productId }: { productId: string }) {
           ...catalogProduct,
           image: normalizeImageValue(catalogProduct.image) ?? normalizedImages[0] ?? null,
           images: normalizedImages,
+          variants: (catalogProduct.variants ?? []).map((variant) => ({
+            ...variant,
+            previewImageUrl: normalizeImageValue(variant.previewImageUrl) ?? null,
+          })),
         };
 
-        const finalImage = normalizedProduct.image;
+        const defaultVariant = normalizedProduct.variants.find((variant) => variant.isEnabled && variant.inStock)
+          ?? normalizedProduct.variants[0]
+          ?? null;
+
+        const finalImage = resolveDisplayImage(normalizedProduct, defaultVariant);
         if (!finalImage || finalImage.includes('placeholder') || finalImage.includes('seed:') || finalImage.trim() === '') {
           setError('Product image not available');
           setLoading(false);
@@ -110,18 +130,16 @@ export default function ProductClient({ productId }: { productId: string }) {
         if (isCancelled) return;
 
         setProduct(normalizedProduct);
+        setSelectedVariant(defaultVariant);
 
-        const defaultVariant = catalogProduct.variants.find((variant) => variant.isEnabled && variant.inStock);
-        setSelectedVariant(defaultVariant ?? catalogProduct.variants[0] ?? null);
+        const displayPrice = normalizedProduct.price ?? (normalizedProduct.priceRange.min != null ? Math.round(normalizedProduct.priceRange.min) / 100 : 0);
+        const normalizedPriceCents = normalizedProduct.priceCents ?? (displayPrice != null ? Math.round(displayPrice * 100) : 0);
 
-        const displayPrice = catalogProduct.price ?? (catalogProduct.priceRange.min != null ? Math.round(catalogProduct.priceRange.min) / 100 : 0);
-        const normalizedPriceCents = catalogProduct.priceCents ?? (displayPrice != null ? Math.round(displayPrice * 100) : 0);
-
-        if (!isCancelled && normalizedProduct.image) {
+        if (!isCancelled && finalImage) {
           addProduct({
-            id: catalogProduct.id,
-            title: catalogProduct.title,
-            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '',
+            id: normalizedProduct.id,
+            title: normalizedProduct.title,
+            image: finalImage,
             priceCents: normalizedPriceCents,
           });
         }
@@ -150,7 +168,7 @@ export default function ProductClient({ productId }: { productId: string }) {
       return;
     }
 
-    const imageUrl = product.image ?? product.images?.[0];
+    const imageUrl = resolveDisplayImage(product, selectedVariant);
     if (!imageUrl) {
       showError('Product image not available');
       return;
@@ -185,7 +203,7 @@ export default function ProductClient({ productId }: { productId: string }) {
     return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Not Found</h1><p className="text-zinc-300 mb-6">{error || 'This treasure has gone missing.'}</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
   }
 
-  const imageUrl = product.image ?? product.images?.[0];
+  const imageUrl = displayImageUrl;
   if (!imageUrl) {
     return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Image Not Available</h1><p className="text-zinc-300 mb-6">This product is missing required images.</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
   }
