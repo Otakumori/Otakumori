@@ -12,6 +12,7 @@ import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
 import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide-react';
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
+import { useCart } from '@/app/components/cart/CartProvider';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -49,30 +50,17 @@ const GAME_FACE_LINKS = [
   { label: 'All Games', href: paths.games(), description: 'Browse every cube face and challenge.' },
 ];
 
-function readCartCountFromStorage() {
-  if (typeof window === 'undefined') return 0;
-  try {
-    const raw = window.localStorage.getItem('cart');
-    if (!raw) return 0;
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return 0;
-    return parsed.reduce((sum, item) => sum + (Number(item?.quantity) || 0), 0);
-  } catch {
-    return 0;
-  }
-}
-
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
   const { requireAuthForSoapstone, requireAuthForWishlist, signOut } = useAuthContext();
+  const { itemCount } = useCart();
 
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [itemCount, setItemCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [_scrollY, setScrollY] = useState(0);
 
@@ -81,19 +69,6 @@ export default function Navbar() {
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const refreshCartCount = () => setItemCount(readCartCountFromStorage());
-    refreshCartCount();
-    window.addEventListener('storage', refreshCartCount);
-    window.addEventListener('focus', refreshCartCount);
-    window.addEventListener('cart-updated', refreshCartCount as EventListener);
-    return () => {
-      window.removeEventListener('storage', refreshCartCount);
-      window.removeEventListener('focus', refreshCartCount);
-      window.removeEventListener('cart-updated', refreshCartCount as EventListener);
-    };
-  }, []);
 
   useEffect(() => {
     let ticking = false;
