@@ -18,52 +18,69 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   typescript: true,
 });
 
+function isHttpUrl(value: unknown): value is string {
+  return typeof value === 'string' && /^https?:\/\//i.test(value);
+}
+
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
     const requestId = generateRequestId();
+    let stage = 'init';
 
     try {
+      stage = 'config';
       if (!env.STRIPE_SECRET_KEY) {
         const { logger } = await import('@/app/lib/logger');
         logger.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
         return NextResponse.json(
-          { ok: false, error: 'Checkout temporarily unavailable. Please contact support.', requestId },
+          { ok: false, error: 'Checkout temporarily unavailable. Please contact support.', requestId, stage },
           { status: 503 },
         );
       }
 
+      stage = 'auth';
       const { userId } = await auth();
       if (!userId) {
         return NextResponse.json(
-          { ok: false, error: 'Unauthorized', requestId },
+          { ok: false, error: 'Unauthorized', requestId, stage },
           { status: 401 },
         );
       }
 
+      stage = 'idempotency_header';
       const idempotencyKey = req.headers.get('x-idempotency-key');
       if (!idempotencyKey) {
         return NextResponse.json(
-          { ok: false, error: 'Missing idempotency key', requestId },
+          { ok: false, error: 'Missing idempotency key', requestId, stage },
           { status: 400 },
         );
       }
 
+      stage = 'idempotency_check';
       const idempotencyResult = await checkIdempotency(idempotencyKey);
       if (!idempotencyResult.isNew && idempotencyResult.response) {
         return idempotencyResult.response;
       }
 
+      stage = 'parse_request';
       const json = await req.json();
       const parsed = CheckoutRequest.safeParse(json);
       if (!parsed.success) {
-        return NextResponse.json({ ok: false, error: 'Invalid request', requestId }, { status: 400 });
+        return NextResponse.json(
+          { ok: false, error: 'Invalid request', requestId, stage, issues: parsed.error.flatten() },
+          { status: 400 },
+        );
       }
 
       const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } = parsed.data as any;
 
+      stage = 'load_user';
       const user = await prisma.user.findFirst({ where: { clerkId: userId } });
-      if (!user) return NextResponse.json({ ok: false, error: 'User not found', requestId }, { status: 404 });
+      if (!user) {
+        return NextResponse.json({ ok: false, error: 'User not found', requestId, stage }, { status: 404 });
+      }
 
+      stage = 'validate_items';
       const productIds = items.map((i: any) => i.productId).filter(Boolean);
       const variantIds = items.map((i: any) => i.variantId).filter(Boolean);
 
@@ -89,11 +106,18 @@ export async function POST(req: NextRequest) {
             ok: false,
             error: 'One or more cart items are no longer valid. Please refresh your cart and try again.',
             requestId,
+            stage,
+            invalidItems: invalidItems.map((item: any) => ({
+              productId: item.productId,
+              variantId: item.variantId,
+              name: item.name,
+            })),
           },
           { status: 400 },
         );
       }
 
+      stage = 'calculate_totals';
       const subtotalCents = items.reduce((sum: number, i: any) => sum + i.priceCents * i.quantity, 0);
 
       let appliedCodes: string[] = [];
@@ -101,6 +125,7 @@ export async function POST(req: NextRequest) {
       let shippingDiscountCents = 0;
       let discountedLineItems: { id: string; totalDiscountCents: number }[] = [];
       if (Array.isArray(couponCodes) && couponCodes.length > 0) {
+        stage = 'coupons';
         const codes = (couponCodes as string[]).map(normalizeCode);
         const couponRows = await prisma.coupon.findMany({ where: { code: { in: codes } } });
         const { getPolicyFromRequest } = await import('@/app/lib/policy/fromRequest');
@@ -119,15 +144,14 @@ export async function POST(req: NextRequest) {
           id: r.id,
           code: r.code,
           type: r.type as any,
-          value: r.value,
-          valueCents: r.value,
-          valuePct: r.type === 'PERCENT' ? r.value : undefined,
+          valueCents: r.valueCents,
+          valuePct: r.type === 'PERCENT' ? r.valueCents : undefined,
           enabled: r.enabled,
           startsAt: r.startsAt,
           endsAt: r.endsAt ?? undefined,
           maxRedemptions: r.maxRedemptions ?? undefined,
           maxRedemptionsPerUser: r.maxRedemptionsPerUser ?? undefined,
-          minSubtotalCents: r.minSubtotal ?? undefined,
+          minSubtotalCents: r.minSubtotalCents ?? undefined,
           allowedProductIds: r.allowedProductIds,
           excludedProductIds: r.excludedProductIds,
           allowedCollections: r.allowedCollections,
@@ -193,6 +217,7 @@ export async function POST(req: NextRequest) {
         discountedLineItems = itemTotals.map((it: any) => ({ id: it.key, totalDiscountCents: discountsPerItem[it.key] ?? 0 }));
       }
 
+      stage = 'create_order';
       const order = await prisma.order.create({
         data: {
           User: { connect: { id: user.id } },
@@ -207,6 +232,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      stage = 'create_order_items';
       for (const item of items) {
         await prisma.orderItem.create({
           data: {
@@ -218,25 +244,34 @@ export async function POST(req: NextRequest) {
             quantity: item.quantity,
             unitAmount: item.priceCents,
             printifyProductId: item.printifyProductId,
-            printifyVariantId: item.printifyVariantId,
+            printifyVariantId: typeof item.printifyVariantId === 'number' ? item.printifyVariantId : null,
           },
         });
       }
 
+      stage = 'build_line_items';
       const lineItems = items.map((i: any) => {
         const key = i.productId ?? i.sku ?? i.variantId ?? i.name;
         const totalDiscount = discountedLineItems.find((d) => d.id === key)?.totalDiscountCents ?? 0;
         const qty = i.quantity;
         const perItemBase = i.priceCents;
         const perItemDiscount = Math.floor(totalDiscount / qty);
+        const productData: Record<string, unknown> = { name: i.name };
+        if (typeof i.description === 'string' && i.description.trim()) {
+          productData.description = i.description.trim().slice(0, 500);
+        }
+        if (Array.isArray(i.images)) {
+          const validImages = i.images.filter(isHttpUrl).slice(0, 8);
+          if (validImages.length > 0) productData.images = validImages;
+        }
         return {
           price_data: {
             currency: 'usd',
-            product_data: { name: i.name, description: i.description, images: i.images },
+            product_data: productData,
             unit_amount: Math.max(0, perItemBase - perItemDiscount),
           },
           quantity: qty,
-        } as any;
+        } as Stripe.Checkout.SessionCreateParams.LineItem;
       });
 
       const original = subtotalCents;
@@ -256,10 +291,11 @@ export async function POST(req: NextRequest) {
       }
 
       const shippingOptions = shippingDiscountCents > 0
-        ? [{ shipping_rate_data: { type: 'fixed_amount', fixed_amount: { amount: 0, currency: 'usd' }, displayName: 'Free shipping' } }]
+        ? [{ shipping_rate_data: { type: 'fixed_amount', fixed_amount: { amount: 0, currency: 'usd' }, display_name: 'Free shipping' } }]
         : undefined;
 
-      const sessionParams: any = {
+      stage = 'create_stripe_session';
+      const sessionParams: Stripe.Checkout.SessionCreateParams = {
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
@@ -271,13 +307,15 @@ export async function POST(req: NextRequest) {
         metadata: {
           coupon_codes: appliedCodes.join(','),
           discount_total_cents: String(discountTotalCents),
+          request_id: requestId,
         },
       };
 
-      if (shippingOptions) sessionParams.shipping_options = shippingOptions;
+      if (shippingOptions) sessionParams.shipping_options = shippingOptions as any;
 
       const session = await stripe.checkout.sessions.create(sessionParams);
 
+      stage = 'update_order';
       await prisma.order.update({ where: { id: order.id }, data: { stripeId: session.id } });
 
       const responseBody = {
@@ -286,6 +324,7 @@ export async function POST(req: NextRequest) {
         requestId,
       };
 
+      stage = 'store_idempotency';
       if (idempotencyKey) {
         await storeIdempotencyResponse(idempotencyKey, responseBody);
       }
@@ -293,12 +332,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(responseBody);
     } catch (error) {
       const { logger } = await import('@/app/lib/logger');
-      logger.error('[checkout/session] unhandled server error', undefined, { requestId }, error instanceof Error ? error : new Error(String(error)));
+      logger.error('[checkout/session] unhandled server error', undefined, { requestId, stage }, error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         {
           ok: false,
           error: error instanceof Error ? error.message : 'Unhandled checkout session error',
           requestId,
+          stage,
         },
         { status: 500 },
       );
