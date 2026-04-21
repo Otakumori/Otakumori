@@ -1,7 +1,7 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@clerk/nextjs';
 
 interface CartItem {
@@ -34,8 +34,6 @@ function getLineKey(item: CartItem) {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [itemCount, setItemCount] = useState(0);
   const { isSignedIn, userId } = useAuth();
 
   useEffect(() => {
@@ -45,7 +43,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         try {
           const parsedCart = JSON.parse(savedCart);
           setItems(parsedCart);
-          updateTotals(parsedCart);
         } catch (error) {
           logger.error('Error parsing cart from localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           localStorage.removeItem('cart');
@@ -60,21 +57,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         logger.error('Failed to sync cart to Prisma:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       });
     }
-  }, [isSignedIn, userId, items.length]);
+  }, [isSignedIn, userId, items]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cart', JSON.stringify(items));
     }
-    updateTotals(items);
   }, [items]);
 
-  const updateTotals = (cartItems: CartItem[]) => {
-    const newTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const newItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    setTotal(newTotal);
-    setItemCount(newItemCount);
-  };
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items],
+  );
+
+  const itemCount = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items],
+  );
 
   const addItem = (newItem: CartItem) => {
     setItems((currentItems) => {
@@ -108,8 +107,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
-    setTotal(0);
-    setItemCount(0);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('cart');
     }
