@@ -52,6 +52,13 @@ function getLineKey(item: CartItem) {
   return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
 }
 
+function formatServerError(data: any): string {
+  const parts = [data?.error || 'Failed to create checkout session.'];
+  if (data?.stage) parts.push(`Stage: ${data.stage}`);
+  if (data?.requestId) parts.push(`Request ID: ${data.requestId}`);
+  return parts.join('\n');
+}
+
 export default function CheckoutPage() {
   const { items: cart, total } = useCart();
   const { isSignedIn } = useAuth();
@@ -179,7 +186,7 @@ export default function CheckoutPage() {
         window.location.href = data.data.url;
       } else {
         console.error('Checkout session error:', data);
-        setError(`${data?.error || 'Failed to create checkout session.'}${data?.requestId ? ` Request ID: ${data.requestId}` : ''}`);
+        setError(formatServerError(data));
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
