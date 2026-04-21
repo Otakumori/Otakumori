@@ -159,12 +159,27 @@ export default function CheckoutPage() {
         }),
       });
 
-      const data = await response.json();
-      if (data.ok && data.data?.url) {
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (parseError) {
+        console.error('Checkout returned non-JSON response:', {
+          status: response.status,
+          statusText: response.statusText,
+          raw,
+          parseError,
+        });
+        const preview = raw ? raw.slice(0, 240) : '(empty response body)';
+        setError(`Checkout returned a non-JSON response. HTTP ${response.status} ${response.statusText}.\n\nResponse preview:\n${preview}`);
+        return;
+      }
+
+      if (data?.ok && data.data?.url) {
         window.location.href = data.data.url;
       } else {
         console.error('Checkout session error:', data);
-        setError(`${data.error || 'Failed to create checkout session.'}${data.requestId ? ` Request ID: ${data.requestId}` : ''}`);
+        setError(`${data?.error || 'Failed to create checkout session.'}${data?.requestId ? ` Request ID: ${data.requestId}` : ''}`);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
