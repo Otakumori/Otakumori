@@ -13,10 +13,12 @@ import { getDiscountConfig } from '@/app/config/petalTuning';
 import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-10-29.clover',
-  typescript: true,
-});
+function getStripeClient() {
+  return new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-10-29.clover',
+    typescript: true,
+  });
+}
 
 function isHttpUrl(value: unknown): value is string {
   return typeof value === 'string' && /^https?:\/\//i.test(value);
@@ -37,6 +39,8 @@ export async function POST(req: NextRequest) {
           { status: 503 },
         );
       }
+
+      const stripe = getStripeClient();
 
       stage = 'auth';
       const { userId } = await auth();
