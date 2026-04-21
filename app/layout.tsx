@@ -7,6 +7,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import { NSFWProvider } from './contexts/NSFWContext';
 import AppQueryProvider from './providers/AppQueryProvider';
 import Navbar from './components/layout/Navbar';
+import { CartProvider } from './components/cart/CartProvider';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -24,8 +25,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <ToastProvider>
               <NSFWProvider>
                 <AppQueryProvider>
-                  <Navbar />
-                  {children}
+                  <CartProvider>
+                    <Navbar />
+                    {children}
+                  </CartProvider>
                 </AppQueryProvider>
               </NSFWProvider>
             </ToastProvider>
