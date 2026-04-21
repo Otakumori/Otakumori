@@ -250,13 +250,15 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'build_line_items';
-      const lineItems = items.map((i: any) => {
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((i: any) => {
         const key = i.productId ?? i.sku ?? i.variantId ?? i.name;
         const totalDiscount = discountedLineItems.find((d) => d.id === key)?.totalDiscountCents ?? 0;
         const qty = i.quantity;
         const perItemBase = i.priceCents;
         const perItemDiscount = Math.floor(totalDiscount / qty);
-        const productData: Record<string, unknown> = { name: i.name };
+        const productData: Stripe.Checkout.SessionCreateParams.LineItem.PriceData.ProductData = {
+          name: String(i.name ?? 'Item'),
+        };
         if (typeof i.description === 'string' && i.description.trim()) {
           productData.description = i.description.trim().slice(0, 500);
         }
@@ -271,20 +273,21 @@ export async function POST(req: NextRequest) {
             unit_amount: Math.max(0, perItemBase - perItemDiscount),
           },
           quantity: qty,
-        } as Stripe.Checkout.SessionCreateParams.LineItem;
+        };
       });
 
       const original = subtotalCents;
-      const discountedSum = lineItems.reduce((s: number, li: any) => s + (li.price_data.unit_amount as number) * (li.quantity as number), 0);
+      const discountedSum = lineItems.reduce((s: number, li: any) => s + (li.price_data?.unit_amount as number) * (li.quantity as number), 0);
       const nonShipDiscountCents = discountTotalCents - shippingDiscountCents;
       const target = original - Math.max(0, nonShipDiscountCents);
       let delta = discountedSum - target;
       if (delta !== 0 && lineItems.length > 0) {
         for (let i = 0; i < lineItems.length && delta !== 0; i++) {
-          const li: any = lineItems[i];
-          const canReduce = Math.min(delta, li.price_data.unit_amount - 0);
-          if (canReduce > 0) {
-            li.price_data.unit_amount -= canReduce;
+          const li = lineItems[i];
+          const unitAmount = li.price_data?.unit_amount ?? 0;
+          const canReduce = Math.min(delta, unitAmount);
+          if (canReduce > 0 && li.price_data) {
+            li.price_data.unit_amount = unitAmount - canReduce;
             delta -= canReduce;
           }
         }
