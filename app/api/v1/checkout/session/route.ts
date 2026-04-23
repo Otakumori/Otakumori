@@ -97,7 +97,10 @@ export async function POST(req: NextRequest) {
 
       const [dbProducts, dbVariants] = await Promise.all([
         prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true } }),
-        prisma.productVariant.findMany({ where: { id: { in: variantIds } }, select: { id: true, productId: true } }),
+        prisma.productVariant.findMany({
+          where: { id: { in: variantIds } },
+          select: { id: true, productId: true, isEnabled: true, inStock: true },
+        }),
       ]);
 
       const validProductIds = new Set(dbProducts.map((p) => p.id));
@@ -108,14 +111,16 @@ export async function POST(req: NextRequest) {
         if (!validProductIds.has(item.productId)) return true;
         const variant = variantById.get(item.variantId);
         if (!variant) return true;
-        return variant.productId !== item.productId;
+        if (variant.productId !== item.productId) return true;
+        if (!variant.isEnabled || !variant.inStock) return true;
+        return false;
       });
 
       if (invalidItems.length > 0) {
         return NextResponse.json(
           {
             ok: false,
-            error: 'One or more cart items are no longer valid. Please refresh your cart and try again.',
+            error: 'One or more cart items are no longer available. Please refresh your cart and try again.',
             requestId,
             stage,
             invalidItems: invalidItems.map((item: any) => ({
