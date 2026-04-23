@@ -31,6 +31,12 @@ interface CartItem {
   };
 }
 
+interface InvalidCheckoutItem {
+  productId?: string;
+  variantId?: string;
+  name?: string;
+}
+
 const COUNTRY_OPTIONS = [
   { value: 'US', label: 'United States' },
   { value: 'CA', label: 'Canada' },
@@ -59,10 +65,23 @@ function formatServerError(data: any): string {
   return parts.join('\n');
 }
 
+function buildInvalidItemsMessage(invalidItems: InvalidCheckoutItem[]): string {
+  const names = invalidItems
+    .map((item) => item.name?.trim())
+    .filter((name): name is string => Boolean(name));
+
+  if (names.length === 0) {
+    return 'Some items in your cart are no longer available and were removed. Please review your cart and try again.';
+  }
+
+  return `Some items in your cart are no longer available and were removed: ${names.join(', ')}. Please review your cart and try again.`;
+}
+
 export default function CheckoutPage() {
-  const { items: cart, total } = useCart();
+  const { items: cart, total, removeItem } = useCart();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
+  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',
@@ -75,6 +94,7 @@ export default function CheckoutPage() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cartNeedsReview, setCartNeedsReview] = useState(false);
 
   const isUS = shippingInfo.country === 'US';
   const zipPlaceholder = useMemo(() => (isUS ? 'ZIP Code' : 'Postal Code'), [isUS]);
@@ -130,6 +150,7 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
     setError(null);
+    setCartNeedsReview(false);
 
     try {
       const orderItems = cart.map((item) => ({
@@ -184,6 +205,14 @@ export default function CheckoutPage() {
 
       if (data?.ok && data.data?.url) {
         window.location.href = data.data.url;
+      } else if (Array.isArray(data?.invalidItems) && data.invalidItems.length > 0) {
+        const invalidItems = data.invalidItems as InvalidCheckoutItem[];
+        invalidItems.forEach((item) => {
+          if (!item.productId || !item.variantId) return;
+          removeItem(`${item.productId}::${item.variantId}`);
+        });
+        setCartNeedsReview(true);
+        setError(buildInvalidItemsMessage(invalidItems));
       } else {
         console.error('Checkout session error:', data);
         setError(formatServerError(data));
@@ -203,7 +232,7 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-3xl px-4 py-16">
           <h1 className="text-2xl font-semibold">Sign In Required</h1>
           <p className="mt-3 text-pink-200">Please sign in to complete your purchase.</p>
-          <Link href="/sign-in" className="mt-6 inline-block rounded-lg bg-pink-500 px-4 py-2 text-white">Sign In</Link>
+          <Link href={signInHref} className="mt-6 inline-block rounded-lg bg-pink-500 px-4 py-2 text-white">Sign In</Link>
         </div>
       </main>
     );
@@ -263,7 +292,12 @@ export default function CheckoutPage() {
 
               {error && (
                 <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 whitespace-pre-wrap">
-                  {error}
+                  <div>{error}</div>
+                  {cartNeedsReview && (
+                    <Link href={paths.cart()} className="mt-3 inline-block rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20">
+                      Review cart
+                    </Link>
+                  )}
                 </div>
               )}
 
