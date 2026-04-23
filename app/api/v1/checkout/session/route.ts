@@ -79,9 +79,16 @@ export async function POST(req: NextRequest) {
       const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } = parsed.data as any;
 
       stage = 'load_user';
-      const user = await prisma.user.findFirst({ where: { clerkId: userId } });
+      let user = await prisma.user.findFirst({ where: { clerkId: userId } });
       if (!user) {
-        return NextResponse.json({ ok: false, error: 'User not found', requestId, stage }, { status: 404 });
+        stage = 'create_missing_user';
+        user = await prisma.user.create({
+          data: {
+            clerkId: userId,
+            email: shippingInfo?.email ?? '',
+            username: `user_${userId.slice(0, 8)}`,
+          },
+        });
       }
 
       stage = 'validate_items';
