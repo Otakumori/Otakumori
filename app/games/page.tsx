@@ -14,7 +14,6 @@ export default function GameCubePage() {
   const [gameProgress, setGameProgress] = useState<Record<string, any>>({});
   const bootSequenceRef = useRef<HTMLDivElement>(null);
 
-  // Check if boot sequence has been completed today
   useEffect(() => {
     const lastBootDate = localStorage.getItem('gamecube-boot-date');
     const today = new Date().toDateString();
@@ -25,7 +24,6 @@ export default function GameCubePage() {
     }
   }, []);
 
-  // Load game progress from localStorage
   useEffect(() => {
     const savedProgress = localStorage.getItem('gamecube-progress');
     if (savedProgress) {
@@ -33,27 +31,23 @@ export default function GameCubePage() {
     }
   }, []);
 
-  // Save game progress to localStorage
   const _saveGameProgress = (gameId: string, progress: any) => {
     const newProgress = { ...gameProgress, [gameId]: progress };
     setGameProgress(newProgress);
     localStorage.setItem('gamecube-progress', JSON.stringify(newProgress));
   };
 
-  // Complete boot sequence
   const completeBoot = () => {
     setBootComplete(true);
     setShowBootSequence(false);
     localStorage.setItem('gamecube-boot-date', new Date().toDateString());
   };
 
-  // Skip boot sequence
   const skipBoot = () => {
     setBootComplete(true);
     setShowBootSequence(false);
   };
 
-  // Game definitions with tooltips and save data
   const games = [
     {
       id: 'samurai-petal-slice',
@@ -113,23 +107,22 @@ export default function GameCubePage() {
     },
   ];
 
-  // Boot sequence component
   const BootSequence = () => (
     <motion.div
       ref={bootSequenceRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black"
     >
-      <div className="max-w-2xl mx-auto px-4 text-center">
+      <div className="mx-auto max-w-2xl px-4 text-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
           className="mb-8"
         >
-          <h1 className="text-4xl md:text-6xl font-display text-pink-400 mb-4">GAMECUBE</h1>
+          <h1 className="mb-4 text-4xl font-display text-pink-400 md:text-6xl">GAMECUBE</h1>
           <p className="text-xl text-zinc-300">Initializing memory core...</p>
         </motion.div>
 
@@ -137,7 +130,7 @@ export default function GameCubePage() {
           initial={{ width: 0 }}
           animate={{ width: '100%' }}
           transition={{ delay: 1, duration: 2 }}
-          className="h-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full mb-8"
+          className="mb-8 h-1 rounded-full bg-gradient-to-r from-pink-500 to-purple-500"
         />
 
         <motion.div
@@ -168,7 +161,6 @@ export default function GameCubePage() {
     </motion.div>
   );
 
-  // Memory cube component
   const MemoryCube = ({ game, index }: { game: any; index: number }) => {
     const isHovered = hoveredGame === game.id;
     const isCompleted = game.progress.completed;
@@ -184,53 +176,50 @@ export default function GameCubePage() {
           rotateX: 5,
           transition: { duration: 0.2 },
         }}
-        className="relative group"
+        className="group relative"
         onMouseEnter={() => setHoveredGame(game.id)}
         onMouseLeave={() => setHoveredGame(null)}
       >
         <Link href={`/mini-games/${game.id}`} className="block">
           <GlassPanel
-            className={`p-6 h-64 flex flex-col justify-between transition-all duration-300 ${
+            className={`flex h-64 flex-col justify-between p-6 transition-all duration-300 ${
               isHovered ? 'shadow-[0_0_30px_rgba(255,79,163,0.4)]' : ''
             }`}
           >
-            {/* Game Icon */}
-            <div className="text-center mb-4">
-              <div className="text-4xl mb-2">{game.icon}</div>
-              <h3 className="text-lg font-display text-white group-hover:text-pink-300 transition-colors">
+            <div className="mb-4 text-center">
+              <div className="mb-2 text-4xl">{game.icon}</div>
+              <h3 className="text-lg font-display text-white transition-colors group-hover:text-pink-300">
                 {game.title}
               </h3>
             </div>
 
-            {/* Progress Indicators */}
             <div className="space-y-2">
               {isCompleted && (
-                <div className="flex items-center justify-center text-green-400 text-sm">
+                <div className="flex items-center justify-center text-sm text-green-400">
                   <span className="mr-1"></span>
                   Completed
                 </div>
               )}
               {hasHighScore && (
-                <div className="text-center text-pink-300 text-sm">
+                <div className="text-center text-sm text-pink-300">
                   High Score: {game.progress.highScore}
                 </div>
               )}
-              <div className="text-center text-zinc-400 text-xs">
+              <div className="text-center text-xs text-zinc-400">
                 {game.difficulty.toUpperCase()} • {game.rewards.petals} petals
               </div>
             </div>
 
-            {/* Hover Tooltip */}
             <AnimatePresence>
               {isHovered && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-black/90 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap z-10"
+                  className="absolute -top-12 left-1/2 z-10 -translate-x-1/2 transform whitespace-nowrap rounded-lg bg-black/90 px-3 py-2 text-sm text-white"
                 >
                   {game.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90" />
+                  <div className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 transform border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -244,11 +233,11 @@ export default function GameCubePage() {
     <>
       <Navbar />
       <main className="relative z-10 min-h-screen bg-otaku-space">
-        {/* Boot Sequence */}
-        <AnimatePresence>{showBootSequence && <BootSequence />}</AnimatePresence>
+        <AnimatePresence mode="wait">
+          {showBootSequence ? <BootSequence key="boot-sequence" /> : null}
+        </AnimatePresence>
 
-        {/* Main Content */}
-        {bootComplete && (
+        {bootComplete ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -256,13 +245,12 @@ export default function GameCubePage() {
             className="min-h-screen"
           >
             <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-              {/* Header */}
               <div className="mb-12 text-center">
                 <motion.h1
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
-                  className="text-4xl md:text-6xl font-display text-pink-400 mb-4"
+                  className="mb-4 text-4xl font-display text-pink-400 md:text-6xl"
                 >
                   The Arena of Trials
                 </motion.h1>
@@ -276,19 +264,17 @@ export default function GameCubePage() {
                 </motion.p>
               </div>
 
-              {/* Memory Cubes Grid */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.8 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
               >
                 {games.map((game, index) => (
                   <MemoryCube key={game.id} game={game} index={index} />
                 ))}
               </motion.div>
 
-              {/* Stats Panel */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -296,8 +282,8 @@ export default function GameCubePage() {
                 className="mt-12"
               >
                 <GlassPanel className="p-6">
-                  <h3 className="text-xl font-display text-white mb-4">Your Progress</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <h3 className="mb-4 text-xl font-display text-white">Your Progress</h3>
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-pink-400">
                         {Object.values(gameProgress).filter((p: any) => p.completed).length}
@@ -336,7 +322,7 @@ export default function GameCubePage() {
               </motion.div>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </main>
       <FooterDark />
     </>
