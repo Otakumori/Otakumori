@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -27,7 +28,11 @@ function getLineKey(item: CartItem) {
 }
 
 export default function CartPage() {
+  const { isSignedIn } = useAuth();
   const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();
+  const checkoutHref = isSignedIn
+    ? paths.checkout()
+    : `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
 
   if (cart.length === 0) {
     return (
@@ -97,7 +102,7 @@ export default function CartPage() {
                 <div className="flex justify-between border-t border-glass-border pt-4 font-semibold text-primary"><span>Total</span><span>${total.toFixed(2)}</span></div>
               </div>
               <div className="mt-6">
-                <Link href={paths.checkout()}>
+                <Link href={checkoutHref}>
                   <Button className="w-full btn-primary">Proceed to Checkout</Button>
                 </Link>
               </div>
