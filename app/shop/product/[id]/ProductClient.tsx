@@ -59,6 +59,7 @@ export default function ProductClient({ productId }: { productId: string }) {
     [product?.description],
   );
   const displayImageUrl = useMemo(() => resolveDisplayImage(product, selectedVariant), [product, selectedVariant]);
+  const variantAvailable = Boolean(selectedVariant?.isEnabled && selectedVariant?.inStock);
 
   useEffect(() => {
     let isCancelled = false;
@@ -163,7 +164,7 @@ export default function ProductClient({ productId }: { productId: string }) {
 
   const handleAddToCart = () => {
     if (!product) return;
-    if (!selectedVariant || !selectedVariant.isEnabled) {
+    if (!selectedVariant || !selectedVariant.isEnabled || !selectedVariant.inStock) {
       showError('Please select an available variant');
       return;
     }
@@ -261,8 +262,8 @@ export default function ProductClient({ productId }: { productId: string }) {
                 <label htmlFor="variant-select" className="block text-sm font-medium text-pink-200 mb-2">Select Variant</label>
                 <select id="variant-select" value={selectedVariant?.id || ''} onChange={(e) => { const variant = product.variants?.find((v) => v.id === e.target.value); if (variant) setSelectedVariant(variant); }} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white">
                   {product.variants.map((variant) => (
-                    <option key={variant.id} value={variant.id} disabled={!variant.isEnabled} className="bg-purple-900">
-                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - ${(((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100)).toFixed(2)}{!variant.isEnabled ? ' (Out of Stock)' : ''}
+                    <option key={variant.id} value={variant.id} disabled={!variant.isEnabled || !variant.inStock} className="bg-purple-900">
+                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - ${(((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100)).toFixed(2)}{!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
                     </option>
                   ))}
                 </select>
@@ -274,14 +275,14 @@ export default function ProductClient({ productId }: { productId: string }) {
               <input id="quantity" type="number" min="1" max="99" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white" />
             </div>
 
-            <HeaderButton onClick={handleAddToCart} disabled={!selectedVariant || !selectedVariant.isEnabled} className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">Add to Cart</HeaderButton>
+            <HeaderButton onClick={handleAddToCart} disabled={!variantAvailable} className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">Add to Cart</HeaderButton>
 
             <div className="glass-panel rounded-xl p-6 space-y-3">
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
               <div className="space-y-2 text-sm text-zinc-300">
                 <p><span className="font-medium">SKU:</span> {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}</p>
                 {product.category && <p><span className="font-medium">Category:</span> {product.category}</p>}
-                <p><span className="font-medium">Availability:</span> {selectedVariant?.isEnabled ? 'In Stock' : 'Out of Stock'}</p>
+                <p><span className="font-medium">Availability:</span> {variantAvailable ? 'In Stock' : 'Unavailable'}</p>
               </div>
             </div>
           </div>
