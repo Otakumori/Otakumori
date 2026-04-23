@@ -34,11 +34,11 @@ interface ServerCartItem {
     title?: string;
     name?: string;
     image?: string | null;
-    ProductVariant?: Array<{
-      id: string;
-      title?: string | null;
-      priceCents?: number | null;
-    }>;
+  };
+  variant?: {
+    id?: string;
+    title?: string | null;
+    priceCents?: number | null;
   };
 }
 
@@ -48,7 +48,7 @@ function getLineKey(item: CartItem) {
   return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
 }
 
-function mergeCartItems(serverItems: CartItem[], localItems: CartItem[]) {
+function reconcileCartItems(serverItems: CartItem[], localItems: CartItem[]) {
   const merged = new Map<string, CartItem>();
 
   for (const item of serverItems) {
@@ -61,7 +61,11 @@ function mergeCartItems(serverItems: CartItem[], localItems: CartItem[]) {
     if (existing) {
       merged.set(lineKey, {
         ...existing,
-        quantity: existing.quantity + item.quantity,
+        quantity: Math.max(existing.quantity, item.quantity),
+        price: item.price || existing.price,
+        image: item.image || existing.image,
+        name: item.name || existing.name,
+        selectedVariant: item.selectedVariant || existing.selectedVariant,
       });
     } else {
       merged.set(lineKey, item);
@@ -74,8 +78,7 @@ function mergeCartItems(serverItems: CartItem[], localItems: CartItem[]) {
 function normalizeServerCartItems(serverItems: ServerCartItem[]): CartItem[] {
   return serverItems
     .map((item) => {
-      const matchingVariant = item.product?.ProductVariant?.find((variant) => variant.id === item.variantId);
-      const price = matchingVariant?.priceCents != null ? matchingVariant.priceCents / 100 : 0;
+      const price = item.variant?.priceCents != null ? item.variant.priceCents / 100 : 0;
       return {
         id: item.productId,
         name: item.product?.title || item.product?.name || 'Product',
@@ -85,7 +88,7 @@ function normalizeServerCartItems(serverItems: ServerCartItem[]): CartItem[] {
         selectedVariant: item.variantId
           ? {
               id: item.variantId,
-              title: matchingVariant?.title || 'Variant',
+              title: item.variant?.title || 'Variant',
             }
           : undefined,
       };
@@ -138,13 +141,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         if (cancelled) return;
 
-        const mergedItems = mergeCartItems(serverItems, items);
-        setItems(mergedItems);
         hasHydratedServerRef.current = true;
-
-        if (mergedItems.length > 0) {
-          await syncCartToPrisma(userId, mergedItems);
-        }
+        setItems((currentItems) => {
+          const mergedItems = reconcileCartItems(serverItems, currentItems);
+          void syncCartToPrisma(userId, mergedItems);
+          return mergedItems;
+        });
       } catch (error) {
         logger.error('Failed to hydrate cart from server:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         hasHydratedServerRef.current = true;
@@ -156,7 +158,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [hasLoadedLocal, isSignedIn, userId, items]);
+  }, [hasLoadedLocal, isSignedIn, userId]);
 
   useEffect(() => {
     if (isSignedIn && userId && hasHydratedServerRef.current && items.length > 0) {
