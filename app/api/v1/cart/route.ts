@@ -23,8 +23,8 @@ export async function GET(req: NextRequest) {
             Product: {
               select: {
                 id: true,
-                title: true,
-                image: true,
+                name: true,
+                primaryImageUrl: true,
               },
             },
             ProductVariant: {
@@ -48,8 +48,8 @@ export async function GET(req: NextRequest) {
               Product: {
                 select: {
                   id: true,
-                  title: true,
-                  image: true,
+                  name: true,
+                  primaryImageUrl: true,
                 },
               },
               ProductVariant: {
@@ -72,8 +72,8 @@ export async function GET(req: NextRequest) {
       quantity: item.quantity,
       product: {
         id: item.Product.id,
-        title: item.Product.title,
-        image: item.Product.image,
+        title: item.Product.name,
+        image: item.Product.primaryImageUrl,
       },
       variant: {
         id: item.ProductVariant.id,
@@ -147,8 +147,8 @@ export async function POST(req: NextRequest) {
         Product: {
           select: {
             id: true,
-            title: true,
-            image: true,
+            name: true,
+            primaryImageUrl: true,
           },
         },
         ProductVariant: {
@@ -166,8 +166,16 @@ export async function POST(req: NextRequest) {
       productId: cartItem.productId,
       variantId: cartItem.productVariantId,
       quantity: cartItem.quantity,
-      product: cartItem.Product,
-      variant: cartItem.ProductVariant,
+      product: {
+        id: cartItem.Product.id,
+        title: cartItem.Product.name,
+        image: cartItem.Product.primaryImageUrl,
+      },
+      variant: {
+        id: cartItem.ProductVariant.id,
+        title: cartItem.ProductVariant.title,
+        priceCents: cartItem.ProductVariant.priceCents,
+      },
     };
 
     return NextResponse.json({ ok: true, data: response });
