@@ -7,7 +7,6 @@ import { CartUpdateSchema } from '@/app/lib/contracts';
 
 export async function GET(req: NextRequest) {
   try {
-    // Log cart request for analytics
     const { logger } = await import('@/app/lib/logger');
     logger.warn('Cart GET requested from:', undefined, { userAgent: req.headers.get('user-agent') });
 
@@ -16,18 +15,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get or create cart for user
     let cart = await prisma.cart.findUnique({
       where: { userId },
       include: {
         CartItem: {
           include: {
             Product: {
-              include: {
-                ProductVariant: true,
+              select: {
+                id: true,
+                name: true,
+                primaryImageUrl: true,
               },
             },
-            ProductVariant: true,
+            ProductVariant: {
+              select: {
+                id: true,
+                title: true,
+                priceCents: true,
+              },
+            },
           },
         },
       },
@@ -40,11 +46,19 @@ export async function GET(req: NextRequest) {
           CartItem: {
             include: {
               Product: {
-                include: {
-                  ProductVariant: true,
+                select: {
+                  id: true,
+                  name: true,
+                  primaryImageUrl: true,
                 },
               },
-              ProductVariant: true,
+              ProductVariant: {
+                select: {
+                  id: true,
+                  title: true,
+                  priceCents: true,
+                },
+              },
             },
           },
         },
@@ -56,7 +70,16 @@ export async function GET(req: NextRequest) {
       productId: item.productId,
       variantId: item.productVariantId,
       quantity: item.quantity,
-      product: item.Product,
+      product: {
+        id: item.Product.id,
+        title: item.Product.name,
+        image: item.Product.primaryImageUrl,
+      },
+      variant: {
+        id: item.ProductVariant.id,
+        title: item.ProductVariant.title,
+        priceCents: item.ProductVariant.priceCents,
+      },
     }));
 
     return NextResponse.json({ ok: true, data: response });
@@ -82,7 +105,6 @@ export async function POST(req: NextRequest) {
 
     const { productId, variantId, quantity } = parsed.data;
 
-    // Verify product and variant exist
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: { ProductVariant: true },
@@ -96,7 +118,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Variant not found' }, { status: 404 });
     }
 
-    // Get or create cart for user
     let cart = await prisma.cart.findUnique({
       where: { userId },
     });
@@ -107,7 +128,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Upsert cart item
     const cartItem = await prisma.cartItem.upsert({
       where: {
         cartId_productId_productVariantId: {
@@ -125,11 +145,19 @@ export async function POST(req: NextRequest) {
       },
       include: {
         Product: {
-          include: {
-            ProductVariant: true,
+          select: {
+            id: true,
+            name: true,
+            primaryImageUrl: true,
           },
         },
-        ProductVariant: true,
+        ProductVariant: {
+          select: {
+            id: true,
+            title: true,
+            priceCents: true,
+          },
+        },
       },
     });
 
@@ -138,7 +166,16 @@ export async function POST(req: NextRequest) {
       productId: cartItem.productId,
       variantId: cartItem.productVariantId,
       quantity: cartItem.quantity,
-      product: cartItem.Product,
+      product: {
+        id: cartItem.Product.id,
+        title: cartItem.Product.name,
+        image: cartItem.Product.primaryImageUrl,
+      },
+      variant: {
+        id: cartItem.ProductVariant.id,
+        title: cartItem.ProductVariant.title,
+        priceCents: cartItem.ProductVariant.priceCents,
+      },
     };
 
     return NextResponse.json({ ok: true, data: response });
