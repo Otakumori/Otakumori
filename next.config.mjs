@@ -171,6 +171,30 @@ const nextConfig = {
         destination: '/mini-games/memory-match',
         permanent: true,
       },
+      ...[
+        '/shop-live',
+        '/shop-ready',
+        '/shop-proof',
+        '/shop-smart',
+        '/shop-clean',
+        '/shop-curated',
+        '/shop-lite',
+        '/shop-cart-ready',
+      ].map((source) => ({
+        source,
+        destination: '/shop',
+        permanent: true,
+      })),
+      ...[
+        '/shop-item/:id',
+        '/shop-proof-item/:id',
+        '/shop-smart-item/:id',
+        '/shop-buy-item/:id',
+      ].map((source) => ({
+        source,
+        destination: '/shop/product/:id',
+        permanent: true,
+      })),
     ];
   },
   // This is required to support PostHog trailing slash API requests
