@@ -1,9 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
-import { getMerchizeService } from '@/app/lib/merchize/service';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
-import { createProductSlug } from '@/lib/catalog/mapPrintify';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
@@ -52,51 +50,11 @@ function normalizeListingImages(images: string[]): string[] {
   return images.filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index).slice(0, 2);
 }
 
-function toMerchizeCatalogProduct(product: Awaited<ReturnType<ReturnType<typeof getMerchizeService>['getProducts']>>[number]): CatalogProduct {
-  const priceCents = product.price != null ? Math.round(product.price * 100) : null;
-  const images = normalizeListingImages(product.images.map((image) => image.url).filter(Boolean));
-  return {
-    id: `merchize:${product.id}`,
-    title: product.title,
-    slug: createProductSlug(product.title, `merchize-${product.id}`),
-    description: product.description ?? '',
-    image: images[0] ?? null,
-    images,
-    tags: ['merchize'],
-    category: 'merchize-catalog',
-    categorySlug: 'merchize-catalog',
-    price: product.price,
-    priceCents,
-    priceRange: { min: priceCents, max: priceCents },
-    available: true,
-    visible: true,
-    active: true,
-    provider: 'merchize',
-    variants: [{
-      id: `merchize:${product.id}:default`,
-      title: product.title,
-      sku: product.sku,
-      price: product.price,
-      priceCents,
-      inStock: true,
-      isEnabled: true,
-      printifyVariantId: 0,
-      optionValues: [],
-      previewImageUrl: images[0] ?? null,
-    }],
-    integrationRef: 'merchize',
-    printifyProductId: null,
-    blueprintId: null,
-    printProviderId: null,
-    lastSyncedAt: null,
-  };
-}
-
 function toListingProduct(product: CatalogProduct): CatalogProduct {
   const images = normalizeListingImages(product.images || []);
   const primaryImage = isRenderableListingImage(product.image) ? product.image : images[0] ?? null;
   const trimmedVariants = (product.variants || [])
-    .filter((variant) => variant.isEnabled)
+    .filter((variant) => variant.isEnabled && variant.inStock)
     .slice(0, 12)
     .map((variant) => ({
       id: variant.id,
@@ -116,6 +74,7 @@ function toListingProduct(product: CatalogProduct): CatalogProduct {
     description: (product.description || '').slice(0, 400),
     image: primaryImage,
     images: primaryImage ? [primaryImage, ...images.filter((image) => image !== primaryImage)].slice(0, 2) : images,
+    available: trimmedVariants.length > 0,
     variants: trimmedVariants,
   };
 }
@@ -171,27 +130,24 @@ export async function GET(request: NextRequest) {
     const page = params.page ?? 1;
     const limit = params.limit ?? 20;
 
-    const [prismaProducts, merchizeProducts] = await Promise.all([
-      db.product.findMany({
-        where: { active: true, visible: true },
-        include: { ProductVariant: true, ProductImage: { orderBy: { position: 'asc' } } },
-        take: 120,
-        orderBy: { updatedAt: 'desc' },
-      }),
-      getMerchizeService().getProducts({ limit: 30, page: 1 }),
-    ]);
+    const prismaProducts = await db.product.findMany({
+      where: { active: true, visible: true },
+      include: { ProductVariant: true, ProductImage: { orderBy: { position: 'asc' } } },
+      take: 120,
+      orderBy: { updatedAt: 'desc' },
+    });
 
-    const merged = [
-      ...prismaProducts.map(serializeProduct).map(toListingProduct),
-      ...merchizeProducts.map(toMerchizeCatalogProduct).map(toListingProduct),
-    ].filter((product) => Boolean(product.image));
+    const checkoutSafeProducts = prismaProducts
+      .map(serializeProduct)
+      .map(toListingProduct)
+      .filter((product) => Boolean(product.image) && product.available && product.variants.length > 0);
 
-    const filtered = sortProducts(filterProducts(merged, params), params);
+    const filtered = sortProducts(filterProducts(checkoutSafeProducts, params), params);
     const total = filtered.length;
     const totalPages = Math.ceil(total / limit);
     const paginated = filtered.slice((page - 1) * limit, page * limit);
 
-    const pricedProducts = merged.filter((product) => typeof product.price === 'number');
+    const pricedProducts = checkoutSafeProducts.filter((product) => typeof product.price === 'number');
     const minPrice = pricedProducts.length > 0 ? Math.min(...pricedProducts.map((product) => product.price as number)) : 0;
     const maxPrice = pricedProducts.length > 0 ? Math.max(...pricedProducts.map((product) => product.price as number)) : 0;
 
@@ -204,7 +160,7 @@ export async function GET(request: NextRequest) {
         perPage: limit,
       },
       filters: {
-        availableCategories: Array.from(new Set(merged.map((product) => product.categorySlug || product.category).filter(Boolean))) as string[],
+        availableCategories: Array.from(new Set(checkoutSafeProducts.map((product) => product.categorySlug || product.category).filter(Boolean))) as string[],
         priceRange: { min: minPrice, max: maxPrice },
         availableColors: [],
         availableSizes: [],
@@ -216,7 +172,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Merged catalog API error', { requestId, route: '/api/v1/catalog' }, undefined, error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to fetch merged catalog', requestId), { status: 500 });
+    logger.error('Catalog API error', { requestId, route: '/api/v1/catalog' }, undefined, error instanceof Error ? error : new Error(String(error)));
+    return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to fetch catalog', requestId), { status: 500 });
   }
 }
