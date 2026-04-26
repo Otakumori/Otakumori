@@ -97,6 +97,8 @@ export async function POST(req: Request) {
       create: { userId },
     });
 
+    const syncedItems: Array<{ productId: string; variantId: string; quantity: number }> = [];
+
     await prisma.$transaction(async (tx) => {
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
 
@@ -112,29 +114,18 @@ export async function POST(req: Request) {
             quantity: item.quantity,
           },
         });
-      }
-    });
 
-    const syncedCart = await prisma.cart.findUnique({
-      where: { id: cart.id },
-      include: {
-        CartItem: {
-          include: {
-            Product: true,
-            ProductVariant: true,
-          },
-        },
-      },
+        syncedItems.push({
+          productId: item.productId,
+          variantId: resolvedVariantId,
+          quantity: item.quantity,
+        });
+      }
     });
 
     return NextResponse.json({
       ok: true,
-      data: syncedCart?.CartItem.map((item) => ({
-        id: item.id,
-        productId: item.productId,
-        variantId: item.productVariantId,
-        quantity: item.quantity,
-      })) ?? [],
+      data: syncedItems,
     });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
