@@ -1,2 +1,5 @@
 packages:
   - 'packages/*'
+
+overrides:
+  inngest: 3.54.0
