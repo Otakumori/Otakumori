@@ -78,7 +78,7 @@ export default function BuyReadyShopCatalog() {
         const loaded = payload.data?.products ?? payload.products ?? [];
         if (!cancelled) setProducts(dedupeProducts(loaded.filter(isBuyReadyProduct)));
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load live products');
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load buy-ready products');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -93,6 +93,16 @@ export default function BuyReadyShopCatalog() {
 
   if (loading) return <div className="text-zinc-300">Loading buy-ready storefront...</div>;
   if (error) return <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-200"><h2 className="text-xl font-semibold mb-2">Unable to load storefront</h2><p>{error}</p></div>;
+  if (visibleProducts.length === 0) {
+    return (
+      <div className="rounded-3xl border border-pink-500/20 bg-white/5 p-8 text-center text-pink-100">
+        <h2 className="text-2xl font-semibold">No buy-ready products yet</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-pink-100/70">
+          The public shop is only showing products with images, prices, and in-stock variants right now. Sync or enable products in admin, then refresh this page.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
