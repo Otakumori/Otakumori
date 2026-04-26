@@ -1,0 +1,62 @@
+name: Update browser compatibility data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 1 * *'
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/update-browser-data.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-browser-data:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.12'
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.1 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Refresh browser data
+        run: |
+          pnpm dlx update-browserslist-db@latest
+          pnpm up -D baseline-browser-mapping@latest caniuse-lite@latest browserslist@latest
+
+      - name: Verify lockfile and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm prisma generate
+          pnpm build
+
+      - name: Commit browser data refresh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "Browser compatibility data is already current."
+          else
+            git commit -m "chore(deps): refresh browser compatibility data"
+            git push
+          fi
