@@ -26,11 +26,11 @@ function normalizeTitle(title: string) {
   return title.toLowerCase().replace(/&[a-z]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function isLiveProduct(product: CatalogProduct) {
-  const hasProvider = product.provider === 'printify' || product.provider === 'merchize';
+function isBuyReadyProduct(product: CatalogProduct) {
   const hasPrice = typeof product.price === 'number' || typeof product.priceCents === 'number' || typeof product.priceRange?.min === 'number';
   const hasImage = Boolean((product.image ?? product.images?.[0] ?? '').trim());
-  return hasProvider && hasPrice && hasImage;
+  const hasAvailableVariant = Boolean(product.variants?.some((variant) => variant.isEnabled && variant.inStock));
+  return hasPrice && hasImage && hasAvailableVariant;
 }
 
 function cleanSummary(raw: string) {
@@ -53,7 +53,7 @@ function dedupeProducts(products: CatalogProduct[]) {
   const seen = new Set<string>();
   const deduped: CatalogProduct[] = [];
   for (const product of products) {
-    const key = [product.provider ?? 'unknown', normalizeTitle(product.title)].join('::');
+    const key = [product.provider ?? 'prisma', normalizeTitle(product.title)].join('::');
     if (seen.has(key)) continue;
     seen.add(key);
     deduped.push(product);
@@ -76,7 +76,7 @@ export default function BuyReadyShopCatalog() {
         if (!response.ok) throw new Error(`Catalog request failed with ${response.status}`);
         const payload = (await response.json()) as ApiResponse;
         const loaded = payload.data?.products ?? payload.products ?? [];
-        if (!cancelled) setProducts(dedupeProducts(loaded.filter(isLiveProduct)));
+        if (!cancelled) setProducts(dedupeProducts(loaded.filter(isBuyReadyProduct)));
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load live products');
       } finally {
@@ -106,7 +106,7 @@ export default function BuyReadyShopCatalog() {
             <Link href={productHref} className="block">
               <div className="relative aspect-[4/5] bg-black/20">
                 <Image src={image} alt={product.title} fill className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" unoptimized />
-                <div className="absolute right-3 top-3 rounded-lg bg-black/70 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-white">{product.provider}</div>
+                {product.provider ? <div className="absolute right-3 top-3 rounded-lg bg-black/70 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-white">{product.provider}</div> : null}
               </div>
             </Link>
             <div className="space-y-3 p-5">
