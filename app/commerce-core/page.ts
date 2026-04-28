@@ -1,3 +1,1 @@
-export default function Page() {
-  return 'Commerce Core skeleton route';
-}
+export { CommerceCoreHome as default } from './_components/pages';
