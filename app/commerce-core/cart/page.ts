@@ -1,3 +1,1 @@
-export default function Page() {
-  return 'Commerce Core cart skeleton';
-}
+export { CommerceCoreCart as default } from '../_components/pages';
