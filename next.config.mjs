@@ -1,4 +1,3 @@
-import { withSentryConfig } from '@sentry/nextjs';
 import path from 'node:path';
 import { env } from './env.mjs';
 
@@ -259,23 +258,21 @@ const nextConfig = {
   },
 };
 
-// Temporarily disable Sentry for development
 export default withBundleAnalyzer(nextConfig);
 
-// Uncomment below to re-enable Sentry when configuration is fixed
+// To re-enable the Sentry Next.js build wrapper, import withSentryConfig from
+// '@sentry/nextjs' and wrap the export below. Keeping that import out of the
+// active config prevents unused Sentry build tooling from contributing extra
+// OpenTelemetry trace noise during normal deployments.
+//
 // export default withSentryConfig(withBundleAnalyzer(nextConfig), {
 //   org: env.SENTRY_ORG || 'otaku-mori',
 //   project: env.SENTRY_PROJECT || 'javascript-react',
-//   // Pass the auth token
 //   authToken: env.SENTRY_AUTH_TOKEN,
-//   // Upload a larger set of source maps for prettier stack traces (increases build time)
 //   widenClientFileUpload: true,
-//   // Reduce noise if token is missing (no uploads)
 //   silent: !env.SENTRY_AUTH_TOKEN,
-//   // Disable Sentry plugin telemetry logs
 //   telemetry: false,
-//   // Sentry runtime config
-//   tunnelRoute: '/monitoring', // helps bypass ad blockers
-//   hideSourceMaps: true, // source maps still uploaded to Sentry
+//   tunnelRoute: '/monitoring',
+//   hideSourceMaps: true,
 //   disableLogger: true,
 // });
