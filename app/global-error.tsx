@@ -1,12 +1,13 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
 import NextError from 'next/error';
 import { useEffect } from 'react';
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    // Keep this boundary dependency-light. Importing Sentry here pulls server-side
+    // OpenTelemetry instrumentation into production build traces.
+    console.error('Global application error boundary caught an error:', error);
   }, [error]);
 
   return (
