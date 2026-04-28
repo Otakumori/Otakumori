@@ -1,3 +1,1 @@
-export default function Page() {
-  return 'Commerce Core checkout skeleton';
-}
+export { CommerceCoreCheckout as default } from '../_components/pages';
