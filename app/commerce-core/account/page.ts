@@ -1,3 +1,1 @@
-export default function Page() {
-  return 'Commerce Core account skeleton';
-}
+export { CommerceCoreAccount as default } from '../_components/pages';
