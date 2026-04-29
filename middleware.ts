@@ -97,6 +97,16 @@ function buildAccountsUrl(path: string, redirectUrl?: string) {
   return url;
 }
 
+function nextWithPathname(req: Request, pathname: string) {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-otm-pathname', pathname);
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+}
+
 export default clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
@@ -117,7 +127,7 @@ export default clerkMiddleware(async (auth, req) => {
         return handleCorsPreflight(req);
       }
 
-      const res = NextResponse.next();
+      const res = nextWithPathname(req, url.pathname);
       res.headers.set('X-Request-ID', reqId);
 
       return withCors(res, req.headers.get('origin'), {
@@ -156,7 +166,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    const res = NextResponse.next();
+    const res = nextWithPathname(req, url.pathname);
     res.headers.set('X-Request-ID', reqId);
     res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     res.headers.set('X-Content-Type-Options', 'nosniff');

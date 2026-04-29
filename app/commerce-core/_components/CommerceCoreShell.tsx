@@ -1,5 +1,6 @@
 'use client';
 
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { commerceCoreConfig } from './config';
@@ -237,6 +238,8 @@ export function CommerceCoreShell({ mode }: { mode: Mode }) {
 
         <p className="rounded-2xl border border-zinc-800 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-200">{notice}</p>
 
+        {(active.account || active.checkout) && <CommerceCoreAuthState mode={mode} />}
+
         {active.shop && (
           <section className="grid gap-4 md:grid-cols-3">
             {products.map((product) => (
@@ -350,6 +353,38 @@ export function CommerceCoreShell({ mode }: { mode: Mode }) {
         )}
       </section>
     </main>
+  );
+}
+
+function CommerceCoreAuthState({ mode }: { mode: Mode }) {
+  const redirectPath = mode === 'checkout' ? commerceCoreConfig.routes.checkout : commerceCoreConfig.routes.home;
+  const buttonText = mode === 'checkout' ? 'Sign in to checkout' : 'Sign in';
+
+  return (
+    <section className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
+      <SignedOut>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold">Sign-in state</h2>
+            <p className="mt-2 text-sm text-zinc-400">You are signed out. Commerce Core keeps this route local until sign-in is requested.</p>
+          </div>
+          <SignInButton mode="modal" fallbackRedirectUrl={redirectPath} forceRedirectUrl={redirectPath}>
+            <button type="button" className="rounded-full bg-pink-200 px-5 py-3 text-sm font-semibold text-zinc-950">
+              {buttonText}
+            </button>
+          </SignInButton>
+        </div>
+      </SignedOut>
+      <SignedIn>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold">Signed in</h2>
+            <p className="mt-2 text-sm text-zinc-400">Commerce Core can attach saved checkout and order data to this account when backend persistence is wired.</p>
+          </div>
+          <UserButton />
+        </div>
+      </SignedIn>
+    </section>
   );
 }
 
