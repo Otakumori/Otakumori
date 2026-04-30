@@ -11,6 +11,7 @@ type Product = {
   variantId: string;
   name: string;
   description: string;
+  imageUrl?: string;
   priceCents: number;
   category: string;
 };
@@ -34,6 +35,7 @@ const products: Product[] = [
     variantId: 'core-tee-black-m',
     name: 'Core Graphic Tee',
     description: 'Launch-ready hero tee placeholder for original Otaku-mori artwork.',
+    imageUrl: '/assets/commerce-core/core-tee.svg',
     priceCents: 2800,
     category: 'Apparel',
   },
@@ -42,6 +44,7 @@ const products: Product[] = [
     variantId: 'core-hoodie-black-m',
     name: 'Core Hoodie',
     description: 'Premium hoodie placeholder with room for provider variant sync.',
+    imageUrl: '/assets/commerce-core/core-hoodie.svg',
     priceCents: 6400,
     category: 'Apparel',
   },
@@ -50,6 +53,7 @@ const products: Product[] = [
     variantId: 'core-sticker-3x3',
     name: 'Sigil Sticker',
     description: 'Small add-on product for testing low-ticket order behavior.',
+    imageUrl: '/assets/commerce-core/core-sticker.svg',
     priceCents: 450,
     category: 'Accessories',
   },

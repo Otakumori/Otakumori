@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Sigil sticker">
+  <rect width="240" height="260" fill="#17131a"/>
+  <path d="M120 42 185 77v71c0 43-27 63-65 78-38-15-65-35-65-78V77l65-35Z" fill="#241e29" stroke="#f8c8dc" stroke-width="6"/>
+  <path d="M84 132c24-46 48-46 72 0-24 46-48 46-72 0Z" fill="#f8c8dc"/>
+  <circle cx="120" cy="132" r="17" fill="#17131a"/>
+  <path d="M120 71v30M120 163v30M72 132h28M140 132h28" stroke="#f8c8dc" stroke-width="7" stroke-linecap="round"/>
+</svg>

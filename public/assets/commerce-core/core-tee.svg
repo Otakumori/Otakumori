@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Core graphic tee">
+  <rect width="240" height="260" fill="#18151c"/>
+  <path d="M64 50 95 32h50l31 18 27 45-34 18-11-17v115H82V96l-11 17-34-18 27-45Z" fill="#29232d" stroke="#f8c8dc" stroke-width="5"/>
+  <circle cx="120" cy="112" r="31" fill="#f8c8dc"/>
+  <path d="M102 112c12-24 24-24 36 0-12 24-24 24-36 0Z" fill="#18151c"/>
+  <path d="M83 212h74" stroke="#635866" stroke-width="6" stroke-linecap="round"/>
+</svg>
