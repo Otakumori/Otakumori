@@ -1,13 +1,10 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
-import { ToastProvider } from './contexts/ToastContext';
-import { NSFWProvider } from './contexts/NSFWContext';
-import AppQueryProvider from './providers/AppQueryProvider';
-import Navbar from './components/layout/Navbar';
-import { CartProvider } from './components/cart/CartProvider';
+
+const FullAppShell = dynamic(() => import('./FullAppShell'));
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -16,18 +13,5 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return children;
   }
 
-  return (
-    <AuthProvider>
-      <ToastProvider>
-        <NSFWProvider>
-          <AppQueryProvider>
-            <CartProvider>
-              <Navbar />
-              {children}
-            </CartProvider>
-          </AppQueryProvider>
-        </NSFWProvider>
-      </ToastProvider>
-    </AuthProvider>
-  );
+  return <FullAppShell>{children}</FullAppShell>;
 }
