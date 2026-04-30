@@ -1,1 +1,1 @@
-export { CommerceCoreCheckout as default } from '../_components/pages';
+export { default } from '../_components/CommerceCoreCheckoutClient';
