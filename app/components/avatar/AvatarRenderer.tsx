@@ -3,7 +3,7 @@
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { AvatarRenderer as R3FAvatarRenderer } from '../../adults/_components/AvatarRenderer.safe';
+import { AvatarRenderer as R3FAvatarRenderer } from '@/app/(site)/adults/_components/AvatarRenderer.safe';
 import { AvatarCard } from './AvatarCard';
 import { AvatarSkeleton } from './AvatarSkeleton';
 import { AvatarFallback } from './AvatarFallback';

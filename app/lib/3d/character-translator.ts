@@ -5,7 +5,7 @@
  * Comprehensive error handling
  */
 
-import type { FullCharacterConfig } from '@/app/test/character-creator/types';
+import type { FullCharacterConfig } from '@/app/(site)/test/character-creator/types';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import { CODE_VEIN_PRESET, ULTRA_PRESET, type AdvancedCelShadingConfig } from './advanced-cel-shading';
 

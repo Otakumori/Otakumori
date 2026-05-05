@@ -28,6 +28,7 @@ export default function CheckoutContent() {
   const [preview, setPreview] = useState<any>(null);
   const [availableDiscounts, setAvailableDiscounts] = useState<AvailableDiscount[]>([]);
   const [loadingDiscounts, setLoadingDiscounts] = useState(true);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -38,6 +39,14 @@ export default function CheckoutContent() {
     zipCode: '',
     country: 'US',
   });
+  const subtotal = useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0), [items]);
+  const previewDiscount =
+    typeof preview?.discountTotal === 'number'
+      ? preview.discountTotal
+      : typeof preview?.discount === 'number'
+        ? preview.discount
+        : 0;
+  const estimatedSubtotal = Math.max(0, subtotal - previewDiscount);
 
   // Fetch available discounts
   useEffect(() => {
@@ -88,8 +97,6 @@ export default function CheckoutContent() {
   // preview engine output
   useEffect(() => {
     let cancelled = false;
-    const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-    const baseShipping = subtotal > 50 ? 0 : 9.99;
     const run = async () => {
       if (codes.length === 0) {
         setPreview(null);
@@ -109,7 +116,7 @@ export default function CheckoutContent() {
                 quantity: i.quantity,
                 unitPrice: i.price,
               })),
-              shipping: { provider: 'stripe', fee: baseShipping },
+              shipping: { provider: 'stripe', fee: 0 },
             },
           }),
         });
@@ -134,20 +141,18 @@ export default function CheckoutContent() {
   };
 
   const handleCheckout = async () => {
+    setCheckoutError(null);
+    if (items.length === 0) {
+      setCheckoutError('Your cart is empty.');
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      // Build CheckoutRequest items
       const checkoutItems = items.map((i) => ({
         productId: i.id,
         variantId: i.selectedVariant?.id || 'default',
-        name: i.name,
-        description: undefined,
-        images: i.image ? [i.image] : [],
         quantity: i.quantity,
-        priceCents: Math.round(i.price * 100),
-        sku: undefined,
-        printifyProductId: undefined,
-        printifyVariantId: undefined,
       }));
 
       // Attach redemptions (best effort)
@@ -168,8 +173,6 @@ export default function CheckoutContent() {
         }
       } catch {}
 
-      const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-      const baseShipping = subtotal > 50 ? 0 : 9.99;
       const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,16 +180,33 @@ export default function CheckoutContent() {
           items: checkoutItems,
           shippingInfo: formData,
           couponCodes: codes,
-          shipping: { provider: 'stripe', fee: baseShipping },
         }),
       });
 
-      const { url } = await response.json();
+      const rawBody = await response.text();
+      let payload: any = null;
+      if (rawBody) {
+        try {
+          payload = JSON.parse(rawBody);
+        } catch {
+          throw new Error('Checkout returned an invalid response. Please try again.');
+        }
+      }
+
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.error || 'Checkout could not be started. Please try again.');
+      }
+
+      const url = payload?.data?.url;
       if (url) {
         window.location.href = url;
+        return;
       }
+
+      throw new Error('Checkout did not return a payment URL. Please try again.');
     } catch (error) {
       logger.error('Checkout failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      setCheckoutError(error instanceof Error ? error.message : 'Checkout failed. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -364,7 +384,6 @@ export default function CheckoutContent() {
             <div className="space-y-2">
               {availableDiscounts.map((discount) => {
                 const isSelected = codes.includes(discount.code);
-                const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
                 const subtotalCents = Math.round(subtotal * 100);
                 const meetsMinSpend =
                   !discount.minSpendCents || subtotalCents >= discount.minSpendCents;
@@ -470,59 +489,38 @@ export default function CheckoutContent() {
           <div className="border-t border-white/10 pt-4 space-y-2">
             <div className="flex justify-between text-zinc-300">
               <span>Subtotal</span>
-              <span>
-                $
-                {useMemo(
-                  () => items.reduce((s, i) => s + i.price * i.quantity, 0),
-                  [items],
-                ).toFixed(2)}
-              </span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
-            {preview && preview.discount > 0 && (
+            {previewDiscount > 0 && (
               <div className="flex justify-between text-green-400">
                 <span>Coupon Discount ({codes.join(', ')})</span>
-                <span>-${preview.discount.toFixed(2)}</span>
+                <span>-${previewDiscount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
-              <span>
-                $
-                {useMemo(
-                  () => items.reduce((s, i) => s + i.price * i.quantity, 0) * 0.08,
-                  [items],
-                ).toFixed(2)}
-              </span>
+              <span>Calculated at payment</span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Shipping</span>
-              <span>
-                {useMemo(
-                  () => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99),
-                  [items],
-                ) === 0
-                  ? 'Free'
-                  : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}
-              </span>
+              <span>Calculated at payment</span>
             </div>
             {preview && preview.freeShipping && (
               <div className="text-sm text-green-400">✓ Free shipping applied from coupon</div>
             )}
             <div className="border-t border-white/10 pt-2">
               <div className="flex justify-between text-lg font-semibold text-white">
-                <span>Total</span>
-                <span>
-                  $
-                  {useMemo(() => {
-                    const sub = items.reduce((s, i) => s + i.price * i.quantity, 0);
-                    const tax = sub * 0.08;
-                    const ship = sub > 50 ? 0 : 9.99;
-                    return sub + tax + ship;
-                  }, [items]).toFixed(2)}
-                </span>
+                <span>Estimated subtotal</span>
+                <span>${estimatedSubtotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
+
+          {checkoutError && (
+            <p className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+              {checkoutError}
+            </p>
+          )}
 
           <button
             onClick={handleCheckout}

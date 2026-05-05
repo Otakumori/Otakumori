@@ -8,7 +8,7 @@
 
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGameAvatar } from '@/app/mini-games/_shared/useGameAvatarWithConfig';
+import { useGameAvatar } from '@/app/(site)/mini-games/_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { OmButton, OmCard, OmPanel } from '@/app/components/ui/om';
 

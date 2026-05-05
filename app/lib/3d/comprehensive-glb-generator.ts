@@ -8,7 +8,7 @@
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import * as THREE from 'three';
 import { EnhancedProceduralMesh } from './enhanced-procedural-mesh';
-import type { FullCharacterConfig } from '@/app/test/character-creator/types';
+import type { FullCharacterConfig } from '@/app/(site)/test/character-creator/types';
 import { logger } from '@/app/lib/logger';
 import { createAdvancedCelShadedMaterial, CODE_VEIN_PRESET } from './advanced-cel-shading';
 import { getGameTranslationConfig, type GameTranslationConfig } from './character-translator';

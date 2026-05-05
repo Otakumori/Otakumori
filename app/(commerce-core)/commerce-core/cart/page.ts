@@ -1,1 +1,1 @@
-export { CommerceCoreCart as default } from '../../../commerce-core/_components/pages';
+export { CommerceCoreCart as default } from '../_components/pages';

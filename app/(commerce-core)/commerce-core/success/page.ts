@@ -1,1 +1,1 @@
-export { CommerceCoreSuccess as default } from '../../../commerce-core/_components/pages';
+export { CommerceCoreSuccess as default } from '../_components/pages';

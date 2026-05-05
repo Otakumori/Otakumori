@@ -1,13 +1,13 @@
 // DEPRECATED: This component is a duplicate. Use components\hero\BlogTeaser.tsx instead.
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
-import { db } from '@/lib/db';
 import { paths } from '@/lib/paths';
 
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 
 async function getBlogPosts(): Promise<Post[]> {
   try {
+    const { db } = await import('@/lib/db');
     const posts = await db.contentPage.findMany({
       where: {
         published: true,

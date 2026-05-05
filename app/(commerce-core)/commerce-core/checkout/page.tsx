@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import CommerceCoreCheckoutActions from '../../../commerce-core/_components/CommerceCoreCheckoutActions';
-import { commerceCoreConfig } from '../../../commerce-core/_components/config';
+import CommerceCoreCheckoutActions from '../_components/CommerceCoreCheckoutActions';
+import { commerceCoreConfig } from '../_components/config';
 
 const signInHref = `/sign-in?redirect_url=${encodeURIComponent(commerceCoreConfig.routes.checkout)}`;
 

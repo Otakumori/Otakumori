@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
-import ClerkProviderWrapper from '../providers/ClerkProviderWrapper';
-import FullAppShell from '../FullAppShell';
+import FullAppShell from '@/app/FullAppShell';
+import ClerkProviderWrapper from '@/app/providers/ClerkProviderWrapper';
 
-export default async function SiteLayout({ children }: { children: ReactNode }) {
+interface SiteLayoutProps {
+  children: ReactNode;
+}
+
+export default async function SiteLayout({ children }: SiteLayoutProps) {
   const headersList = await headers();
   const nonce = headersList.get('x-nonce') ?? undefined;
 

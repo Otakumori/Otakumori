@@ -4,7 +4,7 @@
  * Handles saving/loading character configurations for use across games
  */
 
-import type { FullCharacterConfig } from '@/app/test/character-creator/types';
+import type { FullCharacterConfig } from '@/app/(site)/test/character-creator/types';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 
 async function getLogger() {

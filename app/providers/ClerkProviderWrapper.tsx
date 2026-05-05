@@ -1,9 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { usePathname } from 'next/navigation';
-
-const FullClerkProviderWrapper = dynamic(() => import('./FullClerkProviderWrapper'));
+import FullClerkProviderWrapper from './FullClerkProviderWrapper';
 
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
@@ -11,11 +8,5 @@ interface ClerkProviderWrapperProps {
 }
 
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
-  const pathname = usePathname();
-
-  if (pathname?.startsWith('/commerce-core')) {
-    return children;
-  }
-
   return <FullClerkProviderWrapper nonce={nonce}>{children}</FullClerkProviderWrapper>;
 }

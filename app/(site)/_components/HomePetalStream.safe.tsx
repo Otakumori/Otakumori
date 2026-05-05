@@ -2,8 +2,8 @@
 
 import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { createEngine, type EngineCallbacks } from '@/app/mini-games/_engine/Engine.safe';
-import { createTextureFromUrl } from '@/app/mini-games/_engine/glTexture.safe';
+import { createEngine, type EngineCallbacks } from '@/app/(site)/mini-games/_engine/Engine.safe';
+import { createTextureFromUrl } from '@/app/(site)/mini-games/_engine/glTexture.safe';
 import { petalCredit, PetalCreditError } from '@/app/lib/petals/credit.safe';
 
 interface Petal {

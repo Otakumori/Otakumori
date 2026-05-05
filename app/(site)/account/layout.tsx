@@ -1,0 +1,18 @@
+import type { ReactNode } from 'react';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { paths } from '@/lib/paths';
+
+export default async function AccountLayout({ children }: { children: ReactNode }) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect(paths.signIn());
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+      {children}
+    </div>
+  );
+}

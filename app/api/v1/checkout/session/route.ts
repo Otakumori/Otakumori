@@ -24,6 +24,19 @@ function isHttpUrl(value: unknown): value is string {
   return typeof value === 'string' && /^https?:\/\//i.test(value);
 }
 
+type TrustedCheckoutItem = {
+  productId: string;
+  variantId: string;
+  name: string;
+  description?: string;
+  images: string[];
+  quantity: number;
+  priceCents: number;
+  sku?: string;
+  printifyProductId?: string;
+  printifyVariantId?: number;
+};
+
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
     const requestId = generateRequestId();
@@ -76,7 +89,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } = parsed.data as any;
+      const { items: requestItems, successUrl, cancelUrl, shippingInfo, couponCodes } = parsed.data as any;
 
       stage = 'load_user';
       let user = await prisma.user.findFirst({ where: { clerkId: userId } });
@@ -92,27 +105,58 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'validate_items';
-      const productIds = items.map((i: any) => i.productId).filter(Boolean);
-      const variantIds = items.map((i: any) => i.variantId).filter(Boolean);
+      const productIds = requestItems.map((i: any) => i.productId).filter(Boolean);
 
       const [dbProducts, dbVariants] = await Promise.all([
-        prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true } }),
+        prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            primaryImageUrl: true,
+            printifyProductId: true,
+            active: true,
+            visible: true,
+          },
+        }),
         prisma.productVariant.findMany({
-          where: { id: { in: variantIds } },
-          select: { id: true, productId: true, isEnabled: true, inStock: true },
+          where: { productId: { in: productIds } },
+          select: {
+            id: true,
+            productId: true,
+            isDefaultVariant: true,
+            isEnabled: true,
+            inStock: true,
+            priceCents: true,
+            sku: true,
+            title: true,
+            previewImageUrl: true,
+            printifyVariantId: true,
+          },
         }),
       ]);
 
-      const validProductIds = new Set(dbProducts.map((p) => p.id));
+      const productById = new Map(dbProducts.map((p) => [p.id, p]));
       const variantById = new Map(dbVariants.map((v) => [v.id, v]));
+      const firstVariantByProductId = new Map(dbVariants.map((v) => [v.productId, v]));
+      const defaultVariantByProductId = new Map(
+        dbVariants.filter((v) => v.isDefaultVariant).map((v) => [v.productId, v]),
+      );
+      const resolveVariant = (item: any) =>
+        item.variantId === 'default'
+          ? defaultVariantByProductId.get(item.productId) ?? firstVariantByProductId.get(item.productId)
+          : variantById.get(item.variantId);
 
-      const invalidItems = items.filter((item: any) => {
+      const invalidItems = requestItems.filter((item: any) => {
         if (!item.productId || !item.variantId) return true;
-        if (!validProductIds.has(item.productId)) return true;
-        const variant = variantById.get(item.variantId);
+        const product = productById.get(item.productId);
+        if (!product?.active || !product.visible) return true;
+        const variant = resolveVariant(item);
         if (!variant) return true;
         if (variant.productId !== item.productId) return true;
         if (!variant.isEnabled || !variant.inStock) return true;
+        if (!variant.priceCents || variant.priceCents <= 0) return true;
         return false;
       });
 
@@ -132,6 +176,25 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
+
+      const items: TrustedCheckoutItem[] = requestItems.map((item: any) => {
+        const product = productById.get(item.productId)!;
+        const variant = resolveVariant(item)!;
+        const image = variant.previewImageUrl ?? product.primaryImageUrl;
+
+        return {
+          productId: product.id,
+          variantId: variant.id,
+          name: product.name,
+          description: product.description ?? undefined,
+          images: image ? [image] : [],
+          quantity: item.quantity,
+          priceCents: variant.priceCents!,
+          sku: variant.sku ?? undefined,
+          printifyProductId: product.printifyProductId ?? undefined,
+          printifyVariantId: variant.printifyVariantId,
+        };
+      });
 
       stage = 'calculate_totals';
       const subtotalCents = items.reduce((sum: number, i: any) => sum + i.priceCents * i.quantity, 0);
@@ -205,7 +268,7 @@ export async function POST(req: NextRequest) {
             quantity: i.quantity,
             unitPrice: i.priceCents / 100,
           })),
-          shipping: shipping ? { provider: shipping.provider ?? 'stripe', fee: shipping.fee ?? 0 } : { provider: 'stripe', fee: 0 },
+          shipping: { provider: 'stripe', fee: 0 },
           coupons: metas,
           codesOrder: codes,
         });
@@ -309,10 +372,6 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const shippingOptions = shippingDiscountCents > 0
-        ? [{ shipping_rate_data: { type: 'fixed_amount', fixed_amount: { amount: 0, currency: 'usd' }, display_name: 'Free shipping' } }]
-        : undefined;
-
       stage = 'create_stripe_session';
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
         payment_method_types: ['card'],
@@ -329,8 +388,6 @@ export async function POST(req: NextRequest) {
           request_id: requestId,
         },
       };
-
-      if (shippingOptions) sessionParams.shipping_options = shippingOptions as any;
 
       const session = await stripe.checkout.sessions.create(sessionParams);
 

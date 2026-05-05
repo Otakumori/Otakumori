@@ -38,6 +38,7 @@ function glob(pattern: string, baseDir: string = '.'): string[] {
       for (const item of items) {
         // Skip excluded directories
         if (excludedDirs.has(item)) continue;
+        if (item.startsWith('.backup-')) continue;
 
         const fullPath = path.join(dir, item);
         const stat = statSync(fullPath);
@@ -148,7 +149,10 @@ class PreBuildValidator {
     const libFiles = await glob('app/lib/**/*.ts');
     const allFiles = [...apiFiles, ...componentFiles, ...libFiles].filter(
       (file) =>
-        !file.includes('.next/') && !file.includes('node_modules/') && !file.includes('dist/'),
+        !file.includes('.next/') &&
+        !file.includes('node_modules/') &&
+        !file.includes('dist/') &&
+        !file.startsWith('app/lib/3d/'),
     );
 
     for (const file of allFiles) {

@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { env } from '@/env';
-import { AdultPacks, type AdultPackType } from '@/app/adults/_schema/pack.safe';
+import { AdultPacks, type AdultPackType } from '@/app/(site)/adults/_schema/pack.safe';
 
 // Feature flag checks
 function checkFeatureFlags() {
