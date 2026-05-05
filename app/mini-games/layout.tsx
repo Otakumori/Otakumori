@@ -1,6 +1,18 @@
-// DEPRECATED: This component is a duplicate. Use app\components\components\Layout.jsx instead.
+import type { ReactNode } from 'react';
+import { headers } from 'next/headers';
 import { optimusPrinceps } from '@/lib/fonts';
+import ClerkProviderWrapper from '../providers/ClerkProviderWrapper';
+import FullAppShell from '../FullAppShell';
 
-export default function MiniGamesLayout({ children }: { children: React.ReactNode }) {
-  return <section className={optimusPrinceps.variable}>{children}</section>;
+export default async function MiniGamesLayout({ children }: { children: ReactNode }) {
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? undefined;
+
+  return (
+    <ClerkProviderWrapper nonce={nonce}>
+      <FullAppShell>
+        <section className={optimusPrinceps.variable}>{children}</section>
+      </FullAppShell>
+    </ClerkProviderWrapper>
+  );
 }
