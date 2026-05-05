@@ -7,6 +7,7 @@ import Image from 'next/image';
 import InteractiveCherryBlossom from '@/components/animations/InteractiveCherryBlossom';
 import { type Product, type BlogPost, type SocialLink } from '../../app/types/index';
 import Header from '@/app/components/layout/Navbar';
+import { paths } from '@/lib/paths';
 
 const socialLinks: SocialLink[] = [
   {
@@ -43,7 +44,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
       {/* Hero Section Buttons Below Hero */}
       <section className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8">
         <Link
-          href="/shop"
+          href={paths.shop()}
           className="rounded-lg bg-pink-600 px-6 py-3 transition-colors hover:bg-pink-700"
         >
           Shop Now
@@ -66,7 +67,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
                   className="overflow-hidden rounded-xl bg-gray-800 transition-shadow hover:shadow-lg"
                   whileHover={{ y: -5 }}
                 >
-                  <Link href={`/shop/${product.id}`}>
+                  <Link href={paths.product(String(product.id))}>
                     {imageSrc ? (
                       <Image
                         src={imageSrc}
@@ -117,7 +118,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
                   className="overflow-hidden rounded-xl bg-gray-800 transition-shadow hover:shadow-lg"
                   whileHover={{ y: -5 }}
                 >
-                  <Link href={`/blog/${post.id}`}>
+                  <Link href={paths.blogPost(String(post.id))}>
                     <Image
                       src={post.image}
                       alt={post.title}
@@ -162,22 +163,22 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
 
           {/* Navigation Links */}
           <div className="mb-4 flex justify-center space-x-6 text-sm">
-            <Link href="/" className="hover:text-pink-500">
+            <Link href={paths.home()} className="hover:text-pink-500">
               Home
             </Link>
-            <Link href="/shop" className="hover:text-pink-500">
+            <Link href={paths.shop()} className="hover:text-pink-500">
               Shop
             </Link>
-            <Link href="/blog" className="hover:text-pink-500">
+            <Link href={paths.blogIndex()} className="hover:text-pink-500">
               Blog
             </Link>
-            <Link href="/mini-games" className="hover:text-pink-500">
+            <Link href={paths.games()} className="hover:text-pink-500">
               Mini-Games
             </Link>
             <Link href="/my-account" className="hover:text-pink-500">
               My Account
             </Link>
-            <Link href="/community" className="hover:text-pink-500">
+            <Link href={paths.community()} className="hover:text-pink-500">
               Community
             </Link>
           </div>

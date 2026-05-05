@@ -32,7 +32,7 @@ export default function CartPage() {
   const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();
   const checkoutHref = isSignedIn
     ? paths.checkout()
-    : `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
+    : paths.signIn(paths.checkout());
 
   if (cart.length === 0) {
     return (

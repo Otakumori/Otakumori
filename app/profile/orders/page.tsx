@@ -5,6 +5,7 @@ import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
 import OrdersList from '../../components/profile/OrdersList';
 import { t } from '@/lib/microcopy';
+import { paths } from '@/lib/paths';
 
 async function getOrders() {
   try {
@@ -37,7 +38,7 @@ export default async function OrdersPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in?redirect_url=/profile/orders');
+    redirect(paths.signIn(paths.profileOrders()));
   }
 
   const orders = await getOrders();

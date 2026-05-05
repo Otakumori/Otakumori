@@ -44,7 +44,7 @@ export function PetalBalanceDisplay() {
     return (
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-6">
         <p className="text-sm text-white/70 mb-2">
-          <Link href="/sign-in" className="text-pink-300 hover:text-pink-400 underline">
+          <Link href={paths.signIn()} className="text-pink-300 hover:text-pink-400 underline">
             Sign in
           </Link>{' '}
           to earn and use petals for discounts!

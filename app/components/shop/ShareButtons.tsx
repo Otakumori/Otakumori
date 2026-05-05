@@ -4,6 +4,7 @@ import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { Share2, Twitter, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
 import { useToastContext } from '@/app/contexts/ToastContext';
+import { paths } from '@/lib/paths';
 
 interface ShareButtonsProps {
   productTitle: string;
@@ -16,7 +17,7 @@ export function ShareButtons({ productTitle, productId }: ShareButtonsProps) {
   const { success } = useToastContext();
 
   const productUrl =
-    typeof window !== 'undefined' ? `${window.location.origin}/shop/product/${productId}` : '';
+    typeof window !== 'undefined' ? `${window.location.origin}${paths.product(productId)}` : '';
   const shareText = `Check out this treasure: ${productTitle}`;
 
   const shareToTwitter = () => {

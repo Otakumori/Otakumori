@@ -6,6 +6,7 @@ import FooterDark from '../../components/FooterDark';
 import PetalsDashboard from '../../components/profile/PetalsDashboard';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
+import { paths } from '@/lib/paths';
 
 async function getPetalsData() {
   try {
@@ -45,7 +46,7 @@ export default async function PetalsPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in?redirect_url=/profile/petals');
+    redirect(paths.signIn(paths.profilePetals()));
   }
 
   const petalsData = await getPetalsData();

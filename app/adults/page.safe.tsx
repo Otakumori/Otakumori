@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
 export default function AdultsIndexPage() {
   const { user, isLoaded } = useUser();
@@ -13,7 +14,7 @@ export default function AdultsIndexPage() {
 
   useEffect(() => {
     if (isLoaded && !user) {
-      router.push('/sign-in');
+      router.push(paths.signIn('/adults'));
       return;
     }
 

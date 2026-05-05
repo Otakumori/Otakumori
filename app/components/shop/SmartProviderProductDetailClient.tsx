@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
+import { paths } from '@/lib/paths';
 
 type CatalogVariant = CatalogProduct['variants'][number];
 
@@ -91,7 +92,7 @@ export default function SmartProviderProductDetailClient({ productId }: { produc
       <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-200">
         <h1 className="text-2xl font-semibold mb-2">Unable to load product</h1>
         <p>{error || 'Unknown error'}</p>
-        <Link href="/shop-smart" className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to shop</Link>
+        <Link href={paths.shop()} className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to shop</Link>
       </div>
     );
   }
@@ -156,7 +157,7 @@ export default function SmartProviderProductDetailClient({ productId }: { produc
           <p><span className="font-medium text-pink-200">Category:</span> {product.category || 'N/A'}</p>
         </div>
 
-        <Link href="/shop-smart" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
+        <Link href={paths.shop()} className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
       </div>
     </div>
   );

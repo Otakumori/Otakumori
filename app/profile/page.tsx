@@ -1,5 +1,6 @@
 import { generateSEO } from '@/app/lib/seo';
 import { getProfileData } from './_data/profile';
+import Link from 'next/link';
 import AchievementsPanel from '../components/profile/AchievementsPanel';
 import OneTapGamertag from '../components/profile/OneTapGamertag';
 import DailyQuests from '../components/quests/DailyQuests';
@@ -12,6 +13,7 @@ import ProfileStatsCard from '../components/profile/ProfileStatsCard';
 import MiniGameStats from '../components/profile/MiniGameStats';
 import RecentActivity from '../components/profile/RecentActivity';
 import CosmeticsTab from '../components/profile/CosmeticsTab';
+import { paths } from '@/lib/paths';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,12 +49,12 @@ export default async function ProfilePage() {
             Profiles track your lifetime petals, achievements, and avatar. Sign in to see your
             progress and unlock rewards!
           </p>
-          <a
-            href="/sign-in"
+          <Link
+            href={paths.signIn(paths.profile())}
             className="inline-block px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-colors"
           >
             Sign In
-          </a>
+          </Link>
         </div>
       </div>
     );

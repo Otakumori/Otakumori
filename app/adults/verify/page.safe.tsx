@@ -5,6 +5,7 @@ import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { paths } from '@/lib/paths';
 
 export default function AdultsVerifyPage() {
   const { user, isLoaded } = useUser();
@@ -14,7 +15,7 @@ export default function AdultsVerifyPage() {
 
   useEffect(() => {
     if (isLoaded && !user) {
-      router.push('/sign-in');
+      router.push(paths.signIn('/adults/verify'));
       return;
     }
 

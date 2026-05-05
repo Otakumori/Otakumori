@@ -2,6 +2,7 @@
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useAuth } from '@/app/hooks/useAuth';
+import { paths } from '@/lib/paths';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
@@ -27,7 +28,7 @@ export function RouteGuard({
     if (!isLoaded) return;
 
     if (requireAuth && !isSignedIn) {
-      const url = new URL('/sign-in', window.location.origin);
+      const url = new URL(paths.signIn(), window.location.origin);
       if (redirectTo) {
         url.searchParams.set('redirect_url', redirectTo);
       }
@@ -37,13 +38,13 @@ export function RouteGuard({
 
     if (requireAdmin && (!isSignedIn || !isAdmin)) {
       if (!isSignedIn) {
-        const url = new URL('/sign-in', window.location.origin);
+        const url = new URL(paths.signIn(), window.location.origin);
         if (redirectTo) {
           url.searchParams.set('redirect_url', redirectTo);
         }
         router.push(url.toString());
       } else {
-        router.push('/unauthorized');
+        router.push(paths.unauthorized());
       }
       return;
     }

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -19,7 +20,7 @@ export default function UnauthorizedPage() {
           page.
         </p>
         <Link
-          href="/"
+          href={paths.home()}
           className="inline-block rounded-lg bg-pink-600 px-6 py-3 text-white hover:bg-pink-700 transition-colors"
         >
           Return to Home

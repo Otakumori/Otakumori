@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
+import { paths } from '@/lib/paths';
 
 export default function AdminBurstPage() {
-  redirect('/admin');
+  redirect(paths.admin());
 }

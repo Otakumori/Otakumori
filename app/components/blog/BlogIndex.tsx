@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
+import { paths } from '@/lib/paths';
 // Server component: prefer relative API calls to avoid SSR base-URL issues
 
 type BlogPost = {
@@ -58,7 +59,7 @@ export default async function BlogIndex() {
       {/* Featured Post */}
       {posts.length > 0 && (
         <GlassPanel className="overflow-hidden">
-          <Link href={`/blog/${posts[0]?.slug ?? 'unknown'}`} className="block">
+          <Link href={paths.blogPost(posts[0]?.slug ?? 'unknown')} className="block">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="relative aspect-video md:aspect-square">
                 {posts[0]?.image ? (
@@ -100,7 +101,7 @@ export default async function BlogIndex() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.slice(1).map((post) => (
           <GlassPanel key={post.id} className="group overflow-hidden">
-            <Link href={`/blog/${post.slug}`} className="block">
+            <Link href={paths.blogPost(post.slug)} className="block">
               <div className="relative aspect-video w-full overflow-hidden">
                 {post.image ? (
                   <Image

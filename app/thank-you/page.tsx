@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Crown, Flower } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { paths } from '@/lib/paths';
 
 interface OrderResult {
   id: string;
@@ -46,7 +47,7 @@ export default function ThankYouPage() {
     }
 
     if (!isSignedIn) {
-      router.push('/sign-in?redirect=/thank-you?s=' + sessionId);
+      router.push(paths.signIn(`/thank-you?s=${sessionId}`));
       return;
     }
 
@@ -101,7 +102,7 @@ export default function ThankYouPage() {
           <h1 className="mb-4 text-2xl font-bold text-white">Order Not Found</h1>
           <p className="mb-6 text-neutral-300">{error}</p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push(paths.home())}
             className="rounded-lg bg-pink-600 px-6 py-3 font-medium text-white transition-colors hover:bg-pink-700"
           >
             Return Home
@@ -294,14 +295,14 @@ export default function ThankYouPage() {
           >
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <button
-                onClick={() => router.push('/shop')}
+                onClick={() => router.push(paths.shop())}
                 className="rounded-lg bg-pink-600 px-8 py-4 font-semibold text-white transition-colors hover:bg-pink-700"
               >
                 Continue Shopping
               </button>
 
               <button
-                onClick={() => router.push('/profile')}
+                onClick={() => router.push(paths.profile())}
                 className="rounded-lg border-2 border-pink-500/50 bg-transparent px-8 py-4 font-semibold text-pink-400 transition-colors hover:border-pink-400 hover:text-pink-300"
               >
                 View Profile

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import FooterDark from '../components/FooterDark';
 import CheckoutContent from '../components/shop/CheckoutContent';
 import { t } from '@/lib/microcopy';
+import { paths } from '@/lib/paths';
 
 
 export function generateMetadata() {
@@ -17,7 +18,7 @@ export default async function CheckoutPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in?redirect_url=/checkout');
+    redirect(paths.signIn(paths.checkout()));
   }
 
   return (

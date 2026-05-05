@@ -3,6 +3,7 @@ import { env } from '@/env.mjs';
 import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import SoapstoneWall from '@/components/soapstone/SoapstoneWall';
 import { transformApiUserToComponent, type ApiSoapstoneUser } from '@/app/lib/soapstone-user-utils';
+import { paths } from '@/lib/paths';
 
 interface SoapstoneMessage {
   id: string;
@@ -115,7 +116,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
             <h4 className="text-lg font-semibold text-pink-200 mb-4">Explore</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/shop" className="text-pink-200/70 hover:text-pink-200 transition-colors">
+                <a href={paths.shop()} className="text-pink-200/70 hover:text-pink-200 transition-colors">
                   Shop
                 </a>
               </li>
@@ -128,7 +129,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
                 </a>
               </li>
               <li>
-                <a href="/blog" className="text-pink-200/70 hover:text-pink-200 transition-colors">
+                <a href={paths.blogIndex()} className="text-pink-200/70 hover:text-pink-200 transition-colors">
                   Blog
                 </a>
               </li>
@@ -145,7 +146,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
             <ul className="space-y-2">
               <li>
                 <a
-                  href="/community"
+                  href={paths.community()}
                   className="text-pink-200/70 hover:text-pink-200 transition-colors"
                 >
                   Community
@@ -182,7 +183,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
             <h4 className="text-lg font-semibold text-pink-200 mb-4">Support</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/help" className="text-pink-200/70 hover:text-pink-200 transition-colors">
+                <a href={paths.help()} className="text-pink-200/70 hover:text-pink-200 transition-colors">
                   Help Center
                 </a>
               </li>
@@ -215,20 +216,20 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
             <ul className="space-y-2">
               <li>
                 <a
-                  href="/privacy"
+                  href={paths.privacy()}
                   className="text-pink-200/70 hover:text-pink-200 transition-colors"
                 >
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="/terms" className="text-pink-200/70 hover:text-pink-200 transition-colors">
+                <a href={paths.terms()} className="text-pink-200/70 hover:text-pink-200 transition-colors">
                   Terms of Service
                 </a>
               </li>
               <li>
                 <a
-                  href="/cookies"
+                  href={paths.cookies()}
                   className="text-pink-200/70 hover:text-pink-200 transition-colors"
                 >
                   Cookie Settings

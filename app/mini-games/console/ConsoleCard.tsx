@@ -11,6 +11,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import OwnedRunesGrid from '../_components/OwnedRunesGrid';
 import gamesMeta from '../games.meta.json';
+import { paths } from '@/lib/paths';
 // import { env } from '@/env.mjs';
 
 type Mode = 'boot' | 'cube' | 'loadingGame' | 'playingGame';
@@ -477,7 +478,7 @@ export default function ConsoleCard({
         <FaceTitle>Mini-Games</FaceTitle>
         <div className="flex items-center gap-3">
           <a
-            href="/profile/achievements"
+            href={paths.achievements()}
             className="text-xs text-pink-300 underline hover:text-pink-200"
           >
             View Achievements
@@ -1364,11 +1365,11 @@ function CommunityFace() {
         {error === 'AUTH_REQUIRED' ? (
           <div data-testid="routing-guard">
             Login required for Community.{' '}
-            <a className="underline" href="/sign-in?redirect_url=/mini-games?face=2">
+            <a className="underline" href={paths.signIn('/mini-games?face=2')}>
               Sign in
             </a>{' '}
             or{' '}
-            <a className="underline" href="/mini-games?face=0">
+            <a className="underline" href={`${paths.games()}?face=0`}>
               return to Face 0
             </a>
             .

@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { paths } from '@/lib/paths';
 
 export default function CheckoutSuccessPage() {
   const { clearCart } = useCart();
@@ -486,7 +487,7 @@ export default function CheckoutSuccessPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              <Link href="/shop">
+              <Link href={paths.shop()}>
                 <Button className="w-full bg-pink-500 hover:bg-pink-600 sm:w-auto">
                   {
                     <>

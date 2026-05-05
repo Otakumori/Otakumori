@@ -10,6 +10,7 @@ import FooterDark from '@/app/components/FooterDark';
 import { EmptyWishlist } from '@/app/components/empty-states';
 import { ShopGridSkeleton } from '@/app/components/ui/Skeleton';
 import GlassPanel from '@/app/components/GlassPanel';
+import { paths } from '@/lib/paths';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -38,7 +39,7 @@ export default function WishlistPage() {
 
   useEffect(() => {
     if (!isSignedIn) {
-      router.push('/sign-in?redirect_url=/wishlist');
+      router.push(paths.signIn('/wishlist'));
       return;
     }
     if (userId) {
@@ -169,7 +170,7 @@ export default function WishlistPage() {
                   className="group relative overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                 >
                   <Link
-                    href={`/shop/${item.product.id}`}
+                    href={paths.product(String(item.product.id))}
                     className="block"
                     aria-label={`View ${item.product.name}`}
                   >

@@ -4,6 +4,7 @@ import { logger } from '@/app/lib/logger';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { paths } from '@/lib/paths';
 
 type FlagCategory = 'events' | 'gameplay' | 'economy' | 'admin';
 
@@ -78,13 +79,13 @@ export default function AdminFlagsPage() {
   useEffect(() => {
     if (!isLoaded) return;
     if (!user) {
-      router.replace('/login');
+      router.replace(paths.signIn(paths.admin()));
       return;
     }
 
     const role = user.publicMetadata?.role as string | undefined;
     if (role !== 'admin') {
-      router.replace('/');
+      router.replace(paths.home());
       return;
     }
 

@@ -86,7 +86,7 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
       <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-200">
         <h1 className="text-2xl font-semibold mb-2">Proof detail page failed</h1>
         <p>{error || 'Unknown error'}</p>
-        <Link href="/shop-cart-ready" className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to shop</Link>
+        <Link href={paths.shop()} className="mt-4 inline-flex rounded-xl bg-white/10 px-4 py-2 text-white">Back to shop</Link>
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function ProofProviderProductDetailClient({ productId }: { produc
           <button onClick={handleBuyNow} className="inline-flex items-center justify-center rounded-xl border border-pink-300/30 bg-white/5 px-5 py-3 text-sm text-pink-100 hover:bg-white/10 transition-colors">Buy now</button>
           <Link href={paths.checkout()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">Go to checkout</Link>
           <Link href={paths.cart()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white hover:bg-white/10 transition-colors">View cart</Link>
-          <Link href="/shop-cart-ready" className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
+          <Link href={paths.shop()} className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white">Back to shop</Link>
         </div>
 
         {notice ? <p className="text-sm text-pink-200">{notice}</p> : null}

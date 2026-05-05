@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { clientEnv } from '@/env/client';
+import { paths } from '@/lib/paths';
 
 export default function UserMenu() {
   // Call useUser to maintain session persistence and auth state synchronization
@@ -18,12 +19,12 @@ export default function UserMenu() {
   }, []);
 
   const signInUrl = useMemo(() => {
-    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
+    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL || paths.signIn();
     return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 
   const signUpUrl = useMemo(() => {
-    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up';
+    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL || paths.signUp();
     return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 
@@ -46,7 +47,7 @@ export default function UserMenu() {
 
       <SignedIn>
         <Link
-          href="/profile"
+          href={paths.profile()}
           className="rounded-full border border-white/15 px-3 py-1.5 text-sm text-white hover:bg-white/10"
         >
           Profile

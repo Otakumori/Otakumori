@@ -9,7 +9,8 @@ import { requireAdmin } from '@/app/lib/auth/admin';
 import { env } from '@/env.mjs';
 import AdminConsoleClient from './AdminConsoleClient';
 import Link from 'next/link';
-import { Users, Flower, Palette, Ticket, Shield, BarChart3 } from 'lucide-react';
+import { Users, Flower, Palette, Ticket, Shield, BarChart3, Package } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -65,7 +66,7 @@ export default async function AdminPage() {
         {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Link
-            href="/admin/users"
+            href={paths.adminUsers()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">
@@ -82,7 +83,7 @@ export default async function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/economy"
+            href={paths.adminEconomy()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">
@@ -99,7 +100,7 @@ export default async function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/cosmetics"
+            href={paths.adminCosmetics()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">
@@ -116,7 +117,7 @@ export default async function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/vouchers"
+            href={paths.adminVouchers()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">
@@ -133,7 +134,24 @@ export default async function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/nsfw"
+            href={paths.adminOrders()}
+            className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
+          >
+            <div className="flex items-center gap-4 mb-3">
+              <div className="rounded-lg bg-cyan-500/20 p-3">
+                <Package className="h-6 w-6 text-cyan-300" />
+              </div>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Orders & Tax Export
+              </h2>
+            </div>
+            <p className="text-sm text-zinc-400">
+              Review payouts, export CSVs, and reconcile sole-proprietor tax records
+            </p>
+          </Link>
+
+          <Link
+            href={paths.adminNsfw()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">
@@ -150,7 +168,7 @@ export default async function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/settings"
+            href={paths.adminSettings()}
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
           >
             <div className="flex items-center gap-4 mb-3">

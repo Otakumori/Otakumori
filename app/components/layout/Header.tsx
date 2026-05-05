@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href={paths.home()} className="flex items-center space-x-2">
             <img
               src="/assets/logo.png"
               alt="Otaku-mori"
@@ -23,16 +23,16 @@ export const Header: React.FC = () => {
 
           {/* Navigation */}
           <nav className="hidden items-center space-x-8 md:flex">
-            <Link href="/shop" className="text-gray-300 transition-colors hover:text-white">
+            <Link href={paths.shop()} className="text-gray-300 transition-colors hover:text-white">
               Shop
             </Link>
-            <Link href="/blog" className="text-gray-300 transition-colors hover:text-white">
+            <Link href={paths.blogIndex()} className="text-gray-300 transition-colors hover:text-white">
               Blog
             </Link>
-            <Link href="/mini-games" className="text-gray-300 transition-colors hover:text-white">
+            <Link href={paths.games()} className="text-gray-300 transition-colors hover:text-white">
               Mini-Games
             </Link>
-            <Link href="/community" className="text-gray-300 transition-colors hover:text-white">
+            <Link href={paths.community()} className="text-gray-300 transition-colors hover:text-white">
               Community
             </Link>
           </nav>
@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
               <ShoppingCart className="h-5 w-5" />
             </Link>
             <Link
-              href="/login"
+              href={paths.signIn()}
               className="rounded-lg bg-pink-600 px-4 py-2 text-white transition-colors hover:bg-pink-700"
             >
               Log in

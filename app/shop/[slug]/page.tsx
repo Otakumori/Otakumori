@@ -1,5 +1,6 @@
 import { generateSEO } from '@/app/lib/seo';
 import { redirect } from 'next/navigation';
+import { paths } from '@/lib/paths';
 
 export const runtime = 'nodejs';
 
@@ -22,5 +23,5 @@ export default async function ProductSlugRedirect({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  redirect(`/shop/product/${slug}`);
+  redirect(paths.product(slug));
 }

@@ -7,6 +7,7 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
 import { UltraDetailedCharacterCreator } from '../_components/UltraDetailedCharacterCreator.safe';
+import { paths } from '@/lib/paths';
 
 export default function AvatarEditorPage() {
   const { user, isLoaded } = useUser();
@@ -30,7 +31,7 @@ export default function AvatarEditorPage() {
   }
 
   if (!user) {
-    redirect('/sign-in?redirect_url=/adults/editor');
+    redirect(paths.signIn('/adults/editor'));
   }
 
   // Load user's existing avatar configuration

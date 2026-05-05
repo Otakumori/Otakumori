@@ -6,6 +6,7 @@ import FooterDark from '../../components/FooterDark';
 import AchievementsTabs from '../../components/profile/AchievementsTabs';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
+import { paths } from '@/lib/paths';
 
 async function getAchievements() {
   try {
@@ -35,7 +36,7 @@ export default async function AchievementsPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in?redirect_url=/profile/achievements');
+    redirect(paths.signIn(paths.achievements()));
   }
 
   const achievements = await getAchievements();

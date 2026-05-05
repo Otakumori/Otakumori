@@ -4,6 +4,8 @@ import { Skeleton } from '@/app/components/ui/Skeleton';
 import { SignUp } from '@clerk/nextjs';
 import { Suspense } from 'react';
 import PetalField from '@/app/components/effects/PetalField';
+import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
 export default function SignUpPage() {
   return (
@@ -40,9 +42,9 @@ export default function SignUpPage() {
           <Suspense fallback={<Skeleton />}>
             <SignUp
               routing="path"
-              path="/sign-up"
-              signInUrl="/sign-in"
-              fallbackRedirectUrl="/"
+              path={paths.signUp()}
+              signInUrl={paths.signIn()}
+              fallbackRedirectUrl={paths.home()}
               appearance={{
                 elements: {
                   rootBox: 'w-full',
@@ -71,12 +73,12 @@ export default function SignUpPage() {
         <div className="text-center mt-8">
           <p className="text-gray-400 text-sm">
             Already have an account?{' '}
-            <a
-              href="/sign-in"
+            <Link
+              href={paths.signIn()}
               className="text-[#ff4fa3] hover:text-[#ff86c2] font-medium transition-colors"
             >
               Sign in
-            </a>
+            </Link>
           </p>
           <div className="mt-4 flex items-center justify-center">
             <img

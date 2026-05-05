@@ -3,6 +3,7 @@
  *
  * Provides Dark Souls/anime-themed error messages that match the site's aesthetic
  */
+import { paths } from '@/lib/paths';
 
 export interface BrandedErrorMessage {
   title: string;
@@ -41,7 +42,7 @@ export function getBrandedErrorMessage(
         message: customMessage || "This path doesn't exist. The bonfire has faded.",
         cta: {
           label: 'Return to Home',
-          href: '/',
+          href: paths.home(),
         },
       };
 
@@ -52,7 +53,7 @@ export function getBrandedErrorMessage(
           customMessage || 'Your link to the server has been severed. Try again, brave soul.',
         cta: {
           label: 'Try Again',
-          href: section ? `/${section}` : '/',
+          href: section ? `/${section}` : paths.home(),
         },
       };
 
@@ -62,7 +63,7 @@ export function getBrandedErrorMessage(
         message: customMessage || 'Rest a moment before continuing your journey.',
         cta: {
           label: 'Return Home',
-          href: '/',
+          href: paths.home(),
         },
       };
 
@@ -72,7 +73,7 @@ export function getBrandedErrorMessage(
         message: customMessage || 'This realm requires authentication. Join us, traveler.',
         cta: {
           label: 'Sign In',
-          href: '/sign-in',
+          href: paths.signIn(),
         },
       };
 
@@ -82,7 +83,7 @@ export function getBrandedErrorMessage(
         message: customMessage || 'This realm is forbidden to you. Perhaps another path?',
         cta: {
           label: 'Return Home',
-          href: '/',
+          href: paths.home(),
         },
       };
 
@@ -92,7 +93,7 @@ export function getBrandedErrorMessage(
         message: customMessage || 'The server has lost its way. We shall restore it soon.',
         cta: {
           label: 'Return Home',
-          href: '/',
+          href: paths.home(),
         },
       };
 
@@ -102,7 +103,7 @@ export function getBrandedErrorMessage(
         message: customMessage || 'The path forward is unclear. Try again, traveler.',
         cta: {
           label: 'Return Home',
-          href: '/',
+          href: paths.home(),
         },
       };
   }

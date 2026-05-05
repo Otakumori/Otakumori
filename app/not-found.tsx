@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Empty404Icon } from '@/app/components/empty-states/icons';
+import { paths } from '@/lib/paths';
 
 // Remove duplicate gtag declaration - already defined in lib/ga.ts
 
@@ -175,7 +176,7 @@ export default function LRoom404() {
               Return to Home
             </Link>
           <Link
-              href="/shop"
+              href={paths.shop()}
               className="rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-white font-semibold hover:bg-white/10 transition-all"
           >
               Browse Shop

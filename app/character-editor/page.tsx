@@ -32,6 +32,7 @@ import {
   type GuestCharacter,
 } from '@/app/lib/avatar/guest-storage';
 import { avatarPartManager } from '@/app/lib/3d/avatar-parts';
+import { paths } from '@/lib/paths';
 
 export default function CharacterEditorPage() {
   const { user, isLoaded } = useUser();
@@ -146,7 +147,7 @@ export default function CharacterEditorPage() {
       }
     }
     // Navigate to mini-games page
-    router.push('/mini-games');
+    router.push(paths.games());
   };
 
   // Get initial configuration
@@ -166,7 +167,7 @@ export default function CharacterEditorPage() {
           <span className="font-semibold">Guest Mode:</span> Your characters will be saved
           temporarily for 7 days.{' '}
           <button
-            onClick={() => router.push('/sign-in?redirect_url=/character-editor')}
+            onClick={() => router.push(paths.signIn('/character-editor'))}
             className="underline hover:text-pink-100"
           >
             Sign in to save permanently

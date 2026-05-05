@@ -81,7 +81,7 @@ export default function CheckoutPage() {
   const { items: cart, total, removeItem } = useCart();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
+  const signInHref = paths.signIn(paths.checkout());
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { MessageCircle, Heart, Share2, BookOpen } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 interface BlogPost {
   id: string;
@@ -154,7 +155,7 @@ export function BlogTeaser() {
 
         <div className="mt-12 text-center">
           <Link
-            href="/blog"
+            href={paths.blogIndex()}
             className="inline-flex items-center gap-2 rounded-full border-2 border-purple-600 px-8 py-3 font-semibold text-purple-600 transition-colors duration-200 hover:bg-purple-600 hover:text-white"
           >
             <BookOpen className="h-5 w-5" />

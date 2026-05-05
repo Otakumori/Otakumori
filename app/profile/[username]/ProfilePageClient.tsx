@@ -9,6 +9,7 @@ import GlassCard from '../../components/ui/GlassCard';
 import GlassButton from '../../components/ui/GlassButton';
 import CommentsSection from '../../components/CommentsSection';
 import { type ProfileView, type ProfileSection } from '@/app/lib/contracts';
+import { paths } from '@/lib/paths';
 
 export default function ProfilePageClient() {
   const { username } = useParams();
@@ -117,7 +118,7 @@ export default function ProfilePageClient() {
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-pink-300 mb-4">Profile Not Found</h1>
             <p className="text-pink-300/70 mb-6">This profile doesn't exist or is private.</p>
-            <GlassButton href="/" variant="secondary">
+            <GlassButton href={paths.home()} variant="secondary">
               Back to Home
             </GlassButton>
           </div>
@@ -227,7 +228,7 @@ export default function ProfilePageClient() {
                   )}
 
                   {isOwnProfile && (
-                    <GlassButton href="/profile/edit" variant="secondary" className="px-6 py-2">
+                    <GlassButton href={paths.profileEdit()} variant="secondary" className="px-6 py-2">
                       Edit Profile
                     </GlassButton>
                   )}

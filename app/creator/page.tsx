@@ -28,6 +28,7 @@ const CharacterEditor = dynamic(
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
+import { paths } from '@/lib/paths';
 
 /**
  * CREATOR Page - Main avatar creation interface
@@ -55,7 +56,7 @@ export default function CreatorPage() {
 
     if (!user) {
       // Redirect to sign-in if not authenticated
-      router.push('/sign-in?redirect=/creator');
+      router.push(paths.signIn('/creator'));
       return;
     }
 
@@ -381,7 +382,7 @@ export default function CreatorPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <HeaderButton
-                onClick={() => router.push('/mini-games')}
+                onClick={() => router.push(paths.games())}
                 className="text-white/80 hover:text-white"
               >
                 ← Back to Games

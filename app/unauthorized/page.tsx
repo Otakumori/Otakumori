@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
+import { paths } from '@/lib/paths';
 
 export default function UnauthorizedPage() {
   const { isSignedIn, user } = useUser();
@@ -24,14 +25,14 @@ export default function UnauthorizedPage() {
         <div className="space-y-4">
           {!isSignedIn ? (
             <Link
-              href="/sign-in"
+              href={paths.signIn()}
               className="inline-block bg-[#ff4fa3] hover:bg-[#ff86c2] text-white px-6 py-3 rounded-lg font-medium transition-all duration-200"
             >
               Sign In
             </Link>
           ) : (
             <Link
-              href="/"
+              href={paths.home()}
               className="inline-block bg-[#ff4fa3] hover:bg-[#ff86c2] text-white px-6 py-3 rounded-lg font-medium transition-all duration-200"
             >
               Return Home

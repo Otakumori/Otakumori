@@ -3,6 +3,8 @@
 import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { Ticket } from 'lucide-react';
+import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
 interface VoucherStats {
   totalVouchers: number;
@@ -99,9 +101,9 @@ export default function VouchersPageClient() {
       <div className="rounded-xl border border-white/10 bg-black/50 p-4">
         <p className="text-sm text-neutral-400">
           For detailed voucher management, visit the{' '}
-          <a href="/admin/discounts" className="text-pink-400 hover:text-pink-300 underline">
+          <Link href={paths.adminDiscounts()} className="text-pink-400 hover:text-pink-300 underline">
             Discount Rewards
-          </a>{' '}
+          </Link>{' '}
           page.
         </p>
       </div>

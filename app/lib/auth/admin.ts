@@ -9,6 +9,7 @@ import { currentUser, auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { isAdminEmail, ADMIN_EMAILS } from '@/app/lib/config/admin';
 import { type NextRequest, NextResponse } from 'next/server';
+import { paths } from '@/lib/paths';
 
 /**
  * Get admin email addresses
@@ -47,14 +48,14 @@ export async function requireAdmin(): Promise<{ id: string; email: string | null
   const user = await currentUser();
 
   if (!user) {
-    redirect('/sign-in?redirect_url=/admin');
+    redirect(paths.signIn(paths.admin()));
   }
 
   const email =
     user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
 
   if (!isAdminEmail(email)) {
-    redirect('/admin/unauthorized');
+    redirect(paths.adminUnauthorized());
   }
 
   return {

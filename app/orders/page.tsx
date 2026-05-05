@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { EmptyOrders } from '@/app/components/empty-states';
+import { paths } from '@/lib/paths';
 
 interface OrderItem {
   id: string;
@@ -109,7 +110,7 @@ export default function OrdersPage() {
           <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
             <h1 className="mb-4 text-2xl font-bold text-white">Sign In Required</h1>
             <p className="mb-8 text-pink-200">Please sign in to view your orders</p>
-            <Link href="/sign-in">
+            <Link href={paths.signIn(paths.orders())}>
               <Button className="bg-pink-500 hover:bg-pink-600">Sign In</Button>
             </Link>
           </Card>

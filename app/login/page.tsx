@@ -4,6 +4,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
+import { paths } from '@/lib/paths';
 
 export default function LoginPage() {
   const { isLoaded, isSignedIn } = useUser();
@@ -13,10 +14,10 @@ export default function LoginPage() {
     if (isLoaded) {
       if (isSignedIn) {
         // User is already signed in, redirect to home
-        router.push('/');
+        router.push(paths.home());
       } else {
         // User is not signed in, redirect to Clerk's sign-in
-        window.location.href = '/sign-in';
+        window.location.href = paths.signIn();
       }
     }
   }, [isLoaded, isSignedIn, router]);

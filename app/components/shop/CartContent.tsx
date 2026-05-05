@@ -8,6 +8,7 @@ import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalBalanceDisplay } from './PetalBalanceDisplay';
 import { EmptyCart } from '@/app/components/empty-states';
+import { paths } from '@/lib/paths';
 
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
@@ -247,7 +248,7 @@ export default function CartContent() {
           <Link
             href={
               {
-                pathname: '/checkout',
+                pathname: paths.checkout(),
                 query: codes.length ? { coupons: codes.join(',') } : undefined,
               } as any
             }

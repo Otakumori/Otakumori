@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
+import { paths } from '@/lib/paths';
 
 type Session = {
   user: {
@@ -38,7 +39,7 @@ export function useSession(): {
 
 export function signIn(router: any) {
   // Push to your sign-in route (Clerk)
-  router.push('/sign-in');
+  router.push(paths.signIn());
 }
 
 export async function signOut(clerk: any) {

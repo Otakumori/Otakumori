@@ -6,6 +6,7 @@ import FriendsButton from '@/app/components/FriendsButton';
 import NotificationBell from '@/app/components/NotificationBell';
 import CharacterReaction from '@/app/components/CharacterReaction';
 import { useAuthContext } from '@/app/contexts/AuthContext';
+import { paths } from '@/lib/paths';
 
 // ---- Experience flags (could be fed by proxy) ----
 const experience = {
@@ -141,40 +142,40 @@ export default function SiteLayout({
           {/* Nav */}
           <nav className="ml-6 hidden md:flex gap-4 text-sm text-neutral-300">
             <div className="relative group">
-              <a className="hover:text-pink-200 inline-flex items-center gap-1" href="/shop">
+              <a className="hover:text-pink-200 inline-flex items-center gap-1" href={paths.shop()}>
                 Shop
               </a>
               <div className="absolute left-0 mt-2 hidden group-hover:block bg-neutral-900/95 border border-white/10 rounded-2xl shadow-lg p-2 min-w-[200px]">
                 <a
-                  href="/shop?category=pins"
+                  href={`${paths.shop()}?category=pins`}
                   className="block px-3 py-2 rounded-xl text-neutral-300 hover:bg-pink-500/10 hover:text-pink-200"
                 >
                   Pins
                 </a>
                 <a
-                  href="/shop?category=kicks"
+                  href={`${paths.shop()}?category=kicks`}
                   className="block px-3 py-2 rounded-xl text-neutral-300 hover:bg-pink-500/10 hover:text-pink-200"
                 >
                   Kicks
                 </a>
                 <a
-                  href="/shop?category=bottoms"
+                  href={`${paths.shop()}?category=bottoms`}
                   className="block px-3 py-2 rounded-xl text-neutral-300 hover:bg-pink-500/10 hover:text-pink-200"
                 >
                   Bottoms
                 </a>
                 <a
-                  href="/shop?category=unmentionables"
+                  href={`${paths.shop()}?category=unmentionables`}
                   className="block px-3 py-2 rounded-xl text-neutral-300 hover:bg-pink-500/10 hover:text-pink-200"
                 >
                   Unmentionables
                 </a>
               </div>
             </div>
-            <a className="hover:text-pink-200" href="/blog">
+            <a className="hover:text-pink-200" href={paths.blogIndex()}>
               Blog
             </a>
-            <a className="hover:text-pink-200" href="/mini-games">
+            <a className="hover:text-pink-200" href={paths.games()}>
               Mini-Games
             </a>
             <a className="hover:text-pink-200" href="/about">
@@ -220,7 +221,7 @@ export default function SiteLayout({
             </div>
 
             <a
-              href="/cart"
+              href={paths.cart()}
               className="relative rounded-2xl border border-white/10 bg-neutral-900/70 px-3 py-2 text-sm hover:border-pink-400/50"
             >
               Cart
@@ -255,17 +256,17 @@ export default function SiteLayout({
             <h4 className="font-semibold text-neutral-200">Explore</h4>
             <ul className="mt-2 text-sm text-neutral-400 space-y-1">
               <li>
-                <a className="hover:text-pink-200" href="/shop?category=pins">
+                <a className="hover:text-pink-200" href={`${paths.shop()}?category=pins`}>
                   Pins
                 </a>
               </li>
               <li>
-                <a className="hover:text-pink-200" href="/shop?category=kicks">
+                <a className="hover:text-pink-200" href={`${paths.shop()}?category=kicks`}>
                   Kicks
                 </a>
               </li>
               <li>
-                <a className="hover:text-pink-200" href="/shop?category=unmentionables">
+                <a className="hover:text-pink-200" href={`${paths.shop()}?category=unmentionables`}>
                   Unmentionables
                 </a>
               </li>

@@ -2,6 +2,7 @@ import { generateSEO } from '@/app/lib/seo';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { UserProfile } from '@clerk/nextjs';
+import { paths } from '@/lib/paths';
 
 export function generateMetadata() {
   return generateSEO({
@@ -14,7 +15,7 @@ export default async function AccountPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    redirect(paths.signIn());
   }
 
   return (
