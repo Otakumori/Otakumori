@@ -185,6 +185,21 @@ export function createProductSlug(title: string, productId: string): string {
   return `${base}-${suffix}`;
 }
 
+function getVariantPriceRange(variants: PrintifyProduct['variants'] | null | undefined): { min: number | null; max: number | null } {
+  let min: number | null = null;
+  let max: number | null = null;
+
+  for (const variant of variants ?? []) {
+    const price = variant.price;
+    if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) continue;
+
+    min = min === null ? price : Math.min(min, price);
+    max = max === null ? price : Math.max(max, price);
+  }
+
+  return { min, max };
+}
+
 /**
  * Map Printify product payload into a normalized catalog DTO
  */
@@ -192,11 +207,7 @@ export function mapPrintifyProduct(product: PrintifyProduct, shopId: string) {
   const categorySlug = normalizeCategorySlug(product);
   const image =
     product.images?.find((img) => img.is_default)?.src ?? product.images?.[0]?.src ?? null;
-  const prices = (product.variants ?? [])
-    .map((variant) => variant.price)
-    .filter((price) => typeof price === 'number' && price > 0);
-  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+  const { min: minPrice, max: maxPrice } = getVariantPriceRange(product.variants);
 
   return {
     id: String(product.id),
