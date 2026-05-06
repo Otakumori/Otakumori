@@ -50,14 +50,22 @@ export interface CatalogProduct {
 }
 
 function centsToDollars(value: number | null | undefined): number | null {
-  if (typeof value !== 'number') return null;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   return Math.round(value) / 100;
+}
+
+function toSafeIsoString(value: Date | string | null | undefined): string | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  const time = date.getTime();
+  if (!Number.isFinite(time)) return null;
+  return date.toISOString();
 }
 
 function computePriceRange(variants: ProductVariant[]): { min: number | null; max: number | null } {
   const prices = variants
     .map((variant) => variant.priceCents)
-    .filter((price): price is number => typeof price === 'number' && price > 0);
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price > 0);
 
   if (prices.length === 0) {
     return { min: null, max: null };
@@ -124,7 +132,7 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
       title: variant.title ?? null,
       sku: variant.sku ?? null,
       price: centsToDollars(variant.priceCents ?? null),
-      priceCents: variant.priceCents ?? null,
+      priceCents: typeof variant.priceCents === 'number' && Number.isFinite(variant.priceCents) ? variant.priceCents : null,
       inStock: variant.inStock,
       isEnabled: variant.isEnabled,
       printifyVariantId: variant.printifyVariantId,
@@ -135,6 +143,6 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     printifyProductId: product.printifyProductId ?? null,
     blueprintId: product.blueprintId ?? null,
     printProviderId: product.printProviderId ?? null,
-    lastSyncedAt: product.lastSyncedAt ? product.lastSyncedAt.toISOString() : null,
+    lastSyncedAt: toSafeIsoString(product.lastSyncedAt),
   };
 }
