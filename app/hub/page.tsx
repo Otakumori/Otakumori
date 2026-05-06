@@ -1,13 +1,13 @@
 
 'use client';
 import { useEffect } from 'react';
-import CubeHub from '../mini-games/components/CubeHub';
+import CubeHub from '@/app/(site)/mini-games/components/CubeHub';
 import AvatarPerch from './_scene/AvatarPerch';
 import FrontSelector from './_scene/FrontSelector';
 import { useHub } from './_scene/store';
 import { useHubInput } from './_scene/useInput';
 import './_scene/hub.css';
-import { play } from '@/app/mini-games/_shared/audio-bus';
+import { play } from '@/app/(site)/mini-games/_shared/audio-bus';
 import Link from 'next/link';
 
 export default function HubPage() {

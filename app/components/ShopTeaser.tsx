@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
 import { useState, useEffect } from 'react';
+import { paths } from '@/lib/paths';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -128,7 +129,7 @@ export default function ShopTeaser() {
               key={product.id}
               className="group relative overflow-hidden hover:scale-105 transition-all duration-300"
             >
-              <Link href={`/shop?productId=${product.id}`} className="block">
+              <Link href={paths.product(String(product.id))} className="block">
                 <div className="aspect-square relative mb-4">
                   <Image
                     src={product.image}
@@ -200,7 +201,7 @@ export default function ShopTeaser() {
       {products.length > 0 && (
         <div className="text-center">
           <Link
-            href="/shop"
+            href={paths.shop()}
             className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
           >
             Browse All Products

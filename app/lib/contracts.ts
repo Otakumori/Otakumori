@@ -69,11 +69,11 @@ export const ProductDetailResponse = z.object({
 export const CheckoutItem = z.object({
   productId: z.string(),
   variantId: z.string(),
-  name: z.string(),
+  name: z.string().optional(),
   description: z.string().optional(),
   images: z.array(z.string()).optional(),
   quantity: z.number().int().positive(),
-  priceCents: z.number().int().positive(),
+  priceCents: z.number().int().positive().optional(),
   sku: z.string().optional(),
   printifyProductId: z.string().optional(),
   printifyVariantId: z.number().optional(),

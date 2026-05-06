@@ -1,4 +1,5 @@
 import React from 'react';
+import { paths } from '@/lib/paths';
 
 export default function Navigation() {
   return (
@@ -6,32 +7,32 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <a href="/" className="text-white text-xl font-bold">
+            <a href={paths.home()} className="text-white text-xl font-bold">
               Otaku-mori
             </a>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               <a
-                href="/"
+                href={paths.home()}
                 className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Home
               </a>
               <a
-                href="/shop"
+                href={paths.shop()}
                 className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Shop
               </a>
               <a
-                href="/games"
+                href={paths.games()}
                 className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Games
               </a>
               <a
-                href="/community"
+                href={paths.community()}
                 className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Community

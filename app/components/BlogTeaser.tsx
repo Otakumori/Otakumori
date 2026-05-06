@@ -1,12 +1,13 @@
 // DEPRECATED: This component is a duplicate. Use components\hero\BlogTeaser.tsx instead.
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
-import { db } from '@/lib/db';
+import { paths } from '@/lib/paths';
 
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 
 async function getBlogPosts(): Promise<Post[]> {
   try {
+    const { db } = await import('@/lib/db');
     const posts = await db.contentPage.findMany({
       where: {
         published: true,
@@ -48,7 +49,7 @@ export default async function BlogTeaser() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {posts.map((post) => (
           <GlassPanel key={post.id} className="group hover:scale-105 transition-all duration-300">
-            <Link href={`/blog/${post.slug}`} className="block p-6">
+            <Link href={paths.blogPost(post.slug)} className="block p-6">
               <div className="mb-4">
                 <time className="text-sm text-pink-400 font-medium">{post.publishedAt}</time>
               </div>
@@ -80,7 +81,7 @@ export default async function BlogTeaser() {
       {/* View All CTA */}
       <div className="text-center">
         <Link
-          href="/blog"
+          href={paths.blogIndex()}
           className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
         >
           View All Posts

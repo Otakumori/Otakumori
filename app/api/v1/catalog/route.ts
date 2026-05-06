@@ -50,6 +50,39 @@ function normalizeListingImages(images: string[]): string[] {
   return images.filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index).slice(0, 2);
 }
 
+function getPriceRange(products: CatalogProduct[]): { min: number; max: number } {
+  let min = 0;
+  let max = 0;
+  let hasPrice = false;
+
+  for (const product of products) {
+    if (typeof product.price !== 'number' || !Number.isFinite(product.price)) continue;
+
+    if (!hasPrice) {
+      min = product.price;
+      max = product.price;
+      hasPrice = true;
+      continue;
+    }
+
+    if (product.price < min) min = product.price;
+    if (product.price > max) max = product.price;
+  }
+
+  return { min: hasPrice ? min : 0, max: hasPrice ? max : 0 };
+}
+
+function getAvailableCategories(products: CatalogProduct[]): string[] {
+  const categories = new Set<string>();
+
+  for (const product of products) {
+    const category = product.categorySlug || product.category;
+    if (category) categories.add(category);
+  }
+
+  return Array.from(categories);
+}
+
 function toListingProduct(product: CatalogProduct): CatalogProduct {
   const images = normalizeListingImages(product.images || []);
   const primaryImage = isRenderableListingImage(product.image) ? product.image : images[0] ?? null;
@@ -146,10 +179,7 @@ export async function GET(request: NextRequest) {
     const total = filtered.length;
     const totalPages = Math.ceil(total / limit);
     const paginated = filtered.slice((page - 1) * limit, page * limit);
-
-    const pricedProducts = checkoutSafeProducts.filter((product) => typeof product.price === 'number');
-    const minPrice = pricedProducts.length > 0 ? Math.min(...pricedProducts.map((product) => product.price as number)) : 0;
-    const maxPrice = pricedProducts.length > 0 ? Math.max(...pricedProducts.map((product) => product.price as number)) : 0;
+    const priceRange = getPriceRange(checkoutSafeProducts);
 
     return NextResponse.json(createApiSuccess({
       products: paginated,
@@ -160,8 +190,8 @@ export async function GET(request: NextRequest) {
         perPage: limit,
       },
       filters: {
-        availableCategories: Array.from(new Set(checkoutSafeProducts.map((product) => product.categorySlug || product.category).filter(Boolean))) as string[],
-        priceRange: { min: minPrice, max: maxPrice },
+        availableCategories: getAvailableCategories(checkoutSafeProducts),
+        priceRange,
         availableColors: [],
         availableSizes: [],
       },

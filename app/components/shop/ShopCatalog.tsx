@@ -7,6 +7,7 @@ import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { InteractiveCard } from '../games/InteractiveCard';
+import { paths } from '@/lib/paths';
 
 type Product = {
   id: string;
@@ -38,6 +39,10 @@ export default function ShopCatalog({
   const [sortBy, setSortBy] = useState(searchParams.sort || 'newest');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [selectedCategory, setSelectedCategory] = useState(searchParams.category || '');
+  const buildShopQueryHref = (params: URLSearchParams) => {
+    const query = params.toString();
+    return query ? `${paths.shop()}?${query}` : paths.shop();
+  };
 
   const categories = ['All', 'Hoodies', 'T-Shirts', 'Accessories', 'Digital'];
 
@@ -45,7 +50,7 @@ export default function ShopCatalog({
     setSortBy(newSort);
     const params = new URLSearchParams(searchParamsHook);
     params.set('sort', newSort);
-    router.push(`/shop?${params.toString()}`);
+    router.push(buildShopQueryHref(params));
   };
 
   const handleCategoryChange = (category: string) => {
@@ -56,14 +61,14 @@ export default function ShopCatalog({
     } else {
       params.set('category', category);
     }
-    router.push(`/shop?${params.toString()}`);
+    router.push(buildShopQueryHref(params));
   };
 
   const handlePriceFilter = () => {
     const params = new URLSearchParams(searchParamsHook);
     if (priceRange.min) params.set('minPrice', priceRange.min);
     if (priceRange.max) params.set('maxPrice', priceRange.max);
-    router.push(`/shop?${params.toString()}`);
+    router.push(buildShopQueryHref(params));
   };
 
   return (
@@ -156,9 +161,9 @@ export default function ShopCatalog({
           {products.map((product) => (
             <InteractiveCard
               key={product.id}
-              onClick={() => router.push(`/shop/${product.slug}`)}
+              onClick={() => router.push(paths.product(product.slug))}
             >
-              <Link href={`/shop/${product.slug}`} className="block" data-testid="product-card">
+              <Link href={paths.product(product.slug)} className="block" data-testid="product-card">
                 <div className="relative aspect-[4/5] w-full -m-6 mb-3">
                   <Image
                     src={product.image}
@@ -199,7 +204,7 @@ export default function ShopCatalog({
             return (
               <Link
                 key={page}
-                href={`/shop?${params.toString()}`}
+                href={buildShopQueryHref(params)}
                 className={`rounded-xl px-4 py-2 text-sm transition-colors ${
                   page === currentPage
                     ? 'bg-fuchsia-500/90 text-white'

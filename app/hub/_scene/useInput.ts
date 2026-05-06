@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useHub } from './store';
-import { play } from '@/app/mini-games/_shared/audio-bus';
+import { play } from '@/app/(site)/mini-games/_shared/audio-bus';
 
 export function useHubInput() {
   const { face, rotate, confirm, isZooming, backToIdle } = useHub();

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { useHub } from './store';
-import { getAsset } from '@/app/mini-games/_shared/assets-resolver';
+import { getAsset } from '@/app/(site)/mini-games/_shared/assets-resolver';
 
 export default function AvatarPerch() {
   const { isZooming } = useHub();

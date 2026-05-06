@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import ProfileLoadout from './ProfileLoadout';
+import { paths } from '@/lib/paths';
 
 type ProfileData = {
   id: string;
@@ -24,12 +25,12 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview', label: 'Overview', href: '/profile' },
-    { id: 'orders', label: 'Orders', href: '/profile/orders' },
-    { id: 'petals', label: 'Rewards (Petals)', href: '/profile/petals' },
-    { id: 'achievements', label: 'Achievements', href: '/profile/achievements' },
-    { id: 'addresses', label: 'Addresses', href: '/profile/addresses' },
-    { id: 'security', label: 'Security', href: '/profile/security' },
+    { id: 'overview', label: 'Overview', href: paths.profile() },
+    { id: 'orders', label: 'Orders', href: paths.profileOrders() },
+    { id: 'petals', label: 'Rewards (Petals)', href: paths.profilePetals() },
+    { id: 'achievements', label: 'Achievements', href: paths.achievements() },
+    { id: 'addresses', label: 'Addresses', href: paths.profileAddresses() },
+    { id: 'security', label: 'Security', href: paths.profileSecurity() },
   ];
 
   if (!profileData) {

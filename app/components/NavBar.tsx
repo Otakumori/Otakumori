@@ -29,29 +29,29 @@ export default async function NavBar() {
       <GlassPanel className="mx-3 mt-3 px-4 py-3 md:mx-6 md:mt-4 md:px-6">
         <nav className="flex items-center justify-between gap-6">
           <Link
-            href="/"
+            href={paths.home()}
             className="font-semibold tracking-wide text-fuchsia-200 hover:text-fuchsia-100"
           >
             {t('brand', 'siteName')}
           </Link>
           <ul className="flex items-center gap-5 text-sm text-zinc-200">
             <li>
-              <Link className="hover:text-white/90 transition-colors" href="/">
+              <Link className="hover:text-white/90 transition-colors" href={paths.home()}>
                 {t('nav', 'home')}
               </Link>
             </li>
             <li>
-              <Link className="hover:text-white/90 transition-colors" href="/shop">
+              <Link className="hover:text-white/90 transition-colors" href={paths.shop()}>
                 {t('nav', 'shop')}
               </Link>
             </li>
             <li>
-              <Link className="hover:text-white/90 transition-colors" href="/blog">
+              <Link className="hover:text-white/90 transition-colors" href={paths.blogIndex()}>
                 {t('nav', 'blog')}
               </Link>
             </li>
             <li>
-              <Link className="hover:text-white/90 transition-colors" href="/games">
+              <Link className="hover:text-white/90 transition-colors" href={paths.games()}>
                 {t('nav', 'miniGames')}
               </Link>
             </li>

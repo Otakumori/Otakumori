@@ -9,7 +9,7 @@
 'use client';
 
 import { calculateGameReward } from '@/app/config/petalTuning';
-import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
+import { usePetalEarn } from '@/app/(site)/mini-games/_shared/usePetalEarn';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');

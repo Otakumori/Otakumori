@@ -4,6 +4,7 @@ import React, { Component, type ReactNode } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { OmButton as Button } from '@/app/components/ui/om/OmButton';
 import { AlertTriangle } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 interface Props {
   children: ReactNode;
@@ -65,7 +66,7 @@ export class ProductErrorBoundary extends Component<Props, State> {
               </Button>
               <Button
                 onClick={() => {
-                  window.location.href = '/shop';
+                  window.location.href = paths.shop();
                 }}
                 variant="ghost"
               >

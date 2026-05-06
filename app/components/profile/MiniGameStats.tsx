@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getGameDisplayName } from '@/app/mini-games/_shared/gameVisuals';
+import { getGameDisplayName } from '@/app/(site)/mini-games/_shared/gameVisuals';
 
 interface GameStat {
   gameId: string;

@@ -7,6 +7,14 @@ export const paths = {
   // Core
   home: () => '/',
 
+  // Auth
+  signIn: (redirectUrl?: string) =>
+    redirectUrl ? `/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}` : '/sign-in',
+  signUp: (redirectUrl?: string) =>
+    redirectUrl ? `/sign-up?redirect_url=${encodeURIComponent(redirectUrl)}` : '/sign-up',
+  login: () => '/login',
+  unauthorized: () => '/unauthorized',
+
   // Shop
   shop: (page?: number) => (page && page > 1 ? `/shop?page=${page}` : '/shop'),
   product: (id: string) => `/shop/product/${id}`,
@@ -26,7 +34,13 @@ export const paths = {
   community: () => '/community',
   soapstones: () => '/community/soapstones',
   profile: (username?: string) => (username ? `/profile/${username}` : '/profile'),
+  profileOrders: () => '/profile/orders',
+  profilePetals: () => '/profile/petals',
   achievements: () => '/profile/achievements',
+  profileAddresses: () => '/profile/addresses',
+  profileSecurity: () => '/profile/security',
+  profileEdit: () => '/profile/edit',
+  orders: () => '/orders',
 
   // Account
   account: () => '/account',
@@ -38,6 +52,22 @@ export const paths = {
   cookies: () => '/cookies',
 
   // Admin
+  admin: () => '/admin',
+  adminUnauthorized: () => '/admin/unauthorized',
+  adminUsers: () => '/admin/users',
+  adminEconomy: () => '/admin/economy',
+  adminCosmetics: () => '/admin/cosmetics',
+  adminVouchers: () => '/admin/vouchers',
+  adminNsfw: () => '/admin/nsfw',
+  adminSettings: () => '/admin/settings',
+  adminCoupons: () => '/admin/coupons',
+  adminDiscounts: () => '/admin/discounts',
+  adminOrders: () => '/admin/orders',
+  adminContentBlog: () => '/admin/content/blog',
+  adminRunes: () => '/admin/runes',
+  adminRewards: () => '/admin/rewards',
+  adminPetalShop: () => '/admin/petal-shop',
+  adminBurst: () => '/admin/burst',
   adminPrintify: () => '/admin/printify',
 } as const;
 

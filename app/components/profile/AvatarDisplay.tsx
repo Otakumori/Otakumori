@@ -5,7 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { AvatarRenderer } from '@/app/adults/_components/AvatarRenderer.safe';
+import { AvatarRenderer } from '@/app/(site)/adults/_components/AvatarRenderer.safe';
 import { getAvatarSizeClasses } from '@/app/lib/avatar-sizes';
 import { AvatarSkeleton } from '@/app/components/avatar/AvatarSkeleton';
 import { AvatarFallback } from '@/app/components/avatar/AvatarFallback';

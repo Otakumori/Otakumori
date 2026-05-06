@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Core hoodie">
+  <rect width="240" height="260" fill="#16161a"/>
+  <path d="M76 87c4-35 21-55 44-55s40 20 44 55l30 27-18 97H64l-18-97 30-27Z" fill="#26212b" stroke="#f8c8dc" stroke-width="5"/>
+  <path d="M92 93c5-25 14-38 28-38s23 13 28 38" fill="none" stroke="#807384" stroke-width="8" stroke-linecap="round"/>
+  <path d="M92 132h56v45H92z" fill="#1b171f" stroke="#5f5361" stroke-width="4"/>
+  <circle cx="120" cy="118" r="20" fill="#f8c8dc"/>
+  <path d="M111 118h18" stroke="#16161a" stroke-width="5" stroke-linecap="round"/>
+</svg>

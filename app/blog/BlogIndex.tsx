@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 // import Image from 'next/image';
+import { paths } from '@/lib/paths';
 
 interface BlogPost {
   id: string;
@@ -80,7 +81,7 @@ export default function BlogIndex() {
           key={post.id}
           className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:border-pink-400/30 transition-all duration-300 hover:scale-105"
         >
-          <Link href={`/blog/${post.slug}`} className="block p-6 h-full">
+          <Link href={paths.blogPost(post.slug)} className="block p-6 h-full">
             <div className="mb-4">
               {post.category && (
                 <span className="inline-block px-3 py-1 bg-pink-600/20 text-pink-300 text-xs rounded-full border border-pink-500/30">

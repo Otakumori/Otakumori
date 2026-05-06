@@ -8,12 +8,12 @@ import { useRewards } from './useRewards';
 import { Caption as CaptionComponent } from './ui/Caption';
 import { TimerRing } from './ui/TimerRing';
 import { OverlayPetals } from './ui/OverlayPetals';
-import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
+import { usePetalEarn } from '@/app/(site)/mini-games/_shared/usePetalEarn';
 // Shared UI components - imported for QA validation (Engine handles its own UI)
 // eslint-disable-next-line unused-imports/no-unused-imports
-import { useGameHud } from '@/app/mini-games/_shared/useGameHud';
+import { useGameHud } from '@/app/(site)/mini-games/_shared/useGameHud';
 // eslint-disable-next-line unused-imports/no-unused-imports
-import { GameOverlay } from '@/app/mini-games/_shared/GameOverlay';
+import { GameOverlay } from '@/app/(site)/mini-games/_shared/GameOverlay';
 
 interface EngineProps {
   playlist: EngineGame[];

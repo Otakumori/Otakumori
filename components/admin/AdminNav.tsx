@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { paths } from '@/lib/paths';
 import {
   Sparkles,
   Flower,
@@ -17,91 +18,91 @@ import {
 
 const adminRoutes = [
   {
-    path: '/admin',
+    path: paths.admin(),
     name: 'Dashboard',
     icon: Home,
     description: 'Admin overview',
   },
   {
-    path: '/admin/users',
+    path: paths.adminUsers(),
     name: 'Users & Profiles',
     icon: Users,
     description: 'User overview and management',
   },
   {
-    path: '/admin/economy',
+    path: paths.adminEconomy(),
     name: 'Economy Overview',
     icon: Sparkles,
     description: 'Monitor petals, discounts, and cosmetics',
   },
   {
-    path: '/admin/cosmetics',
+    path: paths.adminCosmetics(),
     name: 'Cosmetics',
     icon: Palette,
     description: 'Manage cosmetics config',
   },
   {
-    path: '/admin/vouchers',
+    path: paths.adminVouchers(),
     name: 'Vouchers',
     icon: Ticket,
     description: 'Discount voucher management',
   },
   {
-    path: '/admin/nsfw',
+    path: paths.adminNsfw(),
     name: 'NSFW Controls',
     icon: Shield,
     description: 'NSFW gating and controls',
   },
   {
-    path: '/admin/settings',
+    path: paths.adminSettings(),
     name: 'Appearance',
     icon: Sparkles,
     description: 'Theme and seasonal settings',
   },
   {
-    path: '/admin/runes',
+    path: paths.adminRunes(),
     name: 'Rune System',
     icon: Sparkles,
     description: 'Manage runes and combos',
   },
   {
-    path: '/admin/rewards',
+    path: paths.adminRewards(),
     name: 'Rewards',
     icon: Flower,
     description: 'Configure petal rewards',
   },
   {
-    path: '/admin/petal-shop',
+    path: paths.adminPetalShop(),
     name: 'Petal Shop',
     icon: Flower,
     description: 'Manage petal shop items',
   },
   {
-    path: '/admin/coupons',
+    path: paths.adminCoupons(),
     name: 'Coupons',
     icon: Ticket,
     description: 'Coupon SKUs and templates',
   },
   {
-    path: '/admin/discounts',
+    path: paths.adminDiscounts(),
     name: 'Discount Rewards',
     icon: Ticket,
     description: 'Manage petal-purchased discount vouchers',
   },
   {
-    path: '/admin/burst',
+    path: paths.adminBurst(),
     name: 'Burst System',
     icon: Zap,
     description: 'Configure burst effects',
   },
   {
-    path: '/admin/orders',
+    path: paths.adminOrders(),
     name: 'Orders',
     icon: Ticket,
     description: 'Order operations center & financial tracking',
   },
   {
-    path: '/admin/content/blog',
+    path: paths.adminContentBlog(),
     name: 'Blog Posts',
     icon: Flower,
     description: 'Create and manage blog posts',

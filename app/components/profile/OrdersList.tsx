@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { EmptyOrders } from '@/app/components/empty-states';
+import { paths } from '@/lib/paths';
 
 type Order = {
   id: string;
@@ -109,7 +110,7 @@ export default function OrdersList({ orders }: OrdersListProps) {
 
           <div className="mt-4 flex gap-3">
             <Link
-              href={`/profile/orders/${order.id}`}
+              href={`${paths.profileOrders()}/${order.id}`}
               className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors"
             >
               View Details

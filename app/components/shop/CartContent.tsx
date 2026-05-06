@@ -8,6 +8,7 @@ import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalBalanceDisplay } from './PetalBalanceDisplay';
 import { EmptyCart } from '@/app/components/empty-states';
+import { paths } from '@/lib/paths';
 
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
@@ -16,7 +17,7 @@ export default function CartContent() {
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [items],
   );
-  const baseShipping = subtotal > 50 ? 0 : 9.99; // legacy heuristic
+  const paymentTimeLabel = 'Calculated at payment';
   const [couponInput, setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
   const [preview, setPreview] = useState<{
@@ -27,16 +28,8 @@ export default function CartContent() {
   } | null>(null);
   const [busyPreview, setBusyPreview] = useState(false);
 
-  // Compute shipping after FREESHIP
-  const shipping = useMemo(() => {
-    const d = preview?.shippingDiscount ?? 0;
-    const fee = baseShipping;
-    if (d >= fee && fee > 0) return 0;
-    return fee;
-  }, [preview, baseShipping]);
   const discount = preview?.discountTotal ?? 0;
-  const tax = subtotal * 0.08; // display only; Stripe computes real tax
-  const total = Math.max(0, subtotal - discount) + tax + shipping;
+  const total = Math.max(0, subtotal - discount);
 
   // Debounced preview
   useEffect(() => {
@@ -61,7 +54,7 @@ export default function CartContent() {
                 quantity: i.quantity,
                 unitPrice: i.price,
               })),
-              shipping: { provider: 'stripe', fee: baseShipping },
+              shipping: { provider: 'stripe', fee: 0 },
             },
           }),
         });
@@ -78,7 +71,7 @@ export default function CartContent() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [codes, items, baseShipping]);
+  }, [codes, items]);
 
   const addCode = () => {
     const c = couponInput.trim().toUpperCase();
@@ -224,11 +217,11 @@ export default function CartContent() {
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
-              <span>${tax.toFixed(2)}</span>
+              <span>{paymentTimeLabel}</span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+              <span>{paymentTimeLabel}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-zinc-300">
@@ -238,7 +231,7 @@ export default function CartContent() {
             )}
             <div className="border-t border-white/10 pt-3">
               <div className="flex justify-between text-lg font-semibold text-white">
-                <span>Total</span>
+                <span>Estimated subtotal</span>
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>
@@ -247,7 +240,7 @@ export default function CartContent() {
           <Link
             href={
               {
-                pathname: '/checkout',
+                pathname: paths.checkout(),
                 query: codes.length ? { coupons: codes.join(',') } : undefined,
               } as any
             }

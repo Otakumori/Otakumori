@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { trapFocus } from '@/app/lib/accessibility';
+import { paths } from '@/lib/paths';
 
 export function QuickSearch() {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,7 @@ export function QuickSearch() {
     (e: React.FormEvent) => {
       e.preventDefault();
       if (query.trim()) {
-        router.push(`/shop?q=${encodeURIComponent(query.trim())}`);
+        router.push(`${paths.shop()}?q=${encodeURIComponent(query.trim())}`);
         setIsOpen(false);
         setQuery('');
       }

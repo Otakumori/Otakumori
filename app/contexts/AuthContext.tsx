@@ -5,6 +5,7 @@ import { useUser, useAuth } from '@clerk/nextjs';
 import { type User } from '@clerk/nextjs/server';
 import { useRouter } from 'next/navigation';
 import { OnboardingModal } from '@/app/components/onboarding/OnboardingModal';
+import { paths } from '@/lib/paths';
 
 interface AuthModalState {
   isOpen: boolean;
@@ -173,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const redirectToSignIn = (redirectUrl?: string) => {
-    const url = new URL('/sign-in', window.location.origin);
+    const url = new URL(paths.signIn(), window.location.origin);
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
@@ -182,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const redirectToSignUp = (redirectUrl?: string) => {
-    const url = new URL('/sign-up', window.location.origin);
+    const url = new URL(paths.signUp(), window.location.origin);
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
@@ -289,6 +290,8 @@ function AuthModal() {
 
   if (!isOpen) return null;
 
+  const authPath = action === 'sign-up' ? paths.signUp(redirectUrl) : paths.signIn(redirectUrl);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4">
@@ -312,7 +315,7 @@ function AuthModal() {
 
             <div className="space-y-4">
               <a
-                href={`/sign-in${redirectUrl ? `?redirect_url=${encodeURIComponent(redirectUrl)}` : ''}`}
+                href={authPath}
                 className="block w-full bg-pink-600 hover:bg-pink-700 text-white font-ui py-3 px-6 rounded-xl transition-colors"
               >
                 {action === 'sign-in' ? 'Sign In' : 'Sign Up'}

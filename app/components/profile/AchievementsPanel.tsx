@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { loadAchievementsForProfile } from '../../profile/_data/achievements';
+import { loadAchievementsForProfile } from '@/app/(site)/profile/_data/achievements';
 
 export default async function AchievementsPanel() {
   const { catalog, ownedSet, earnedPoints, totalPoints } = await loadAchievementsForProfile();
