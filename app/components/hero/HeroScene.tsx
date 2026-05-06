@@ -156,7 +156,7 @@ export default function HeroScene() {
       <TreePetalEmitter scene={scene} />
       <div className="absolute inset-0 z-[7] bg-[radial-gradient(circle_at_center,transparent_36%,rgba(3,2,8,0.44)_78%),linear-gradient(to_bottom,rgba(5,3,10,0.12),rgba(5,3,10,0.46))]" />
 
-      <style jsx>{`
+      <style>{`
         @keyframes treePetalDrift {
           0% {
             opacity: 0;
