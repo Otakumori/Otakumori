@@ -1,7 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { resolveHomeScene, type HomeSceneState } from './homeScene';
+
+type PetalStyle = CSSProperties & {
+  '--petal-drift': string;
+  '--petal-fall': string;
+  '--petal-rotate': string;
+  '--petal-gust': string;
+};
 
 const CANOPY_ANCHORS = [
   { x: 26, y: 26 },
@@ -62,34 +69,38 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
   }
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[6] overflow-hidden">
-      {petals.map((petal) => (
-        <button
-          key={`${scene.bucket}-${petal.id}`}
-          type="button"
-          tabIndex={-1}
-          aria-label="Collect preview sakura petal"
-          onClick={() => collectPreview(petal.id)}
-          className="pointer-events-auto absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)] transition-transform duration-300 hover:scale-125 focus:outline-none"
-          style={{
-            left: `${petal.left}%`,
-            top: `${petal.top}%`,
-            transform: `scale(${petal.scale})`,
-            animation: scene.motion.reducedMotion
-              ? undefined
-              : `treePetalDrift ${petal.duration}s linear ${petal.delay}s infinite`,
-            ['--petal-drift' as string]: `${petal.drift}vw`,
-            ['--petal-fall' as string]: `${petal.fall}vh`,
-            ['--petal-rotate' as string]: `${petal.rotate}deg`,
-            ['--petal-gust' as string]: `${scene.motion.gustStrength * 24}vw`,
-          }}
-        >
-          <span className="block rotate-45 text-lg leading-none">❀</span>
-          {collected === petal.id ? (
-            <span className="absolute inset-0 rounded-full border border-pink-100/70 animate-ping" />
-          ) : null}
-        </button>
-      ))}
+    <div className="pointer-events-none absolute inset-0 z-[6] overflow-hidden">
+      {petals.map((petal) => {
+        const petalStyle: PetalStyle = {
+          left: `${petal.left}%`,
+          top: `${petal.top}%`,
+          transform: `scale(${petal.scale})`,
+          animation: scene.motion.reducedMotion
+            ? undefined
+            : `treePetalDrift ${petal.duration}s linear ${petal.delay}s infinite`,
+          '--petal-drift': `${petal.drift}vw`,
+          '--petal-fall': `${petal.fall}vh`,
+          '--petal-rotate': `${petal.rotate}deg`,
+          '--petal-gust': `${scene.motion.gustStrength * 24}vw`,
+        };
+
+        return (
+          <button
+            key={`${scene.bucket}-${petal.id}`}
+            type="button"
+            tabIndex={-1}
+            aria-label="Collect preview sakura petal"
+            onClick={() => collectPreview(petal.id)}
+            className="pointer-events-auto absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)] transition-transform duration-300 hover:scale-125 focus:outline-none"
+            style={petalStyle}
+          >
+            <span className="block rotate-45 text-lg leading-none">❀</span>
+            {collected === petal.id ? (
+              <span className="absolute inset-0 rounded-full border border-pink-100/70 animate-ping" />
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
