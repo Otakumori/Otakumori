@@ -17,6 +17,24 @@ import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
 
+type PrintifyPriceRange = { min: number | null; max: number | null };
+
+type PrintifyVariantLike = { price?: number | null };
+
+function getPrintifyPriceRange(variants: PrintifyVariantLike[] | null | undefined): PrintifyPriceRange {
+  let min: number | null = null;
+  let max: number | null = null;
+
+  for (const variant of variants ?? []) {
+    if (typeof variant.price !== 'number' || !Number.isFinite(variant.price)) continue;
+
+    min = min === null ? variant.price : Math.min(min, variant.price);
+    max = max === null ? variant.price : Math.max(max, variant.price);
+  }
+
+  return { min, max };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -101,14 +119,9 @@ export async function GET(
 
       if (printifyProductData) {
         // Transform Printify product to CatalogProduct format
-        const primaryImage = printifyProductData.images?.find((img) => img.is_default) 
+        const primaryImage = printifyProductData.images?.find((img) => img.is_default)
           ?? printifyProductData.images?.[0];
-        const priceRange = printifyProductData.variants?.length 
-          ? {
-              min: Math.min(...printifyProductData.variants.map((v) => v.price)),
-              max: Math.max(...printifyProductData.variants.map((v) => v.price)),
-            }
-          : { min: null, max: null };
+        const priceRange = getPrintifyPriceRange(printifyProductData.variants);
 
         const catalogProduct: CatalogProduct = {
           id: String(printifyProductData.id),
