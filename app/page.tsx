@@ -1,5 +1,6 @@
 import { generateSEO } from '@/app/lib/seo';
 import HeroRoot from './components/hero/HeroRoot';
+import HomeMain from './components/home/HomeMain';
 
 export const revalidate = 60;
 
@@ -12,5 +13,10 @@ export function generateMetadata() {
 }
 
 export default function HomePage() {
-  return <HeroRoot />;
+  return (
+    <>
+      <HeroRoot />
+      <HomeMain />
+    </>
+  );
 }
