@@ -89,7 +89,7 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           items: checkoutItems,
-          successUrl: `${origin}${paths.checkoutSuccess()}?session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: `${origin}${paths.checkoutSuccess()}`,
           cancelUrl: `${origin}${paths.cart()}`,
           shippingInfo: {
             email: user?.primaryEmailAddress?.emailAddress,
