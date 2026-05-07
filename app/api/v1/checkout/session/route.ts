@@ -382,7 +382,7 @@ export async function POST(req: NextRequest) {
         success_url: normalizeSuccessUrl(successUrl),
         cancel_url: cancelUrl ?? `${getOrigin()}/shop/cart`,
         client_reference_id: userId,
-        customer_email: shippingInfo?.email ?? user.email,
+        customer_email: shippingInfo?.email || user.email || undefined,
         shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'] },
         metadata: {
           userId,
