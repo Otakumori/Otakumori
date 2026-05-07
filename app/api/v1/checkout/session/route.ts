@@ -122,7 +122,6 @@ export async function POST(req: NextRequest) {
           printifyProductId: true,
           ProductImage: {
             select: { url: true, isDefault: true },
-            orderBy: [{ isDefault: 'desc' }, { position: 'asc' }],
           },
           ProductVariant: {
             where: { id: { in: variantIds } },
@@ -176,10 +175,11 @@ export async function POST(req: NextRequest) {
       const normalizedItems = items.map((item: any) => {
         const product = productById.get(item.productId)!;
         const variant = variantById.get(item.variantId)!;
+        const sortedProductImages = [...product.ProductImage].sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
         const imageCandidates = [
           variant.previewImageUrl,
           product.primaryImageUrl,
-          ...product.ProductImage.map((image) => image.url),
+          ...sortedProductImages.map((image) => image.url),
           ...(Array.isArray(item.images) ? item.images : []),
         ];
         const images = imageCandidates.map(toStripeImageUrl).filter(isHttpUrl).slice(0, 8);
