@@ -2,332 +2,206 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Lock } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowLeft, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useCart } from '../../components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
 import { paths } from '@/lib/paths';
 
-interface ShippingInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-}
-
-interface CartItem {
-  id: string;
+type CheckoutLineItem = {
+  productId: string;
+  variantId: string;
   name: string;
-  price: number;
+  description?: string;
+  images?: string[];
   quantity: number;
-  selectedVariant?: {
-    id: string;
-    title: string;
-  };
+  priceCents: number;
+  sku?: string;
+};
+
+function toAbsoluteImageUrl(image: string | undefined | null) {
+  if (!image || typeof image !== 'string') return undefined;
+  if (/^https?:\/\//i.test(image)) return image;
+  if (typeof window === 'undefined') return undefined;
+  if (image.startsWith('/')) return `${window.location.origin}${image}`;
+  return undefined;
 }
 
-interface InvalidCheckoutItem {
-  productId?: string;
-  variantId?: string;
-  name?: string;
-}
-
-const COUNTRY_OPTIONS = [
-  { value: 'US', label: 'United States' },
-  { value: 'CA', label: 'Canada' },
-  { value: 'GB', label: 'United Kingdom' },
-  { value: 'AU', label: 'Australia' },
-  { value: 'DE', label: 'Germany' },
-  { value: 'FR', label: 'France' },
-  { value: 'JP', label: 'Japan' },
-] as const;
-
-const US_STATE_OPTIONS = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
-  'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
-  'VA', 'WA', 'WV', 'WI', 'WY',
-];
-
-function getLineKey(item: CartItem) {
-  return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
-}
-
-function formatServerError(data: any): string {
-  const parts = [data?.error || 'Failed to create checkout session.'];
-  if (data?.stage) parts.push(`Stage: ${data.stage}`);
-  if (data?.requestId) parts.push(`Request ID: ${data.requestId}`);
-  return parts.join('\n');
-}
-
-function buildInvalidItemsMessage(invalidItems: InvalidCheckoutItem[]): string {
-  const names = invalidItems
-    .map((item) => item.name?.trim())
-    .filter((name): name is string => Boolean(name));
-
-  if (names.length === 0) {
-    return 'Some items in your cart are no longer available and were removed. Please review your cart and try again.';
+function makeIdempotencyKey() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return `checkout_${crypto.randomUUID()}`;
   }
 
-  return `Some items in your cart are no longer available and were removed: ${names.join(', ')}. Please review your cart and try again.`;
+  return `checkout_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
 
 export default function CheckoutPage() {
-  const { items: cart, total, removeItem } = useCart();
+  const { items, total, itemCount } = useCart();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
-  const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'US',
-  });
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cartNeedsReview, setCartNeedsReview] = useState(false);
 
-  const isUS = shippingInfo.country === 'US';
-  const zipPlaceholder = useMemo(() => (isUS ? 'ZIP Code' : 'Postal Code'), [isUS]);
+  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
 
-  useEffect(() => {
-    if (!user) return;
-    setShippingInfo((prev) => ({
-      ...prev,
-      firstName: prev.firstName || user.firstName || '',
-      lastName: prev.lastName || user.lastName || '',
-      email: prev.email || user.primaryEmailAddress?.emailAddress || '',
-    }));
-  }, [user]);
+  const checkoutItems = useMemo<CheckoutLineItem[]>(() => {
+    return items
+      .filter((item) => item.selectedVariant?.id && item.price > 0 && item.quantity > 0)
+      .map((item) => {
+        const imageUrl = toAbsoluteImageUrl(item.image);
+        return {
+          productId: item.id,
+          variantId: item.selectedVariant!.id,
+          name: item.name,
+          description: item.selectedVariant?.title,
+          images: imageUrl ? [imageUrl] : undefined,
+          quantity: item.quantity,
+          priceCents: Math.round(item.price * 100),
+          sku: `${item.id}-${item.selectedVariant!.id}`,
+        };
+      });
+  }, [items]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (name === 'zipCode') {
-      const cleaned = shippingInfo.country === 'US'
-        ? value.replace(/[^0-9-]/g, '').slice(0, 10)
-        : value.slice(0, 12);
-      setShippingInfo((prev) => ({ ...prev, zipCode: cleaned }));
-      return;
-    }
-    if (name === 'state' && shippingInfo.country === 'US') {
-      setShippingInfo((prev) => ({ ...prev, state: value.toUpperCase() }));
-      return;
-    }
-    if (name === 'country') {
-      setShippingInfo((prev) => ({ ...prev, country: value, state: value === 'US' ? prev.state : '' }));
-      return;
-    }
-    setShippingInfo((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  async function startCheckout() {
     if (!isSignedIn) {
-      setError('Please sign in to complete your purchase');
+      setError('Please sign in to complete your purchase.');
       return;
     }
 
-    if (shippingInfo.country === 'US' && !US_STATE_OPTIONS.includes(shippingInfo.state.toUpperCase())) {
-      setError('Please select a valid U.S. state.');
+    if (checkoutItems.length === 0) {
+      setError('Your cart has no checkout-ready items. Please return to cart and refresh your selections.');
       return;
     }
 
-    const missingVariantItem = cart.find((item) => !item.selectedVariant?.id);
-    if (missingVariantItem) {
-      setError(`A valid variant is required before checkout for: ${missingVariantItem.name}. Please return to the product page and re-add it.`);
-      return;
-    }
-
-    setIsProcessing(true);
+    setIsSubmitting(true);
     setError(null);
-    setCartNeedsReview(false);
 
     try {
-      const orderItems = cart.map((item) => ({
-        productId: String(item.id),
-        variantId: String(item.selectedVariant!.id),
-        name: String(item.name),
-        quantity: Number(item.quantity),
-        priceCents: Number(Math.round(item.price * 100)),
-        sku: `SKU-${item.id}`,
-      }));
-
-      try {
-        const serialized = JSON.stringify({ items: orderItems, shippingInfo });
-        console.log('Checkout payload size:', serialized.length);
-      } catch (serializationError) {
-        console.error('Checkout payload serialization failed:', serializationError);
-        setError('Payload serialization failed before request.');
-        setIsProcessing(false);
-        return;
-      }
-
-      const idempotencyKey = `checkout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const origin = window.location.origin;
       const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-idempotency-key': idempotencyKey,
+          'x-idempotency-key': makeIdempotencyKey(),
         },
         body: JSON.stringify({
-          items: orderItems,
-          shippingInfo,
-          successUrl: `${window.location.origin}${paths.checkoutSuccess()}`,
-          cancelUrl: `${window.location.origin}${paths.cart()}`,
+          items: checkoutItems,
+          successUrl: `${origin}${paths.checkoutSuccess()}`,
+          cancelUrl: `${origin}${paths.cart()}`,
+          shippingInfo: {
+            email: user?.primaryEmailAddress?.emailAddress,
+            firstName: user?.firstName ?? undefined,
+            lastName: user?.lastName ?? undefined,
+          },
+          shipping: {
+            provider: 'stripe',
+            fee: 0,
+          },
         }),
       });
 
-      const raw = await response.text();
-      let data: any = null;
-      try {
-        data = raw ? JSON.parse(raw) : null;
-      } catch (parseError) {
-        console.error('Checkout returned non-JSON response:', {
-          status: response.status,
-          statusText: response.statusText,
-          raw,
-          parseError,
-        });
-        const preview = raw ? raw.slice(0, 240) : '(empty response body)';
-        setError(`Checkout returned a non-JSON response. HTTP ${response.status} ${response.statusText}.\n\nResponse preview:\n${preview}`);
-        return;
+      const result = await response.json();
+      if (!response.ok || !result.ok || !result.data?.url) {
+        throw new Error(result?.error || 'Stripe Checkout could not be started.');
       }
 
-      if (data?.ok && data.data?.url) {
-        window.location.href = data.data.url;
-      } else if (Array.isArray(data?.invalidItems) && data.invalidItems.length > 0) {
-        const invalidItems = data.invalidItems as InvalidCheckoutItem[];
-        invalidItems.forEach((item) => {
-          if (!item.productId || !item.variantId) return;
-          removeItem(`${item.productId}::${item.variantId}`);
-        });
-        setCartNeedsReview(true);
-        setError(buildInvalidItemsMessage(invalidItems));
-      } else {
-        console.error('Checkout session error:', data);
-        setError(formatServerError(data));
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Checkout submit crash:', err);
-      setError(`Checkout crashed before redirect: ${message}`);
-    } finally {
-      setIsProcessing(false);
+      window.location.assign(result.data.url);
+    } catch (checkoutError) {
+      setError(checkoutError instanceof Error ? checkoutError.message : 'Checkout failed. Please try again.');
+      setIsSubmitting(false);
     }
-  };
+  }
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
-        <div className="mx-auto max-w-3xl px-4 py-16">
-          <h1 className="text-2xl font-semibold">Sign In Required</h1>
-          <p className="mt-3 text-pink-200">Please sign in to complete your purchase.</p>
-          <Link href={signInHref} className="mt-6 inline-block rounded-lg bg-pink-500 px-4 py-2 text-white">Sign In</Link>
-        </div>
+      <main className="min-h-screen bg-[#080611] px-4 pt-28 text-white sm:px-6 lg:px-8">
+        <section className="glass-panel card-stroke mx-auto max-w-2xl rounded-3xl p-8 text-center">
+          <p className="font-ui text-xs uppercase tracking-[0.32em] text-sakura-50/70">Checkout</p>
+          <h1 className="font-display mt-4 text-3xl font-semibold">Sign in to continue.</h1>
+          <p className="font-body mt-4 text-white/70">Checkout is protected so your order can be connected to your account.</p>
+          <Link href={signInHref} className="mt-7 inline-flex">
+            <Button className="btn-primary">Sign in</Button>
+          </Link>
+        </section>
       </main>
     );
   }
 
-  if (cart.length === 0) {
+  if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
-        <div className="mx-auto max-w-3xl px-4 py-16">
-          <h1 className="text-2xl font-semibold">Your Cart is Empty</h1>
-          <p className="mt-3 text-pink-200">Add an item to continue.</p>
-          <Link href={paths.shop()} className="mt-6 inline-block rounded-lg bg-pink-500 px-4 py-2 text-white">Continue Shopping</Link>
-        </div>
+      <main className="min-h-screen bg-[#080611] px-4 pt-28 text-white sm:px-6 lg:px-8">
+        <section className="glass-panel card-stroke mx-auto max-w-2xl rounded-3xl p-8 text-center">
+          <p className="font-ui text-xs uppercase tracking-[0.32em] text-sakura-50/70">Checkout</p>
+          <h1 className="font-display mt-4 text-3xl font-semibold">Your cart is empty.</h1>
+          <p className="font-body mt-4 text-white/70">Add something from the grove before starting Stripe Checkout.</p>
+          <Link href={paths.shop()} className="mt-7 inline-flex">
+            <Button className="btn-primary">Return to shop</Button>
+          </Link>
+        </section>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#120917] text-white pt-20">
-      <div className="mx-auto max-w-5xl px-4 py-12">
-        <div className="mb-8">
-          <Link href={paths.cart()} className="inline-flex items-center text-pink-200 hover:text-white">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Cart
-          </Link>
-        </div>
+    <main className="min-h-screen bg-[#080611] px-4 pt-24 text-white sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl py-12">
+        <Link href={paths.cart()} className="font-ui inline-flex items-center text-sm text-sakura-50/70 transition hover:text-sakura-50">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to cart
+        </Link>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <section className="rounded-2xl border border-pink-500/20 bg-white/5 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Checkout</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <input name="firstName" value={shippingInfo.firstName} onChange={handleInputChange} placeholder="First name" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-                <input name="lastName" value={shippingInfo.lastName} onChange={handleInputChange} placeholder="Last name" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              </div>
-              <input name="email" type="email" value={shippingInfo.email} onChange={handleInputChange} placeholder="Email" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              <input name="address" value={shippingInfo.address} onChange={handleInputChange} placeholder="Street address" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              <select name="country" value={shippingInfo.country} onChange={handleInputChange} className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
-                {COUNTRY_OPTIONS.map((country) => (
-                  <option key={country.value} value={country.value} className="bg-[#2b1738] text-white">{country.label}</option>
-                ))}
-              </select>
-              <div className="grid grid-cols-3 gap-4">
-                <input name="city" value={shippingInfo.city} onChange={handleInputChange} placeholder="City" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-                {isUS ? (
-                  <select name="state" value={shippingInfo.state} onChange={handleInputChange} className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
-                    <option value="" className="bg-[#2b1738] text-white">State</option>
-                    {US_STATE_OPTIONS.map((state) => (
-                      <option key={state} value={state} className="bg-[#2b1738] text-white">{state}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input name="state" value={shippingInfo.state} onChange={handleInputChange} placeholder="Region" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-                )}
-                <input name="zipCode" value={shippingInfo.zipCode} onChange={handleInputChange} placeholder={zipPlaceholder} className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              </div>
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_420px]">
+          <section className="glass-card card-stroke rounded-3xl p-6 md:p-8">
+            <p className="font-ui text-xs uppercase tracking-[0.32em] text-sakura-50/70">Secure Stripe Checkout</p>
+            <h1 className="font-display mt-4 text-3xl font-semibold md:text-5xl">Review your order.</h1>
+            <p className="font-body mt-4 max-w-2xl text-white/70">
+              We hand you off to Stripe to collect payment, shipping, and tax details. Card data is handled by Stripe, not Otaku-mori.
+            </p>
 
-              {error && (
-                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 whitespace-pre-wrap">
-                  <div>{error}</div>
-                  {cartNeedsReview && (
-                    <Link href={paths.cart()} className="mt-3 inline-block rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20">
-                      Review cart
-                    </Link>
-                  )}
-                </div>
-              )}
-
-              <button type="submit" disabled={isProcessing} className="inline-flex w-full items-center justify-center rounded-xl bg-pink-500 px-4 py-3 font-medium text-white disabled:opacity-50">
-                {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : <><Lock className="mr-2 h-4 w-4" />Proceed to Payment</>}
-              </button>
-            </form>
-          </section>
-
-          <section className="rounded-2xl border border-pink-500/20 bg-white/5 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
-            <div className="space-y-4">
-              {cart.map((item) => (
-                <div key={getLineKey(item)} className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
-                  <div>
-                    <p className="font-medium text-white">{item.name}</p>
-                    {item.selectedVariant && <p className="text-sm text-pink-200">{item.selectedVariant.title}</p>}
-                    <p className="text-sm text-pink-200">Qty: {item.quantity}</p>
+            <div className="mt-8 space-y-5">
+              {items.map((item) => (
+                <article key={`${item.id}-${item.selectedVariant?.id ?? 'default'}`} className="flex gap-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-white/10">
+                    <Image src={item.image || '/placeholder-product.jpg'} alt={item.name} fill sizes="96px" className="object-cover" />
                   </div>
-                  <div className="text-right text-pink-100">${(item.price * item.quantity).toFixed(2)}</div>
-                </div>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-display text-xl text-white">{item.name}</h2>
+                    {item.selectedVariant?.title ? <p className="font-body mt-1 text-sm text-white/58">{item.selectedVariant.title}</p> : null}
+                    <p className="font-ui mt-3 text-sm text-sakura-50/80">Qty {item.quantity}</p>
+                  </div>
+                  <p className="font-ui shrink-0 text-sm text-white/80">${(item.price * item.quantity).toFixed(2)}</p>
+                </article>
               ))}
-              <div className="space-y-2 pt-2 text-pink-100">
-                <div className="flex justify-between"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span>Shipping</span><span>Calculated at payment</span></div>
-                <div className="flex justify-between"><span>Tax</span><span>Calculated at payment</span></div>
-                <div className="flex justify-between border-t border-white/10 pt-3 font-semibold text-white"><span>Total</span><span>${total.toFixed(2)} + shipping</span></div>
-              </div>
             </div>
           </section>
+
+          <aside className="glass-panel card-stroke h-fit rounded-3xl p-6 md:p-8">
+            <div className="flex items-center gap-3 text-sakura-50">
+              <ShieldCheck className="h-5 w-5" />
+              <p className="font-ui text-xs uppercase tracking-[0.24em]">Protected payment</p>
+            </div>
+            <div className="mt-7 space-y-4 text-sm text-white/72">
+              <div className="flex justify-between"><span>Items</span><span>{itemCount}</span></div>
+              <div className="flex justify-between"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Shipping</span><span>Calculated by Stripe</span></div>
+              <div className="flex justify-between"><span>Tax</span><span>Calculated by Stripe</span></div>
+              <div className="flex justify-between border-t border-white/10 pt-4 text-base font-semibold text-white"><span>Due now</span><span>${total.toFixed(2)}+</span></div>
+            </div>
+
+            {error ? <p className="font-body mt-5 rounded-2xl border border-red-300/20 bg-red-500/10 p-3 text-sm text-red-100">{error}</p> : null}
+
+            <Button onClick={startCheckout} disabled={isSubmitting || checkoutItems.length === 0} className="btn-primary mt-6 w-full">
+              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {isSubmitting ? 'Opening Stripe...' : 'Continue to secure checkout'}
+            </Button>
+
+            <p className="font-body mt-4 text-xs leading-6 text-white/50">
+              Product images are forwarded to Stripe when they are available as secure public URLs.
+            </p>
+          </aside>
         </div>
       </div>
     </main>
