@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
-import { SignInButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
 import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
@@ -53,8 +52,15 @@ const GAME_FACE_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  let isSignedIn = false;
+  let user: ReturnType<typeof useUser>['user'] = null;
+  try {
+    isSignedIn = Boolean(useAuth().isSignedIn);
+    user = useUser().user;
+  } catch {
+    isSignedIn = false;
+    user = null;
+  }
   const { requireAuthForSoapstone, requireAuthForWishlist, signOut } = useAuthContext();
   const { itemCount } = useCart();
 
@@ -249,7 +255,7 @@ export default function Navbar() {
                 )}
               </>
             ) : (
-              <SignInButton mode="modal"><button className="min-h-[44px] px-4 py-2 bg-transparent border border-current rounded-lg text-text-link hover:text-text-link-hover hover:border-primary transition-all duration-300">Sign In</button></SignInButton>
+              <Link href={paths.signIn()} className="inline-flex min-h-[44px] items-center rounded-lg border border-current bg-transparent px-4 py-2 text-text-link transition-all duration-300 hover:border-primary hover:text-text-link-hover">Sign In</Link>
             )}
           </div>
         </div>
@@ -297,7 +303,7 @@ export default function Navbar() {
                     <button onClick={async () => { setIsMenuOpen(false); await signOut(); }} className="w-full text-left min-h-[44px] px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">Sign Out</button>
                   </div>
                 ) : (
-                  <SignInButton mode="modal"><button className="w-full min-h-[44px] px-4 py-3 bg-transparent border border-current rounded-lg text-white hover:bg-white/10 transition-colors">Sign In</button></SignInButton>
+                  <Link href={paths.signIn()} onClick={() => setIsMenuOpen(false)} className="flex min-h-[44px] w-full items-center justify-center rounded-lg border border-current bg-transparent px-4 py-3 text-white transition-colors hover:bg-white/10">Sign In</Link>
                 )}
               </div>
             </div>

@@ -2,13 +2,15 @@ import { vi } from 'vitest';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+const vitestMock = Reflect.get(vi, 'mock').bind(vi);
+const vitestUnmock = Reflect.get(vi, 'unmock').bind(vi);
 
 // Jest compatibility shim - map jest.* to vitest vi.*
 (global as any).jest = {
   fn: vi.fn,
   spyOn: vi.spyOn,
-  mock: (moduleId: string, factory?: any) => vi.mock(moduleId, factory),
-  unmock: (moduleId: string) => vi.unmock(moduleId),
+  mock: vitestMock,
+  unmock: vitestUnmock,
   clearAllMocks: vi.clearAllMocks,
   resetAllMocks: vi.resetAllMocks,
   restoreAllMocks: vi.restoreAllMocks,

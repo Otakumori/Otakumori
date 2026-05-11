@@ -136,6 +136,44 @@ html {
   }
 }
 
+@keyframes otmPetalDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(4vw, 78vh, 0) rotate(420deg);
+  }
+}
+
+@keyframes otmShrinePulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.otm-season-petal {
+  border-radius: 70% 30% 70% 30%;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--otm-hero-accent, #ff6aa9) 55%, transparent));
+  opacity: 0;
+  transform-origin: 50% 75%;
+  animation: otmPetalDrift linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otm-season-petal {
+    animation: none !important;
+    opacity: 0.24;
+  }
+}
+
 /* Apply page transition to main content */
 .page-transition {
   animation: fadeInUp 400ms ease-out;

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
+import { getSellableCatalogItems } from '@/lib/catalog/sellable';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
@@ -137,10 +138,9 @@ export async function GET(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
     });
 
-    const checkoutSafeProducts = prismaProducts
+    const checkoutSafeProducts = getSellableCatalogItems(prismaProducts
       .map(serializeProduct)
-      .map(toListingProduct)
-      .filter((product) => Boolean(product.image) && product.available && product.variants.length > 0);
+      .map(toListingProduct));
 
     const filtered = sortProducts(filterProducts(checkoutSafeProducts, params), params);
     const total = filtered.length;

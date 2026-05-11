@@ -13,6 +13,7 @@ export default [
       // build + deps
       'node_modules/',
       '.next/',
+      '_deprecated/**',
       'packages/**',
       'out/',
       'coverage/',

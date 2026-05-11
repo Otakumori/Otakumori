@@ -7,6 +7,7 @@ import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
+import { getCartCheckoutReadiness } from '@/lib/cart/reconciliation';
 
 interface AvailableDiscount {
   id: string;
@@ -40,6 +41,7 @@ export default function CheckoutContent() {
     country: 'US',
   });
   const subtotal = useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0), [items]);
+  const checkoutReadiness = useMemo(() => getCartCheckoutReadiness(items), [items]);
   const previewDiscount =
     typeof preview?.discountTotal === 'number'
       ? preview.discountTotal
@@ -146,12 +148,16 @@ export default function CheckoutContent() {
       setCheckoutError('Your cart is empty.');
       return;
     }
+    if (!checkoutReadiness.ready) {
+      setCheckoutError(checkoutReadiness.issues[0]?.message ?? 'Choose options for each item before checkout.');
+      return;
+    }
 
     setIsProcessing(true);
     try {
       const checkoutItems = items.map((i) => ({
         productId: i.id,
-        variantId: i.selectedVariant?.id || 'default',
+        variantId: i.selectedVariant?.id,
         quantity: i.quantity,
       }));
 
@@ -521,10 +527,15 @@ export default function CheckoutContent() {
               {checkoutError}
             </p>
           )}
+          {!checkoutReadiness.ready && items.length > 0 && (
+            <p className="mt-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+              {checkoutReadiness.issues[0]?.message ?? 'Choose options for each item before checkout.'}
+            </p>
+          )}
 
           <button
             onClick={handleCheckout}
-            disabled={isProcessing}
+            disabled={isProcessing || (items.length > 0 && !checkoutReadiness.ready)}
             className="mt-6 w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isProcessing ? 'Processing...' : 'Proceed to Payment'}

@@ -394,6 +394,53 @@ export async function POST(req: NextRequest) {
       stage = 'update_order';
       await prisma.order.update({ where: { id: order.id }, data: { stripeId: session.id } });
 
+      stage = 'persist_checkout_session';
+      const checkoutProvider = 'stripe';
+      await prisma.checkoutSession.upsert({
+        where: {
+          provider_idempotencyKey: {
+            provider: checkoutProvider,
+            idempotencyKey,
+          },
+        },
+        update: {
+          orderId: order.id,
+          userId: user.id,
+          providerSessionId: session.id,
+          status: session.status ?? 'open',
+          currency: (session.currency ?? 'usd').toUpperCase(),
+          amountSubtotal: session.amount_subtotal ?? subtotalCents,
+          amountTotal: session.amount_total ?? subtotalCents,
+          expiresAt: typeof session.expires_at === 'number' ? new Date(session.expires_at * 1000) : null,
+          metadata: {
+            requestId,
+            couponCodes: appliedCodes,
+            discountTotalCents,
+            shippingDiscountCents,
+            stripeSessionStatus: session.status,
+          },
+        },
+        create: {
+          orderId: order.id,
+          userId: user.id,
+          provider: checkoutProvider,
+          providerSessionId: session.id,
+          idempotencyKey,
+          status: session.status ?? 'open',
+          currency: (session.currency ?? 'usd').toUpperCase(),
+          amountSubtotal: session.amount_subtotal ?? subtotalCents,
+          amountTotal: session.amount_total ?? subtotalCents,
+          expiresAt: typeof session.expires_at === 'number' ? new Date(session.expires_at * 1000) : null,
+          metadata: {
+            requestId,
+            couponCodes: appliedCodes,
+            discountTotalCents,
+            shippingDiscountCents,
+            stripeSessionStatus: session.status,
+          },
+        },
+      });
+
       const responseBody = {
         ok: true,
         data: { url: session.url, orderId: order.id, orderNumber: order.displayNumber },

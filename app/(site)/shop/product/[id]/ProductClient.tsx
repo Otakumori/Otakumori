@@ -197,16 +197,16 @@ export default function ProductClient({ productId }: { productId: string }) {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black flex items-center justify-center"><div className="text-center"><div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-500 border-r-transparent" /><p className="mt-4 text-pink-200">Loading treasure...</p></div></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-[#06040c]"><div className="text-center"><div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-400 border-r-transparent" /><p className="mt-4 text-pink-100">Loading relic...</p></div></div>;
   }
 
   if (error || !product) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Not Found</h1><p className="text-zinc-300 mb-6">{error || 'This treasure has gone missing.'}</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
+    return <div className="min-h-screen bg-[#06040c] pt-24"><div className="mx-auto max-w-4xl px-4 py-20"><div className="rounded-lg border border-red-500/30 bg-red-500/10 p-8 text-center"><h1 className="mb-4 text-3xl font-semibold text-pink-100">Product Not Found</h1><p className="mb-6 text-zinc-300">{error || 'This relic has gone missing.'}</p><Link href={paths.shop()}><Button className="bg-pink-500 hover:bg-pink-400">Return to Shop</Button></Link></div></div></div>;
   }
 
   const imageUrl = displayImageUrl;
   if (!imageUrl) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Image Not Available</h1><p className="text-zinc-300 mb-6">This product is missing required images.</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
+    return <div className="min-h-screen bg-[#06040c] pt-24"><div className="mx-auto max-w-4xl px-4 py-20"><div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-8 text-center"><h1 className="mb-4 text-3xl font-semibold text-pink-100">Product Image Not Available</h1><p className="mb-6 text-zinc-300">This product is missing required images.</p><Link href={paths.shop()}><Button className="bg-pink-500 hover:bg-pink-400">Return to Shop</Button></Link></div></div></div>;
   }
 
   const currentPriceCents = selectedVariant?.priceCents ?? (product.priceRange.min != null ? Math.round(product.priceRange.min) : (product.priceCents ?? null));
@@ -215,28 +215,29 @@ export default function ProductClient({ productId }: { productId: string }) {
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen bg-[#06040c] text-white">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_8%,rgba(255,106,169,0.16),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(247,197,107,0.10),transparent_28%),linear-gradient(180deg,#120817,#06040c_54%,#020103)]" />
+      <div className="relative mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8">
         <nav className="mb-8">
-          <ol className="flex items-center space-x-2 text-sm text-muted">
-            <li><Link href={paths.shop()} className="hover:text-primary transition-colors">{t('nav', 'shop')}</Link></li>
+          <ol className="flex items-center space-x-2 text-sm text-pink-100/60">
+            <li><Link href={paths.shop()} className="transition-colors hover:text-pink-100">{t('nav', 'shop')}</Link></li>
             <li>/</li>
-            <li className="text-primary">{product.title}</li>
+            <li className="text-pink-100">{product.title}</li>
           </ol>
         </nav>
 
         {isNSFW && <NSFWAffirmNote />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-2xl glass-card">
+            <div className="relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-2xl shadow-black/40">
               <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
             </div>
 
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full">{tag}</span>
+                  <span key={index} className="rounded-md border border-pink-200/20 bg-pink-500/10 px-3 py-1 text-sm text-pink-100">{tag}</span>
                 ))}
               </div>
             )}
@@ -245,22 +246,22 @@ export default function ProductClient({ productId }: { productId: string }) {
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl font-bold text-pink-200">{product.title}</h1>
+                <h1 className="text-4xl font-semibold leading-tight tracking-normal text-pink-50 md:text-5xl">{product.title}</h1>
               </div>
               <div className="flex items-center gap-4 mb-6">
-                <p className="text-3xl font-bold text-pink-400">{currency === 'USD' ? '$' : currency}{currentPrice.toFixed(2)}</p>
+                <p className="text-3xl font-semibold text-pink-200">{currency === 'USD' ? '$' : currency}{currentPrice.toFixed(2)}</p>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
               <PetalDiscountBadge productPrice={currentPrice} />
-              <div className="space-y-4 text-zinc-300 text-lg leading-relaxed">
+              <div className="space-y-4 text-lg leading-relaxed text-zinc-300">
                 {descriptionParagraphs.length > 0 ? descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>) : <p>Premium quality print-on-demand merchandise.</p>}
               </div>
             </div>
 
             {product.variants && product.variants.length > 0 && (
-              <div className="glass-panel rounded-xl p-4">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <label htmlFor="variant-select" className="block text-sm font-medium text-pink-200 mb-2">Select Variant</label>
-                <select id="variant-select" value={selectedVariant?.id || ''} onChange={(e) => { const variant = product.variants?.find((v) => v.id === e.target.value); if (variant) setSelectedVariant(variant); }} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white">
+                <select id="variant-select" value={selectedVariant?.id || ''} onChange={(e) => { const variant = product.variants?.find((v) => v.id === e.target.value); if (variant) setSelectedVariant(variant); }} className="w-full rounded-lg border border-white/15 bg-black/40 px-4 py-3 text-white">
                   {product.variants.map((variant) => (
                     <option key={variant.id} value={variant.id} disabled={!variant.isEnabled || !variant.inStock} className="bg-purple-900">
                       {variant.title ?? `Variant ${variant.printifyVariantId}`} - ${(((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100)).toFixed(2)}{!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
@@ -270,14 +271,14 @@ export default function ProductClient({ productId }: { productId: string }) {
               </div>
             )}
 
-            <div className="glass-panel rounded-xl p-4">
-              <label htmlFor="quantity" className="block text-sm font-medium text-pink-200 mb-2">Quantity</label>
-              <input id="quantity" type="number" min="1" max="99" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white" />
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+                <label htmlFor="quantity" className="block text-sm font-medium text-pink-200 mb-2">Quantity</label>
+              <input id="quantity" type="number" min="1" max="99" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-full rounded-lg border border-white/15 bg-black/40 px-4 py-3 text-white" />
             </div>
 
             <HeaderButton onClick={handleAddToCart} disabled={!variantAvailable} className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">Add to Cart</HeaderButton>
 
-            <div className="glass-panel rounded-xl p-6 space-y-3">
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-6">
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
               <div className="space-y-2 text-sm text-zinc-300">
                 <p><span className="font-medium">SKU:</span> {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}</p>

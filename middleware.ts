@@ -1,8 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 
 const isProtected = createRouteMatcher([
   '/account(.*)',
@@ -107,7 +108,37 @@ function nextWithPathname(req: Request, pathname: string) {
   });
 }
 
-export default clerkMiddleware(async (auth, req) => {
+function applyPublicSecurityHeaders(res: NextResponse, reqId: string) {
+  res.headers.set('X-Request-ID', reqId);
+  res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  return res;
+}
+
+function getRequestId(req: Request) {
+  return (
+    req.headers.get('x-request-id') ||
+    req.headers.get('x-correlation-id') ||
+    `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  );
+}
+
+function isLocalPublicSiteRequest(req: NextRequest) {
+  const host = req.headers.get('host')?.split(':')[0] ?? '';
+  const pathname = req.nextUrl.pathname;
+  return (
+    process.env.NODE_ENV !== 'production' &&
+    LOCAL_HOSTS.has(host) &&
+    !pathname.startsWith('/api/') &&
+    !pathname.startsWith('/ingest') &&
+    !isAdmin(req) &&
+    !isProtected(req)
+  );
+}
+
+const authMiddleware = clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
     const host = req.headers.get('host') || '';
@@ -115,12 +146,8 @@ export default clerkMiddleware(async (auth, req) => {
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
-    const { userId, sessionClaims } = await auth();
 
-    const reqId =
-      req.headers.get('x-request-id') ||
-      req.headers.get('x-correlation-id') ||
-      `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const reqId = getRequestId(req);
 
     if (isApi || isIngest) {
       if (req.method === 'OPTIONS') {
@@ -149,6 +176,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     if (isAdmin(req) && !isMerchizeAdminProbe) {
+      const { userId, sessionClaims } = await auth();
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
@@ -161,23 +189,27 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     if (isProtected(req) && !isMerchizeAdminProbe) {
+      const { userId } = await auth();
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
     }
 
     const res = nextWithPathname(req, url.pathname);
-    res.headers.set('X-Request-ID', reqId);
-    res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    res.headers.set('X-Content-Type-Options', 'nosniff');
-    res.headers.set('X-Frame-Options', 'SAMEORIGIN');
-    res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    if (userId) res.headers.set('X-User-ID', userId);
-    return res;
+    return applyPublicSecurityHeaders(res, reqId);
   } catch {
     return NextResponse.next();
   }
 });
+
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (isLocalPublicSiteRequest(req)) {
+    const res = nextWithPathname(req, req.nextUrl.pathname);
+    return applyPublicSecurityHeaders(res, getRequestId(req));
+  }
+
+  return authMiddleware(req, event);
+}
 
 export const config = {
   matcher: [

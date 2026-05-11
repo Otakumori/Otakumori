@@ -11,12 +11,25 @@ async function getLogger() {
 interface FullClerkProviderWrapperProps {
   children: React.ReactNode;
   nonce?: string | undefined;
+  disableClerk?: boolean;
 }
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 
-export default function FullClerkProviderWrapper({ children, nonce }: FullClerkProviderWrapperProps) {
+function isLocalBrowserOrigin() {
+  return typeof window !== 'undefined' && LOCAL_HOSTS.has(window.location.hostname);
+}
+
+export default function FullClerkProviderWrapper({ children, nonce, disableClerk = false }: FullClerkProviderWrapperProps) {
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const isLocalOrigin = isLocalBrowserOrigin();
+  const useProductionClerkRouting = clientEnv.NODE_ENV === 'production' && !isLocalOrigin;
+  const bypassClerkForLocalProxy = clientEnv.NODE_ENV !== 'production' && Boolean(clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL);
+
+  if (disableClerk) {
+    return <>{children}</>;
+  }
 
   if (!publishableKey) {
     getLogger()
@@ -29,22 +42,26 @@ export default function FullClerkProviderWrapper({ children, nonce }: FullClerkP
     return <div>Authentication configuration error</div>;
   }
 
+  if (bypassClerkForLocalProxy) {
+    return <>{children}</>;
+  }
+
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
 
   const clerkProps: any = {
     publishableKey,
-    signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
-    signUpUrl: `${ACCOUNTS_BASE_URL}/sign-up`,
+    signInUrl: useProductionClerkRouting ? `${ACCOUNTS_BASE_URL}/sign-in` : '/sign-in',
+    signUpUrl: useProductionClerkRouting ? `${ACCOUNTS_BASE_URL}/sign-up` : '/sign-up',
     fallbackRedirectUrl: '/',
     nonce,
   };
 
-  if (configuredDomain) {
+  if (configuredDomain && useProductionClerkRouting) {
     clerkProps.domain = configuredDomain;
   }
 
-  if (configuredProxyUrl) {
+  if (configuredProxyUrl && useProductionClerkRouting) {
     clerkProps.proxyUrl = configuredProxyUrl;
   }
 

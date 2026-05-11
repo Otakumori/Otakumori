@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingBag, Gamepad2, Users, Music, Info } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 interface PanelConfig {
   title: string;
@@ -23,7 +24,7 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
     routes: [
       {
         name: 'Shop Collection',
-        href: '/shop',
+        href: paths.shop(),
         description: 'Browse anime-inspired apparel and accessories',
       },
       { name: 'Trade Items', href: '/trade', description: 'Exchange items with other players' },
@@ -62,14 +63,14 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
     description: 'Customize your avatar and connect with others',
     icon: <Users className="h-12 w-12 text-blue-400" />,
     routes: [
-      { name: 'Profile', href: '/profile', description: 'Customize your avatar and profile' },
+      { name: 'Profile', href: paths.profile(), description: 'Customize your avatar and profile' },
       {
         name: 'Achievements',
-        href: '/profile/achievements',
+        href: paths.achievements(),
         description: 'View your unlocked achievements',
       },
       { name: 'Friends', href: '/friends', description: 'Connect with other players' },
-      { name: 'Community', href: '/community', description: 'Join discussions and events' },
+      { name: 'Community', href: paths.community(), description: 'Join discussions and events' },
     ],
   },
   music: {

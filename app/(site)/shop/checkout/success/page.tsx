@@ -546,7 +546,7 @@ export default function CheckoutSuccessPage() {
                   }
                 </Button>
               </Link>
-              <Link href="/account/orders">
+              <Link href={paths.profileOrders()}>
                 <Button
                   variant="outline"
                   className="w-full border-pink-500/30 text-pink-200 hover:bg-pink-500/10 sm:w-auto"

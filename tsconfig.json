@@ -49,6 +49,7 @@
     "node_modules",
     "scripts/**",
     "dist/**",
+    "_deprecated/**",
     ".next/**",
     "__tests__/**",
     "**/*.test.ts",
