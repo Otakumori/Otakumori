@@ -1,1 +1,4 @@
-export { POST, dynamic, runtime } from '@/app/api/webhooks/stripe/route';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+export { POST } from '@/app/api/webhooks/stripe/route';
