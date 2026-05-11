@@ -952,22 +952,22 @@ model OrderItem {
 }
 
 model CheckoutSession {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   orderId           String
   userId            String
   provider          String
   providerSessionId String
   idempotencyKey    String
   status            String
-  currency          String   @default("USD")
+  currency          String    @default("USD")
   amountSubtotal    Int
   amountTotal       Int
   expiresAt         DateTime?
   metadata          Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  Order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  User              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  Order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, idempotencyKey])
   @@unique([provider, providerSessionId])
@@ -1207,22 +1207,22 @@ model PrintifyOrderSync {
 }
 
 model PrintifySyncLog {
-  id             String    @id @default(cuid())
-  syncType       String
-  entityType     String
-  entityId       String?
-  orderId        String?
-  status         String
-  attempt        Int       @default(1)
-  requestPayload Json?
+  id              String    @id @default(cuid())
+  syncType        String
+  entityType      String
+  entityId        String?
+  orderId         String?
+  status          String
+  attempt         Int       @default(1)
+  requestPayload  Json?
   responsePayload Json?
-  errorCode      String?
-  errorMessage   String?
-  startedAt      DateTime  @default(now())
-  finishedAt     DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  Order          Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  errorCode       String?
+  errorMessage    String?
+  startedAt       DateTime  @default(now())
+  finishedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  Order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([syncType, status])
   @@index([entityType, entityId])
@@ -2071,17 +2071,17 @@ model Wallet {
 }
 
 model WebhookEvent {
-  id              String   @id @default(cuid())
-  provider        String
-  externalEventId String
-  type            String
-  payload         Json
-  processingStatus String  @default("received")
-  attemptCount    Int      @default(0)
-  processedAt     DateTime?
-  lastError       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String    @id @default(cuid())
+  provider         String
+  externalEventId  String
+  type             String
+  payload          Json
+  processingStatus String    @default("received")
+  attemptCount     Int       @default(0)
+  processedAt      DateTime?
+  lastError        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([provider, externalEventId])
   @@index([provider, processingStatus])
