@@ -2,12 +2,12 @@
 ALTER TYPE "OrderStatus" ADD VALUE IF NOT EXISTS 'pending_fulfillment';
 
 -- AlterTable
-ALTER TABLE "WebhookEvent" ADD COLUMN     "attemptCount" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "externalEventId" TEXT,
-ADD COLUMN     "lastError" TEXT,
-ADD COLUMN     "processedAt" TIMESTAMP(3),
-ADD COLUMN     "processingStatus" TEXT NOT NULL DEFAULT 'received',
-ADD COLUMN     "provider" TEXT;
+ALTER TABLE "WebhookEvent" ADD COLUMN IF NOT EXISTS "attemptCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS "externalEventId" TEXT,
+ADD COLUMN IF NOT EXISTS "lastError" TEXT,
+ADD COLUMN IF NOT EXISTS "processedAt" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS "processingStatus" TEXT NOT NULL DEFAULT 'received',
+ADD COLUMN IF NOT EXISTS "provider" TEXT;
 
 UPDATE "WebhookEvent"
 SET "provider" = COALESCE("provider", 'legacy'),
@@ -25,7 +25,7 @@ ALTER COLUMN "provider" SET NOT NULL,
 ALTER COLUMN "externalEventId" SET NOT NULL;
 
 -- CreateTable
-CREATE TABLE "CheckoutSession" (
+CREATE TABLE IF NOT EXISTS "CheckoutSession" (
     "id" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -39,13 +39,13 @@ CREATE TABLE "CheckoutSession" (
     "expiresAt" TIMESTAMP(3),
     "metadata" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "CheckoutSession_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "PrintifySyncLog" (
+CREATE TABLE IF NOT EXISTS "PrintifySyncLog" (
     "id" TEXT NOT NULL,
     "syncType" TEXT NOT NULL,
     "entityType" TEXT NOT NULL,
@@ -60,49 +60,70 @@ CREATE TABLE "PrintifySyncLog" (
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "finishedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "PrintifySyncLog_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE INDEX "CheckoutSession_orderId_idx" ON "CheckoutSession"("orderId");
+CREATE INDEX IF NOT EXISTS "CheckoutSession_orderId_idx" ON "CheckoutSession"("orderId");
 
 -- CreateIndex
-CREATE INDEX "CheckoutSession_userId_createdAt_idx" ON "CheckoutSession"("userId", "createdAt");
+CREATE INDEX IF NOT EXISTS "CheckoutSession_userId_createdAt_idx" ON "CheckoutSession"("userId", "createdAt");
 
 -- CreateIndex
-CREATE INDEX "CheckoutSession_status_updatedAt_idx" ON "CheckoutSession"("status", "updatedAt");
+CREATE INDEX IF NOT EXISTS "CheckoutSession_status_updatedAt_idx" ON "CheckoutSession"("status", "updatedAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CheckoutSession_provider_idempotencyKey_key" ON "CheckoutSession"("provider", "idempotencyKey");
+CREATE UNIQUE INDEX IF NOT EXISTS "CheckoutSession_provider_idempotencyKey_key" ON "CheckoutSession"("provider", "idempotencyKey");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CheckoutSession_provider_providerSessionId_key" ON "CheckoutSession"("provider", "providerSessionId");
+CREATE UNIQUE INDEX IF NOT EXISTS "CheckoutSession_provider_providerSessionId_key" ON "CheckoutSession"("provider", "providerSessionId");
 
 -- CreateIndex
-CREATE INDEX "PrintifySyncLog_syncType_status_idx" ON "PrintifySyncLog"("syncType", "status");
+CREATE INDEX IF NOT EXISTS "PrintifySyncLog_syncType_status_idx" ON "PrintifySyncLog"("syncType", "status");
 
 -- CreateIndex
-CREATE INDEX "PrintifySyncLog_entityType_entityId_idx" ON "PrintifySyncLog"("entityType", "entityId");
+CREATE INDEX IF NOT EXISTS "PrintifySyncLog_entityType_entityId_idx" ON "PrintifySyncLog"("entityType", "entityId");
 
 -- CreateIndex
-CREATE INDEX "PrintifySyncLog_orderId_idx" ON "PrintifySyncLog"("orderId");
+CREATE INDEX IF NOT EXISTS "PrintifySyncLog_orderId_idx" ON "PrintifySyncLog"("orderId");
 
 -- CreateIndex
-CREATE INDEX "PrintifySyncLog_createdAt_idx" ON "PrintifySyncLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "PrintifySyncLog_createdAt_idx" ON "PrintifySyncLog"("createdAt");
 
 -- CreateIndex
-CREATE INDEX "WebhookEvent_provider_processingStatus_idx" ON "WebhookEvent"("provider", "processingStatus");
+CREATE INDEX IF NOT EXISTS "WebhookEvent_provider_processingStatus_idx" ON "WebhookEvent"("provider", "processingStatus");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "WebhookEvent_provider_externalEventId_key" ON "WebhookEvent"("provider", "externalEventId");
+CREATE UNIQUE INDEX IF NOT EXISTS "WebhookEvent_provider_externalEventId_key" ON "WebhookEvent"("provider", "externalEventId");
 
 -- AddForeignKey
-ALTER TABLE "CheckoutSession" ADD CONSTRAINT "CheckoutSession_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'CheckoutSession_orderId_fkey'
+  ) THEN
+    ALTER TABLE "CheckoutSession" ADD CONSTRAINT "CheckoutSession_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "CheckoutSession" ADD CONSTRAINT "CheckoutSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'CheckoutSession_userId_fkey'
+  ) THEN
+    ALTER TABLE "CheckoutSession" ADD CONSTRAINT "CheckoutSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "PrintifySyncLog" ADD CONSTRAINT "PrintifySyncLog_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'PrintifySyncLog_orderId_fkey'
+  ) THEN
+    ALTER TABLE "PrintifySyncLog" ADD CONSTRAINT "PrintifySyncLog_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+  END IF;
+END $$;
