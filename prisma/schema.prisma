@@ -920,7 +920,9 @@ model Order {
   EmailLog             EmailLog[]
   User                 User                   @relation(fields: [userId], references: [id])
   OrderItem            OrderItem[]
+  CheckoutSession      CheckoutSession[]
   PrintifyOrderSync    PrintifyOrderSync?
+  PrintifySyncLog      PrintifySyncLog[]
   RewardLedger         RewardLedger[]
   UserRune             UserRune[]
   FinancialTransaction FinancialTransaction[]
@@ -947,6 +949,31 @@ model OrderItem {
   @@index([orderId])
   @@index([printifyVariantId])
   @@index([upc])
+}
+
+model CheckoutSession {
+  id                String    @id @default(cuid())
+  orderId           String
+  userId            String
+  provider          String
+  providerSessionId String
+  idempotencyKey    String
+  status            String
+  currency          String    @default("USD")
+  amountSubtotal    Int
+  amountTotal       Int
+  expiresAt         DateTime?
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  Order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, idempotencyKey])
+  @@unique([provider, providerSessionId])
+  @@index([orderId])
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
 }
 
 model Party {
@@ -1177,6 +1204,30 @@ model PrintifyOrderSync {
 
   @@index([localOrderId])
   @@index([status])
+}
+
+model PrintifySyncLog {
+  id              String    @id @default(cuid())
+  syncType        String
+  entityType      String
+  entityId        String?
+  orderId         String?
+  status          String
+  attempt         Int       @default(1)
+  requestPayload  Json?
+  responsePayload Json?
+  errorCode       String?
+  errorMessage    String?
+  startedAt       DateTime  @default(now())
+  finishedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  Order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([syncType, status])
+  @@index([entityType, entityId])
+  @@index([orderId])
+  @@index([createdAt])
 }
 
 model PrivacySettings {
@@ -1806,6 +1857,7 @@ model User {
   ModeratorRole_ModeratorRole_userIdToUser              ModeratorRole[]          @relation("ModeratorRole_userIdToUser")
   Notification                                          Notification[]
   Order                                                 Order[]
+  CheckoutSession                                       CheckoutSession[]
   Party                                                 Party[]
   PartyInvitation_PartyInvitation_inviteeIdToUser       PartyInvitation[]        @relation("PartyInvitation_inviteeIdToUser")
   PartyInvitation_PartyInvitation_inviterIdToUser       PartyInvitation[]        @relation("PartyInvitation_inviterIdToUser")
@@ -2019,11 +2071,20 @@ model Wallet {
 }
 
 model WebhookEvent {
-  id        String   @id @default(cuid())
-  type      String
-  payload   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(cuid())
+  provider         String
+  externalEventId  String
+  type             String
+  payload          Json
+  processingStatus String    @default("received")
+  attemptCount     Int       @default(0)
+  processedAt      DateTime?
+  lastError        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([provider, externalEventId])
+  @@index([provider, processingStatus])
 }
 
 model Wishlist {
@@ -2085,6 +2146,7 @@ enum LedgerType {
 
 enum OrderStatus {
   pending
+  pending_fulfillment
   pending_mapping
   in_production
   shipped
