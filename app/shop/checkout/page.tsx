@@ -163,8 +163,7 @@ export default function CheckoutPage() {
       }));
 
       try {
-        const serialized = JSON.stringify({ items: orderItems, shippingInfo });
-        console.log('Checkout payload size:', serialized.length);
+        JSON.stringify({ items: orderItems, shippingInfo });
       } catch (serializationError) {
         console.error('Checkout payload serialization failed:', serializationError);
         setError('Payload serialization failed before request.');
