@@ -30,52 +30,54 @@ export type HomeSceneState = {
   motion: HomeSceneMotion;
 };
 
+const DEFAULT_HOME_SCENE_SRC = '/3afternoon tree.png';
+
 export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
   earlyMorning: {
     bucket: 'earlyMorning',
     label: 'Early morning',
-    src: '/assets/bg/1earlymorningtree.png',
-    fallback: '/assets/bg/2morningtree.png',
+    src: '/1earlymorningtree.png',
+    fallback: DEFAULT_HOME_SCENE_SRC,
     alt: 'Otakumori sakura tree scene in early morning light',
   },
   morning: {
     bucket: 'morning',
     label: 'Morning',
-    src: '/assets/bg/2morningtree.png',
-    fallback: '/assets/bg/3afternoon tree.png',
+    src: '/2morningtree.png',
+    fallback: DEFAULT_HOME_SCENE_SRC,
     alt: 'Otakumori sakura tree scene in soft morning light',
   },
   afternoon: {
     bucket: 'afternoon',
     label: 'Afternoon',
-    src: '/assets/bg/3afternoon tree.png',
-    fallback: '/assets/bg/2morningtree.png',
+    src: DEFAULT_HOME_SCENE_SRC,
+    fallback: '/2morningtree.png',
     alt: 'Otakumori sakura tree scene in afternoon light',
   },
   lateAfternoon: {
     bucket: 'lateAfternoon',
     label: 'Late afternoon',
-    src: '/assets/bg/4lateafternoontree.png',
-    fallback: '/assets/bg/3afternoon tree.png',
+    src: '/4lateafternoontree.png',
+    fallback: DEFAULT_HOME_SCENE_SRC,
     alt: 'Otakumori sakura tree scene in late afternoon light',
   },
   night: {
     bucket: 'night',
     label: 'Night',
-    src: '/assets/bg/5nighttree.png',
-    fallback: '/assets/bg/6special_twilight.png',
+    src: '/5nighttree.png',
+    fallback: DEFAULT_HOME_SCENE_SRC,
     alt: 'Otakumori sakura tree scene at night',
   },
   specialTwilight: {
     bucket: 'specialTwilight',
     label: 'Special twilight',
-    src: '/assets/bg/6special_twilight.png',
-    fallback: '/assets/bg/5nighttree.png',
+    src: '/6special_twilight.png',
+    fallback: DEFAULT_HOME_SCENE_SRC,
     alt: 'Otakumori sakura tree scene in special twilight glow',
   },
 };
 
-export function resolveHomeSceneBucket(hour = new Date().getHours()): HomeSceneBucket {
+export function resolveHomeSceneBucket(hour = 12): HomeSceneBucket {
   const safeHour = Number.isFinite(hour) ? Math.max(0, Math.min(23, Math.floor(hour))) : 12;
 
   if (safeHour >= 5 && safeHour < 8) return 'earlyMorning';
@@ -153,7 +155,7 @@ export function resolveHomeSceneMotion(
   };
 }
 
-export function resolveHomeScene(date = new Date(), reducedMotion = false): HomeSceneState {
+export function resolveHomeScene(date = new Date(2000, 0, 1, 12), reducedMotion = false): HomeSceneState {
   const bucket = resolveHomeSceneBucket(date.getHours());
 
   return {
