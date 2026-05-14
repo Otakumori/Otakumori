@@ -8,6 +8,8 @@ import { NSFWProvider } from './contexts/NSFWContext';
 import AppQueryProvider from './providers/AppQueryProvider';
 import Navbar from './components/layout/Navbar';
 import { CartProvider } from './components/cart/CartProvider';
+import PostHogProvider from './providers/PostHogProvider.safe';
+import ClerkPostHogBridge from './(site)/_providers/ClerkPostHogBridge.safe';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -21,18 +23,21 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <ClerkProviderWrapper nonce={nonce || undefined}>
       <html lang="en">
         <body>
-          <AuthProvider>
-            <ToastProvider>
-              <NSFWProvider>
-                <AppQueryProvider>
-                  <CartProvider>
-                    <Navbar />
-                    {children}
-                  </CartProvider>
-                </AppQueryProvider>
-              </NSFWProvider>
-            </ToastProvider>
-          </AuthProvider>
+          <PostHogProvider>
+            <ClerkPostHogBridge />
+            <AuthProvider>
+              <ToastProvider>
+                <NSFWProvider>
+                  <AppQueryProvider>
+                    <CartProvider>
+                      <Navbar />
+                      {children}
+                    </CartProvider>
+                  </AppQueryProvider>
+                </NSFWProvider>
+              </ToastProvider>
+            </AuthProvider>
+          </PostHogProvider>
         </body>
       </html>
     </ClerkProviderWrapper>
