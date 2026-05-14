@@ -107,7 +107,7 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
 
 export default function HeroScene() {
   const reducedMotion = usePrefersReducedMotion();
-  const [scene, setScene] = useState(() => resolveHomeScene(new Date(), reducedMotion));
+  const [scene, setScene] = useState(() => resolveHomeScene(undefined, false));
   const [imageSrc, setImageSrc] = useState(scene.asset.src);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { withAdminAuth } from '@/app/lib/auth/admin';
 import { env } from '@/env';
 import { getPrintifyService } from '@/app/lib/printify/service';
 
@@ -9,14 +10,13 @@ export const dynamic = 'force-dynamic';
  * Printify Diagnostic Endpoint
  * Returns status of Printify integration without exposing secrets
  */
-export async function GET(_request: NextRequest) {
+export const GET = withAdminAuth(async (_request: NextRequest) => {
   const diagnostics: {
     configured: boolean;
     apiKeyPresent: boolean;
     shopIdPresent: boolean;
     connectionStatus: 'ok' | 'error' | 'not-configured';
     error?: string;
-    shopId?: string; // Safe to expose - it's just an ID
   } = {
     configured: false,
     apiKeyPresent: false,
@@ -31,12 +31,8 @@ export async function GET(_request: NextRequest) {
     diagnostics.configured = diagnostics.apiKeyPresent && diagnostics.shopIdPresent;
 
     if (diagnostics.configured) {
-      diagnostics.shopId = env.PRINTIFY_SHOP_ID;
-
-      // Test connection by fetching shop info (lightweight request)
       try {
         const service = getPrintifyService();
-        // Try to get products with limit 1 to test connection
         await service.getProducts(1, 1);
         diagnostics.connectionStatus = 'ok';
       } catch (error) {
@@ -65,4 +61,4 @@ export async function GET(_request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

@@ -2149,6 +2149,8 @@ enum OrderStatus {
   pending_fulfillment
   pending_mapping
   in_production
+  fulfillment_failed
+  manual_review
   shipped
   cancelled
 }

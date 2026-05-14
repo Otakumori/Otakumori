@@ -97,6 +97,10 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
 
   if (missingMappings.length > 0) {
     const error = `Missing Printify mappings for order items: ${missingMappings.join(', ')}`;
+    await prisma.order.update({
+      where: { id: localOrderId },
+      data: { status: 'manual_review' },
+    }).catch(() => undefined);
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'mapping_failed', error, lastSyncAt: new Date() },
@@ -107,6 +111,10 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
 
   if (lineItems.length === 0) {
     const error = 'No Printify-eligible items found for order';
+    await prisma.order.update({
+      where: { id: localOrderId },
+      data: { status: 'manual_review' },
+    }).catch(() => undefined);
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'no_items', error, lastSyncAt: new Date() },
@@ -144,6 +152,10 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
 
   if (!response.ok) {
     const error = typeof parsed?.message === 'string' ? parsed.message : `Printify order creation failed with ${response.status}`;
+    await prisma.order.update({
+      where: { id: localOrderId },
+      data: { status: 'fulfillment_failed' },
+    }).catch(() => undefined);
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'failed', error, lastSyncAt: new Date() },

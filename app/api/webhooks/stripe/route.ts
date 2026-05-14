@@ -26,6 +26,10 @@ function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
 }
 
+function createOrderId() {
+  return `order_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+}
+
 async function beginWebhookProcessing(event: Stripe.Event): Promise<BeginWebhookProcessingResult> {
   const existing = await prisma.webhookEvent.findUnique({
     where: {
@@ -194,15 +198,14 @@ export async function POST(req: Request) {
           expand: ['line_items.data.price.product'],
         });
 
-        const user = await resolveUser(fullSession);
-        if (!user) {
-          responsePayload = { ok: true, note: 'no-user' };
-          break;
-        }
-
         const total = fullSession.amount_total ?? 0;
         const currency = fullSession.currency ?? 'usd';
         const paymentIntentId = typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
+        const localOrderId =
+          typeof fullSession.metadata?.local_order_id === 'string'
+            ? fullSession.metadata.local_order_id
+            : null;
+        const user = await resolveUser(fullSession);
 
         const updateData: {
           status: OrderStatus;
@@ -218,8 +221,6 @@ export async function POST(req: Request) {
         };
 
         const createData: {
-          id: string;
-          userId: string;
           stripeId: string;
           totalAmount: number;
           currency: string;
@@ -228,8 +229,6 @@ export async function POST(req: Request) {
           updatedAt: Date;
           paymentIntentId?: string;
         } = {
-          id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          userId: user.id,
           stripeId: fullSession.id,
           totalAmount: total,
           currency: currency.toUpperCase(),
@@ -243,11 +242,47 @@ export async function POST(req: Request) {
           createData.paymentIntentId = paymentIntentId;
         }
 
-        const order = await prisma.order.upsert({
-          where: { stripeId: fullSession.id },
-          update: updateData,
-          create: createData,
-        });
+        let order;
+        if (localOrderId) {
+          order = await prisma.order
+            .update({
+              where: { id: localOrderId },
+              data: {
+                ...updateData,
+                stripeId: fullSession.id,
+              },
+            })
+            .catch(async () => {
+              if (!user) return null;
+
+              return prisma.order.upsert({
+                where: { stripeId: fullSession.id },
+                update: updateData,
+                create: {
+                  ...createData,
+                  id: createOrderId(),
+                  userId: user.id,
+                },
+              });
+            });
+        } else if (user) {
+          order = await prisma.order.upsert({
+            where: { stripeId: fullSession.id },
+            update: updateData,
+            create: {
+              ...createData,
+              id: createOrderId(),
+              userId: user.id,
+            },
+          });
+        } else {
+          order = null;
+        }
+
+        if (!order) {
+          responsePayload = { ok: true, note: 'no-local-order' };
+          break;
+        }
 
         try {
           const result = await createPrintifyOrder(order.id, fullSession);

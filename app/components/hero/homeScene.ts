@@ -30,6 +30,10 @@ export type HomeSceneState = {
   motion: HomeSceneMotion;
 };
 
+export type HomeSceneOptions = {
+  specialTwilight?: boolean;
+};
+
 const DEFAULT_HOME_SCENE_SRC = '/3afternoon tree.png';
 
 export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
@@ -84,7 +88,6 @@ export function resolveHomeSceneBucket(hour = 12): HomeSceneBucket {
   if (safeHour >= 8 && safeHour < 12) return 'morning';
   if (safeHour >= 12 && safeHour < 16) return 'afternoon';
   if (safeHour >= 16 && safeHour < 19) return 'lateAfternoon';
-  if (safeHour >= 19 && safeHour < 21) return 'specialTwilight';
 
   return 'night';
 }
@@ -155,8 +158,12 @@ export function resolveHomeSceneMotion(
   };
 }
 
-export function resolveHomeScene(date = new Date(2000, 0, 1, 12), reducedMotion = false): HomeSceneState {
-  const bucket = resolveHomeSceneBucket(date.getHours());
+export function resolveHomeScene(
+  date = new Date(2000, 0, 1, 12),
+  reducedMotion = false,
+  options: HomeSceneOptions = {},
+): HomeSceneState {
+  const bucket = options.specialTwilight ? 'specialTwilight' : resolveHomeSceneBucket(date.getHours());
 
   return {
     bucket,

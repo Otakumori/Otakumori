@@ -1,6 +1,7 @@
 import { env } from '@/env/server';
 
 type JsonRecord = Record<string, unknown>;
+const MERCHIZE_FETCH_TIMEOUT_MS = 12_000;
 
 export interface MerchizeProductImage {
   url: string;
@@ -290,22 +291,35 @@ export class MerchizeService {
   }
 
   private async request(path = '/product/catalog', query?: Record<string, string | number | undefined>): Promise<{ response: Response; body: unknown }> {
-    const response = await fetch(this.buildUrl(path, query), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'User-Agent': this.userAgent,
-      },
-      cache: 'no-store',
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), MERCHIZE_FETCH_TIMEOUT_MS);
+    let response: Response;
+
+    try {
+      response = await fetch(this.buildUrl(path, query), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'User-Agent': this.userAgent,
+        },
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Merchize API request timed out');
+      }
+      throw new Error('Merchize API request failed');
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const body = await parseResponseBody(response);
 
     if (!response.ok) {
-      const detail = typeof body === 'string' ? body : JSON.stringify(body);
-      throw new Error(`Merchize API error (${response.status}): ${detail}`);
+      throw new Error(`Merchize API error (${response.status})`);
     }
 
     return { response, body };

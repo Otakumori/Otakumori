@@ -182,7 +182,7 @@
     "test:webhooks": "curl -X GET http://localhost:3000/api/webhooks/inngest",
     "test:inngest": "curl -X POST http://localhost:8288/api/inngest -H 'Content-Type: application/json' -d '{\"name\": \"test/function\", \"data\": {\"test\": true}}'",
     "test:admin": "node scripts/test-admin-setup.js",
-    "smoke": "tsx scripts/smoke.ts",
+    "smoke": "node scripts/smoke-routes.mjs",
     "assets:sync": "tsx scripts/assets.ts",
     "gen:asset": "tsx scripts/generate.ts",
     "gen:sfx": "tsx scripts/generate-sfx.ts",

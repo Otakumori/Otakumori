@@ -1,5 +1,7 @@
 -- AlterEnum
 ALTER TYPE "OrderStatus" ADD VALUE IF NOT EXISTS 'pending_fulfillment';
+ALTER TYPE "OrderStatus" ADD VALUE IF NOT EXISTS 'fulfillment_failed';
+ALTER TYPE "OrderStatus" ADD VALUE IF NOT EXISTS 'manual_review';
 
 -- AlterTable
 ALTER TABLE "WebhookEvent" ADD COLUMN IF NOT EXISTS "attemptCount" INTEGER NOT NULL DEFAULT 0,

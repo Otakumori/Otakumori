@@ -383,9 +383,14 @@ export async function POST(req: NextRequest) {
         customer_email: shippingInfo?.email ?? user.email,
         shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'] },
         metadata: {
+          local_order_id: order.id,
+          clerk_user_id: userId,
+          user_id: user.id,
+          idempotency_key: idempotencyKey,
           coupon_codes: appliedCodes.join(','),
           discount_total_cents: String(discountTotalCents),
           request_id: requestId,
+          source: 'otakumori_checkout',
         },
       };
 
@@ -414,6 +419,8 @@ export async function POST(req: NextRequest) {
           expiresAt: typeof session.expires_at === 'number' ? new Date(session.expires_at * 1000) : null,
           metadata: {
             requestId,
+            localOrderId: order.id,
+            clerkUserId: userId,
             couponCodes: appliedCodes,
             discountTotalCents,
             shippingDiscountCents,
@@ -433,6 +440,8 @@ export async function POST(req: NextRequest) {
           expiresAt: typeof session.expires_at === 'number' ? new Date(session.expires_at * 1000) : null,
           metadata: {
             requestId,
+            localOrderId: order.id,
+            clerkUserId: userId,
             couponCodes: appliedCodes,
             discountTotalCents,
             shippingDiscountCents,
