@@ -1,168 +1,17 @@
-
-// app/api/admin/printify-sync/route.ts  (admin-only)
-import { logger } from '@/app/lib/logger';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
-import { db } from '@/lib/db';
-import { getPrintifyService } from '@/app/lib/printify/service';
-import { randomUUID } from 'crypto';
-import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
+import { syncPrintifyCatalogFromProvider } from '@/lib/catalog/providerSync';
 
 export const runtime = 'nodejs';
 
 export async function POST() {
   await requireAdminOrThrow();
-  const res = await syncPrintify();
-  return Response.json(res);
-}
+  const result = await syncPrintifyCatalogFromProvider();
 
-async function syncPrintify() {
-  try {
-    const printifyService = getPrintifyService();
-    // Get all products from Printify (getAllProducts returns array directly)
-    const allProducts = await printifyService.getAllProducts();
-    logger.warn(`Sync retrieved ${allProducts.length} products from Printify`);
-
-    // Filter out invalid/placeholder products before syncing
-    const products = filterValidPrintifyProducts(allProducts);
-    logger.warn(`After filtering: ${products.length} valid products to sync`);
-
-    let unlockedCount = 0;
-    const unlockErrors: string[] = [];
-
-    for (const product of products) {
-      // Type assertion - we know these are PrintifyProduct after filtering
-      const printifyProduct = product as any;
-      
-      const visible = printifyProduct.variants?.some((v: any) => v.is_enabled || v.is_available) ?? false;
-      const subcategory = mapSubcategory(printifyProduct);
-      const printifyProductId = String(printifyProduct.id);
-
-      // Get image URL
-      let imageUrl: string | null = null;
-      if (printifyProduct.images && printifyProduct.images.length > 0) {
-        const firstImage = printifyProduct.images[0];
-        imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.src || null;
-      }
-
-      // Use printifyProductId as unique identifier for upsert, generate separate DB ID
-      // This prevents duplicates when syncing the same Printify product multiple times
-      const isLocked = printifyProduct.is_locked ?? false;
-      const specs = {
-        is_locked: isLocked, // Track Printify "Publishing" status
-      };
-      
-      const dbProduct = await db.product.upsert({
-        where: { printifyProductId },
-        update: {
-          name: printifyProduct.title,
-          description: printifyProduct.description ?? '',
-          category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
-          primaryImageUrl: imageUrl,
-          active: visible,
-          visible: printifyProduct.visible ?? visible,
-          specs,
-          printifyProductId,
-        },
-        create: {
-          id: randomUUID(), // Generate unique DB ID
-          name: printifyProduct.title,
-          description: printifyProduct.description ?? '',
-          category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
-          primaryImageUrl: imageUrl,
-          active: visible,
-          visible: printifyProduct.visible ?? visible,
-          specs,
-          printifyProductId,
-        },
-        select: {
-          id: true, // Return the DB ID for variant creation
-        },
-      });
-
-      // Use the DB product ID (not Printify ID) for variants
-      const dbProductId = dbProduct.id;
-
-      for (const variant of printifyProduct.variants || []) {
-        await db.productVariant.upsert({
-          where: {
-            productId_printifyVariantId: {
-              productId: dbProductId,
-              printifyVariantId: variant.id,
-            },
-          },
-          update: {
-            priceCents: toCents(variant.price),
-            isEnabled: variant.is_enabled ?? variant.is_available ?? false,
-            inStock: variant.is_available ?? variant.is_enabled ?? false,
-          },
-          create: {
-            id: randomUUID(), // Generate unique variant ID
-            productId: dbProductId, // Use DB product ID, not Printify ID
-            printifyVariantId: variant.id,
-            priceCents: toCents(variant.price),
-            isEnabled: variant.is_enabled ?? variant.is_available ?? false,
-            inStock: variant.is_available ?? variant.is_enabled ?? false,
-          },
-        });
-      }
-
-      // If product was locked (Publishing status), unlock it after successful sync
-      if (isLocked) {
-        try {
-          await printifyService.publishingSucceeded(printifyProductId);
-          unlockedCount++;
-          logger.warn(`Unlocked product ${printifyProductId} (${printifyProduct.title})`);
-        } catch (unlockError) {
-          const errorMsg = `Failed to unlock product ${printifyProductId}: ${String(unlockError)}`;
-          logger.error(errorMsg);
-          unlockErrors.push(errorMsg);
-        }
-      }
-    }
-
-    return {
-      upserted: 0, // result.upserted,
-      hidden: 0, // result.hidden,
-      count: products.length, // result.count,
-      unlocked: unlockedCount,
-      unlockErrors,
-      errors: [], // result.errors,
-    };
-  } catch (error) {
-    logger.error('Printify sync failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    throw error;
-  }
-}
-
-function toCents(n: number) {
-  return Math.round(Number(n) * 100);
-}
-
-// Very simple mappers — refine as you like
-function mapCategory(product: any): string {
-  const name = (product.tags ?? []).join(' ').toLowerCase();
-  if (name.includes('shirt') || name.includes('hoodie') || name.includes('tee')) return 'apparel';
-  if (name.includes('hat') || name.includes('pin') || name.includes('bow')) return 'accessories';
-  if (
-    name.includes('cup') ||
-    name.includes('mug') ||
-    name.includes('pillow') ||
-    name.includes('sticker')
-  )
-    return 'home-decor';
-  return 'apparel';
-}
-function mapSubcategory(full: any): string {
-  const t = (full.tags ?? []).join(' ').toLowerCase();
-  if (t.includes('hoodie') || t.includes('tee') || t.includes('shirt')) return 'tops';
-  if (t.includes('socks') || t.includes('shorts') || t.includes('pants')) return 'bottoms';
-  if (t.includes('underwear') || t.includes('lingerie')) return 'unmentionables';
-  if (t.includes('sneaker') || t.includes('shoe') || t.includes('kicks')) return 'kicks';
-  if (t.includes('pin')) return 'pins';
-  if (t.includes('hat') || t.includes('cap')) return 'hats';
-  if (t.includes('bow')) return 'bows';
-  if (t.includes('cup') || t.includes('mug')) return 'cups';
-  if (t.includes('pillow')) return 'pillows';
-  if (t.includes('sticker')) return 'stickers';
-  return 'tops';
+  return Response.json(
+    {
+      ok: result.ok,
+      data: result,
+    },
+    { status: result.ok ? 200 : 207 },
+  );
 }

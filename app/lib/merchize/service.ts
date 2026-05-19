@@ -18,6 +18,19 @@ export interface MerchizeProduct {
   currency: string | null;
   price: number | null;
   images: MerchizeProductImage[];
+  variants: MerchizeVariant[];
+  raw: JsonRecord;
+}
+
+export interface MerchizeVariant {
+  id: string;
+  title: string | null;
+  sku: string | null;
+  status: string | null;
+  currency: string | null;
+  price: number | null;
+  cost: number | null;
+  imageUrl: string | null;
   raw: JsonRecord;
 }
 
@@ -182,6 +195,70 @@ function extractDefaultPrice(raw: JsonRecord): number | null {
   return null;
 }
 
+function normalizeVariant(rawValue: unknown, index: number, product: JsonRecord): MerchizeVariant | null {
+  if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+    return null;
+  }
+
+  const raw = rawValue as JsonRecord;
+  const id =
+    coerceString(raw.id) ||
+    coerceString(raw._id) ||
+    coerceString(raw.variantId) ||
+    coerceString(raw.variant_id) ||
+    coerceString(raw.sku) ||
+    `${coerceString(product.id) || coerceString(product._id) || coerceString(product.sku) || 'product'}-${index + 1}`;
+
+  const image =
+    coerceString(raw.image) ||
+    coerceString(raw.imageUrl) ||
+    coerceString(raw.image_url) ||
+    coerceString(raw.thumbnail);
+
+  return {
+    id,
+    title:
+      coerceString(raw.title) ||
+      coerceString(raw.name) ||
+      coerceString(raw.label),
+    sku: coerceString(raw.sku),
+    status:
+      coerceString(raw.status) ||
+      coerceString(raw.state) ||
+      coerceString(raw.availability),
+    currency:
+      coerceString(raw.currency) ||
+      coerceString(product.currency) ||
+      'USD',
+    price:
+      coerceNumber(raw.price) ||
+      coerceNumber(raw.retailPrice) ||
+      coerceNumber(raw.retail_price) ||
+      coerceNumber(raw.salePrice) ||
+      coerceNumber(raw.sale_price),
+    cost:
+      coerceNumber(raw.cost) ||
+      coerceNumber(raw.costPrice) ||
+      coerceNumber(raw.cost_price),
+    imageUrl: image,
+    raw,
+  };
+}
+
+function extractVariants(raw: JsonRecord): MerchizeVariant[] {
+  const variants = Array.isArray(raw.variants)
+    ? raw.variants
+    : Array.isArray(raw.skus)
+      ? raw.skus
+      : Array.isArray(raw.items)
+        ? raw.items
+        : [];
+
+  return variants
+    .map((item, index) => normalizeVariant(item, index, raw))
+    .filter((item): item is MerchizeVariant => Boolean(item));
+}
+
 function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | null {
   if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
     return null;
@@ -232,6 +309,7 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
     currency: 'USD',
     price: extractDefaultPrice(raw),
     images: extractImageUrls(raw),
+    variants: extractVariants(raw),
     raw,
   };
 }
@@ -357,6 +435,23 @@ export class MerchizeService {
     return collection
       .map((item, index) => normalizeProduct(item, index))
       .filter((item): item is MerchizeProduct => Boolean(item));
+  }
+
+  async getAllProducts(options?: { limit?: number; maxPages?: number }): Promise<MerchizeProduct[]> {
+    const limit = options?.limit ?? 50;
+    const maxPages = options?.maxPages ?? 20;
+    const products: MerchizeProduct[] = [];
+
+    for (let page = 1; page <= maxPages; page++) {
+      const pageProducts = await this.getProducts({ limit, page });
+      products.push(...pageProducts);
+
+      if (pageProducts.length < limit) {
+        break;
+      }
+    }
+
+    return products;
   }
 }
 

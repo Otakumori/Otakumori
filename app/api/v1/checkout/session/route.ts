@@ -35,6 +35,9 @@ type TrustedCheckoutItem = {
   sku?: string;
   printifyProductId?: string;
   printifyVariantId?: number;
+  provider?: 'printify' | 'merchize' | 'manual';
+  providerProductId?: string;
+  providerVariantId?: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -116,6 +119,7 @@ export async function POST(req: NextRequest) {
             description: true,
             primaryImageUrl: true,
             printifyProductId: true,
+            integrationRef: true,
             active: true,
             visible: true,
           },
@@ -133,6 +137,8 @@ export async function POST(req: NextRequest) {
             title: true,
             previewImageUrl: true,
             printifyVariantId: true,
+            printProviderName: true,
+            optionValues: true,
           },
         }),
       ]);
@@ -181,6 +187,24 @@ export async function POST(req: NextRequest) {
         const product = productById.get(item.productId)!;
         const variant = resolveVariant(item)!;
         const image = variant.previewImageUrl ?? product.primaryImageUrl;
+        const provider = product.printifyProductId
+          ? 'printify'
+          : product.integrationRef?.startsWith('merchize:')
+            ? 'merchize'
+            : 'manual';
+        const optionValues = Array.isArray(variant.optionValues) ? variant.optionValues : [];
+        const providerOption = optionValues.find((value) => value && typeof value === 'object' && 'providerVariantId' in value) as
+          | { providerProductId?: unknown; providerVariantId?: unknown }
+          | undefined;
+        const merchizeProductId = product.integrationRef?.startsWith('merchize:')
+          ? product.integrationRef.slice('merchize:'.length)
+          : undefined;
+        const providerProductId = product.printifyProductId ?? merchizeProductId;
+        const providerVariantId = product.printifyProductId
+          ? String(variant.printifyVariantId)
+          : typeof providerOption?.providerVariantId === 'string'
+            ? providerOption.providerVariantId
+            : undefined;
 
         return {
           productId: product.id,
@@ -193,6 +217,9 @@ export async function POST(req: NextRequest) {
           sku: variant.sku ?? undefined,
           printifyProductId: product.printifyProductId ?? undefined,
           printifyVariantId: variant.printifyVariantId,
+          provider,
+          providerProductId,
+          providerVariantId,
         };
       });
 
@@ -337,6 +364,14 @@ export async function POST(req: NextRequest) {
         const perItemDiscount = Math.floor(totalDiscount / qty);
         const productData: Stripe.Checkout.SessionCreateParams.LineItem.PriceData.ProductData = {
           name: String(i.name ?? 'Item'),
+          metadata: {
+            local_product_id: String(i.productId),
+            local_variant_id: String(i.variantId),
+            provider: String(i.provider ?? 'manual'),
+            provider_product_id: String(i.providerProductId ?? ''),
+            provider_variant_id: String(i.providerVariantId ?? ''),
+            sku: String(i.sku ?? ''),
+          },
         };
         if (typeof i.description === 'string' && i.description.trim()) {
           productData.description = i.description.trim().slice(0, 500);
