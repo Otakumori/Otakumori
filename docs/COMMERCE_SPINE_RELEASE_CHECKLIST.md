@@ -51,21 +51,23 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 ## 2026-05-19 preview verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
+- Deploy SHA: `af1b9deb`
 - Health fix commit: `3f7603a3`
-- Latest inspected Preview URL: `https://otaku-mori-okoyn93da-otaku-mori-babe.vercel.app`
+- Latest smoke-passing Preview URL: `https://otaku-mori-922hqs6nb-otaku-mori-babe.vercel.app`
 - Stable branch Preview alias: `https://otaku-mori-git-chore-commerce-schema-rea-8c786b-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
 - Local gates: `pnpm type-check`, `pnpm lint`, `pnpm prisma generate`, and `pnpm build` passed.
-- Smoke status: Deployment Protection bypass reaches the app. Verified route results from bypass smoke: `/`, `/shop`, `/blog`, `/api/v1/cart`, `/shop/cart`, and `/shop/checkout` returned 200; `/api/health` returned an app-level 500 before the health route hardening patch.
-- Exact smoke command after bypass is available: `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=https://otaku-mori-okoyn93da-otaku-mori-babe.vercel.app pnpm smoke`.
+- Smoke status: Deployment Protection bypass reaches the app and route smoke is green.
+- Verified smoke route results: `/` 200, `/shop` 200, `/blog` 200, `/api/v1/cart` 200, `/api/health` 200, `/shop/cart` 200, `/shop/checkout` 200.
+- Exact smoke command: `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=https://otaku-mori-922hqs6nb-otaku-mori-babe.vercel.app pnpm smoke`.
 - Protection bypass status: configured and working. Keep using `VERCEL_AUTOMATION_BYPASS_SECRET` or `VERCEL_PROTECTION_BYPASS` for preview smoke; do not commit the value.
 - Env status: Vercel build completed with `pnpm build`; no env-schema build blocker was observed in the inspected deployment.
 - Health status: root cause was a brittle `/api/health` implementation that only wrapped a database `SELECT 1` and returned a raw 500 on any exception. The route now returns sanitized structured dependency checks, treats optional provider config as skipped, and supports strict non-200 monitoring through `/api/health?strict=1`.
-- Post-fix smoke status: pending rerun from a shell with the protection bypass secret loaded.
+- Post-fix smoke status: passed from a shell with the protection bypass secret loaded.
 - Stripe webhook status: code readiness verified by local gates only; live webhook delivery and replay idempotency still require Dashboard testing.
 - Printify/Merchize status: provider routes are expected to degrade to sanitized diagnostics when env is absent; live order sync still requires provider credentials and test orders.
 - Observability status: Sentry/OpenTelemetry build warnings remain non-blocking; capture behavior still needs Preview runtime validation after protection bypass.
-- Credential rotation note: `.env.template` has been sanitized; if any previously committed template values were real, rotate those credentials before launch.
+- Credential rotation note: `.env.template` has been sanitized and currently contains placeholders only. Rotate the Vercel Deployment Protection automation bypass secret after shared use, rotate any database credentials that ever appeared in git history or real-looking templates, and confirm Vercel Preview/Production env vars use current rotated values before cutover.
 
 ## Manual Stripe test
 

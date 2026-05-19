@@ -1,6 +1,13 @@
 import { getMerchizeService } from '@/app/lib/merchize/service';
+import { requireAdmin } from '@/app/lib/auth/admin';
 
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 function formatPrice(price: number | null, currency: string | null) {
   if (price == null) return 'Price unavailable';
@@ -9,6 +16,8 @@ function formatPrice(price: number | null, currency: string | null) {
 }
 
 export default async function MerchizeProbePage() {
+  await requireAdmin();
+
   const service = getMerchizeService();
   const connection = await service.testConnection();
   const products = connection.success ? await service.getProducts() : [];
@@ -18,7 +27,7 @@ export default async function MerchizeProbePage() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold">Merchize Probe</h1>
         <p className="mt-2 text-sm text-white/70">
-          Public provider test surface for Merchize while the rest of the admin/auth layer is being stabilized.
+          Admin-only provider test surface for validating Merchize connectivity before launch.
         </p>
       </div>
 
