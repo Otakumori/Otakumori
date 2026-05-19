@@ -57,6 +57,9 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 - Current fulfillment-gate deploy SHA: `fd51200f`
 - Current fulfillment-gate Preview URL: `https://otaku-mori-5totxs23h-otaku-mori-babe.vercel.app`
 - Current fulfillment-gate Preview status: Ready and superseded by the `58cf70d8` smoke-green deployment.
+- Current provider-hardening deploy SHA: `6df9eaf0`
+- Current provider-hardening Preview URL: `https://otaku-mori-hcn2u9bfy-otaku-mori-babe.vercel.app`
+- Current provider-hardening Preview status: Ready; bypass-backed smoke rerun is required before this deployment replaces the smoke-passing baseline.
 - Stable branch Preview alias: `https://otaku-mori-git-chore-commerce-schema-rea-8c786b-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
 - Local gates: `pnpm type-check`, `pnpm lint`, `pnpm prisma generate`, and `pnpm build` passed.
