@@ -93,6 +93,19 @@ export async function loadPrintifyOrderItems(localOrderId: string) {
 }
 
 export async function createPrintifyOrder(localOrderId: string, session: any): Promise<PrintifyOrderResult> {
+  const existingSync = await prisma.printifyOrderSync.findUnique({
+    where: { localOrderId },
+    select: { printifyOrderId: true, status: true },
+  });
+
+  if (existingSync && !['failed', 'mapping_failed', 'no_items'].includes(existingSync.status)) {
+    return {
+      ok: true,
+      printifyOrderId: existingSync.printifyOrderId,
+      status: existingSync.status,
+    };
+  }
+
   const { lineItems, missingMappings } = await loadPrintifyOrderItems(localOrderId);
 
   if (missingMappings.length > 0) {
@@ -133,14 +146,30 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
 
   const endpoint = `${env.PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/orders.json`;
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Printify order creation request failed';
+    const safeError = message.slice(0, 500);
+    await prisma.order.update({
+      where: { id: localOrderId },
+      data: { status: 'fulfillment_failed' },
+    }).catch(() => undefined);
+    await prisma.printifyOrderSync.upsert({
+      where: { localOrderId },
+      update: { status: 'failed', error: safeError, lastSyncAt: new Date() },
+      create: { localOrderId, printifyOrderId: `failed_${localOrderId}`, status: 'failed', error: safeError, lastSyncAt: new Date() },
+    });
+    return { ok: false, error: safeError, payload };
+  }
 
   const responseText = await response.text();
   let parsed: any = null;

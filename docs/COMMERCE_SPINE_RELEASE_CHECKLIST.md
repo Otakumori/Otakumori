@@ -51,18 +51,18 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 ## 2026-05-19 preview verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
-- Latest smoke-passing deploy SHA: `ba3fa784`
+- Latest smoke-passing deploy SHA: `58cf70d8`
 - Health fix commit: `3f7603a3`
-- Latest smoke-passing Preview URL: `https://otaku-mori-h804p1qfw-otaku-mori-babe.vercel.app`
+- Latest smoke-passing Preview URL: `https://otaku-mori-m7uxkaf6y-otaku-mori-babe.vercel.app`
 - Current fulfillment-gate deploy SHA: `fd51200f`
 - Current fulfillment-gate Preview URL: `https://otaku-mori-5totxs23h-otaku-mori-babe.vercel.app`
-- Current fulfillment-gate Preview status: Ready; bypass-backed smoke rerun required before this deployment replaces the smoke-passing baseline.
+- Current fulfillment-gate Preview status: Ready and superseded by the `58cf70d8` smoke-green deployment.
 - Stable branch Preview alias: `https://otaku-mori-git-chore-commerce-schema-rea-8c786b-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
 - Local gates: `pnpm type-check`, `pnpm lint`, `pnpm prisma generate`, and `pnpm build` passed.
 - Smoke status: Deployment Protection bypass reaches the app and route smoke is green.
 - Verified smoke route results: `/` 200, `/shop` 200, `/blog` 200, `/api/v1/cart` 200, `/api/health` 200, `/shop/cart` 200, `/shop/checkout` 200.
-- Exact smoke command: `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=https://otaku-mori-h804p1qfw-otaku-mori-babe.vercel.app pnpm smoke`.
+- Exact smoke command: `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=https://otaku-mori-m7uxkaf6y-otaku-mori-babe.vercel.app pnpm smoke`.
 - Protection bypass status: configured and working. Keep using `VERCEL_AUTOMATION_BYPASS_SECRET` or `VERCEL_PROTECTION_BYPASS` for preview smoke; do not commit the value.
 - Env status: Vercel build completed with `pnpm build`; no env-schema build blocker was observed in the inspected deployment.
 - Health status: root cause was a brittle `/api/health` implementation that only wrapped a database `SELECT 1` and returned a raw 500 on any exception. The route now returns sanitized structured dependency checks, treats optional provider config as skipped, and supports strict non-200 monitoring through `/api/health?strict=1`.
@@ -71,7 +71,10 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 - Stripe checkout static audit: `/api/v1/checkout/session` validates product, variant, stock/enabled state, quantity, price, and currency from Prisma before creating Stripe line items. Checkout metadata includes `local_order_id`, Clerk/local user IDs, idempotency key, request ID, and `source=otakumori_checkout`.
 - Payment truth status: `/shop/checkout/success` is display/cart cleanup only; order payment state is reconciled by the canonical `/api/webhooks/stripe` handler after Stripe signature verification.
 - Fulfillment gate status: public direct Printify fulfillment endpoints are disabled for client-triggered POSTs; fulfillment must start from verified Stripe webhook processing or an admin-controlled recovery path.
-- Printify/Merchize status: provider routes are expected to degrade to sanitized diagnostics when env is absent; live order sync still requires provider credentials and test orders.
+- Printify/Merchize status: provider routes are expected to degrade to sanitized diagnostics when env is absent; live order sync still requires provider credentials and test orders. Printify fulfillment now skips already-synced local orders and records provider request failures as `fulfillment_failed` with a `PrintifyOrderSync` failure row.
+- Stripe test checkout result: pending manual Preview validation from an authenticated session with Stripe test-mode dashboard access. The current shell did not have Preview bypass, Clerk, or Stripe secrets loaded, so no live payment or replay was performed from this run.
+- Webhook delivery/replay result: pending manual Stripe Dashboard validation. Static audit confirms canonical signature verification and `WebhookEvent` event-ID dedupe; live event delivery and replay still need to be proven against Preview.
+- Order record audit result: pending after the first completed test payment.
 - Observability status: Sentry/OpenTelemetry build warnings remain non-blocking; capture behavior still needs Preview runtime validation after protection bypass.
 - Credential rotation note: `.env.template` has been sanitized and currently contains placeholders only. Rotate the Vercel Deployment Protection automation bypass secret after shared use, rotate any database credentials that ever appeared in git history or real-looking templates, and confirm Vercel Preview/Production env vars use current rotated values before cutover.
 
