@@ -51,16 +51,18 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 ## 2026-05-19 preview verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
-- Deploy SHA: `a0065a15`
-- Preview URL: `https://otaku-mori-fztcgzf0l-otaku-mori-babe.vercel.app`
+- Deploy SHA: `8c56d53d`
+- Preview URL: `https://otaku-mori-iprldl6e3-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
 - Local gates: `pnpm type-check`, `pnpm lint`, `pnpm prisma generate`, and `pnpm build` passed.
-- Smoke status: blocked by Vercel-served HTTP 401 on `/`, `/shop`, `/blog`, `/api/v1/cart`, `/api/health`, `/shop/cart`, and `/shop/checkout` until Deployment Protection bypass access is provided.
+- Smoke status: Manual Required. The local shell does not have `VERCEL_AUTOMATION_BYPASS_SECRET` or `VERCEL_PROTECTION_BYPASS`, so route-level smoke cannot reach the app while Vercel Deployment Protection is enabled.
+- Exact smoke command after bypass is available: `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=https://otaku-mori-iprldl6e3-otaku-mori-babe.vercel.app pnpm smoke`.
 - Protection bypass status: not available in the local shell during this verification pass. Configure Vercel Project Settings > Deployment Protection > Protection Bypass for Automation, then provide the generated value to smoke as `VERCEL_AUTOMATION_BYPASS_SECRET` or `VERCEL_PROTECTION_BYPASS`.
 - Env status: Vercel build completed with `pnpm build`; no env-schema build blocker was observed in the inspected deployment.
 - Stripe webhook status: code readiness verified by local gates only; live webhook delivery and replay idempotency still require Dashboard testing.
 - Printify/Merchize status: provider routes are expected to degrade to sanitized diagnostics when env is absent; live order sync still requires provider credentials and test orders.
 - Observability status: Sentry/OpenTelemetry build warnings remain non-blocking; capture behavior still needs Preview runtime validation after protection bypass.
+- Credential rotation note: `.env.template` has been sanitized; if any previously committed template values were real, rotate those credentials before launch.
 
 ## Manual Stripe test
 
