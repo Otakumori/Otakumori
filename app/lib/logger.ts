@@ -30,36 +30,77 @@ class Logger {
   private isDevelopment = (env.NODE_ENV ?? 'development') === 'development';
   private isTest = (env.NODE_ENV ?? '') === 'test';
 
+  private normalizeUnknown(value: unknown): unknown {
+    if (value instanceof Error) {
+      return this.formatError(value);
+    }
+
+    return value;
+  }
+
+  private safeStringify(value: unknown): string {
+    const seen = new WeakSet<object>();
+
+    try {
+      return JSON.stringify(value, (_key, nestedValue) => {
+        if (typeof nestedValue === 'bigint') return nestedValue.toString();
+
+        if (nestedValue instanceof Error) {
+          return this.formatError(nestedValue);
+        }
+
+        if (typeof nestedValue === 'object' && nestedValue !== null) {
+          if (seen.has(nestedValue)) return '[Circular]';
+          seen.add(nestedValue);
+        }
+
+        return nestedValue;
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return JSON.stringify({
+        ts: new Date().toISOString(),
+        level: 'error',
+        msg: 'Failed to serialize log entry',
+        error: message,
+      });
+    }
+  }
+
   private formatError(error: Error): LogEntry['error'] {
-    const errorData: any = {
+    const errorData: LogEntry['error'] = {
       name: error.name,
       message: error.message,
     };
+
     if (error.stack && this.isDevelopment) {
       errorData.stack = error.stack;
     }
-    if (error.cause) {
-      errorData.cause = error.cause;
+
+    if (error.cause !== undefined) {
+      errorData.cause = this.normalizeUnknown(error.cause);
     }
+
     return errorData;
   }
 
   private base(level: LogLevel, msg: string, ctx?: LogCtx, data?: unknown, error?: Error) {
-    const entry: any = {
+    const entry: LogEntry = {
       ts: new Date().toISOString(),
       level,
       msg,
     };
+
     if (ctx?.requestId) entry.requestId = ctx.requestId;
     if (ctx?.route) entry.route = ctx.route;
     if (ctx?.userId) entry.userId = ctx.userId;
     if (ctx?.extra) entry.extra = ctx.extra;
-    if (data) entry.data = data;
+    if (data !== undefined) entry.data = data;
     if (error) entry.error = this.formatError(error);
 
-    const line = JSON.stringify(entry);
+    const line = this.safeStringify(entry);
 
-    // In development, also log to console with colors
+    // Important: never call logger.* from inside Logger.base(). That recurses.
     if (this.isDevelopment) {
       const colors = {
         info: '\x1b[36m', // Cyan
@@ -74,36 +115,33 @@ class Logger {
       const routeInfo = ctx?.route ? ` ${colors.debug}[${ctx.route}]${colors.reset}` : '';
       const requestInfo = ctx?.requestId ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}` : '';
 
-      // Use console.warn for info/debug in development (allowed by linter)
-      logger.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
+      console.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
 
-      if (data) {
-        logger.warn(`${colors.debug}Data:${colors.reset}`, undefined, { value: data });
+      if (data !== undefined) {
+        console.warn(`${colors.debug}Data:${colors.reset}`, data);
       }
 
       if (error) {
-        logger.error(`${colors.error}Error:${colors.reset}`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        console.error(`${colors.error}Error:${colors.reset}`, error);
       }
-    } else {
-      // Production logging - structured JSON only
-      switch (level) {
-        case 'error':
-          logger.error(line);
-          break;
-        case 'warn':
-          logger.warn(line);
-          break;
-        case 'debug':
-          if (!this.isTest) logger.warn(line);
-          break;
-        default:
-          // Use console.warn for unknown log levels
-          logger.warn(line);
-      }
+
+      return;
     }
 
-    // TODO: In production, you might want to send to external logging service
-    // like Sentry, LogRocket, or CloudWatch
+    // Production logging - structured JSON only.
+    switch (level) {
+      case 'error':
+        console.error(line);
+        break;
+      case 'warn':
+        console.warn(line);
+        break;
+      case 'debug':
+        if (!this.isTest) console.warn(line);
+        break;
+      default:
+        console.info(line);
+    }
   }
 
   info(msg: string, ctx?: LogCtx, data?: unknown) {
