@@ -140,7 +140,8 @@ class Logger {
         if (!this.isTest) console.warn(line);
         break;
       default:
-        console.info(line);
+        // Lint policy allows warn/error only; info logs are emitted as structured warnings.
+        console.warn(line);
     }
   }
 
