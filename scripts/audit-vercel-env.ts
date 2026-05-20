@@ -280,12 +280,8 @@ function checkSuspiciousValue(
 
   // Database URL format checks
   if (key === 'DATABASE_URL') {
-    if (
-      !value.startsWith('postgresql://') &&
-      !value.startsWith('postgres://') &&
-      !value.startsWith('prisma://')
-    ) {
-      return 'DATABASE_URL should start with postgresql://, postgres://, or prisma://';
+    if (!value.startsWith('postgresql://') && !value.startsWith('postgres://')) {
+      return 'DATABASE_URL should start with postgresql:// or postgres://';
     }
   }
 

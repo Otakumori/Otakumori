@@ -1,11 +1,15 @@
 generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+generator clientJs {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Achievement {
