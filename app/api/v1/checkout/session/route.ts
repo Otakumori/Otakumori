@@ -503,7 +503,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: error instanceof Error ? error.message : 'Unhandled checkout session error',
+          error: 'Checkout could not be started. Please try again or contact support.',
           requestId,
           stage,
         },

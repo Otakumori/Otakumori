@@ -40,6 +40,71 @@ function toCents(value: number | null | undefined): number | null {
   return Math.round(value * 100);
 }
 
+function coerceMoneyNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value !== 'string') return null;
+
+  const parsed = Number(value.replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function readMoneyValue(raw: Record<string, unknown>, keys: string[]): number | null {
+  for (const key of keys) {
+    const value = coerceMoneyNumber(raw[key]);
+    if (value != null) return value;
+  }
+
+  return null;
+}
+
+function explicitMinorUnitCents(raw: Record<string, unknown>, baseNames: string[]): number | null {
+  const keys = baseNames.flatMap((baseName) => [
+    `${baseName}Cents`,
+    `${baseName}_cents`,
+    `${baseName}Minor`,
+    `${baseName}_minor`,
+    `${baseName}MinorUnits`,
+    `${baseName}_minor_units`,
+  ]);
+  const value = readMoneyValue(raw, keys);
+  return value != null && Number.isInteger(value) && value > 0 ? value : null;
+}
+
+function decimalMajorUnitCents(raw: Record<string, unknown>, keys: string[]): number | null {
+  const value = readMoneyValue(raw, keys);
+  if (value == null || value <= 0) return null;
+
+  if (!Number.isInteger(value)) {
+    return toCents(value);
+  }
+
+  return value < 1000 ? toCents(value) : null;
+}
+
+function merchizePriceCents(product: MerchizeProduct, variant: MerchizeVariant): number | null {
+  const variantRaw = variant.raw as Record<string, unknown>;
+  const productRaw = product.raw as Record<string, unknown>;
+
+  return (
+    explicitMinorUnitCents(variantRaw, ['price', 'retailPrice', 'retail_price', 'salePrice', 'sale_price']) ??
+    explicitMinorUnitCents(productRaw, ['price', 'retailPrice', 'retail_price', 'salePrice', 'sale_price']) ??
+    decimalMajorUnitCents(variantRaw, ['price', 'retailPrice', 'retail_price', 'salePrice', 'sale_price']) ??
+    decimalMajorUnitCents(productRaw, ['price', 'retailPrice', 'retail_price', 'salePrice', 'sale_price'])
+  );
+}
+
+function merchizeCostCents(product: MerchizeProduct, variant: MerchizeVariant): number | null {
+  const variantRaw = variant.raw as Record<string, unknown>;
+  const productRaw = product.raw as Record<string, unknown>;
+
+  return (
+    explicitMinorUnitCents(variantRaw, ['cost', 'costPrice', 'cost_price']) ??
+    explicitMinorUnitCents(productRaw, ['cost', 'costPrice', 'cost_price']) ??
+    decimalMajorUnitCents(variantRaw, ['cost', 'costPrice', 'cost_price']) ??
+    decimalMajorUnitCents(productRaw, ['cost', 'costPrice', 'cost_price'])
+  );
+}
+
 function stablePositiveInt(value: string): number {
   let hash = 0;
   for (let index = 0; index < value.length; index++) {
@@ -179,8 +244,8 @@ async function syncMerchizeProduct(product: MerchizeProduct): Promise<string> {
     const syntheticVariantId = stablePositiveInt(`${product.id}:${variant.id}`);
     incomingVariantIds.add(syntheticVariantId);
     const variantActive = active && isActiveStatus(variant.status);
-    const priceCents = toCents(variant.price ?? product.price);
-    const costCents = toCents(variant.cost);
+    const priceCents = merchizePriceCents(product, variant);
+    const costCents = merchizeCostCents(product, variant);
 
     await db.productVariant.upsert({
       where: {

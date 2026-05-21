@@ -48,6 +48,19 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
   `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=<preview-url> pnpm smoke`.
   The smoke script sends the secret only as the `x-vercel-protection-bypass` header and does not print it.
 
+## 2026-05-21 PR #29 verification snapshot
+
+- Branch: `chore/commerce-schema-readiness-clean`
+- Local HEAD verified after fast-forward: `cbebc57830334da10a9354bfb2017cf1ae05410a`
+- Origin branch HEAD verified: `cbebc57830334da10a9354bfb2017cf1ae05410a`
+- Current Ready Preview URL: `https://otaku-mori-djwzztdzz-otaku-mori-babe.vercel.app`
+- Vercel build status: Ready.
+- Local gates: `pnpm type-check`, `pnpm lint`, `pnpm prisma generate`, and `pnpm build` passed. Lint remains 0 errors with warnings under the configured threshold.
+- Preview smoke skipped because no Vercel protection bypass env var is loaded in this shell.
+- Checkout safety update: customer-facing checkout session 500 responses are generic and keep `requestId` plus `stage`; detailed exception text stays server-side.
+- Merchize catalog safety update: explicit cent/minor-unit fields are treated as cents, decimal currency fields are converted to cents, and ambiguous large integer prices are left unsellable instead of risking a 100x charge.
+- Remaining manual gates: Stripe test checkout, Stripe webhook replay/idempotency, Printify catalog sync, Merchize catalog sync if env exists, Clerk Preview sign-in/callback, Mobile Safari checkout path, and proof that fulfillment only starts after verified Stripe webhook payment truth.
+
 ## 2026-05-19 preview verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
