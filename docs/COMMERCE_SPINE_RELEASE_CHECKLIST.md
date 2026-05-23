@@ -56,7 +56,9 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 - Current Ready Preview URL: `https://otaku-mori-bow6t4lhb-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
 - Local gates: `pnpm type-check` passed, `pnpm lint` passed with 0 errors and 198 warnings under the configured threshold, `pnpm prisma generate` passed, and `pnpm build` passed.
-- Smoke status: Manual Required - Preview smoke skipped because no Vercel protection bypass env var is loaded in this shell.
+- Smoke status: passed from a shell with the Vercel protection bypass env var loaded.
+- Verified smoke route results: `/` 200, `/shop` 200, `/blog` 200, `/api/v1/cart` 200, `/api/health` 200, `/shop/cart` 200, `/shop/checkout` 200.
+- Exact smoke target: `BASE_URL=https://otaku-mori-bow6t4lhb-otaku-mori-babe.vercel.app pnpm smoke`. Do not record the bypass secret.
 - Checkout safety update: customer-facing checkout session 500 responses are generic and keep `requestId` plus `stage`; detailed exception text stays server-side.
 - Merchize catalog safety update: explicit cent/minor-unit fields are treated as cents, decimal currency fields are converted to cents, and ambiguous large integer prices are left unsellable instead of risking a 100x charge.
 - Remaining manual gates: Stripe test checkout, Stripe webhook replay/idempotency, Printify catalog sync, Merchize catalog sync if env exists, Clerk Preview sign-in/callback, Mobile Safari checkout path, and proof that fulfillment only starts after verified Stripe webhook payment truth.
