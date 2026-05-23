@@ -26,6 +26,8 @@ export function isAdmin(
   user: {
     emailAddresses?: Array<{ emailAddress?: string | null }>;
     primaryEmailAddress?: { emailAddress?: string | null } | null;
+    publicMetadata?: Record<string, unknown> | null;
+    privateMetadata?: Record<string, unknown> | null;
   } | null,
 ): boolean {
   if (!user) return false;
@@ -33,7 +35,11 @@ export function isAdmin(
   const email =
     user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
 
-  return isAdminEmail(email);
+  return (
+    isAdminEmail(email)
+    || user.publicMetadata?.role === 'admin'
+    || user.privateMetadata?.role === 'admin'
+  );
 }
 
 /**
