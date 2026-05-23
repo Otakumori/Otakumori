@@ -51,17 +51,21 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 ## 2026-05-21 PR #29 verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
-- Local HEAD verified after validation: `894ea392f37cbba0c2f31282981cb4f876369496`
-- Origin branch HEAD verified: `894ea392f37cbba0c2f31282981cb4f876369496`
-- Current Ready Preview URL: `https://otaku-mori-bow6t4lhb-otaku-mori-babe.vercel.app`
+- Release-validation automation commit: `991c3fc6`
+- Previous smoke-green baseline commit: `1d1cd7d5a22b6ec51de6fa727186ad98d1d9f80c`
+- Current Ready Preview URL: `https://otaku-mori-cn8kfuc8o-otaku-mori-babe.vercel.app`
 - Vercel build status: Ready.
-- Local gates: `pnpm type-check` passed, `pnpm lint` passed with 0 errors and 198 warnings under the configured threshold, `pnpm prisma generate` passed, and `pnpm build` passed.
+- Local gates after the validation harness patch: `pnpm type-check` passed, `pnpm lint` passed with 0 errors and 198 warnings under the configured threshold, `pnpm prisma generate` passed, and `pnpm build` passed.
 - Smoke status: passed from a shell with the Vercel protection bypass env var loaded.
 - Verified smoke route results: `/` 200, `/shop` 200, `/blog` 200, `/api/v1/cart` 200, `/api/health` 200, `/shop/cart` 200, `/shop/checkout` 200.
-- Exact smoke target: `BASE_URL=https://otaku-mori-bow6t4lhb-otaku-mori-babe.vercel.app pnpm smoke`. Do not record the bypass secret.
+- Exact smoke target: `BASE_URL=https://otaku-mori-cn8kfuc8o-otaku-mori-babe.vercel.app pnpm smoke`. Do not record the bypass secret.
+- Release validation automation: `pnpm smoke` now reads `.env.local` for local-only Preview URL and Vercel bypass values without printing secrets; `pnpm test:clerk-preview` and `pnpm test:commerce-release` use `playwright.commerce-release.config.ts`.
+- Static commerce release checks: `node scripts/commerce-release-static-checks.mjs` passed. It verifies Stripe webhook signature handling, `WebhookEvent` dedupe, Printify order-sync uniqueness, fulfillment-after-webhook ordering, checkout DB product/variant reload, and checkout metadata reconciliation fields.
+- Clerk Preview E2E status: blocked. `pnpm test:clerk-preview` reaches the Preview with bypass, but the deployed Clerk key/config still causes browser CORS failures against the production custom Clerk frontend domain (`otaku-mori.com`) from the Vercel Preview origin. Configure Preview Clerk keys/origins/custom domain behavior so the Preview domain can load ClerkJS and Frontend API requests, then rerun `BASE_URL=https://otaku-mori-cn8kfuc8o-otaku-mori-babe.vercel.app pnpm test:clerk-preview`.
+- Commerce Playwright status: partially automated, not release-green. `BASE_URL=https://otaku-mori-cn8kfuc8o-otaku-mori-babe.vercel.app pnpm test:commerce-release` passed static checks and smoke, then Playwright finished with 5 passed, 5 failed, and 2 skipped. Health/provider diagnostics pass with bypass, desktop Chromium and mobile Chromium route rendering pass, but signed-out cart seeding currently cannot use `/api/v1/products` because that API returns a sanitized 500 on Preview, signed-in checkout is blocked by Clerk Preview CORS, and WebKit still reports Preview/Clerk CORS-related RSC fetch noise. Do not call PR #29 release-ready until these are resolved or explicitly accepted with manual evidence.
 - Checkout safety update: customer-facing checkout session 500 responses are generic and keep `requestId` plus `stage`; detailed exception text stays server-side.
 - Merchize catalog safety update: explicit cent/minor-unit fields are treated as cents, decimal currency fields are converted to cents, and ambiguous large integer prices are left unsellable instead of risking a 100x charge.
-- Remaining manual gates: Stripe test checkout, Stripe webhook replay/idempotency, Printify catalog sync, Merchize catalog sync if env exists, Clerk Preview sign-in/callback, Mobile Safari checkout path, and proof that fulfillment only starts after verified Stripe webhook payment truth.
+- Remaining blockers/manual gates: fix Clerk Preview CORS/auth config, investigate `/api/v1/products` Preview 500 before automated cart seeding, Stripe test checkout, Stripe webhook replay/idempotency, Printify catalog sync, Merchize catalog sync if env exists, Clerk Preview sign-in/callback, Mobile Safari checkout path, and proof that fulfillment only starts after verified Stripe webhook payment truth.
 
 ## 2026-05-19 preview verification snapshot
 

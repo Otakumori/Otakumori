@@ -10,13 +10,11 @@ if (existsSync('.env.local')) {
 }
 
 const baseURL = process.env.BASE_URL || process.env.PREVIEW_URL || 'http://localhost:3000';
-const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || process.env.VERCEL_PROTECTION_BYPASS;
 
 const use = {
   baseURL,
   trace: 'off' as const,
   screenshot: 'only-on-failure' as const,
-  ...(bypass ? { extraHTTPHeaders: { 'x-vercel-protection-bypass': bypass } } : {}),
 };
 
 export default defineConfig({

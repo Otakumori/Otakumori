@@ -15,10 +15,51 @@ type CatalogProduct = {
   variants?: CatalogVariant[];
 };
 
+const previewOrigin = new URL(process.env.BASE_URL || process.env.PREVIEW_URL || 'http://localhost:3000').origin;
+
 function requireSecretEnv(name: string) {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is required for commerce release validation`);
   return value;
+}
+
+async function installVercelBypassCookie(page: Page) {
+  const bypass = getVercelBypassSecret();
+  if (!bypass) return;
+
+  await page.route('**/*', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.origin !== previewOrigin) {
+      await route.continue();
+      return;
+    }
+
+    await route.continue({
+      headers: {
+        ...request.headers(),
+        'x-vercel-protection-bypass': bypass,
+      },
+    });
+  });
+
+  const response = await page.context().request.get('/', {
+    headers: {
+      'x-vercel-protection-bypass': bypass,
+      'x-vercel-set-bypass-cookie': 'true',
+    },
+  });
+
+  expect(response.status(), 'Vercel bypass cookie bootstrap should reach the Preview app').not.toBe(401);
+}
+
+function getVercelBypassSecret() {
+  return process.env.VERCEL_AUTOMATION_BYPASS_SECRET || process.env.VERCEL_PROTECTION_BYPASS;
+}
+
+function getVercelBypassHeaders() {
+  const bypass = getVercelBypassSecret();
+  return bypass ? { 'x-vercel-protection-bypass': bypass } : undefined;
 }
 
 async function expectNoCriticalConsoleErrors(page: Page) {
@@ -32,7 +73,9 @@ async function expectNoCriticalConsoleErrors(page: Page) {
 }
 
 async function findSellableProduct(page: Page) {
-  const response = await page.request.get('/api/v1/products?limit=25&inStock=true');
+  const response = await page.request.get('/api/v1/products?limit=25&inStock=true', {
+    headers: getVercelBypassHeaders(),
+  });
   expect(response.ok()).toBeTruthy();
   const body = await response.json();
   const products = (body?.data?.products ?? []) as CatalogProduct[];
@@ -78,6 +121,14 @@ async function seedCart(page: Page) {
 async function signInWithClerk(page: Page) {
   const email = requireSecretEnv('CLERK_E2E_EMAIL');
   const password = requireSecretEnv('CLERK_E2E_PASSWORD');
+  const clerkLoadErrors: string[] = [];
+
+  page.on('console', (message) => {
+    const text = message.text();
+    if (message.type() === 'error' && /clerk|otaku-mori\.com\/v1|clerk-js/i.test(text)) {
+      clerkLoadErrors.push(text);
+    }
+  });
 
   await page.goto(`/sign-in?redirect_url=${encodeURIComponent('/shop/checkout')}`);
   if (!page.url().includes('/sign-in')) return;
@@ -101,7 +152,16 @@ async function signInWithClerk(page: Page) {
   } catch {
     if (await signInButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await signInButton.click();
-      await identifier.waitFor({ state: 'visible', timeout: 15_000 });
+      try {
+        await identifier.waitFor({ state: 'visible', timeout: 15_000 });
+      } catch (error) {
+        if (clerkLoadErrors.length > 0) {
+          throw new Error(
+            'Clerk Preview sign-in is blocked by Clerk custom-domain CORS. Configure Preview Clerk keys/origins so the Preview domain can load ClerkJS and Frontend API requests.',
+          );
+        }
+        throw error;
+      }
     } else {
       throw new Error('Clerk sign-in form did not render on Preview');
     }
@@ -119,6 +179,10 @@ async function signInWithClerk(page: Page) {
 }
 
 test.describe('commerce release preview validation', () => {
+  test.beforeEach(async ({ page }) => {
+    await installVercelBypassCookie(page);
+  });
+
   test('signed-out commerce routes require sign-in without creating checkout sessions', async ({ page }) => {
     const assertNoConsoleErrors = await expectNoCriticalConsoleErrors(page);
     let checkoutRequests = 0;
@@ -142,7 +206,7 @@ test.describe('commerce release preview validation', () => {
   });
 
   test('health and provider diagnostics degrade safely without public admin access', async ({ request }) => {
-    const health = await request.get('/api/health');
+    const health = await request.get('/api/health', { headers: getVercelBypassHeaders() });
     expect(health.status()).toBe(200);
     const healthBody = await health.json();
     expect(healthBody.ok).toBe(true);
@@ -150,7 +214,7 @@ test.describe('commerce release preview validation', () => {
     expect(['pass', 'skipped']).toContain(healthBody.checks?.printify?.status);
     expect(['pass', 'skipped']).toContain(healthBody.checks?.merchize?.status);
 
-    const catalogSync = await request.get('/api/admin/catalog-sync');
+    const catalogSync = await request.get('/api/admin/catalog-sync', { headers: getVercelBypassHeaders() });
     expect([302, 401, 403, 404]).toContain(catalogSync.status());
   });
 
