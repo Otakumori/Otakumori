@@ -71,11 +71,7 @@ type ProductListRecord = {
   primaryImageUrl: string | null;
   active: boolean;
   category: string | null;
-  integrationRef: string | null;
-  visible: boolean;
   printifyProductId: string | null;
-  blueprintId: number | null;
-  printProviderId: number | null;
   tags: string[];
   specs: Prisma.JsonValue | null;
   ProductVariant: Array<{
@@ -140,7 +136,7 @@ function serializeProductListRecord(product: ProductListRecord) {
   const specs = product.specs && typeof product.specs === 'object' && !Array.isArray(product.specs)
     ? product.specs as Record<string, unknown>
     : {};
-  const provider = product.printifyProductId || product.integrationRef === 'printify'
+  const provider = product.printifyProductId
     ? 'printify'
     : 'internal';
 
@@ -158,7 +154,7 @@ function serializeProductListRecord(product: ProductListRecord) {
     priceCents: priceRange.min,
     priceRange,
     available: product.ProductVariant.some((variant) => variant.isEnabled && variant.inStock),
-    visible: product.visible,
+    visible: true,
     active: product.active,
     isLocked: Boolean(specs.is_locked),
     provider,
@@ -174,10 +170,10 @@ function serializeProductListRecord(product: ProductListRecord) {
       optionValues: coerceOptionValues(variant.optionValues),
       previewImageUrl: variant.previewImageUrl,
     })),
-    integrationRef: product.integrationRef ?? null,
+    integrationRef: null,
     printifyProductId: product.printifyProductId ?? null,
-    blueprintId: product.blueprintId ?? null,
-    printProviderId: product.printProviderId ?? null,
+    blueprintId: null,
+    printProviderId: null,
     lastSyncedAt: null,
   };
 }
@@ -185,7 +181,6 @@ function serializeProductListRecord(product: ProductListRecord) {
 function buildProductWhere(params: z.infer<typeof QueryParamsSchema>): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {
     active: true,
-    visible: true,
   };
 
   // Category filter
@@ -302,11 +297,7 @@ export async function GET(request: NextRequest) {
           primaryImageUrl: true,
           active: true,
           category: true,
-          integrationRef: true,
-          visible: true,
           printifyProductId: true,
-          blueprintId: true,
-          printProviderId: true,
           tags: true,
           specs: true,
           ProductVariant: {
