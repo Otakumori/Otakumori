@@ -14,7 +14,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
-import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
+import { createProductSlug } from '@/lib/catalog/mapPrintify';
 import {
   generateRequestId,
   createApiError,
@@ -64,6 +64,124 @@ const QueryParamsSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
+type ProductListRecord = {
+  id: string;
+  name: string;
+  description: string | null;
+  primaryImageUrl: string | null;
+  active: boolean;
+  category: string | null;
+  integrationRef: string | null;
+  visible: boolean;
+  printifyProductId: string | null;
+  blueprintId: number | null;
+  printProviderId: number | null;
+  tags: string[];
+  specs: Prisma.JsonValue | null;
+  ProductVariant: Array<{
+    id: string;
+    title: string | null;
+    sku: string | null;
+    priceCents: number | null;
+    inStock: boolean;
+    isEnabled: boolean;
+    printifyVariantId: number;
+    optionValues: Prisma.JsonValue | null;
+    previewImageUrl: string | null;
+  }>;
+  ProductImage: Array<{
+    url: string;
+    isDefault: boolean;
+  }>;
+};
+
+type OptionValue = {
+  option?: string;
+  value?: string;
+  colors?: string[];
+};
+
+function centsToDollars(value: number | null | undefined): number | null {
+  if (typeof value !== 'number') return null;
+  return Math.round(value) / 100;
+}
+
+function coerceOptionValues(value: unknown): OptionValue[] {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.filter((entry) => entry && typeof entry === 'object') as OptionValue[];
+  }
+  if (typeof value === 'object') {
+    return [value as OptionValue];
+  }
+  return [];
+}
+
+function computePriceRange(variants: ProductListRecord['ProductVariant']) {
+  const prices = variants
+    .map((variant) => variant.priceCents)
+    .filter((price): price is number => typeof price === 'number' && price > 0);
+
+  if (prices.length === 0) {
+    return { min: null, max: null };
+  }
+
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+function resolvePrimaryImage(product: ProductListRecord): string | null {
+  if (product.primaryImageUrl) return product.primaryImageUrl;
+  return product.ProductImage.find((image) => image.isDefault)?.url ?? product.ProductImage[0]?.url ?? null;
+}
+
+function serializeProductListRecord(product: ProductListRecord) {
+  const priceRange = computePriceRange(product.ProductVariant);
+  const slugSource = product.printifyProductId ?? product.id;
+  const specs = product.specs && typeof product.specs === 'object' && !Array.isArray(product.specs)
+    ? product.specs as Record<string, unknown>
+    : {};
+  const provider = product.printifyProductId || product.integrationRef === 'printify'
+    ? 'printify'
+    : 'internal';
+
+  return {
+    id: product.id,
+    title: product.name,
+    slug: createProductSlug(product.name, slugSource),
+    description: product.description ?? '',
+    image: resolvePrimaryImage(product),
+    images: product.ProductImage.map((image) => image.url),
+    tags: product.tags ?? [],
+    category: product.category ?? null,
+    categorySlug: null,
+    price: centsToDollars(priceRange.min),
+    priceCents: priceRange.min,
+    priceRange,
+    available: product.ProductVariant.some((variant) => variant.isEnabled && variant.inStock),
+    visible: product.visible,
+    active: product.active,
+    isLocked: Boolean(specs.is_locked),
+    provider,
+    variants: product.ProductVariant.map((variant) => ({
+      id: variant.id,
+      title: variant.title ?? null,
+      sku: variant.sku ?? null,
+      price: centsToDollars(variant.priceCents ?? null),
+      priceCents: variant.priceCents ?? null,
+      inStock: variant.inStock,
+      isEnabled: variant.isEnabled,
+      printifyVariantId: variant.printifyVariantId,
+      optionValues: coerceOptionValues(variant.optionValues),
+      previewImageUrl: variant.previewImageUrl,
+    })),
+    integrationRef: product.integrationRef ?? null,
+    printifyProductId: product.printifyProductId ?? null,
+    blueprintId: product.blueprintId ?? null,
+    printProviderId: product.printProviderId ?? null,
+    lastSyncedAt: null,
+  };
+}
+
 function buildProductWhere(params: z.infer<typeof QueryParamsSchema>): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {
     active: true,
@@ -73,7 +191,6 @@ function buildProductWhere(params: z.infer<typeof QueryParamsSchema>): Prisma.Pr
   // Category filter
   if (params.category) {
     where.OR = [
-      { categorySlug: params.category },
       { category: params.category },
       { tags: { has: params.category } },
     ];
@@ -178,9 +295,38 @@ export async function GET(request: NextRequest) {
     const [products, total] = await Promise.all([
       db.product.findMany({
         where,
-        include: {
-          ProductVariant: true,
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          primaryImageUrl: true,
+          active: true,
+          category: true,
+          integrationRef: true,
+          visible: true,
+          printifyProductId: true,
+          blueprintId: true,
+          printProviderId: true,
+          tags: true,
+          specs: true,
+          ProductVariant: {
+            select: {
+              id: true,
+              title: true,
+              sku: true,
+              priceCents: true,
+              inStock: true,
+              isEnabled: true,
+              printifyVariantId: true,
+              optionValues: true,
+              previewImageUrl: true,
+            },
+          },
           ProductImage: {
+            select: {
+              url: true,
+              isDefault: true,
+            },
             orderBy: { position: 'asc' },
           },
         },
@@ -191,26 +337,18 @@ export async function GET(request: NextRequest) {
       db.product.count({ where }),
     ]);
 
-    // Transform to CatalogProduct format
-    let serialized = products.map(serializeProduct);
+    // Transform to CatalogProduct format. Use a lean select above so older Preview
+    // databases missing optional catalog columns can still serve public product lists.
+    let serialized = products.map(serializeProductListRecord);
 
     // Handle price sorting in application layer
     if (params.sortBy === 'price') {
-      serialized = serialized.sort((a: CatalogProduct, b: CatalogProduct) => {
+      serialized = serialized.sort((a, b) => {
         const aPrice = a.priceRange.min ?? a.priceCents ?? Number.MAX_SAFE_INTEGER;
         const bPrice = b.priceRange.min ?? b.priceCents ?? Number.MAX_SAFE_INTEGER;
         return (params.sortOrder === 'asc' ? 1 : -1) * (aPrice - bPrice);
       });
     }
-
-    // Get the most recent lastSyncedAt from products
-    const lastSyncedAt =
-      products.length > 0
-        ? products
-          .map((p) => p.lastSyncedAt)
-          .filter((date): date is Date => date !== null)
-          .sort((a, b) => b.getTime() - a.getTime())[0]?.toISOString() ?? null
-        : null;
 
     const totalPages = Math.ceil(total / limit);
 
@@ -224,7 +362,7 @@ export async function GET(request: NextRequest) {
             total,
             perPage: limit,
           },
-          lastSyncedAt,
+          lastSyncedAt: null,
         },
         requestId,
       ),
