@@ -72,8 +72,6 @@ type ProductListRecord = {
   active: boolean;
   category: string | null;
   printifyProductId: string | null;
-  tags: string[];
-  specs: Prisma.JsonValue | null;
   ProductVariant: Array<{
     id: string;
     title: string | null;
@@ -133,9 +131,6 @@ function resolvePrimaryImage(product: ProductListRecord): string | null {
 function serializeProductListRecord(product: ProductListRecord) {
   const priceRange = computePriceRange(product.ProductVariant);
   const slugSource = product.printifyProductId ?? product.id;
-  const specs = product.specs && typeof product.specs === 'object' && !Array.isArray(product.specs)
-    ? product.specs as Record<string, unknown>
-    : {};
   const provider = product.printifyProductId
     ? 'printify'
     : 'internal';
@@ -147,7 +142,7 @@ function serializeProductListRecord(product: ProductListRecord) {
     description: product.description ?? '',
     image: resolvePrimaryImage(product),
     images: product.ProductImage.map((image) => image.url),
-    tags: product.tags ?? [],
+    tags: [],
     category: product.category ?? null,
     categorySlug: null,
     price: centsToDollars(priceRange.min),
@@ -156,7 +151,7 @@ function serializeProductListRecord(product: ProductListRecord) {
     available: product.ProductVariant.some((variant) => variant.isEnabled && variant.inStock),
     visible: true,
     active: product.active,
-    isLocked: Boolean(specs.is_locked),
+    isLocked: false,
     provider,
     variants: product.ProductVariant.map((variant) => ({
       id: variant.id,
@@ -185,10 +180,7 @@ function buildProductWhere(params: z.infer<typeof QueryParamsSchema>): Prisma.Pr
 
   // Category filter
   if (params.category) {
-    where.OR = [
-      { category: params.category },
-      { tags: { has: params.category } },
-    ];
+    where.category = params.category;
   }
 
   // Search query
@@ -197,7 +189,6 @@ function buildProductWhere(params: z.infer<typeof QueryParamsSchema>): Prisma.Pr
     const searchConditions: Prisma.ProductWhereInput[] = [
       { name: { contains: query, mode: 'insensitive' } },
       { description: { contains: query, mode: 'insensitive' } },
-      { tags: { hasSome: [query.toLowerCase()] } },
     ];
 
     if (where.OR) {
@@ -298,8 +289,6 @@ export async function GET(request: NextRequest) {
           active: true,
           category: true,
           printifyProductId: true,
-          tags: true,
-          specs: true,
           ProductVariant: {
             select: {
               id: true,
