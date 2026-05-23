@@ -1,7 +1,17 @@
 #!/usr/bin/env node
 
+import { existsSync, readFileSync } from 'node:fs';
+import { parse } from 'dotenv';
+
+if (existsSync('.env.local')) {
+  const parsedEnv = parse(readFileSync('.env.local'));
+  for (const [key, value] of Object.entries(parsedEnv)) {
+    process.env[key] ??= value;
+  }
+}
+
 const baseUrl = normalizeBaseUrl(
-  process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  process.env.BASE_URL || process.env.PREVIEW_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
 );
 
 const routes = parseRoutes(process.env.SMOKE_ROUTES) ?? [

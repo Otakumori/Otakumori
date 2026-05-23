@@ -14,6 +14,7 @@ interface ClerkProviderWrapperProps {
 }
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const CLERK_JS_CDN_URL = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
 
 function isPreviewHost(): boolean {
   if (typeof window === 'undefined') return false;
@@ -47,13 +48,19 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
-  const shouldUseProductionClerkRouting = isProductionHost() && !isPreviewHost();
+  const isPreview = isPreviewHost();
+  const shouldUseProductionClerkRouting = isProductionHost() && !isPreview;
+  const shouldUsePreviewClerkJs = isPreview && publishableKey.startsWith('pk_live_');
 
   const clerkProps: any = {
     publishableKey,
     fallbackRedirectUrl: '/',
     nonce,
   };
+
+  if (shouldUsePreviewClerkJs) {
+    clerkProps.clerkJSUrl = CLERK_JS_CDN_URL;
+  }
 
   if (shouldUseProductionClerkRouting) {
     clerkProps.signInUrl = `${ACCOUNTS_BASE_URL}/sign-in`;
