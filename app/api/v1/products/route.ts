@@ -240,14 +240,14 @@ function buildOrderBy(
     case 'name':
       return { name: sortOrder };
     case 'createdAt':
-      return { createdAt: sortOrder };
     case 'updatedAt':
-      return { updatedAt: sortOrder };
     case 'price':
-      // Price sorting is handled in application layer after serialization
-      return { updatedAt: 'desc' };
+      // Older Preview databases may not have the timestamp column names mapped
+      // by the current Prisma model. Use stable columns here; price sorting is
+      // handled in application code after serialization.
+      return { id: sortOrder };
     default:
-      return { createdAt: 'desc' };
+      return { id: 'desc' };
   }
 }
 
