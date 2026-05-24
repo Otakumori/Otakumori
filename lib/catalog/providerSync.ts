@@ -31,6 +31,10 @@ function sanitizeError(error: unknown): string {
   return message.replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]').slice(0, 500);
 }
 
+function schemaDriftMessage(feature: string, error: unknown): string {
+  return `${feature} unavailable in current schema: ${sanitizeError(error)}`;
+}
+
 function toPrismaJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
 }
@@ -406,55 +410,100 @@ export async function syncMerchizeCatalogFromProvider(): Promise<ProviderCatalog
 }
 
 export async function getProviderCatalogDiagnostics(): Promise<ProviderCatalogDiagnostics[]> {
-  const [printifyLastLog, merchizeLastLog, printifyProductCount, merchizeProductCount, printifyActiveVariantCount, merchizeActiveVariantCount, printifySkippedVariantCount, merchizeSkippedVariantCount] = await Promise.all([
-    db.printifySyncLog.findFirst({
-      where: { syncType: 'printify:catalog' },
-      orderBy: { createdAt: 'desc' },
-      select: { finishedAt: true, errorMessage: true },
-    }),
-    db.printifySyncLog.findFirst({
-      where: { syncType: 'merchize:catalog' },
-      orderBy: { createdAt: 'desc' },
-      select: { finishedAt: true, errorMessage: true },
-    }),
-    db.product.count({ where: { printifyProductId: { not: null } } }),
-    db.product.count({ where: { integrationRef: { startsWith: 'merchize:' } } }),
-    db.productVariant.count({
-      where: { isEnabled: true, inStock: true, Product: { printifyProductId: { not: null } } },
-    }),
-    db.productVariant.count({
-      where: { isEnabled: true, inStock: true, Product: { integrationRef: { startsWith: 'merchize:' } } },
-    }),
-    db.productVariant.count({
-      where: {
-        OR: [{ isEnabled: false }, { inStock: false }],
-        Product: { printifyProductId: { not: null } },
-      },
-    }),
-    db.productVariant.count({
-      where: {
-        OR: [{ isEnabled: false }, { inStock: false }],
-        Product: { integrationRef: { startsWith: 'merchize:' } },
-      },
-    }),
+  const [printify, merchize] = await Promise.all([
+    getPrintifyCatalogDiagnostics(),
+    getMerchizeCatalogDiagnostics(),
   ]);
 
-  return [
-    {
+  return [printify, merchize];
+}
+
+async function readLastSyncLog(provider: CatalogProvider) {
+  try {
+    const log = await db.printifySyncLog.findFirst({
+      where: { syncType: `${provider}:catalog` },
+      orderBy: { createdAt: 'desc' },
+      select: { finishedAt: true, errorMessage: true },
+    });
+    return log ?? { finishedAt: null, errorMessage: null };
+  } catch (error) {
+    return {
+      finishedAt: null,
+      errorMessage: schemaDriftMessage('sync log', error),
+    };
+  }
+}
+
+async function getPrintifyCatalogDiagnostics(): Promise<ProviderCatalogDiagnostics> {
+  const lastLog = await readLastSyncLog('printify');
+
+  try {
+    const [productCount, activeVariantCount, skippedVariantCount] = await Promise.all([
+      db.product.count({ where: { printifyProductId: { not: null } } }),
+      db.productVariant.count({
+        where: { isEnabled: true, inStock: true, Product: { printifyProductId: { not: null } } },
+      }),
+      db.productVariant.count({
+        where: {
+          OR: [{ isEnabled: false }, { inStock: false }],
+          Product: { printifyProductId: { not: null } },
+        },
+      }),
+    ]);
+
+    return {
       provider: 'printify',
-      lastSyncAt: printifyLastLog?.finishedAt?.toISOString() ?? null,
-      productCount: printifyProductCount,
-      activeVariantCount: printifyActiveVariantCount,
-      skippedVariantCount: printifySkippedVariantCount,
-      lastError: printifyLastLog?.errorMessage ? sanitizeError(printifyLastLog.errorMessage) : null,
-    },
-    {
+      lastSyncAt: lastLog.finishedAt?.toISOString() ?? null,
+      productCount,
+      activeVariantCount,
+      skippedVariantCount,
+      lastError: lastLog.errorMessage ? sanitizeError(lastLog.errorMessage) : null,
+    };
+  } catch (error) {
+    return {
+      provider: 'printify',
+      lastSyncAt: lastLog.finishedAt?.toISOString() ?? null,
+      productCount: 0,
+      activeVariantCount: 0,
+      skippedVariantCount: 0,
+      lastError: schemaDriftMessage('printify diagnostics', error),
+    };
+  }
+}
+
+async function getMerchizeCatalogDiagnostics(): Promise<ProviderCatalogDiagnostics> {
+  const lastLog = await readLastSyncLog('merchize');
+
+  try {
+    const [productCount, activeVariantCount, skippedVariantCount] = await Promise.all([
+      db.product.count({ where: { integrationRef: { startsWith: 'merchize:' } } }),
+      db.productVariant.count({
+        where: { isEnabled: true, inStock: true, Product: { integrationRef: { startsWith: 'merchize:' } } },
+      }),
+      db.productVariant.count({
+        where: {
+          OR: [{ isEnabled: false }, { inStock: false }],
+          Product: { integrationRef: { startsWith: 'merchize:' } },
+        },
+      }),
+    ]);
+
+    return {
       provider: 'merchize',
-      lastSyncAt: merchizeLastLog?.finishedAt?.toISOString() ?? null,
-      productCount: merchizeProductCount,
-      activeVariantCount: merchizeActiveVariantCount,
-      skippedVariantCount: merchizeSkippedVariantCount,
-      lastError: merchizeLastLog?.errorMessage ? sanitizeError(merchizeLastLog.errorMessage) : null,
-    },
-  ];
+      lastSyncAt: lastLog.finishedAt?.toISOString() ?? null,
+      productCount,
+      activeVariantCount,
+      skippedVariantCount,
+      lastError: lastLog.errorMessage ? sanitizeError(lastLog.errorMessage) : null,
+    };
+  } catch (error) {
+    return {
+      provider: 'merchize',
+      lastSyncAt: lastLog.finishedAt?.toISOString() ?? null,
+      productCount: 0,
+      activeVariantCount: 0,
+      skippedVariantCount: 0,
+      lastError: schemaDriftMessage('integrationRef', error),
+    };
+  }
 }
