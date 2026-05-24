@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { withAdminAuth } from '@/app/lib/auth/admin';
+import { env } from '@/env/server';
 import {
   getProviderCatalogDiagnostics,
   syncMerchizeCatalogFromProvider,
@@ -17,6 +18,30 @@ function parseProvider(value: unknown): SyncProvider {
     : 'all';
 }
 
+function isPreviewRuntime(): boolean {
+  return env.VERCEL_ENV === 'preview' || env.VERCEL_ENVIRONMENT === 'preview';
+}
+
+function assertCatalogSyncAllowedInRuntime() {
+  if (isPreviewRuntime() && env.STAGING_CATALOG_SYNC_ENABLED !== 'true') {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: 'STAGING_CATALOG_SYNC_DISABLED',
+          message:
+            'Catalog sync is disabled for Preview unless STAGING_CATALOG_SYNC_ENABLED=true is set for the safe staging target.',
+          nextAction:
+            'Configure Preview/staging with test-mode Stripe, safe provider credentials, and STAGING_CATALOG_SYNC_ENABLED=true before syncing catalog data.',
+        },
+      },
+      { status: 403 },
+    );
+  }
+
+  return null;
+}
+
 export const GET = withAdminAuth(async (_request: NextRequest) => {
   const diagnostics = await getProviderCatalogDiagnostics();
 
@@ -31,6 +56,9 @@ export const GET = withAdminAuth(async (_request: NextRequest) => {
 });
 
 export const POST = withAdminAuth(async (request: NextRequest) => {
+  const blocked = assertCatalogSyncAllowedInRuntime();
+  if (blocked) return blocked;
+
   let body: unknown = null;
   try {
     body = await request.json();

@@ -48,6 +48,23 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
   `VERCEL_AUTOMATION_BYPASS_SECRET=<secret> BASE_URL=<preview-url> pnpm smoke`.
   The smoke script sends the secret only as the `x-vercel-protection-bypass` header and does not print it.
 
+## Staging safety gates
+
+- Do not run catalog sync or checkout validation against `https://www.otaku-mori.com` unless the intent is to change production data. The custom domain currently resolves to the Production deployment and Production Stripe is live-mode.
+- `pnpm test:commerce-release` starts with `node scripts/assert-staging-safety.mjs`. This guard refuses to run commerce release validation when local/pulled env files or the shell expose `STRIPE_SECRET_KEY=sk_live_*` or `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_*`.
+- Preview catalog sync is blocked unless `STAGING_CATALOG_SYNC_ENABLED=true` is set on the safe Preview/staging environment. Keep this unset on normal Preview deployments that still use live Stripe or production-impacting provider credentials.
+- The protected admin sync endpoints remain admin-only:
+  - `POST /api/admin/catalog-sync`
+  - `POST /api/admin/printify-sync`
+- Safe staging setup order:
+  1. Configure Preview or a staging custom environment with Stripe test-mode keys: `STRIPE_SECRET_KEY=sk_test_*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_*`, and a matching test `STRIPE_WEBHOOK_SECRET`.
+  2. Configure Clerk to allow the PR Preview URL or a staging alias such as `pr29.otaku-mori.com`. Clerk's proxy/FAPI setup can be configured in the Clerk Dashboard; if using a proxy, Clerk requires `NEXT_PUBLIC_CLERK_PROXY_URL`/proxy configuration for the app domain.
+  3. Point the staging target at a Preview/staging database, not the Production database.
+  4. Only after the above are true, set `STAGING_CATALOG_SYNC_ENABLED=true` for that Preview/staging target.
+  5. Sign in as an admin on the staging target and run `POST /api/admin/catalog-sync` with `{ "provider": "printify" }`.
+  6. Rerun `pnpm smoke`, products API smoke, and `pnpm test:commerce-release` against the same staging URL.
+- Vercel supports separate Preview and Production environment variables, including branch-scoped Preview variables. Use that separation for test-mode Stripe and staging database values; do not reuse live Production Stripe for checkout validation.
+
 ## 2026-05-21 PR #29 verification snapshot
 
 - Branch: `chore/commerce-schema-readiness-clean`
@@ -68,6 +85,7 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 - Checkout safety update: customer-facing checkout session 500 responses are generic and keep `requestId` plus `stage`; detailed exception text stays server-side.
 - Merchize catalog safety update: explicit cent/minor-unit fields are treated as cents, decimal currency fields are converted to cents, and ambiguous large integer prices are left unsellable instead of risking a 100x charge.
 - Remaining blockers/manual gates: seed or sync at least one active in-stock sellable catalog variant in Preview or production-domain staging, run Clerk auth on the real custom domain or configured Preview Clerk origins, Stripe test checkout, Stripe webhook replay/idempotency, Printify catalog sync/degraded behavior, Merchize catalog sync/degraded behavior if env exists, physical Mobile Safari checkout path, and proof that fulfillment only starts after verified Stripe webhook payment truth.
+- 2026-05-23 staging-safety update: `www.otaku-mori.com` was confirmed to serve the Production deployment, not the PR Preview. Production Stripe is live-mode. Do not use `www` for catalog sync or checkout proof. The safe path is a Preview/staging URL with test-mode Stripe, Clerk-compatible auth, Preview/staging DB, and `STAGING_CATALOG_SYNC_ENABLED=true`.
 - Post-merge production-domain validation plan: run `BASE_URL=https://www.otaku-mori.com pnpm smoke`, `BASE_URL=https://www.otaku-mori.com pnpm test:clerk-preview`, and `BASE_URL=https://www.otaku-mori.com pnpm test:commerce-release` after PR #29 is merged and deployed to the real custom domain. Validate Clerk sign-in/sign-up, signed-out checkout guard, signed-in cart/checkout, products API, Stripe test checkout only if test mode is safely configured, Stripe webhook replay/idempotency, provider degraded behavior, and Mobile Safari checkout. Do not run a real paid checkout; if Production Stripe is live-only, stop and require a test-mode/staging setup.
 
 ## 2026-05-19 preview verification snapshot

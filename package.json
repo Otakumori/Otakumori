@@ -117,7 +117,7 @@
     "test:api": "vitest run --config vitest.api.config.ts",
     "test:e2e": "playwright test",
     "test:clerk-preview": "playwright test --config=playwright.commerce-release.config.ts --project=chromium --grep \"signed-in checkout\"",
-    "test:commerce-release": "node scripts/commerce-release-static-checks.mjs && pnpm smoke && playwright test --config=playwright.commerce-release.config.ts",
+    "test:commerce-release": "node scripts/assert-staging-safety.mjs && node scripts/commerce-release-static-checks.mjs && pnpm smoke && playwright test --config=playwright.commerce-release.config.ts",
     "test:e2e:smoke": "playwright test --grep smoke",
     "test:e2e:a11y": "playwright test --grep a11y",
     "test:e2e:perf": "playwright test --grep @perf",

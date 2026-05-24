@@ -51,6 +51,7 @@ export const env = createEnv({
     API_KEY: z.string().optional(),
     CRON_SECRET: z.string().optional(),
     VERCEL: z.string().optional(),
+    VERCEL_ENV: z.string().optional(),
     VERCEL_URL: z.string().optional(),
     VERCEL_ENVIRONMENT: z.string().optional(),
     AUTHORIZED_PARTIES: z.string().optional(),
@@ -104,6 +105,7 @@ export const env = createEnv({
     PETAL_DISCOUNT_MAX_PER_USER_MONTH: z.string().optional(), // Max voucher redemptions per user per month (default: 3)
     // Internal
     INTERNAL_AUTH_TOKEN: z.string().optional(),
+    STAGING_CATALOG_SYNC_ENABLED: z.enum(['true', 'false']).optional(),
     // Adult content storage
     ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
     // Next.js phases/runtime
@@ -214,6 +216,7 @@ export const env = createEnv({
     API_KEY: process.env.API_KEY,
     CRON_SECRET: process.env.CRON_SECRET,
     VERCEL: process.env.VERCEL,
+    VERCEL_ENV: process.env.VERCEL_ENV,
     VERCEL_URL: process.env.VERCEL_URL,
     VERCEL_ENVIRONMENT: process.env.VERCEL_ENVIRONMENT,
     AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
@@ -260,6 +263,7 @@ export const env = createEnv({
     PETAL_DISCOUNT_MAX_PERCENT: process.env.PETAL_DISCOUNT_MAX_PERCENT,
     PETAL_DISCOUNT_MAX_PER_USER_MONTH: process.env.PETAL_DISCOUNT_MAX_PER_USER_MONTH,
     INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
+    STAGING_CATALOG_SYNC_ENABLED: process.env.STAGING_CATALOG_SYNC_ENABLED,
     ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
     NEXT_PHASE: process.env.NEXT_PHASE,
     NEXT_RUNTIME: process.env.NEXT_RUNTIME,
