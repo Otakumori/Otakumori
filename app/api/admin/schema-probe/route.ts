@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/app/lib/auth/admin';
+import { env } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -34,7 +35,7 @@ function sanitizeSchemaProbeError(error: unknown): string {
 }
 
 function databaseFingerprint() {
-  const value = process.env.DATABASE_URL ?? '';
+  const value = env.DATABASE_URL ?? '';
   const hash = createHash('sha256').update(value).digest('hex').slice(0, 12);
 
   try {
