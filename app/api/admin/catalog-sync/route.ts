@@ -1,16 +1,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { env } from '@/env/server';
-import {
-  getProviderCatalogDiagnostics,
-  syncMerchizeCatalogFromProvider,
-  syncPrintifyCatalogFromProvider,
-} from '@/lib/catalog/providerSync';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type SyncProvider = 'printify' | 'merchize' | 'all';
+type CatalogSyncStage =
+  | 'runtime_guard'
+  | 'parse_body'
+  | 'printify_sync'
+  | 'diagnostics'
+  | 'response';
 
 function parseProvider(value: unknown): SyncProvider {
   return value === 'printify' || value === 'merchize' || value === 'all'
@@ -42,7 +43,17 @@ function assertCatalogSyncAllowedInRuntime() {
   return null;
 }
 
+function sanitizeCatalogSyncError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return message
+    .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]')
+    .replace(/(sk|pk)_(live|test)_[A-Za-z0-9_]+/gi, '$1_$2_[redacted]')
+    .replace(/(postgres(?:ql)?:\/\/)[^\s"']+/gi, '$1[redacted]')
+    .slice(0, 500);
+}
+
 export const GET = withAdminAuth(async (_request: NextRequest) => {
+  const { getProviderCatalogDiagnostics } = await import('@/lib/catalog/providerSync');
   const diagnostics = await getProviderCatalogDiagnostics();
 
   return NextResponse.json({
@@ -56,46 +67,82 @@ export const GET = withAdminAuth(async (_request: NextRequest) => {
 });
 
 export const POST = withAdminAuth(async (request: NextRequest) => {
-  const blocked = assertCatalogSyncAllowedInRuntime();
-  if (blocked) return blocked;
+  let stage: CatalogSyncStage = 'runtime_guard';
 
-  let body: unknown = null;
   try {
-    body = await request.json();
-  } catch {
-    body = {};
-  }
+    const blocked = assertCatalogSyncAllowedInRuntime();
+    if (blocked) return blocked;
 
-  const provider = parseProvider(
-    body && typeof body === 'object' && !Array.isArray(body)
-      ? (body as { provider?: unknown }).provider
-      : undefined,
-  );
+    stage = 'parse_body';
+    let body: unknown = null;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
 
-  const results = [];
-  if (provider === 'printify' || provider === 'all') {
-    results.push(await syncPrintifyCatalogFromProvider());
-  }
-  if (provider === 'merchize' || provider === 'all') {
-    results.push(await syncMerchizeCatalogFromProvider());
-  }
+    const provider = parseProvider(
+      body && typeof body === 'object' && !Array.isArray(body)
+        ? (body as { provider?: unknown }).provider
+        : undefined,
+    );
 
-  const diagnostics = await getProviderCatalogDiagnostics();
-  const failed = results.filter((result) => !result.ok);
+    const {
+      getProviderCatalogDiagnostics,
+      syncMerchizeCatalogFromProvider,
+      syncPrintifyCatalogFromProvider,
+    } = await import('@/lib/catalog/providerSync');
 
-  return NextResponse.json(
-    {
-      ok: failed.length === 0,
-      data: {
-        provider,
-        results,
-        diagnostics,
-        nextAction:
-          failed.length > 0
-            ? 'Review sanitized provider sync errors and provider env configuration before launch.'
-            : 'Catalog sync completed. Verify storefront products and checkout with a real test order.',
+    const results = [];
+    if (provider === 'printify' || provider === 'all') {
+      stage = 'printify_sync';
+      results.push(await syncPrintifyCatalogFromProvider());
+    }
+    if (provider === 'merchize' || provider === 'all') {
+      stage = 'printify_sync';
+      results.push(await syncMerchizeCatalogFromProvider());
+    }
+
+    stage = 'diagnostics';
+    const diagnostics = await getProviderCatalogDiagnostics();
+    const failed = results.filter((result) => !result.ok);
+
+    stage = 'response';
+    return NextResponse.json(
+      {
+        ok: failed.length === 0,
+        data: {
+          provider,
+          results,
+          diagnostics,
+          nextAction:
+            failed.length > 0
+              ? 'Review sanitized provider sync errors and provider env configuration before launch.'
+              : 'Catalog sync completed. Verify storefront products and checkout with a real test order.',
+        },
       },
-    },
-    { status: failed.length > 0 ? 207 : 200 },
-  );
+      { status: failed.length > 0 ? 207 : 200 },
+    );
+  } catch (error) {
+    const message = sanitizeCatalogSyncError(error);
+    const { logger } = await import('@/app/lib/logger');
+    logger.error(
+      'Catalog sync failed',
+      undefined,
+      { stage },
+      error instanceof Error ? error : new Error(String(error)),
+    );
+
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: 'CATALOG_SYNC_FAILED',
+          stage,
+          message,
+        },
+      },
+      { status: 500 },
+    );
+  }
 });
