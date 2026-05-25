@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/app/lib/auth/admin';
+import { ADMIN_EMAILS, isAdminEmail } from '@/app/lib/config/admin';
 import { env } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 
@@ -22,6 +23,14 @@ type TableRow = {
 type ColumnRow = {
   table_name: string;
   column_name: string;
+};
+
+type SessionClaimsLike = Record<string, unknown> & {
+  email?: string;
+  primary_email_address?: string;
+  publicMetadata?: Record<string, unknown>;
+  privateMetadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 };
 
 function sanitizeSchemaProbeError(error: unknown): string {
@@ -58,11 +67,48 @@ function databaseFingerprint() {
   }
 }
 
+function hasAdminClaim(sessionClaims: unknown): boolean {
+  if (!sessionClaims || typeof sessionClaims !== 'object') {
+    return false;
+  }
+
+  const claims = sessionClaims as SessionClaimsLike;
+  const roleCandidates = [
+    claims.publicMetadata?.role,
+    claims.privateMetadata?.role,
+    claims.metadata?.role,
+    claims.role,
+  ];
+
+  if (roleCandidates.some((role) => role === 'admin')) {
+    return true;
+  }
+
+  const emailCandidates = [
+    claims.email,
+    claims.primary_email_address,
+    typeof claims.primary_email_address === 'string' ? claims.primary_email_address : null,
+  ];
+
+  return emailCandidates.some((email) => typeof email === 'string' && isAdminEmail(email));
+}
+
+function safeClaimKeys(sessionClaims: unknown): string[] {
+  if (!sessionClaims || typeof sessionClaims !== 'object') {
+    return [];
+  }
+
+  return Object.keys(sessionClaims as Record<string, unknown>)
+    .filter((key) => !/token|secret|jwt|session/i.test(key))
+    .slice(0, 30);
+}
+
 export async function GET() {
   let stage = 'auth';
 
   try {
-    const { userId } = await auth();
+    const authResult = await auth();
+    const { userId, sessionClaims } = authResult;
 
     if (!userId) {
       return NextResponse.json(
@@ -71,10 +117,33 @@ export async function GET() {
       );
     }
 
-    const user = await currentUser();
-    if (!isAdmin(user)) {
+    let adminAllowed = hasAdminClaim(sessionClaims);
+    let currentUserError: string | null = null;
+
+    if (!adminAllowed) {
+      stage = 'auth_current_user';
+
+      try {
+        const user = await currentUser();
+        adminAllowed = isAdmin(user);
+      } catch (error) {
+        currentUserError = sanitizeSchemaProbeError(error);
+      }
+    }
+
+    if (!adminAllowed) {
       return NextResponse.json(
-        { ok: false, error: 'FORBIDDEN' },
+        {
+          ok: false,
+          error: 'FORBIDDEN',
+          auth: {
+            hasUserId: Boolean(userId),
+            hasSessionClaims: Boolean(sessionClaims),
+            claimKeys: safeClaimKeys(sessionClaims),
+            adminEmailsConfigured: ADMIN_EMAILS.length,
+            currentUserError,
+          },
+        },
         { status: 403, headers: { 'x-otm-reason': 'FORBIDDEN' } },
       );
     }
