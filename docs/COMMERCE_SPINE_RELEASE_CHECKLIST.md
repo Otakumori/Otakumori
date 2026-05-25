@@ -53,6 +53,7 @@ This checklist is for a same-day Commerce Spine + Realm Foundation release. Do n
 - Do not run catalog sync or checkout validation against `https://www.otaku-mori.com` unless the intent is to change production data. The custom domain currently resolves to the Production deployment and Production Stripe is live-mode.
 - `pnpm test:commerce-release` starts with `node scripts/assert-staging-safety.mjs`. This guard refuses to run commerce release validation when local/pulled env files or the shell expose `STRIPE_SECRET_KEY=sk_live_*` or `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_*`.
 - Preview catalog sync is blocked unless `STAGING_CATALOG_SYNC_ENABLED=true` is set on the safe Preview/staging environment. Keep this unset on normal Preview deployments that still use live Stripe or production-impacting provider credentials.
+- If a Preview/staging database is missing catalog sync schema pieces, apply the forward-only Prisma migration `20260525152000_catalog_schema_drift_repair` only after confirming the target database is not Production. This repair adds the provider catalog columns/indexes and `PrintifySyncLog` table required by sync; do not use `migrate dev`, `migrate reset`, or seed data for this PR validation path.
 - The protected admin sync endpoints remain admin-only:
   - `POST /api/admin/catalog-sync`
   - `POST /api/admin/printify-sync`
