@@ -14,6 +14,18 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
   // Fix lockfile detection warning
   outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    '/api/**/*': [
+      './node_modules/.prisma/client/**/*',
+      './node_modules/.pnpm/@prisma+client*/node_modules/.prisma/client/**/*',
+      './generated/prisma/**/*',
+    ],
+    '/*': [
+      './node_modules/.prisma/client/**/*',
+      './node_modules/.pnpm/@prisma+client*/node_modules/.prisma/client/**/*',
+      './generated/prisma/**/*',
+    ],
+  },
   // Temporarily disable ESLint during build for deployment
   eslint: {
     ignoreDuringBuilds: true,
