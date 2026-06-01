@@ -20,7 +20,7 @@
     "jsx": "preserve",
     "jsxImportSource": "react",
     "incremental": true,
-    "tsBuildInfoFile": ".cache/tsbuildinfo.json",
+    "tsBuildInfoFile": ".cache/tsconfig.tsbuildinfo",
     "allowImportingTsExtensions": true,
     "types": ["node", "jest"],
     "typeRoots": ["./node_modules/@types", "./types"],

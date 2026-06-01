@@ -20,6 +20,7 @@ CODEX_CONTEXT.md
 
 # TypeScript build info
 *.tsbuildinfo
+.cache/
 packages/avatar-engine/tsconfig.tsbuildinfo*
 *.blend
 
