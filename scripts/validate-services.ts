@@ -23,13 +23,14 @@ const { env } = await import('@/env');
 
 interface ValidationResult {
   service: string;
-  status: 'pass' | 'fail' | 'skip';
+  status: 'pass' | 'fail' | 'skip' | 'warn';
   message: string;
   details?: string;
   action?: string;
 }
 
 const results: ValidationResult[] = [];
+const strict = process.argv.includes('--strict');
 
 function normalizeBaseUrl(value: string | undefined, fallback: string) {
   return (value || fallback).trim().replace(/\/+$/, '');
@@ -457,20 +458,20 @@ async function validateResendAdminDomain() {
     } else {
       results.push({
         service: 'Resend Admin Domain',
-        status: 'fail',
+        status: 'warn',
         message: 'Resend admin API key failed domain readiness',
         details: `HTTP ${response.status}`,
         action:
-          'Regenerate the Resend admin key with Full access. This probe only reads domains and does not send email.',
+          'Optional readiness warning: regenerate the Resend admin key with Full access. This probe only reads domains and does not send email.',
       });
     }
   } catch (error) {
     results.push({
       service: 'Resend Admin Domain',
-      status: 'fail',
+      status: 'warn',
       message: 'Failed to connect to Resend',
       details: error instanceof Error ? error.message : String(error),
-      action: 'Check the Resend admin key and network reachability.',
+      action: 'Optional readiness warning: check the Resend admin key and network reachability.',
     });
   }
 }
@@ -492,6 +493,7 @@ async function main() {
 
   const passed = results.filter((r) => r.status === 'pass');
   const failed = results.filter((r) => r.status === 'fail');
+  const warned = results.filter((r) => r.status === 'warn');
   const skipped = results.filter((r) => r.status === 'skip');
 
   results.forEach((result) => {
@@ -502,8 +504,22 @@ async function main() {
   });
 
   console.log('\n' + '='.repeat(80));
-  console.log(`Passed: ${passed.length} | Failed: ${failed.length} | Skipped: ${skipped.length}`);
+  console.log(
+    `Passed: ${passed.length} | Failed: ${failed.length} | Warnings: ${warned.length} | Skipped: ${skipped.length}`,
+  );
   console.log('='.repeat(80) + '\n');
+
+  if (warned.length > 0) {
+    console.log('[Warning] Optional Readiness Issues Found:');
+    warned.forEach((result) => {
+      console.log(`\nWarning ${result.service}:`);
+      console.log(`   Problem: ${result.message}`);
+      if (result.details) {
+        console.log(`   Details: ${result.details}`);
+      }
+      console.log(`   Action: ${result.action ?? 'Check your environment configuration'}`);
+    });
+  }
 
   if (failed.length > 0) {
     console.log('[Warning] Issues Found:');
@@ -516,8 +532,11 @@ async function main() {
       console.log(`   Action: ${result.action ?? 'Check your environment configuration'}`);
     });
     process.exit(1);
+  } else if (strict && warned.length > 0) {
+    console.log('\nStrict mode failed because optional readiness warnings are present.');
+    process.exit(1);
   } else {
-    console.log('All configured services are working correctly!');
+    console.log('All required configured services are working correctly!');
     process.exit(0);
   }
 }
