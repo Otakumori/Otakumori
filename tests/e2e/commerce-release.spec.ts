@@ -171,14 +171,28 @@ async function signInWithClerk(page: Page) {
   }
 
   await identifier.fill(email);
-  await page.getByRole('button', { name: /continue|sign in/i }).first().click();
+  await identifier.press('Enter');
 
   const passwordInput = page.locator('input[name="password"], input[type="password"]').first();
   await passwordInput.waitFor({ state: 'visible' });
   await passwordInput.fill(password);
-  await page.getByRole('button', { name: /continue|sign in/i }).first().click();
+  await passwordInput.press('Enter');
 
-  await page.waitForURL((url) => !url.pathname.includes('/sign-in'), { timeout: 30_000 });
+  const authError = page
+    .getByText(/password is incorrect|couldn't find your account|invalid password|invalid email/i)
+    .first();
+  const result = await Promise.race([
+    page
+      .waitForURL((url) => !url.pathname.includes('/sign-in'), { timeout: 30_000 })
+      .then(() => 'signed-in' as const),
+    authError.waitFor({ state: 'visible', timeout: 30_000 }).then(() => 'auth-error' as const),
+  ]);
+
+  if (result === 'auth-error') {
+    throw new Error(
+      'BLOCKED_BY_ENV: Clerk E2E credentials were rejected by the Preview Clerk instance.',
+    );
+  }
 }
 
 test.describe('commerce release preview validation', () => {
@@ -239,6 +253,16 @@ test.describe('commerce release preview validation', () => {
         });
         test.skip(true, message);
       }
+      if (
+        process.env.npm_lifecycle_event === 'test:commerce-release'
+        && message.includes('BLOCKED_BY_ENV: Clerk E2E credentials were rejected')
+      ) {
+        testInfo.annotations.push({
+          type: 'blocked',
+          description: 'Preview Clerk rejected the configured CLERK_E2E_EMAIL/CLERK_E2E_PASSWORD.',
+        });
+        test.skip(true, message);
+      }
       throw error;
     }
     await seedCart(page);
@@ -258,6 +282,8 @@ test.describe('commerce release preview validation', () => {
     await expect(page.getByRole('button', { name: /proceed to payment/i })).toBeVisible();
     expect(checkoutRequests).toBe(0);
 
+    await page.getByPlaceholder(/first name/i).fill('Preview');
+    await page.getByPlaceholder(/last name/i).fill('Tester');
     await page.getByPlaceholder(/street address/i).fill('123 Preview Lane');
     await page.getByPlaceholder(/city/i).fill('New York');
     await page.locator('select[name="state"]').selectOption('NY');
@@ -267,6 +293,70 @@ test.describe('commerce release preview validation', () => {
     await expect.poll(() => checkoutRequests).toBe(1);
     await expect(page.getByText(/release validation blocked checkout redirect/i)).toBeVisible();
     assertNoConsoleErrors();
+  });
+
+  test('signed-in checkout creates a Stripe TEST checkout session without completing payment', async ({ page }, testInfo) => {
+    test.skip(
+      process.env.STRIPE_CHECKOUT_PROOF !== '1',
+      'Set STRIPE_CHECKOUT_PROOF=1 to create exactly one Stripe TEST checkout session.',
+    );
+    test.skip(testInfo.project.name !== 'chromium', 'Stripe checkout proof runs once on desktop Chromium.');
+
+    await signInWithClerk(page);
+    const { product, variant } = await findSellableProduct(page);
+
+    await page.goto('/');
+    const body = await page.evaluate(
+      async ({ product, variant }) => {
+        const response = await fetch('/api/v1/checkout/session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-idempotency-key': `stripe-proof-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          },
+          body: JSON.stringify({
+            items: [
+              {
+                productId: product.id,
+                variantId: variant.id,
+                name: product.title,
+                quantity: 1,
+                priceCents: variant.priceCents,
+                sku: `SKU-${product.id}`,
+              },
+            ],
+            shippingInfo: {
+              firstName: 'Preview',
+              lastName: 'Tester',
+              email: 'preview-checkout-proof@example.com',
+              address: '123 Preview Lane',
+              city: 'New York',
+              state: 'NY',
+              zipCode: '10001',
+              country: 'US',
+            },
+            successUrl: `${window.location.origin}/shop/checkout/success`,
+            cancelUrl: `${window.location.origin}/shop/cart`,
+          }),
+        });
+
+        return {
+          status: response.status,
+          ok: response.ok,
+          json: await response.json(),
+        };
+      },
+      { product, variant },
+    );
+
+    expect(body.status).toBe(200);
+    expect(body.ok).toBe(true);
+    const checkoutUrl = body.json?.data?.url;
+
+    expect(body.json?.ok).toBe(true);
+    expect(body.json?.data?.orderId).toBeTruthy();
+    expect(checkoutUrl).toMatch(/^https:\/\/checkout\.stripe\.com\//);
+    expect(checkoutUrl).toContain('cs_test_');
   });
 
   test('mobile and WebKit commerce routes render without critical runtime failures', async ({ page }) => {
