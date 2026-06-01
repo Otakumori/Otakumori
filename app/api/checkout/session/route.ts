@@ -18,6 +18,14 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.auth, async () => {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'This checkout endpoint is retired. Use /api/v1/checkout/session.',
+      },
+      { status: 410 },
+    );
+
     try {
       const { userId } = await auth();
       if (!userId) {
@@ -150,8 +158,8 @@ export async function POST(req: NextRequest) {
       logger.error(
         'Error creating checkout session:',
         undefined,
-        undefined,
-        error instanceof Error ? error : new Error(String(error)),
+        { errorType: typeof error },
+        new Error('Legacy checkout session route failed'),
       );
       return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
     }

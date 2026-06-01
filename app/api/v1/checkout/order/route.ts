@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Unable to load order fulfillment status',
       },
       { status: 500 },
     );

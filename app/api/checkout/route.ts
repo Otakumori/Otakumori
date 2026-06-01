@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
+import { paths } from '@/lib/paths';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-10-29.clover',
@@ -11,6 +12,14 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 });
 
 export async function POST(request: NextRequest) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: 'This checkout endpoint is retired. Use /api/v1/checkout/session.',
+    },
+    { status: 410 },
+  );
+
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -53,8 +62,8 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: `${getRuntimeOrigin()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${getRuntimeOrigin()}/cart`,
+      success_url: `${getRuntimeOrigin()}${paths.checkoutSuccess()}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getRuntimeOrigin()}${paths.cart()}`,
       metadata: {
         clerk_user_id: userId,
         items: JSON.stringify(items),
@@ -98,8 +107,8 @@ export async function POST(request: NextRequest) {
     logger.error(
       'Checkout API error:',
       undefined,
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
+      { errorType: typeof error },
+      new Error('Legacy checkout route failed'),
     );
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }

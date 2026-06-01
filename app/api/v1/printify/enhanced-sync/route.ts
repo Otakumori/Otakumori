@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     return Response.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'Enhanced Printify sync failed',
       },
       { status: 500 },
     );
@@ -55,14 +55,12 @@ export async function GET() {
   try {
     await requireAdminOrThrow();
 
-    // Get current sync statistics from database
-    const stats = await enhancedPrintifyService.validateAllProductLinks();
-
     return Response.json({
       ok: true,
       data: {
-        lastSync: new Date().toISOString(),
-        ...stats,
+        status: 'available',
+        checkedAt: new Date().toISOString(),
+        note: 'Use POST /api/v1/printify/enhanced-sync for validation or sync work.',
       },
     });
   } catch (error) {
@@ -71,7 +69,7 @@ export async function GET() {
     return Response.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'Unable to load enhanced Printify sync status',
       },
       { status: 500 },
     );
