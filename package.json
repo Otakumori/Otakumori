@@ -201,7 +201,10 @@
     "lint-staged": "lint-staged",
     "dev:community-ws": "node scripts/mock-community-ws.mjs",
     "scan:emojis": "node scripts/scan-emojis.mjs",
-    "lighthouse": "node scripts/lighthouse-monitor.mjs"
+    "lighthouse": "node scripts/lighthouse-monitor.mjs",
+    "diagnose:redis": "tsx scripts/diagnose-upstash-rest.ts",
+    "env:audit:runtime": "tsx scripts/audit-runtime-readiness.ts",
+    "env:readiness": "pnpm env:audit:runtime && pnpm validate:services"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.0",

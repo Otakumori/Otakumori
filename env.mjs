@@ -58,6 +58,8 @@ export const env = createEnv({
     NEXT_TELEMETRY_DISABLED: z.string().optional(),
     NODE_OPTIONS: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
+    RESEND_ADMIN_API_KEY: z.string().optional(),
+    RESEND_ADMIN_KEY: z.string().optional(),
     EMAIL_FROM: z.string().email().optional(),
     INNGEST_SERVE_URL: z.string().url().optional(),
     INNGEST_EVENT_KEY: z.string().optional(),
@@ -106,6 +108,8 @@ export const env = createEnv({
     // Internal
     INTERNAL_AUTH_TOKEN: z.string().optional(),
     STAGING_CATALOG_SYNC_ENABLED: z.enum(['true', 'false']).optional(),
+    ALLOW_LIVE_KEYS_IN_NON_PROD: z.enum(['true', 'false']).optional(),
+    ALLOW_TEST_KEYS_IN_PRODUCTION: z.enum(['true', 'false']).optional(),
     // Adult content storage
     ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
     // Next.js phases/runtime
@@ -223,6 +227,8 @@ export const env = createEnv({
     NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED,
     NODE_OPTIONS: process.env.NODE_OPTIONS,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_ADMIN_API_KEY: process.env.RESEND_ADMIN_API_KEY,
+    RESEND_ADMIN_KEY: process.env.RESEND_ADMIN_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
     INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
     INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
@@ -264,6 +270,8 @@ export const env = createEnv({
     PETAL_DISCOUNT_MAX_PER_USER_MONTH: process.env.PETAL_DISCOUNT_MAX_PER_USER_MONTH,
     INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
     STAGING_CATALOG_SYNC_ENABLED: process.env.STAGING_CATALOG_SYNC_ENABLED,
+    ALLOW_LIVE_KEYS_IN_NON_PROD: process.env.ALLOW_LIVE_KEYS_IN_NON_PROD,
+    ALLOW_TEST_KEYS_IN_PRODUCTION: process.env.ALLOW_TEST_KEYS_IN_PRODUCTION,
     ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
     NEXT_PHASE: process.env.NEXT_PHASE,
     NEXT_RUNTIME: process.env.NEXT_RUNTIME,
