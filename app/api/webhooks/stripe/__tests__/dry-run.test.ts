@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const constructEventMock = vi.fn();
 const retrieveSessionMock = vi.fn();
-const createPrintifyOrderMock = vi.fn();
+const retrievePaymentIntentMock = vi.fn();
+const dispatchFulfillmentMock = vi.fn();
+const recordStripePaidOrderLedgerMock = vi.fn();
+const resolveStripePaymentAccountingMock = vi.fn();
 const guardStripeRuntimeUsageMock = vi.fn(() => ({ ok: true, mode: 'test', target: 'preview' }));
 
 const dbMock = {
@@ -32,6 +35,8 @@ vi.mock('@/env', () => ({
     STRIPE_SECRET_KEY: 'sk_test_mock',
     STRIPE_WEBHOOK_SECRET: 'whsec_mock',
     STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN: 'true',
+    FULFILLMENT_DRY_RUN: 'true',
+    FULFILLMENT_PROVIDER: 'printify',
     VERCEL_ENV: 'preview',
     NODE_ENV: 'test',
     ALLOW_LIVE_KEYS_IN_NON_PROD: undefined,
@@ -43,8 +48,13 @@ vi.mock('@/lib/db', () => ({
   db: dbMock,
 }));
 
-vi.mock('@/lib/fulfillment/printify', () => ({
-  createPrintifyOrder: createPrintifyOrderMock,
+vi.mock('@/lib/accounting/ledger', () => ({
+  recordStripePaidOrderLedger: recordStripePaidOrderLedgerMock,
+  resolveStripePaymentAccounting: resolveStripePaymentAccountingMock,
+}));
+
+vi.mock('@/lib/fulfillment/orchestrator', () => ({
+  dispatchFulfillment: dispatchFulfillmentMock,
 }));
 
 vi.mock('@/lib/security/stripe-runtime-guard', () => ({
@@ -67,6 +77,9 @@ vi.mock('stripe', () => ({
       sessions: {
         retrieve: retrieveSessionMock,
       },
+    },
+    paymentIntents: {
+      retrieve: retrievePaymentIntentMock,
     },
   })),
 }));
@@ -99,9 +112,20 @@ describe('Stripe webhook fulfillment dry-run', () => {
     dbMock.webhookEvent.create.mockResolvedValue({ id: 'webhook_event_test' });
     dbMock.webhookEvent.update.mockResolvedValue({ id: 'webhook_event_test' });
     dbMock.order.update.mockResolvedValue({ id: 'order_test_dry_run' });
+    resolveStripePaymentAccountingMock.mockResolvedValue({
+      stripeFeeCents: 152,
+      stripeFeeKnown: true,
+      chargeId: 'ch_test_dry_run',
+    });
+    recordStripePaidOrderLedgerMock.mockResolvedValue([]);
+    dispatchFulfillmentMock.mockResolvedValue({
+      status: 'dry_run',
+      provider: 'printify',
+      duplicate: false,
+    });
   });
 
-  it('verifies a signed checkout.session.completed event and skips Printify in dry-run mode', async () => {
+  it('verifies a signed checkout.session.completed event, writes ledger rows, and dispatches dry-run fulfillment', async () => {
     const { POST } = await import('../route');
 
     const response = await POST(new Request('https://preview.test/api/webhooks/stripe', {
@@ -111,7 +135,12 @@ describe('Stripe webhook fulfillment dry-run', () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body).toEqual({ ok: true, fulfillment: 'dry_run_skipped' });
+    expect(body).toEqual({
+      ok: true,
+      fulfillment: 'dry_run',
+      fulfillmentProvider: 'printify',
+      duplicateFulfillment: false,
+    });
     expect(constructEventMock).toHaveBeenCalledWith(
       JSON.stringify({ id: 'evt_test_dry_run' }),
       'signed-test-event',
@@ -125,10 +154,25 @@ describe('Stripe webhook fulfillment dry-run', () => {
         where: { id: 'order_test_dry_run' },
       }),
     );
-    expect(createPrintifyOrderMock).not.toHaveBeenCalled();
+    expect(resolveStripePaymentAccountingMock).toHaveBeenCalled();
+    expect(recordStripePaidOrderLedgerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order_test_dry_run',
+        sourceEventId: 'evt_test_dry_run',
+        stripeFeeCents: 152,
+      }),
+    );
+    expect(dispatchFulfillmentMock).toHaveBeenCalledWith(
+      'order_test_dry_run',
+      expect.objectContaining({
+        source: 'stripe_webhook',
+        sourceEventId: 'evt_test_dry_run',
+        sourceReference: 'cs_test_dry_run',
+      }),
+    );
   });
 
-  it('returns the duplicate response without retrieving the session or calling Printify', async () => {
+  it('returns the duplicate response without retrieving the session or dispatching fulfillment', async () => {
     dbMock.webhookEvent.findUnique.mockResolvedValue({
       id: 'webhook_event_test',
       processingStatus: 'processed',
@@ -146,6 +190,7 @@ describe('Stripe webhook fulfillment dry-run', () => {
     expect(body).toEqual({ ok: true, duplicate: true, reason: 'already_processed' });
     expect(constructEventMock).toHaveBeenCalled();
     expect(retrieveSessionMock).not.toHaveBeenCalled();
-    expect(createPrintifyOrderMock).not.toHaveBeenCalled();
+    expect(recordStripePaidOrderLedgerMock).not.toHaveBeenCalled();
+    expect(dispatchFulfillmentMock).not.toHaveBeenCalled();
   });
 });

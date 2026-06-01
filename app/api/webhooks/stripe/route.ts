@@ -5,7 +5,12 @@ import Stripe from 'stripe';
 import { OrderStatus, type Prisma } from '@prisma/client';
 import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
-import { createPrintifyOrder } from '@/lib/fulfillment/printify';
+import {
+  recordStripePaidOrderLedger,
+  recordStripeRefundLedger,
+  resolveStripePaymentAccounting,
+} from '@/lib/accounting/ledger';
+import { dispatchFulfillment } from '@/lib/fulfillment/orchestrator';
 import { guardStripeRuntimeUsage } from '@/lib/security/stripe-runtime-guard';
 
 export const runtime = 'nodejs';
@@ -24,10 +29,6 @@ type BeginWebhookProcessingResult = {
   shouldProcess: boolean;
   reason?: 'already_processed' | 'in_flight' | 'concurrent_duplicate';
 };
-
-function isStripeWebhookFulfillmentDryRunEnabled() {
-  return ['1', 'true'].includes((env.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN ?? '').toLowerCase());
-}
 
 function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
@@ -231,6 +232,7 @@ export async function POST(req: Request) {
         const currency = fullSession.currency ?? 'usd';
         const paymentIntentId =
           typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
+        const accounting = await resolveStripePaymentAccounting(stripe, fullSession);
         const localOrderId =
           typeof fullSession.metadata?.local_order_id === 'string'
             ? fullSession.metadata.local_order_id
@@ -243,6 +245,7 @@ export async function POST(req: Request) {
           currency: string;
           paidAt: Date;
           paymentIntentId?: string;
+          chargeId?: string;
         } = {
           status: OrderStatus.pending_fulfillment,
           totalAmount: total,
@@ -258,6 +261,7 @@ export async function POST(req: Request) {
           paidAt: Date;
           updatedAt: Date;
           paymentIntentId?: string;
+          chargeId?: string;
         } = {
           stripeId: fullSession.id,
           totalAmount: total,
@@ -270,6 +274,11 @@ export async function POST(req: Request) {
         if (paymentIntentId) {
           updateData.paymentIntentId = paymentIntentId;
           createData.paymentIntentId = paymentIntentId;
+        }
+
+        if (accounting.chargeId) {
+          updateData.chargeId = accounting.chargeId;
+          createData.chargeId = accounting.chargeId;
         }
 
         let order;
@@ -314,41 +323,66 @@ export async function POST(req: Request) {
           break;
         }
 
-        if (isStripeWebhookFulfillmentDryRunEnabled()) {
-          logger.info('Stripe webhook fulfillment dry-run skipped Printify fulfillment', undefined, {
-            orderId: order.id,
-            eventId: event.id,
-          });
-          responsePayload = { ok: true, fulfillment: 'dry_run_skipped' };
+        await recordStripePaidOrderLedger({
+          orderId: order.id,
+          session: fullSession,
+          sourceEventId: event.id,
+          stripeFeeCents: accounting.stripeFeeCents,
+          stripeFeeKnown: accounting.stripeFeeKnown,
+          chargeId: accounting.chargeId,
+        });
+
+        const fulfillment = await dispatchFulfillment(order.id, {
+          source: 'stripe_webhook',
+          sourceEventId: event.id,
+          sourceReference: fullSession.id,
+          stripeSession: fullSession,
+        });
+
+        responsePayload = {
+          ok: true,
+          fulfillment: fulfillment.status,
+          fulfillmentProvider: fulfillment.provider,
+          duplicateFulfillment: fulfillment.duplicate,
+        };
+        break;
+      }
+
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        const paymentIntentId =
+          typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
+        const order = await prisma.order.findFirst({
+          where: {
+            OR: [
+              { chargeId: charge.id },
+              ...(paymentIntentId ? [{ paymentIntentId }] : []),
+            ],
+          },
+        });
+
+        if (!order) {
+          responsePayload = { ok: true, note: 'refund-no-local-order' };
           break;
         }
 
-        try {
-          const result = await createPrintifyOrder(order.id, fullSession);
+        const amountRefunded = charge.amount_refunded ?? 0;
+        await prisma.order.update({
+          where: { id: order.id },
+          data: {
+            refundAmount: amountRefunded,
+            refundedAt: amountRefunded > 0 ? new Date() : undefined,
+          },
+        });
+        await recordStripeRefundLedger({
+          orderId: order.id,
+          currency: charge.currency ?? order.currency,
+          amountRefunded,
+          sourceEventId: event.id,
+          sourceReference: charge.id,
+        });
 
-          if (!result.ok) {
-            logger.error(
-              'Printify fulfillment failed',
-              undefined,
-              undefined,
-              new Error(result.error || 'unknown'),
-            );
-          } else {
-            logger.info('Printify fulfillment success', undefined, {
-              orderId: order.id,
-              printifyOrderId: result.printifyOrderId,
-            });
-          }
-        } catch (err) {
-          logger.error(
-            'Printify fulfillment exception',
-            undefined,
-            undefined,
-            err instanceof Error ? err : new Error(String(err)),
-          );
-        }
-
-        responsePayload = { ok: true };
+        responsePayload = { ok: true, refundLedger: 'recorded' };
         break;
       }
 

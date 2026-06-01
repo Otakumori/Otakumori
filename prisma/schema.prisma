@@ -927,9 +927,12 @@ model Order {
   User                 User                   @relation(fields: [userId], references: [id])
   OrderItem            OrderItem[]
   CheckoutSession      CheckoutSession[]
+  FulfillmentAttempt   FulfillmentAttempt[]
   PrintifyOrderSync    PrintifyOrderSync?
   PrintifySyncLog      PrintifySyncLog[]
   RewardLedger         RewardLedger[]
+  TaxLedgerEntry       TaxLedgerEntry[]
+  BusinessExpense      BusinessExpense[]
   UserRune             UserRune[]
   FinancialTransaction FinancialTransaction[]
 }
@@ -1210,6 +1213,82 @@ model PrintifyOrderSync {
 
   @@index([localOrderId])
   @@index([status])
+}
+
+model FulfillmentAttempt {
+  id              String                   @id @default(cuid())
+  orderId         String
+  provider        FulfillmentProvider
+  status          FulfillmentAttemptStatus @default(pending)
+  externalOrderId String?
+  idempotencyKey  String                   @unique
+  sourceEventId   String?
+  sourceReference String?
+  attemptCount    Int                      @default(1)
+  requestSummary  Json?
+  responseSummary Json?
+  errorCode       String?
+  errorMessage    String?                  @db.VarChar(500)
+  completedAt     DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  Order           Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([provider, status])
+  @@index([sourceEventId])
+}
+
+model TaxLedgerEntry {
+  id                   String             @id @default(cuid())
+  orderId              String?
+  businessExpenseId    String?
+  entryType            TaxLedgerEntryType
+  amountCents          Int
+  currency             String             @default("USD")
+  customerJurisdiction String?
+  sourceProvider       String
+  sourceEventId        String?
+  sourceReference      String?
+  idempotencyKey       String             @unique
+  reversalOfEntryId    String?
+  occurredAt           DateTime
+  metadata             Json?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  Order                Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  BusinessExpense      BusinessExpense?   @relation(fields: [businessExpenseId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, entryType])
+  @@index([businessExpenseId])
+  @@index([entryType, occurredAt])
+  @@index([sourceProvider, sourceEventId])
+  @@index([occurredAt])
+}
+
+model BusinessExpense {
+  id              String           @id @default(cuid())
+  category        String
+  vendor          String?
+  description     String
+  amountCents     Int
+  currency        String           @default("USD")
+  incurredAt      DateTime
+  paidAt          DateTime?
+  sourceProvider  String?
+  sourceReference String?
+  receiptUrl      String?
+  metadata        Json?
+  orderId         String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  Order           Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  TaxLedgerEntry  TaxLedgerEntry[]
+
+  @@index([category, incurredAt])
+  @@index([orderId])
+  @@index([sourceProvider, sourceReference])
+  @@index([incurredAt])
 }
 
 model PrintifySyncLog {
@@ -2159,6 +2238,35 @@ enum OrderStatus {
   manual_review
   shipped
   cancelled
+}
+
+enum FulfillmentProvider {
+  printify
+  merchize
+  manual
+  disabled
+}
+
+enum FulfillmentAttemptStatus {
+  pending
+  dry_run
+  skipped
+  succeeded
+  failed
+  manual_review
+}
+
+enum TaxLedgerEntryType {
+  SALE_GROSS
+  DISCOUNT
+  SHIPPING_CHARGED
+  TAX_COLLECTED
+  STRIPE_FEE
+  REFUND
+  PROVIDER_PRODUCTION_COST
+  PROVIDER_SHIPPING_COST
+  BUSINESS_EXPENSE
+  NET_REVENUE_ESTIMATE
 }
 
 enum PhraseCategory {

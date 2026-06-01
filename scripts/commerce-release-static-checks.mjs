@@ -24,14 +24,29 @@ const checks = [
     pattern: /beginWebhookProcessing\(event\)[\s\S]*duplicate:\s*true/,
   },
   {
-    name: 'Fulfillment is called after checkout.session.completed handling unless dry-run guarded',
+    name: 'Fulfillment is dispatched through provider-neutral orchestration after payment truth',
     file: 'app/api/webhooks/stripe/route.ts',
-    pattern: /case 'checkout\.session\.completed'[\s\S]*isStripeWebhookFulfillmentDryRunEnabled\(\)[\s\S]*dry_run_skipped[\s\S]*createPrintifyOrder\(order\.id,\s*fullSession\)/,
+    pattern: /case 'checkout\.session\.completed'[\s\S]*recordStripePaidOrderLedger\([\s\S]*dispatchFulfillment\(order\.id,\s*{[\s\S]*source:\s*'stripe_webhook'/,
   },
   {
-    name: 'Stripe webhook fulfillment dry-run is server-env gated',
+    name: 'Fulfillment dry-run supports provider-neutral env and legacy Stripe alias',
     file: 'env.mjs',
-    pattern: /STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN:\s*z\.string\(\)\.optional\(\)[\s\S]*STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN:\s*process\.env\.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN/,
+    pattern: /STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN:\s*z\.string\(\)\.optional\(\)[\s\S]*FULFILLMENT_PROVIDER:\s*z\.enum\(\['printify',\s*'merchize',\s*'manual',\s*'disabled'\]\)\.optional\(\)[\s\S]*FULFILLMENT_DRY_RUN:\s*z\.string\(\)\.optional\(\)[\s\S]*FULFILLMENT_DRY_RUN:\s*process\.env\.FULFILLMENT_DRY_RUN/,
+  },
+  {
+    name: 'Fulfillment attempts are durable and unique per dispatch',
+    file: 'prisma/schema.prisma',
+    pattern: /model FulfillmentAttempt[\s\S]*idempotencyKey\s+String\s+@unique[\s\S]*@@index\(\[provider,\s*status\]\)/,
+  },
+  {
+    name: 'Accounting ledger and business expenses are modeled',
+    file: 'prisma/schema.prisma',
+    pattern: /model TaxLedgerEntry[\s\S]*idempotencyKey\s+String\s+@unique[\s\S]*model BusinessExpense[\s\S]*enum TaxLedgerEntryType[\s\S]*SALE_GROSS[\s\S]*NET_REVENUE_ESTIMATE/,
+  },
+  {
+    name: 'Ledger idempotency includes order, entry type, source event, and source reference',
+    file: 'lib/accounting/ledger.ts',
+    pattern: /buildLedgerIdempotencyKey[\s\S]*orderId[\s\S]*entryType[\s\S]*sourceEventId[\s\S]*(providerReference\s*\|\|\s*sourceReference|sourceReference\s*\|\|\s*providerReference)/,
   },
   {
     name: 'Checkout session reloads product and variant data from Prisma',

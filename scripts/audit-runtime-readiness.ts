@@ -40,6 +40,8 @@ const CORE_KEYS = [
 
 const OPTIONAL_INTEGRATIONS = ['PRINTIFY_API_KEY', 'PRINTIFY_SHOP_ID', 'RESEND_API_KEY'] as const;
 
+const FULFILLMENT_PROVIDER_VALUES = ['printify', 'merchize', 'manual', 'disabled'] as const;
+
 const keyPrefixRules = {
   stripeSecret: {
     live: ['sk_live_', 'rk_live_'],
@@ -138,14 +140,6 @@ function inferKeyMode(
   return 'unknown';
 }
 
-function maskPrefix(value: string | undefined): string {
-  if (!value) return 'missing';
-  const trimmed = value.trim();
-  if (!trimmed) return 'missing';
-  const prefix = trimmed.slice(0, Math.min(10, trimmed.length));
-  return `${prefix}...`;
-}
-
 function dbFingerprint(url: string | undefined): string {
   if (!url) return 'missing';
 
@@ -164,6 +158,12 @@ function dbFingerprint(url: string | undefined): string {
   } catch {
     return 'invalid-url';
   }
+}
+
+function dbStatusLabel(fingerprint: string) {
+  if (fingerprint === 'missing') return 'missing';
+  if (fingerprint === 'invalid-url') return 'invalid-url';
+  return 'present';
 }
 
 function addFinding(
@@ -386,6 +386,61 @@ async function main() {
 
   scanPublicSecretLeakage(findings);
 
+  const fulfillmentProvider = (process.env.FULFILLMENT_PROVIDER ?? 'manual').trim().toLowerCase();
+  const fulfillmentDryRun = (
+    process.env.FULFILLMENT_DRY_RUN ??
+    process.env.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN ??
+    'false'
+  )
+    .trim()
+    .toLowerCase();
+
+  if (!(FULFILLMENT_PROVIDER_VALUES as readonly string[]).includes(fulfillmentProvider)) {
+    addFinding(
+      findings,
+      'FAIL',
+      'FULFILLMENT_PROVIDER_INVALID',
+      'FULFILLMENT_PROVIDER is invalid.',
+      'Use printify, merchize, manual, or disabled.',
+    );
+  } else {
+    addFinding(
+      findings,
+      'PASS',
+      'FULFILLMENT_PROVIDER_OK',
+      `Fulfillment provider is configured as ${fulfillmentProvider}.`,
+    );
+  }
+
+  if (fulfillmentDryRun && !['true', 'false', '1', '0'].includes(fulfillmentDryRun)) {
+    addFinding(
+      findings,
+      'FAIL',
+      'FULFILLMENT_DRY_RUN_INVALID',
+      'FULFILLMENT_DRY_RUN must be true, false, 1, or 0.',
+    );
+  }
+
+  if (target === 'production' && fulfillmentDryRun === 'true') {
+    addFinding(
+      findings,
+      'WARN',
+      'FULFILLMENT_DRY_RUN_PRODUCTION',
+      'Fulfillment dry-run is enabled for production target.',
+      'Unset FULFILLMENT_DRY_RUN before live provider fulfillment unless intentionally pausing fulfillment.',
+    );
+  }
+
+  if (target === 'preview' && fulfillmentDryRun !== 'true' && fulfillmentDryRun !== '1') {
+    addFinding(
+      findings,
+      'WARN',
+      'FULFILLMENT_DRY_RUN_PREVIEW_OFF',
+      'Preview fulfillment dry-run is not enabled.',
+      'Set FULFILLMENT_DRY_RUN=true in Preview before signed webhook proof to prevent provider writes.',
+    );
+  }
+
   const databaseUrl = process.env.DATABASE_URL;
   const directUrl = process.env.DIRECT_URL;
 
@@ -458,20 +513,12 @@ async function main() {
 
   console.log('\nRuntime integration readiness audit');
   console.log(`- target: ${target}`);
-  console.log(
-    `- stripe secret mode: ${stripeSecretMode} (${maskPrefix(process.env.STRIPE_SECRET_KEY)})`,
-  );
-  console.log(
-    `- stripe publishable mode: ${stripePublishableMode} (${maskPrefix(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)})`,
-  );
-  console.log(
-    `- clerk secret mode: ${clerkSecretMode} (${maskPrefix(process.env.CLERK_SECRET_KEY)})`,
-  );
-  console.log(
-    `- clerk publishable mode: ${clerkPublishableMode} (${maskPrefix(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)})`,
-  );
-  console.log(`- database: ${databaseFingerprint}`);
-  console.log(`- direct db: ${directFingerprint}`);
+  console.log(`- stripe secret mode: ${stripeSecretMode}`);
+  console.log(`- stripe publishable mode: ${stripePublishableMode}`);
+  console.log(`- clerk secret mode: ${clerkSecretMode}`);
+  console.log(`- clerk publishable mode: ${clerkPublishableMode}`);
+  console.log(`- database: ${dbStatusLabel(databaseFingerprint)}`);
+  console.log(`- direct db: ${dbStatusLabel(directFingerprint)}`);
 
   printFindings(findings);
 

@@ -151,12 +151,25 @@ async function validateStripe() {
         pending?: Array<{ amount: number; currency: string }>;
       };
       const primaryAvailable = balance.available?.[0];
+      const stripeMode = env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : 'TEST';
+      const target = (process.env.APP_ENV_TARGET ?? env.VERCEL_ENV ?? '').toLowerCase();
+      if (target === 'preview' && stripeMode === 'LIVE') {
+        results.push({
+          service: 'Stripe',
+          status: 'fail',
+          message: 'Stripe Preview readiness cannot use LIVE mode',
+          details: 'Mode: LIVE | target=preview',
+          action: 'Use Stripe TEST keys for Preview readiness.',
+        });
+        return;
+      }
+
       results.push({
         service: 'Stripe',
         status: 'pass',
         message: 'Stripe API key is valid',
         details: [
-          `Mode: ${env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : 'TEST'}`,
+          `Mode: ${stripeMode}`,
           primaryAvailable
             ? `Available balance: ${primaryAvailable.amount} ${primaryAvailable.currency}`
             : undefined,
@@ -181,6 +194,54 @@ async function validateStripe() {
       details: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+function validateFulfillmentConfig() {
+  console.log('[Fulfillment] Checking fulfillment configuration...');
+  const provider = env.FULFILLMENT_PROVIDER ?? 'manual';
+  const dryRun = (env.FULFILLMENT_DRY_RUN ?? env.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN ?? 'false')
+    .trim()
+    .toLowerCase();
+
+  if (!['printify', 'merchize', 'manual', 'disabled'].includes(provider)) {
+    results.push({
+      service: 'Fulfillment',
+      status: 'fail',
+      message: 'Fulfillment provider is invalid',
+      details: 'provider=invalid',
+      action: 'Use FULFILLMENT_PROVIDER=printify, manual, disabled, or merchize.',
+    });
+    return;
+  }
+
+  if (dryRun && !['true', 'false', '1', '0'].includes(dryRun)) {
+    results.push({
+      service: 'Fulfillment',
+      status: 'fail',
+      message: 'Fulfillment dry-run flag is invalid',
+      details: 'FULFILLMENT_DRY_RUN must be true, false, 1, or 0',
+      action: 'Set FULFILLMENT_DRY_RUN=true for safe Preview webhook proof, or false/unset for normal behavior.',
+    });
+    return;
+  }
+
+  if (provider === 'merchize') {
+    results.push({
+      service: 'Fulfillment',
+      status: 'warn',
+      message: 'Merchize fulfillment is stubbed for manual review',
+      details: 'provider=merchize | writesProvider=false',
+      action: 'Keep Merchize orders in manual review until the live order API shape is confirmed.',
+    });
+    return;
+  }
+
+  results.push({
+    service: 'Fulfillment',
+    status: 'pass',
+    message: 'Fulfillment configuration is readable',
+    details: `provider=${provider} | dryRun=${dryRun === 'true' || dryRun === '1'}`,
+  });
 }
 
 async function validatePrintify() {
@@ -428,15 +489,15 @@ async function validateResend() {
 
 async function validateResendAdminDomain() {
   console.log('[Resend] Testing admin/domain readiness...');
-  const adminApiKey = env.RESEND_ADMIN_KEY ?? env.RESEND_ADMIN_API_KEY;
+  const adminApiKey = env.RESEND_ADMIN_API_KEY ?? env.RESEND_ADMIN_KEY;
 
   if (!adminApiKey) {
     results.push({
       service: 'Resend Admin Domain',
-      status: 'skip',
-      message: 'Resend admin/domain readiness not configured',
+      status: 'warn',
+      message: 'Resend admin/domain readiness is missing optional admin scope',
       action:
-        'Set RESEND_ADMIN_API_KEY or RESEND_ADMIN_KEY with Full access to enable the read-only domain readiness probe.',
+        'Keep RESEND_API_KEY for sending only. Add RESEND_ADMIN_API_KEY with Full access to enable the read-only domain readiness probe.',
     });
     return;
   }
@@ -459,19 +520,20 @@ async function validateResendAdminDomain() {
       results.push({
         service: 'Resend Admin Domain',
         status: 'warn',
-        message: 'Resend admin API key failed domain readiness',
+        message: 'Resend admin/domain readiness lacks the required admin scope',
         details: `HTTP ${response.status}`,
         action:
-          'Optional readiness warning: regenerate the Resend admin key with Full access. This probe only reads domains and does not send email.',
+          'Optional readiness warning: keep RESEND_API_KEY for sending only and use RESEND_ADMIN_API_KEY with Full access for read-only domain readiness.',
       });
     }
   } catch (error) {
     results.push({
       service: 'Resend Admin Domain',
       status: 'warn',
-      message: 'Failed to connect to Resend',
+      message: 'Resend admin/domain readiness probe could not complete',
       details: error instanceof Error ? error.message : String(error),
-      action: 'Optional readiness warning: check the Resend admin key and network reachability.',
+      action:
+        'Optional readiness warning: verify RESEND_ADMIN_API_KEY admin scope and network reachability. This probe does not send email.',
     });
   }
 }
@@ -482,6 +544,7 @@ async function main() {
   await validateDatabase();
   await validateClerk();
   await validateStripe();
+  validateFulfillmentConfig();
   await validatePrintify();
   await validateRedis();
   await validateResend();
