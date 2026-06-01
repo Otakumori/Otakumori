@@ -49,7 +49,7 @@ Common service failure interpretations:
 - Database `ENOTFOUND` or tenant/user lookup failures usually indicate the wrong `DATABASE_URL` target or stale pooled/direct connection details, not a Prisma schema migration by itself.
 - Printify readiness should verify `GET /v1/shops.json` and `GET /v1/shops/{PRINTIFY_SHOP_ID}/products.json`. Some accounts return `404` for `/v1/shops/{PRINTIFY_SHOP_ID}.json`; that endpoint is not the product-sync source of truth.
 - Redis/Upstash `fetch failed` or ping failure requires checking `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. Some app paths degrade to memory/DB fallbacks, but rate limiting, cache, idempotency, and analytics features may require Redis.
-- Resend readiness is split into two checks. Runtime send config requires `RESEND_API_KEY` with Resend Sending access plus `EMAIL_FROM`; this check does not send email. Admin/domain readiness uses `RESEND_ADMIN_API_KEY` or `RESEND_ADMIN_KEY` with Resend Full access for `GET /domains`; it skips when the admin key is absent and never falls back to `RESEND_API_KEY`.
+- Resend readiness is split into two checks. Runtime send config requires `RESEND_API_KEY` with Resend Sending access plus `EMAIL_FROM`; this check does not send email. Admin/domain readiness uses `RESEND_ADMIN_KEY` with Resend Full access for `GET /domains`, with `RESEND_ADMIN_API_KEY` accepted as a legacy fallback; it skips when the admin key is absent and never falls back to `RESEND_API_KEY`.
 
 ## Merchize
 

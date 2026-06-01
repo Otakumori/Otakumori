@@ -427,7 +427,7 @@ async function validateResend() {
 
 async function validateResendAdminDomain() {
   console.log('[Resend] Testing admin/domain readiness...');
-  const adminApiKey = env.RESEND_ADMIN_API_KEY ?? env.RESEND_ADMIN_KEY;
+  const adminApiKey = env.RESEND_ADMIN_KEY ?? env.RESEND_ADMIN_API_KEY;
 
   if (!adminApiKey) {
     results.push({
