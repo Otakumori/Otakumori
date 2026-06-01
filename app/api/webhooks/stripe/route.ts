@@ -6,14 +6,17 @@ import { OrderStatus, type Prisma } from '@prisma/client';
 import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
+import { guardStripeRuntimeUsage } from '@/lib/security/stripe-runtime-guard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-10-29.clover',
-  typescript: true,
-});
+function getStripeClient() {
+  return new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-10-29.clover',
+    typescript: true,
+  });
+}
 
 const STRIPE_PROVIDER = 'stripe';
 
@@ -21,6 +24,10 @@ type BeginWebhookProcessingResult = {
   shouldProcess: boolean;
   reason?: 'already_processed' | 'in_flight' | 'concurrent_duplicate';
 };
+
+function isStripeWebhookFulfillmentDryRunEnabled() {
+  return ['1', 'true'].includes((env.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN ?? '').toLowerCase());
+}
 
 function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
@@ -165,6 +172,23 @@ async function readRawBody(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const stripeGuard = guardStripeRuntimeUsage({
+    secretKey: env.STRIPE_SECRET_KEY,
+    vercelEnv: env.VERCEL_ENV,
+    nodeEnv: env.NODE_ENV,
+    allowLiveInNonProd: env.ALLOW_LIVE_KEYS_IN_NON_PROD === 'true',
+    allowTestInProd: env.ALLOW_TEST_KEYS_IN_PRODUCTION === 'true',
+  });
+  if (!stripeGuard.ok) {
+    logger.error('Stripe webhook runtime guard blocked request', undefined, {
+      reason: stripeGuard.reason,
+      target: stripeGuard.target,
+      mode: stripeGuard.mode,
+    });
+    return new NextResponse('Stripe runtime guard blocked request', { status: 503 });
+  }
+
+  const stripe = getStripeClient();
   const headersList = await headers();
   const sig = headersList.get('stripe-signature');
   if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
@@ -178,7 +202,12 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
   } catch (err) {
-    logger.error('Invalid Stripe signature', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+    logger.error(
+      'Invalid Stripe signature',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -200,7 +229,8 @@ export async function POST(req: Request) {
 
         const total = fullSession.amount_total ?? 0;
         const currency = fullSession.currency ?? 'usd';
-        const paymentIntentId = typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
+        const paymentIntentId =
+          typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
         const localOrderId =
           typeof fullSession.metadata?.local_order_id === 'string'
             ? fullSession.metadata.local_order_id
@@ -284,11 +314,25 @@ export async function POST(req: Request) {
           break;
         }
 
+        if (isStripeWebhookFulfillmentDryRunEnabled()) {
+          logger.info('Stripe webhook fulfillment dry-run skipped Printify fulfillment', undefined, {
+            orderId: order.id,
+            eventId: event.id,
+          });
+          responsePayload = { ok: true, fulfillment: 'dry_run_skipped' };
+          break;
+        }
+
         try {
           const result = await createPrintifyOrder(order.id, fullSession);
 
           if (!result.ok) {
-            logger.error('Printify fulfillment failed', undefined, undefined, new Error(result.error || 'unknown'));
+            logger.error(
+              'Printify fulfillment failed',
+              undefined,
+              undefined,
+              new Error(result.error || 'unknown'),
+            );
           } else {
             logger.info('Printify fulfillment success', undefined, {
               orderId: order.id,
@@ -296,7 +340,12 @@ export async function POST(req: Request) {
             });
           }
         } catch (err) {
-          logger.error('Printify fulfillment exception', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+          logger.error(
+            'Printify fulfillment exception',
+            undefined,
+            undefined,
+            err instanceof Error ? err : new Error(String(err)),
+          );
         }
 
         responsePayload = { ok: true };
@@ -312,7 +361,12 @@ export async function POST(req: Request) {
     return NextResponse.json(responsePayload);
   } catch (error) {
     await markWebhookFailed(event.id, error);
-    logger.error('Stripe webhook processing failed', undefined, { eventId: event.id, eventType: event.type }, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Stripe webhook processing failed',
+      undefined,
+      { eventId: event.id, eventType: event.type },
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return new NextResponse('Webhook processing failed', { status: 500 });
   }
 }

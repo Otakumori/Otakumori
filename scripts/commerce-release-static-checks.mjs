@@ -24,9 +24,14 @@ const checks = [
     pattern: /beginWebhookProcessing\(event\)[\s\S]*duplicate:\s*true/,
   },
   {
-    name: 'Fulfillment is called after checkout.session.completed handling',
+    name: 'Fulfillment is called after checkout.session.completed handling unless dry-run guarded',
     file: 'app/api/webhooks/stripe/route.ts',
-    pattern: /case 'checkout\.session\.completed'[\s\S]*createPrintifyOrder\(order\.id,\s*fullSession\)/,
+    pattern: /case 'checkout\.session\.completed'[\s\S]*isStripeWebhookFulfillmentDryRunEnabled\(\)[\s\S]*dry_run_skipped[\s\S]*createPrintifyOrder\(order\.id,\s*fullSession\)/,
+  },
+  {
+    name: 'Stripe webhook fulfillment dry-run is server-env gated',
+    file: 'env.mjs',
+    pattern: /STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN:\s*z\.string\(\)\.optional\(\)[\s\S]*STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN:\s*process\.env\.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN/,
   },
   {
     name: 'Checkout session reloads product and variant data from Prisma',
