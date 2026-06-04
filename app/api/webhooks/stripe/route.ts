@@ -367,11 +367,12 @@ export async function POST(req: Request) {
         }
 
         const amountRefunded = charge.amount_refunded ?? 0;
+        const refundedAt = amountRefunded > 0 ? new Date() : undefined;
         await prisma.order.update({
           where: { id: order.id },
           data: {
             refundAmount: amountRefunded,
-            refundedAt: amountRefunded > 0 ? new Date() : undefined,
+            ...(refundedAt ? { refundedAt } : {}),
           },
         });
         await recordStripeRefundLedger({
@@ -380,6 +381,7 @@ export async function POST(req: Request) {
           amountRefunded,
           sourceEventId: event.id,
           sourceReference: charge.id,
+          occurredAt: refundedAt,
         });
 
         responsePayload = { ok: true, refundLedger: 'recorded' };

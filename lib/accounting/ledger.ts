@@ -3,6 +3,16 @@ import 'server-only';
 import { TaxLedgerEntryType, type Prisma } from '@prisma/client';
 import type Stripe from 'stripe';
 import { db as prisma } from '@/lib/db';
+import {
+  amountFromStripeSession,
+  calculateOrderEconomics,
+  economicsMetadata,
+  jurisdictionFromStripeSession,
+  ledgerAmountsFromEconomics,
+  normalizeCurrency,
+  normalizeProviderCosts,
+  type ProviderCostInput,
+} from '@/lib/accounting/order-economics';
 
 type LedgerSource = {
   orderId?: string | null;
@@ -62,27 +72,6 @@ function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
 }
 
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-}
-
-function customerJurisdictionFromSession(session: Stripe.Checkout.Session) {
-  const sessionRecord = asRecord(session);
-  const shippingDetails = asRecord(sessionRecord.shipping_details);
-  const customerDetails = asRecord(session.customer_details);
-  const address = asRecord(shippingDetails.address ?? customerDetails.address);
-  const parts = [address.country, address.state, address.postal_code].filter(Boolean);
-  return parts.length > 0 ? parts.join('-') : null;
-}
-
-function amountFromSession(
-  session: Stripe.Checkout.Session,
-  key: 'amount_discount' | 'amount_shipping' | 'amount_tax',
-) {
-  const value = asRecord(session.total_details)[key];
-  return typeof value === 'number' ? value : 0;
-}
-
 export function buildStripePaidOrderLedgerEntries({
   orderId,
   session,
@@ -98,63 +87,73 @@ export function buildStripePaidOrderLedgerEntries({
   stripeFeeKnown: boolean;
   chargeId?: string | null;
 }): LedgerEntryInput[] {
-  const currency = (session.currency ?? 'usd').toUpperCase();
   const occurredAt = new Date();
-  const saleGross = session.amount_subtotal ?? session.amount_total ?? 0;
-  const discount = amountFromSession(session, 'amount_discount');
-  const shipping = amountFromSession(session, 'amount_shipping');
-  const tax = amountFromSession(session, 'amount_tax');
-  const refund = 0;
-  const providerProductionCost = 0;
-  const providerShippingCost = 0;
-  const netRevenueEstimate =
-    (session.amount_total ?? saleGross + shipping + tax - discount) -
-    stripeFeeCents -
-    refund -
-    providerProductionCost -
-    providerShippingCost;
-  const customerJurisdiction = customerJurisdictionFromSession(session);
+  const discount = amountFromStripeSession(session, 'amount_discount');
+  const shipping = amountFromStripeSession(session, 'amount_shipping');
+  const tax = amountFromStripeSession(session, 'amount_tax');
+  const subtotal = session.amount_subtotal ?? session.amount_total ?? 0;
+  const grossRevenue = session.amount_total ?? subtotal + shipping + tax - discount;
+  const economics = calculateOrderEconomics({
+    orderId,
+    grossRevenueCents: grossRevenue,
+    subtotalCents: subtotal,
+    discountAmountCents: discount,
+    shippingCollectedCents: shipping,
+    taxCollectedCents: tax,
+    stripeFeeCents,
+    providerProductionCostCents: 0,
+    providerShippingCostCents: 0,
+    refundAmountCents: 0,
+    currency: session.currency ?? 'usd',
+    jurisdiction: jurisdictionFromStripeSession(session),
+    sourceProvider: 'stripe',
+    sourceEventId,
+    sourceReference: session.id,
+    occurredAt,
+    stripeFeeKnown,
+    providerCostsKnown: false,
+  });
+  const snapshotMetadata = economicsMetadata(economics);
   const base = {
     orderId,
-    currency,
-    customerJurisdiction,
+    currency: economics.currency,
+    customerJurisdiction: economics.customerJurisdiction,
     sourceProvider: 'stripe',
     sourceEventId,
     sourceReference: session.id,
     occurredAt,
   } satisfies Omit<LedgerEntryInput, 'entryType' | 'amountCents'>;
 
-  return [
-    { ...base, entryType: TaxLedgerEntryType.SALE_GROSS, amountCents: saleGross },
-    { ...base, entryType: TaxLedgerEntryType.DISCOUNT, amountCents: -Math.abs(discount) },
-    { ...base, entryType: TaxLedgerEntryType.SHIPPING_CHARGED, amountCents: shipping },
-    { ...base, entryType: TaxLedgerEntryType.TAX_COLLECTED, amountCents: tax },
-    {
-      ...base,
-      entryType: TaxLedgerEntryType.STRIPE_FEE,
-      amountCents: -Math.abs(stripeFeeCents),
-      metadata: toPrismaJsonValue({ known: stripeFeeKnown, chargeId }),
-    },
-    { ...base, entryType: TaxLedgerEntryType.REFUND, amountCents: -Math.abs(refund) },
-    {
-      ...base,
-      entryType: TaxLedgerEntryType.PROVIDER_PRODUCTION_COST,
-      amountCents: -Math.abs(providerProductionCost),
-      metadata: toPrismaJsonValue({ known: false, reason: 'pending_provider_result' }),
-    },
-    {
-      ...base,
-      entryType: TaxLedgerEntryType.PROVIDER_SHIPPING_COST,
-      amountCents: -Math.abs(providerShippingCost),
-      metadata: toPrismaJsonValue({ known: false, reason: 'pending_provider_result' }),
-    },
-    {
-      ...base,
-      entryType: TaxLedgerEntryType.NET_REVENUE_ESTIMATE,
-      amountCents: netRevenueEstimate,
-      metadata: toPrismaJsonValue({ stripeFeeKnown, providerCostsKnown: false }),
-    },
-  ];
+  return ledgerAmountsFromEconomics(economics).map((entry) => {
+    if (entry.entryType === TaxLedgerEntryType.STRIPE_FEE) {
+      return {
+        ...base,
+        ...entry,
+        metadata: toPrismaJsonValue({ known: stripeFeeKnown, chargeId, economics: snapshotMetadata }),
+      };
+    }
+
+    if (
+      entry.entryType === TaxLedgerEntryType.PROVIDER_PRODUCTION_COST ||
+      entry.entryType === TaxLedgerEntryType.PROVIDER_SHIPPING_COST
+    ) {
+      return {
+        ...base,
+        ...entry,
+        metadata: toPrismaJsonValue({ known: false, reason: 'pending_provider_result' }),
+      };
+    }
+
+    if (entry.entryType === TaxLedgerEntryType.NET_REVENUE_ESTIMATE) {
+      return {
+        ...base,
+        ...entry,
+        metadata: toPrismaJsonValue(snapshotMetadata),
+      };
+    }
+
+    return { ...base, ...entry };
+  });
 }
 
 export async function appendLedgerEntry(input: LedgerEntryInput) {
@@ -285,5 +284,75 @@ export async function recordStripeRefundLedger({
     sourceEventId,
     sourceReference,
     occurredAt,
+  });
+}
+
+export async function recordProviderCostLedger({
+  orderId,
+  providerCosts,
+  occurredAt = new Date(),
+}: {
+  orderId: string;
+  providerCosts: ProviderCostInput;
+  occurredAt?: Date;
+}) {
+  const costs = normalizeProviderCosts(providerCosts);
+  const base = {
+    orderId,
+    currency: costs.currency,
+    sourceProvider: costs.provider,
+    sourceEventId: costs.sourceEventId,
+    sourceReference: costs.sourceReference,
+    occurredAt,
+  } satisfies Omit<LedgerEntryInput, 'entryType' | 'amountCents'>;
+
+  return appendLedgerEntries([
+    {
+      ...base,
+      entryType: TaxLedgerEntryType.PROVIDER_PRODUCTION_COST,
+      amountCents: -costs.productionCostCents,
+      metadata: costs.metadata ?? toPrismaJsonValue({ known: costs.costKnown }),
+    },
+    {
+      ...base,
+      entryType: TaxLedgerEntryType.PROVIDER_SHIPPING_COST,
+      amountCents: -costs.shippingCostCents,
+      metadata: costs.metadata ?? toPrismaJsonValue({ known: costs.costKnown }),
+    },
+  ]);
+}
+
+export async function recordBusinessExpenseLedger({
+  businessExpenseId,
+  orderId,
+  amountCents,
+  currency,
+  sourceProvider,
+  sourceEventId,
+  sourceReference,
+  occurredAt = new Date(),
+  metadata,
+}: {
+  businessExpenseId: string;
+  orderId?: string | null;
+  amountCents: number;
+  currency: string;
+  sourceProvider: string;
+  sourceEventId?: string | null;
+  sourceReference?: string | null;
+  occurredAt?: Date;
+  metadata?: Prisma.InputJsonValue;
+}) {
+  return appendLedgerEntry({
+    orderId,
+    businessExpenseId,
+    entryType: TaxLedgerEntryType.BUSINESS_EXPENSE,
+    amountCents: -Math.abs(amountCents),
+    currency: normalizeCurrency(currency),
+    sourceProvider,
+    sourceEventId,
+    sourceReference,
+    occurredAt,
+    metadata,
   });
 }

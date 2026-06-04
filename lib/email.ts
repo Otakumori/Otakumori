@@ -1,8 +1,5 @@
-import { Resend } from 'resend';
-import { env } from '@/env';
 import { OrderConfirmationEmail } from '@/app/emails/OrderConfirmation';
-
-const resend = new Resend(env.RESEND_API_KEY);
+import { sendCommerceEmail } from '@/lib/email/service';
 
 export interface OrderConfirmationData {
   orderNumber: string;
@@ -30,10 +27,10 @@ export interface OrderConfirmationData {
 
 export async function sendOrderConfirmation(data: OrderConfirmationData) {
   try {
-    const { data: emailData, error } = await resend.emails.send({
-      from: 'Otaku-mori <orders@otaku-mori.com>',
-      to: [data.customerEmail],
+    const emailData = await sendCommerceEmail({
+      to: data.customerEmail,
       subject: `Order Confirmation #${data.orderNumber}`,
+      template: 'order_confirmation',
       react: OrderConfirmationEmail({
         orderNumber: data.orderNumber,
         customerName: data.customerName,
@@ -43,15 +40,10 @@ export async function sendOrderConfirmation(data: OrderConfirmationData) {
         total: data.total,
         shippingAddress: data.shippingAddress,
       }),
+      metadata: { orderNumber: data.orderNumber },
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      throw new Error(`Failed to send email: ${error.message}`);
-    }
-
-    // Order confirmation email sent
-    return { success: true, emailId: emailData?.id };
+    return { success: true, emailId: emailData.providerMessageId, dryRun: emailData.dryRun };
   } catch (error) {
     console.error('Email sending error:', error);
     throw error;

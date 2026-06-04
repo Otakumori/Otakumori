@@ -15,6 +15,7 @@ const LEDGER_KIND_TYPES: Record<string, TaxLedgerEntryType[]> = {
     TaxLedgerEntryType.SHIPPING_CHARGED,
   ],
   fees: [TaxLedgerEntryType.STRIPE_FEE],
+  'stripe-fees': [TaxLedgerEntryType.STRIPE_FEE],
   refunds: [TaxLedgerEntryType.REFUND],
   'provider-costs': [
     TaxLedgerEntryType.PROVIDER_PRODUCTION_COST,
@@ -22,6 +23,7 @@ const LEDGER_KIND_TYPES: Record<string, TaxLedgerEntryType[]> = {
   ],
   'tax-collected': [TaxLedgerEntryType.TAX_COLLECTED],
   expenses: [TaxLedgerEntryType.BUSINESS_EXPENSE],
+  'profit-estimate': [TaxLedgerEntryType.NET_REVENUE_ESTIMATE],
 };
 
 function parseDateRange(req: NextRequest) {
@@ -76,7 +78,7 @@ async function exportExpenses(createdAt?: { gte?: Date; lte?: Date }) {
       'Currency',
       'Paid At',
       'Source Provider',
-      'Source Reference',
+      'Source Reference Present',
       'Order ID',
     ],
     expenses.map((expense) => [
@@ -88,7 +90,7 @@ async function exportExpenses(createdAt?: { gte?: Date; lte?: Date }) {
       expense.currency,
       expense.paidAt?.toISOString() ?? '',
       expense.sourceProvider ?? '',
-      expense.sourceReference ?? '',
+      expense.sourceReference ? 'yes' : 'no',
       expense.orderId ?? '',
     ]),
   );
@@ -114,8 +116,8 @@ async function exportLedger(kind: string, createdAt?: { gte?: Date; lte?: Date }
       'Order ID',
       'Jurisdiction',
       'Source Provider',
-      'Source Reference',
-      'Source Event ID',
+      'Source Reference Present',
+      'Source Event Present',
       'Reversal Of Entry ID',
     ],
     entries.map((entry) => [
@@ -126,8 +128,8 @@ async function exportLedger(kind: string, createdAt?: { gte?: Date; lte?: Date }
       entry.orderId ?? '',
       entry.customerJurisdiction ?? '',
       entry.sourceProvider,
-      entry.sourceReference ?? '',
-      entry.sourceEventId ?? '',
+      entry.sourceReference ? 'yes' : 'no',
+      entry.sourceEventId ? 'yes' : 'no',
       entry.reversalOfEntryId ?? '',
     ]),
   );

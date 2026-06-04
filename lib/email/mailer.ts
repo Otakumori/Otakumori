@@ -1,23 +1,5 @@
 // lib/email/mailer.ts
-import { Resend } from 'resend';
-import { env } from '@/env';
-
-let resend: Resend | null = null;
-let FROM: string | null = null;
-
-function getResend() {
-  if (!resend) {
-    resend = new Resend(env.RESEND_API_KEY!);
-  }
-  return resend;
-}
-
-function getFromEmail() {
-  if (!FROM) {
-    FROM = env.EMAIL_FROM!;
-  }
-  return FROM;
-}
+import { sendCommerceEmail } from '@/lib/email/service';
 
 export type OrderEmailPayload = {
   to: string;
@@ -28,11 +10,12 @@ export type OrderEmailPayload = {
 
 export async function sendOrderConfirmation(p: OrderEmailPayload) {
   const html = orderConfirmHtml(p);
-  return getResend().emails.send({
-    from: getFromEmail(),
+  return sendCommerceEmail({
     to: p.to,
-    subject: `We got your order — #${p.orderId}`,
+    subject: `We got your order - #${p.orderId}`,
     html,
+    template: 'order_confirmation',
+    orderId: p.orderId,
   });
 }
 
@@ -41,7 +24,7 @@ function orderConfirmHtml({ orderId, lineItems, customerName }: OrderEmailPayloa
   const items = lineItems
     .map(
       (li) =>
-        `<tr><td style="padding:6px 0;">${escapeHtml(li.title)}</td><td align="right" style="padding:6px 0;">× ${li.qty}</td></tr>`,
+        `<tr><td style="padding:6px 0;">${escapeHtml(li.title)}</td><td align="right" style="padding:6px 0;">x ${li.qty}</td></tr>`,
     )
     .join('');
 
@@ -51,13 +34,13 @@ function orderConfirmHtml({ orderId, lineItems, customerName }: OrderEmailPayloa
       <tr><td style="padding:24px 24px 0;">
         <h1 style="margin:0 0 8px;font-size:20px;line-height:1.3;">Thanks${customerName ? `, ${escapeHtml(customerName)}` : ''}!</h1>
         <p style="margin:0;color:#c9c9c9">We're queuing your items for printing. You'll get tracking when it ships.</p>
-        <p style="margin:8px 0 0;color:#c9c9c9">Order • <strong>#${orderId}</strong></p>
+        <p style="margin:8px 0 0;color:#c9c9c9">Order <strong>#${escapeHtml(orderId)}</strong></p>
       </td></tr>
       <tr><td style="padding:16px 24px 0;">
         <table width="100%" style="border-collapse:collapse;">${items}</table>
       </td></tr>
       <tr><td style="padding:24px;">
-        <p style="margin:0;color:#c9c9c9;font-size:12px;">Otaku-Mori · Small-batch anime-inspired goods.</p>
+        <p style="margin:0;color:#c9c9c9;font-size:12px;">Otaku-Mori. Small-batch anime-inspired goods.</p>
       </td></tr>
     </table>
   </div>`;

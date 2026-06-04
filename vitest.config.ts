@@ -21,6 +21,7 @@ export default defineConfig({
     include: [
       '__tests__/**/*.{test,spec}.{ts,tsx}',
       'app/**/__tests__/**/*.{test,spec}.{ts,tsx}',
+      'lib/**/__tests__/**/*.{test,spec}.{ts,tsx}',
       'packages/**/__tests__/**/*.{test,spec}.{ts,tsx}',
     ],
     exclude: [

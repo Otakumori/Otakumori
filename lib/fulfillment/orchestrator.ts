@@ -11,6 +11,7 @@ import { logger } from '@/app/lib/logger';
 import { env } from '@/env';
 import { db as prisma } from '@/lib/db';
 import { createPrintifyOrder, loadPrintifyOrderItems } from '@/lib/fulfillment/printify';
+import { recordProviderCostLedger } from '@/lib/accounting/ledger';
 
 export type FulfillmentDispatchSource = {
   source: 'stripe_webhook' | 'admin' | 'manual';
@@ -142,6 +143,16 @@ const printifyAdapter: FulfillmentAdapter = {
     }
 
     const result = await createPrintifyOrder(orderId, source.stripeSession);
+    if (result.ok && result.providerCosts?.costKnown) {
+      await recordProviderCostLedger({
+        orderId,
+        providerCosts: {
+          ...result.providerCosts,
+          sourceEventId: source.sourceEventId,
+          sourceReference: result.printifyOrderId ?? result.providerCosts.sourceReference,
+        },
+      });
+    }
     return {
       ok: result.ok,
       externalOrderId: result.printifyOrderId,
@@ -153,6 +164,7 @@ const printifyAdapter: FulfillmentAdapter = {
         accepted: result.ok,
         externalOrderIdPresent: Boolean(result.printifyOrderId),
         status: result.status ?? null,
+        providerCostsKnown: result.providerCosts?.costKnown === true,
       }),
     };
   },

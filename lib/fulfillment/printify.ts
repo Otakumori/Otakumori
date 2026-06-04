@@ -1,5 +1,9 @@
 import { env } from '@/env';
 import { db as prisma } from '@/lib/db';
+import {
+  extractPrintifyProviderCostsFromOrderResponse,
+  type NormalizedProviderCosts,
+} from '@/lib/accounting/order-economics';
 
 export interface PrintifyAddress {
   first_name: string;
@@ -33,6 +37,7 @@ export interface PrintifyOrderResult {
   printifyOrderId?: string;
   status?: string;
   error?: string;
+  providerCosts?: NormalizedProviderCosts;
   payload?: unknown;
   response?: unknown;
 }
@@ -224,6 +229,7 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
     ok: true,
     printifyOrderId,
     status,
+    providerCosts: extractPrintifyProviderCostsFromOrderResponse(parsed),
     payload,
     response: parsed,
   };

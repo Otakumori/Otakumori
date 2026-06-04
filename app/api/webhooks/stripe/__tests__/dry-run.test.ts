@@ -5,6 +5,7 @@ const retrieveSessionMock = vi.fn();
 const retrievePaymentIntentMock = vi.fn();
 const dispatchFulfillmentMock = vi.fn();
 const recordStripePaidOrderLedgerMock = vi.fn();
+const recordStripeRefundLedgerMock = vi.fn();
 const resolveStripePaymentAccountingMock = vi.fn();
 const guardStripeRuntimeUsageMock = vi.fn(() => ({ ok: true, mode: 'test', target: 'preview' }));
 
@@ -21,6 +22,7 @@ const dbMock = {
     findFirst: vi.fn(),
   },
   order: {
+    findFirst: vi.fn(),
     update: vi.fn(),
     upsert: vi.fn(),
   },
@@ -50,6 +52,7 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('@/lib/accounting/ledger', () => ({
   recordStripePaidOrderLedger: recordStripePaidOrderLedgerMock,
+  recordStripeRefundLedger: recordStripeRefundLedgerMock,
   resolveStripePaymentAccounting: resolveStripePaymentAccountingMock,
 }));
 
@@ -118,6 +121,7 @@ describe('Stripe webhook fulfillment dry-run', () => {
       chargeId: 'ch_test_dry_run',
     });
     recordStripePaidOrderLedgerMock.mockResolvedValue([]);
+    recordStripeRefundLedgerMock.mockResolvedValue({ id: 'ledger_refund_test' });
     dispatchFulfillmentMock.mockResolvedValue({
       status: 'dry_run',
       provider: 'printify',
@@ -192,5 +196,79 @@ describe('Stripe webhook fulfillment dry-run', () => {
     expect(retrieveSessionMock).not.toHaveBeenCalled();
     expect(recordStripePaidOrderLedgerMock).not.toHaveBeenCalled();
     expect(dispatchFulfillmentMock).not.toHaveBeenCalled();
+  });
+
+  it('records refund ledger rows idempotently without touching sale ledger rows', async () => {
+    constructEventMock.mockReturnValue({
+      id: 'evt_test_refund',
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_test_refund',
+          payment_intent: 'pi_test_refund',
+          amount_refunded: 1200,
+          currency: 'usd',
+        },
+      },
+    });
+    dbMock.order.findFirst.mockResolvedValue({
+      id: 'order_test_refund',
+      currency: 'USD',
+    });
+    dbMock.order.update.mockResolvedValue({ id: 'order_test_refund' });
+
+    const { POST } = await import('../route');
+
+    const response = await POST(new Request('https://preview.test/api/webhooks/stripe', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'evt_test_refund' }),
+    }));
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toEqual({ ok: true, refundLedger: 'recorded' });
+    expect(recordStripeRefundLedgerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order_test_refund',
+        currency: 'usd',
+        amountRefunded: 1200,
+        sourceEventId: 'evt_test_refund',
+        sourceReference: 'ch_test_refund',
+      }),
+    );
+    expect(recordStripePaidOrderLedgerMock).not.toHaveBeenCalled();
+    expect(dispatchFulfillmentMock).not.toHaveBeenCalled();
+  });
+
+  it('returns duplicate refund responses without writing another refund row', async () => {
+    constructEventMock.mockReturnValue({
+      id: 'evt_test_refund',
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_test_refund',
+          amount_refunded: 1200,
+          currency: 'usd',
+        },
+      },
+    });
+    dbMock.webhookEvent.findUnique.mockResolvedValue({
+      id: 'webhook_event_refund',
+      processingStatus: 'processed',
+    });
+
+    const { POST } = await import('../route');
+
+    const response = await POST(new Request('https://preview.test/api/webhooks/stripe', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'evt_test_refund' }),
+    }));
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toEqual({ ok: true, duplicate: true, reason: 'already_processed' });
+    expect(dbMock.order.findFirst).not.toHaveBeenCalled();
+    expect(recordStripeRefundLedgerMock).not.toHaveBeenCalled();
+    expect(recordStripePaidOrderLedgerMock).not.toHaveBeenCalled();
   });
 });
