@@ -3,10 +3,16 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { config as loadDotenv } from 'dotenv';
+import {
+  evaluateDeployedRuntimeProof,
+  parseRuntimeConfigProof,
+  parseRuntimeHealthProof,
+} from '@/lib/commerce/runtime-config-proof';
 
 type RuntimeTarget = 'development' | 'preview' | 'production';
 type KeyMode = 'live' | 'test' | 'missing' | 'unknown';
 type Severity = 'PASS' | 'WARN' | 'FAIL';
+type ReadinessMode = 'local-env' | 'deployed-runtime';
 
 type Finding = {
   severity: Severity;
@@ -20,7 +26,7 @@ type EnvSnapshot = {
   values: Record<string, string>;
 };
 
-const DB_KEYS = ['DATABASE_URL', 'DIRECT_URL'] as const;
+const DB_KEYS = ['DATABASE_URL'] as const;
 
 const COMMERCE_KEYS = [
   'STRIPE_SECRET_KEY',
@@ -93,6 +99,13 @@ function detectTarget(): RuntimeTarget {
   if (envTarget) return parseTarget(envTarget);
 
   return process.env.NODE_ENV === 'production' ? 'production' : 'development';
+}
+
+function detectMode(): ReadinessMode {
+  const mode = (getArgValue('mode') ?? process.env.RUNTIME_READINESS_MODE ?? 'local-env')
+    .trim()
+    .toLowerCase();
+  return mode === 'deployed-runtime' ? 'deployed-runtime' : 'local-env';
 }
 
 function readEnvFile(filepath: string): Record<string, string> {
@@ -314,11 +327,110 @@ function printFindings(findings: Finding[]) {
   }
 }
 
+function runDeployedRuntimeAudit(target: RuntimeTarget) {
+  const findings: Finding[] = [];
+  const runtime = parseRuntimeConfigProof(process.env.DEPLOYED_RUNTIME_PROOF_JSON);
+  const health = parseRuntimeHealthProof(process.env.DEPLOYED_HEALTH_PROOF_JSON);
+
+  if (target !== 'preview') {
+    addFinding(
+      findings,
+      'FAIL',
+      'DEPLOYED_RUNTIME_TARGET_NOT_PREVIEW',
+      'Deployed-runtime readiness proof is allowed only for the Preview target.',
+    );
+  }
+
+  if (!runtime) {
+    addFinding(
+      findings,
+      'FAIL',
+      'DEPLOYED_RUNTIME_PROOF_INVALID',
+      'Protected deployed runtime proof is missing or invalid.',
+    );
+  }
+
+  if (!health) {
+    addFinding(
+      findings,
+      'FAIL',
+      'DEPLOYED_HEALTH_PROOF_INVALID',
+      'Protected Preview health proof is missing or invalid.',
+    );
+  }
+
+  if (runtime && health) {
+    const evaluation = evaluateDeployedRuntimeProof(runtime, health);
+    if (evaluation.ok) {
+      addFinding(
+        findings,
+        'PASS',
+        'DEPLOYED_RUNTIME_PROOF_OK',
+        'Protected Preview runtime proof confirms required services and commerce safety.',
+      );
+      addFinding(
+        findings,
+        'PASS',
+        'DEPLOYED_DATABASE_HEALTH_OK',
+        'Protected Preview health proof confirms the database health check passed.',
+      );
+    } else {
+      for (const reason of evaluation.reasons) {
+        addFinding(
+          findings,
+          'FAIL',
+          `DEPLOYED_RUNTIME_${reason.toUpperCase()}`,
+          `Protected Preview runtime proof failed: ${reason}.`,
+        );
+      }
+    }
+
+    if (
+      runtime.deploymentBypassConfigured === 'not_app_env' &&
+      process.env.DEPLOYED_RUNTIME_ACCESS_METHOD === 'vercel-authenticated-connector'
+    ) {
+      addFinding(
+        findings,
+        'WARN',
+        'DEPLOYMENT_BYPASS_NOT_REQUIRED',
+        'Deployment bypass export is unavailable, but authenticated Vercel access proved the protected Preview runtime.',
+      );
+    }
+  }
+
+  addFinding(
+    findings,
+    'WARN',
+    'LOCAL_SECRET_EXPORT_UNAVAILABLE',
+    'Local Preview secret export remains unavailable for commands that require raw credentials.',
+    'Use local-env mode only after the required credentials can be pulled safely.',
+  );
+
+  console.log('\nRuntime integration readiness audit');
+  console.log(`- target: ${target}`);
+  console.log('- mode: deployed-runtime');
+  printFindings(findings);
+
+  const failCount = findings.filter((finding) => finding.severity === 'FAIL').length;
+  const warnCount = findings.filter((finding) => finding.severity === 'WARN').length;
+  const passCount = findings.filter((finding) => finding.severity === 'PASS').length;
+  console.log(`\nSummary: PASS=${passCount} WARN=${warnCount} FAIL=${failCount}`);
+
+  if (failCount > 0) process.exitCode = 1;
+}
+
 async function main() {
+  const target = detectTarget();
+  const mode = detectMode();
+
+  if (mode === 'deployed-runtime') {
+    runDeployedRuntimeAudit(target);
+    return;
+  }
+
   loadDotenv({ path: resolve(process.cwd(), '.env.local') });
   loadDotenv({ path: resolve(process.cwd(), '.env') });
 
-  const target = detectTarget();
   const findings: Finding[] = [];
   const snapshots = inspectEnvFiles();
 
@@ -453,6 +565,16 @@ async function main() {
 
   if (directUrl && directFingerprint === 'invalid-url') {
     addFinding(findings, 'FAIL', 'DIRECT_URL_INVALID', 'DIRECT_URL is not a valid URL.');
+  }
+
+  if (target === 'preview' && !directUrl) {
+    addFinding(
+      findings,
+      'WARN',
+      'DIRECT_URL_MIGRATION_ONLY_MISSING',
+      'DIRECT_URL is not configured for Preview app-runtime readiness.',
+      'Prisma app runtime uses DATABASE_URL in this repo. Set DIRECT_URL only for migration workflows that require a direct/non-pooled connection.',
+    );
   }
 
   if (target === 'production' && databaseFingerprint.includes('host=localhost')) {

@@ -8,6 +8,15 @@ import { existsSync, readFileSync } from 'node:fs';
 import { lookup } from 'node:dns/promises';
 import { resolve } from 'node:path';
 import { parse } from 'dotenv';
+import {
+  evaluateDeployedRuntimeProof,
+  parseRuntimeConfigProof,
+  parseRuntimeHealthProof,
+  type RuntimeConfigProof,
+  type RuntimeHealthProof,
+} from '@/lib/commerce/runtime-config-proof';
+
+const DEFAULT_PRINTIFY_API_URL = 'https://api.printify.com/v1';
 
 for (const file of ['.env.local', '.env']) {
   const path = resolve(process.cwd(), file);
@@ -19,7 +28,24 @@ for (const file of ['.env.local', '.env']) {
   }
 }
 
-const { env } = await import('@/env');
+const env = {
+  DATABASE_URL: process.env.DATABASE_URL,
+  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  FULFILLMENT_PROVIDER: process.env.FULFILLMENT_PROVIDER,
+  FULFILLMENT_DRY_RUN: process.env.FULFILLMENT_DRY_RUN,
+  STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN: process.env.STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN,
+  PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
+  PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
+  PRINTIFY_API_URL: process.env.PRINTIFY_API_URL ?? DEFAULT_PRINTIFY_API_URL,
+  UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+  UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  RESEND_ADMIN_API_KEY: process.env.RESEND_ADMIN_API_KEY,
+  RESEND_ADMIN_KEY: process.env.RESEND_ADMIN_KEY,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  VERCEL_ENV: process.env.VERCEL_ENV,
+};
 
 interface ValidationResult {
   service: string;
@@ -31,6 +57,10 @@ interface ValidationResult {
 
 const results: ValidationResult[] = [];
 const strict = process.argv.includes('--strict');
+const readinessMode =
+  (process.env.RUNTIME_READINESS_MODE ?? 'local-env').trim().toLowerCase() === 'deployed-runtime'
+    ? 'deployed-runtime'
+    : 'local-env';
 
 function normalizeBaseUrl(value: string | undefined, fallback: string) {
   return (value || fallback).trim().replace(/\/+$/, '');
@@ -78,7 +108,8 @@ async function redisFetchFailureDetails(redisUrl: string) {
 function redisHttpFailureAction(status: number) {
   if (status === 401) return 'Check that UPSTASH_REDIS_REST_TOKEN belongs to this Redis REST URL.';
   if (status === 403) return 'Check token permissions and that the database is active.';
-  if (status === 404) return 'Check that UPSTASH_REDIS_REST_URL is the base HTTPS REST endpoint, without /ping.';
+  if (status === 404)
+    return 'Check that UPSTASH_REDIS_REST_URL is the base HTTPS REST endpoint, without /ping.';
   if (status >= 500) return 'Check Upstash service status and the selected Redis database health.';
   return 'Check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN pairing.';
 }
@@ -104,6 +135,16 @@ async function parseRedisPingResponse(response: Response) {
 
 async function validateClerk() {
   console.log('[Auth] Testing Clerk Authentication...');
+  if (!env.CLERK_SECRET_KEY) {
+    results.push({
+      service: 'Clerk',
+      status: 'fail',
+      message: 'Clerk API key is missing',
+      action: 'Set CLERK_SECRET_KEY for this environment.',
+    });
+    return;
+  }
+
   try {
     const response = await fetch(`https://api.clerk.com/v1/users?limit=1`, {
       headers: {
@@ -138,6 +179,16 @@ async function validateClerk() {
 
 async function validateStripe() {
   console.log('[Stripe] Testing Stripe...');
+  if (!env.STRIPE_SECRET_KEY) {
+    results.push({
+      service: 'Stripe',
+      status: 'fail',
+      message: 'Stripe API key is missing',
+      action: 'Set STRIPE_SECRET_KEY for this environment.',
+    });
+    return;
+  }
+
   try {
     const response = await fetch('https://api.stripe.com/v1/balance', {
       headers: {
@@ -220,7 +271,8 @@ function validateFulfillmentConfig() {
       status: 'fail',
       message: 'Fulfillment dry-run flag is invalid',
       details: 'FULFILLMENT_DRY_RUN must be true, false, 1, or 0',
-      action: 'Set FULFILLMENT_DRY_RUN=true for safe Preview webhook proof, or false/unset for normal behavior.',
+      action:
+        'Set FULFILLMENT_DRY_RUN=true for safe Preview webhook proof, or false/unset for normal behavior.',
     });
     return;
   }
@@ -327,6 +379,16 @@ async function validatePrintify() {
 
 async function validateDatabase() {
   console.log('[Database] Testing Database Connection...');
+  if (!env.DATABASE_URL) {
+    results.push({
+      service: 'Database (Neon)',
+      status: 'fail',
+      message: 'DATABASE_URL is missing',
+      action: 'Set DATABASE_URL for this environment.',
+    });
+    return;
+  }
+
   try {
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
@@ -466,7 +528,7 @@ async function validateResend() {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
     results.push({
       service: 'Resend Send Config',
-      status: 'fail',
+      status: 'warn',
       message: 'Resend runtime send config is incomplete',
       details: [
         env.RESEND_API_KEY ? undefined : 'missing RESEND_API_KEY',
@@ -538,17 +600,127 @@ async function validateResendAdminDomain() {
   }
 }
 
+function validateDeployedRuntimeServices(
+  runtimeProof: RuntimeConfigProof,
+  healthProof: RuntimeHealthProof,
+) {
+  const evaluation = evaluateDeployedRuntimeProof(runtimeProof, healthProof);
+
+  results.push({
+    service: 'Database',
+    status: healthProof.databaseHealthy ? 'pass' : 'fail',
+    message: healthProof.databaseHealthy
+      ? 'Protected Preview database health passed'
+      : 'Protected Preview database health failed',
+  });
+  results.push({
+    service: 'Clerk',
+    status:
+      runtimeProof.clerkServerConfigured && runtimeProof.clerkPublishableConfigured
+        ? 'pass'
+        : 'fail',
+    message:
+      runtimeProof.clerkServerConfigured && runtimeProof.clerkPublishableConfigured
+        ? 'Protected Preview Clerk configuration is present'
+        : 'Protected Preview Clerk configuration is incomplete',
+  });
+  results.push({
+    service: 'Stripe',
+    status:
+      runtimeProof.stripeMode === 'test' && runtimeProof.stripeWebhookConfigured ? 'pass' : 'fail',
+    message:
+      runtimeProof.stripeMode === 'test' && runtimeProof.stripeWebhookConfigured
+        ? 'Protected Preview Stripe TEST configuration is present'
+        : 'Protected Preview Stripe configuration is unsafe or incomplete',
+  });
+  results.push({
+    service: 'Fulfillment',
+    status:
+      runtimeProof.fulfillmentDryRunEnabled && runtimeProof.fulfillmentProvider !== 'unknown'
+        ? 'pass'
+        : 'fail',
+    message:
+      runtimeProof.fulfillmentDryRunEnabled && runtimeProof.fulfillmentProvider !== 'unknown'
+        ? 'Protected Preview fulfillment is dry-run safe'
+        : 'Protected Preview fulfillment safety proof failed',
+  });
+  results.push({
+    service: 'Redis (Upstash)',
+    status: runtimeProof.upstashConfigured ? 'pass' : 'fail',
+    message: runtimeProof.upstashConfigured
+      ? 'Protected Preview Upstash configuration is present'
+      : 'Protected Preview Upstash configuration is missing',
+  });
+  results.push({
+    service: 'Printify',
+    status: 'skip',
+    message: 'Provider API probe skipped in deployed-runtime readiness mode',
+    action:
+      'Use provider-specific readiness with safe credentials when provider access is in scope.',
+  });
+  results.push({
+    service: 'Resend',
+    status: 'warn',
+    message: 'Email readiness is outside deployed-runtime commerce proof',
+    action: 'Use email-specific readiness when sending configuration is in scope.',
+  });
+  results.push({
+    service: 'Deployment Protection',
+    status:
+      process.env.DEPLOYED_RUNTIME_ACCESS_METHOD === 'vercel-authenticated-connector'
+        ? 'pass'
+        : 'warn',
+    message:
+      process.env.DEPLOYED_RUNTIME_ACCESS_METHOD === 'vercel-authenticated-connector'
+        ? 'Authenticated Vercel access proved the protected Preview deployment'
+        : 'Deployment protection access method was not confirmed',
+  });
+
+  if (!evaluation.ok) {
+    results.push({
+      service: 'Deployed Runtime Proof',
+      status: 'fail',
+      message: 'Protected Preview runtime proof is not release-safe',
+      details: evaluation.reasons.join(','),
+    });
+  }
+}
+
 async function main() {
   console.log('[Services] Validating connections...\n');
 
-  await validateDatabase();
-  await validateClerk();
-  await validateStripe();
-  validateFulfillmentConfig();
-  await validatePrintify();
-  await validateRedis();
-  await validateResend();
-  await validateResendAdminDomain();
+  if (readinessMode === 'deployed-runtime') {
+    const runtimeProof = parseRuntimeConfigProof(process.env.DEPLOYED_RUNTIME_PROOF_JSON);
+    const healthProof = parseRuntimeHealthProof(process.env.DEPLOYED_HEALTH_PROOF_JSON);
+
+    if (!runtimeProof || !healthProof) {
+      results.push({
+        service: 'Deployed Runtime Proof',
+        status: 'fail',
+        message: 'Protected deployed runtime or health proof is missing or invalid',
+      });
+    } else if (
+      runtimeProof.environment !== 'preview' ||
+      (process.env.APP_ENV_TARGET ?? '').trim().toLowerCase() !== 'preview'
+    ) {
+      results.push({
+        service: 'Deployed Runtime Proof',
+        status: 'fail',
+        message: 'Deployed-runtime service validation is allowed only for Preview',
+      });
+    } else {
+      validateDeployedRuntimeServices(runtimeProof, healthProof);
+    }
+  } else {
+    await validateDatabase();
+    await validateClerk();
+    await validateStripe();
+    validateFulfillmentConfig();
+    await validatePrintify();
+    await validateRedis();
+    await validateResend();
+    await validateResendAdminDomain();
+  }
 
   console.log('\n' + '='.repeat(80));
   console.log('[Results] Validation Results');
