@@ -11,7 +11,7 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
-import { auth } from '@clerk/nextjs/server';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -23,19 +23,11 @@ const InventorySyncSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    // Require authentication for inventory operations
-    const authResult = await auth();
-    if (!authResult.userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Authentication required',
-        },
-        { status: 401 },
-      );
-    }
+  // Require admin / internal service authorization for inventory writes.
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     const body = await request.json();
     const params = InventorySyncSchema.parse(body);
 
@@ -86,7 +78,7 @@ export async function POST(request: NextRequest) {
         stats,
         alerts,
         syncType: params.full === 'true' ? 'full' : 'selective',
-        requestedBy: authResult.userId,
+        requestedBy: authorization.principal,
       },
     });
   } catch (error) {
@@ -115,6 +107,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');

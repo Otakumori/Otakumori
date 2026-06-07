@@ -2,8 +2,14 @@ import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
+
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request, { developmentOnly: true });
+  if (!guard.ok) return guard.response;
+
   try {
     // Log test error request
     logger.warn('Sentry test error triggered from:', undefined, { value: request.headers.get('user-agent') });
@@ -26,6 +32,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request, { developmentOnly: true });
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
 

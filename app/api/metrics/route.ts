@@ -1,8 +1,11 @@
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { monitor } from '@/lib/monitor';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 // import { redis } from '../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
+
+export const runtime = 'nodejs';
 
 export async function GET() {
   try {
@@ -44,7 +47,10 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const authorization = await authorizeAdminApi(req, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   try {
     const data = await req.json();
     const { logger } = await import('@/app/lib/logger');

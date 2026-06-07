@@ -1,8 +1,12 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
 
 export async function POST(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request, { developmentOnly: true });
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
 

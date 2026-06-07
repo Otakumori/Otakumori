@@ -1,13 +1,19 @@
 
 import { logger } from '@/app/lib/logger';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
+
+export const runtime = 'nodejs';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
 const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';
 const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY || '';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const { items, shippingAddress } = await request.json();
 

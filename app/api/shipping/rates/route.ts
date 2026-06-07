@@ -1,7 +1,14 @@
 import { EP } from '@/app/lib/easypost';
 import { env } from '@/env.mjs';
+import type { NextRequest } from 'next/server';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
 
-export async function POST(req: Request) {
+export const runtime = 'nodejs';
+
+export async function POST(req: NextRequest) {
+  const guard = await authorizeProviderWrite(req);
+  if (!guard.ok) return guard.response;
+
   const { to, parcels } = await req.json();
   const from = {
     name: env.DEFAULT_SHIP_FROM_NAME,
