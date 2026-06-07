@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env/server';
+import { env } from '@/env.mjs';
 
 const DEFAULT_METHODS = 'GET,POST,PUT,PATCH,DELETE,OPTIONS';
 const DEFAULT_HEADERS = 'Content-Type, Authorization, X-Requested-With, X-Request-ID';
