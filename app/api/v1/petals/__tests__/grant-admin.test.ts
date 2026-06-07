@@ -23,13 +23,12 @@ vi.mock('@/app/lib/logger', () => ({
 
 async function callGrant(body: unknown) {
   const { POST } = await import('../grant/route');
-  const { NextRequest } = await import('next/server');
-  const request = new NextRequest('https://otaku-mori.test/api/v1/petals/grant', {
+  const request = new Request('https://otaku-mori.test/api/v1/petals/grant', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return POST(request);
+  return POST(request as unknown as Parameters<typeof POST>[0]);
 }
 
 describe('/api/v1/petals/grant admin_grant authority', () => {

@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
 
     // The PetalWallet is the source of truth. Sync is a reconciliation READ:
     // we surface the authoritative cloud balance to the client and let the
-    // client reconcile downward. We never take Math.max(cloud, local) or write
-    // client-supplied balances/transactions into the ledger.
+    // client reconcile downward. We never raise the cloud balance to match a
+    // higher client-reported total, and we never write client-supplied
+    // balances or transactions into the ledger.
     const cloudWallet = await db.petalWallet.upsert({
       where: { userId },
       update: {},

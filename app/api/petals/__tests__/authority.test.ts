@@ -17,13 +17,12 @@ vi.mock('@/app/lib/logger', () => ({
 
 async function callPetals(body: unknown) {
   const { POST } = await import('../route');
-  const { NextRequest } = await import('next/server');
-  const request = new NextRequest('https://otaku-mori.test/api/petals', {
+  const request = new Request('https://otaku-mori.test/api/petals', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return POST(request);
+  return POST(request as unknown as Parameters<typeof POST>[0]);
 }
 
 describe('/api/petals authority (client amount is ignored)', () => {

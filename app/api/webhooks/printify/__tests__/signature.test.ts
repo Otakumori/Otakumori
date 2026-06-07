@@ -46,13 +46,14 @@ function sign(body: string, secret: string) {
 
 async function callWebhook(body: string, headers: Record<string, string> = {}) {
   const { POST } = await import('../route');
-  const { NextRequest } = await import('next/server');
-  const request = new NextRequest('https://otaku-mori.test/api/webhooks/printify', {
+  const request = new Request('https://otaku-mori.test/api/webhooks/printify', {
     method: 'POST',
     headers,
     body,
   });
-  return POST(request);
+  // The handler only uses `.text()` and `.headers.get()`, so a standard
+  // Request satisfies its NextRequest parameter at runtime.
+  return POST(request as unknown as Parameters<typeof POST>[0]);
 }
 
 describe('Printify webhook signature verification (fail closed)', () => {

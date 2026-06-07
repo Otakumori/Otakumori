@@ -62,7 +62,7 @@ const checks = [
   {
     name: 'Refund ledger records the per-event delta, not the cumulative total',
     file: 'app/api/webhooks/stripe/route.ts',
-    pattern: /refundDelta[\s\S]*previous_attributes[\s\S]*recordStripeRefundLedger\(\s*{[\s\S]*amountRefunded:\s*refundDelta/,
+    pattern: /previous_attributes[\s\S]*recordStripeRefundLedger\(\s*{[\s\S]*amountRefunded:\s*refundDelta/,
   },
   {
     name: 'Petal click route derives the reward server-side via grantPetals',
