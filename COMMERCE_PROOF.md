@@ -83,3 +83,39 @@
 - Quarantine legacy checkout/webhook/admin routes behind explicit compatibility rules.
 - Add branded platform error pages for checkout, webhook, auth, and provider failure modes.
 - Add a future runtime intelligence layer for sanitized commerce readiness, provider mode, webhook target, and ledger health.
+
+## Final Merge-Gate Evidence - June 7, 2026
+
+- Branch: `chore/commerce-schema-readiness-clean`.
+- Validated runtime commit: `bbc2b225`.
+- Vercel deployment metadata mapped the validated Preview deployment to the branch and runtime commit.
+- Branch and upstream matched before the evidence pass; no files were staged.
+- Preview health: HTTP 200, healthy, database check passed.
+- Runtime proof: Preview environment, Stripe TEST mode, webhook configured, fulfillment dry-run enabled, provider `printify`, and `commerceProofSafe=true`.
+- Protected Chromium cart smoke: HTTP 200; the empty-cart surface rendered with its shop navigation control.
+- Cart smoke created zero checkout-session requests and produced zero critical console errors.
+- Canonical unsigned `POST /api/webhooks/stripe`: HTTP 400 with the expected missing-signature rejection.
+- Retired `POST /api/stripe/webhook`: HTTP 410 with a reference to the canonical route.
+- Preview error/fatal runtime logs after the probes: none observed.
+- No signed webhook was replayed and no Stripe Checkout Session or payment was created.
+- Provider writes: none.
+- Email sends: none.
+- Production touched: no.
+- Secrets exposed: no.
+- Destructive database or provider actions: none.
+- Runtime code changes after `bbc2b225`: none.
+
+### Final Merge-Gate Commands
+
+- Vercel deployment metadata and protected runtime proof checks.
+- Authenticated `vercel curl` requests against the exact Preview deployment.
+- Headless Chromium cart smoke using an ephemeral protection header held in process memory only.
+- Unsigned canonical webhook POST and retired webhook POST probes.
+- Read-only Preview runtime error-log query.
+- Git branch, upstream, staged-file, and worktree checks.
+
+### Final Merge-Gate Rollback
+
+- Set `FULFILLMENT_PROVIDER=manual`.
+- Set `FULFILLMENT_DRY_RUN=true`.
+- Revert the evidence-only commit independently if the documentation needs correction.
