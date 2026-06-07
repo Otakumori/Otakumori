@@ -323,6 +323,12 @@ jobs:
         run: pnpm audit --json > pnpm-audit.json
         continue-on-error: true
 
+      # Hard gate: any critical advisory fails the job. This runs WITHOUT
+      # continue-on-error so critical vulnerabilities can no longer be silently
+      # absorbed by the advisory baseline below.
+      - name: Fail on critical advisories
+        run: pnpm audit --audit-level critical
+
       - name: Enforce dependency advisory baseline
         if: always()
         shell: bash
