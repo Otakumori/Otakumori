@@ -296,6 +296,10 @@ export async function recordProviderCostLedger({
   occurredAt?: Date;
 }) {
   const costs = normalizeProviderCosts(providerCosts);
+  if (costs.costKnown && !costs.sourceEventId && !costs.sourceReference) {
+    throw new Error('Known provider costs require a stable source event or reference');
+  }
+
   const base = {
     orderId,
     currency: costs.currency,

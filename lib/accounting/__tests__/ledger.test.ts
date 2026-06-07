@@ -13,6 +13,7 @@ import {
   appendLedgerEntry,
   buildLedgerIdempotencyKey,
   buildStripePaidOrderLedgerEntries,
+  recordProviderCostLedger,
 } from '@/lib/accounting/ledger';
 import {
   calculateOrderEconomics,
@@ -175,6 +176,46 @@ describe('accounting ledger helpers', () => {
         costKnown: true,
       }),
     );
+  });
+
+  it('uses stable provider references to prevent duplicate provider cost rows', async () => {
+    const { db } = await import('@/lib/db');
+    vi.mocked(db.taxLedgerEntry.upsert).mockClear();
+    const providerCosts = {
+      provider: 'printify',
+      productionCostCents: 2000,
+      shippingCostCents: 650,
+      currency: 'USD',
+      sourceReference: 'provider_order_123',
+      costKnown: true,
+    };
+
+    await recordProviderCostLedger({ orderId: 'order_123', providerCosts });
+    await recordProviderCostLedger({ orderId: 'order_123', providerCosts });
+
+    const calls = vi.mocked(db.taxLedgerEntry.upsert).mock.calls;
+    const keys = calls.map(([args]) => args.where.idempotencyKey);
+    expect(new Set(keys)).toEqual(
+      new Set([
+        'order_123:PROVIDER_PRODUCTION_COST:no-event:provider_order_123',
+        'order_123:PROVIDER_SHIPPING_COST:no-event:provider_order_123',
+      ]),
+    );
+  });
+
+  it('rejects known provider costs without a stable server-owned reference', async () => {
+    await expect(
+      recordProviderCostLedger({
+        orderId: 'order_123',
+        providerCosts: {
+          provider: 'printify',
+          productionCostCents: 2000,
+          shippingCostCents: 650,
+          currency: 'USD',
+          costKnown: true,
+        },
+      }),
+    ).rejects.toThrow('stable source event or reference');
   });
 
   it('preserves FinancialTransaction as a compatibility bridge', () => {
