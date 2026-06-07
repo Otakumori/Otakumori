@@ -1,18 +1,15 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 // import { redis } from '../../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
 
 export async function POST(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     // In a real implementation, this would:
     // 1. Create database dump
     // 2. Archive uploaded files
@@ -40,13 +37,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     // Get list of recent backups
     // TODO: Integrate HTTP-based Redis client to get list of recent backups
     const backups: any[] = [];

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
-import { auth, currentUser } from '@clerk/nextjs/server';
 import { env } from '@/env';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
@@ -13,17 +13,11 @@ function getListOptions() {
   return { prefix: 'media/' } as const;
 }
 
-async function requireAdmin() {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
-  const user = await currentUser();
-  const isAdmin = user?.publicMetadata?.role === 'admin';
-  if (!isAdmin) throw new Error('Forbidden');
-}
-
 export async function GET() {
+  const authorization = await authorizeAdminApi();
+  if (!authorization.ok) return authorization.response;
+
   try {
-    await requireAdmin();
     const result = await list(getListOptions());
     result.blobs.sort((a, b) => {
       const aTime = a.uploadedAt ? new Date(a.uploadedAt).getTime() : 0;

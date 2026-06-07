@@ -1,18 +1,15 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 // import { redis } from '../../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
 
 export async function POST(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     const { message, type = 'info', duration = 5000 } = await request.json();
 
     if (!message || typeof message !== 'string') {
@@ -54,13 +51,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     // Get notification history
     // TODO: Integrate HTTP-based Redis client to get notification history
     const notifications: any[] = [];
@@ -76,13 +70,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     const { searchParams } = new URL(request.url);
     const notificationId = searchParams.get('id');
 

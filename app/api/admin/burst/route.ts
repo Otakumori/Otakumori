@@ -1,10 +1,10 @@
 import { logger } from '@/app/lib/logger';
 import { NextResponse, type NextRequest } from 'next/server';
-import { auth, currentUser } from '@clerk/nextjs/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/db';
 import type { BurstConfig } from '@/types/runes';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
@@ -56,29 +56,6 @@ const DEFAULT_BURST_CONFIG: BurstConfig = {
   },
 };
 
-async function requireAdmin() {
-  const { userId } = await auth();
-  if (!userId) {
-    throw new ResponseError('Unauthorized', 401);
-  }
-
-  const user = await currentUser();
-  if (user?.publicMetadata?.role !== 'admin') {
-    throw new ResponseError('Forbidden', 403);
-  }
-
-  return userId;
-}
-
-class ResponseError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-  ) {
-    super(message);
-  }
-}
-
 async function getBurstConfig(): Promise<BurstConfig> {
   const siteConfig = await db.siteConfig.findUnique({
     where: { id: 'singleton' },
@@ -93,24 +70,25 @@ async function getBurstConfig(): Promise<BurstConfig> {
 }
 
 export async function GET() {
+  const authorization = await authorizeAdminApi();
+  if (!authorization.ok) return authorization.response;
+
   try {
-    await requireAdmin();
     const config = await getBurstConfig();
 
     return NextResponse.json({ ok: true, data: { config } });
   } catch (error) {
-    if (error instanceof ResponseError) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
-    }
-
     logger.error('Burst failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+  const userId = authorization.userId!;
+
   try {
-    const userId = await requireAdmin();
     const body = (await request.json()) as unknown;
     const config: BurstConfigPayload = BurstConfigSchema.parse(body);
 
@@ -170,10 +148,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    if (error instanceof ResponseError) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
-    }
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { ok: false, error: error.issues.map((issue) => issue.message).join(', ') },

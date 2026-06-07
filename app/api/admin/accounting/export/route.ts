@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/app/lib/auth/admin';
+import { requireAdminApi as requireAdmin } from '@/app/lib/auth/admin';
 import { createApiError } from '@/app/lib/api-contracts';
 import { db } from '@/app/lib/db';
 import { generateRequestId } from '@/app/lib/request-id';

@@ -2,7 +2,6 @@
 import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { auth } from '@clerk/nextjs/server';
 import { requireAdmin } from '@/app/lib/authz';
 
 export const runtime = 'nodejs';
@@ -25,8 +24,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  let admin: Awaited<ReturnType<typeof requireAdmin>>;
   try {
-    const admin = await requireAdmin();
+    admin = await requireAdmin();
     // admin is { id: string } on success
     logger.warn(`Admin ${admin.id} creating playlist`);
   } catch (error) {
@@ -35,12 +35,11 @@ export async function POST(req: Request) {
   }
 
   const { name, isPublic = true } = await req.json();
-  const { userId } = await auth();
-  if (!name || !userId)
+  if (!name)
     return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
 
   const pl = await db.musicPlaylist.create({
-    data: { name, isPublic, createdBy: userId },
+    data: { name, isPublic, createdBy: admin.id },
   });
   return NextResponse.json({ ok: true, playlist: pl });
 }

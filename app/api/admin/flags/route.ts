@@ -1,9 +1,9 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 // import { createRateLimitMiddleware } from '@/app/api/rate-limit';
 import { log } from '@/lib/logger';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -23,19 +23,11 @@ export async function GET(req: NextRequest) {
   // Log request for audit purposes
   logger.warn('Feature flags requested', undefined, { userAgent: req.headers.get('user-agent') ?? undefined });
 
+  const authorization = await authorizeAdminApi(req);
+  if (!authorization.ok) return authorization.response;
+  const userId = authorization.userId!;
+
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // TODO: Check admin role in database
-    // For now, allow any authenticated user (replace with proper role check)
-    const isAdmin = true; // await checkAdminRole(userId);
-    if (!isAdmin) {
-      return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 });
-    }
-
     // TODO: Load flags from database/Redis
     // For now, return default flags
     const flags = [
@@ -82,18 +74,11 @@ export async function POST(req: NextRequest) {
   // const rateLimitResult = await rateLimitMiddleware(req);
   // if (rateLimitResult) return rateLimitResult;
 
+  const authorization = await authorizeAdminApi(req);
+  if (!authorization.ok) return authorization.response;
+  const userId = authorization.userId!;
+
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // TODO: Check admin role in database
-    const isAdmin = true; // await checkAdminRole(userId);
-    if (!isAdmin) {
-      return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 });
-    }
-
     const body = await req.json();
     const { action, flagId } = body;
 

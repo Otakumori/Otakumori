@@ -1,6 +1,7 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 // Mock data for moderation
 const mockFlaggedContent = [
@@ -111,6 +112,9 @@ const mockModerationActions = [
 ];
 
 export async function GET(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
@@ -169,6 +173,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+
   try {
     const body = await request.json();
     const { action, data } = body;

@@ -1,14 +1,18 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { generateRequestId } from '@/app/lib/request-id';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
 // DELETE: Delete a rune combo
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+  const userId = authorization.userId!;
+
   try {
     // Extract request metadata for logging/audit
     const idempotencyKey = request.headers.get('x-idempotency-key');
@@ -24,22 +28,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       },
     });
     
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
     const { id } = params;
 
     if (!id) {

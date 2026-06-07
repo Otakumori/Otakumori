@@ -3,6 +3,7 @@ import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
@@ -56,6 +57,9 @@ const samplePosts = [
 ];
 
 export async function POST(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+
   try {
     // Log request for audit trail
     logger.warn('Blog seeding requested', undefined, { userAgent: request.headers.get('user-agent') ?? undefined });

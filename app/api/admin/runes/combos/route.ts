@@ -1,30 +1,17 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
 // GET: Fetch all rune combos
 export async function GET() {
+  const authorization = await authorizeAdminApi();
+  if (!authorization.ok) return authorization.response;
+
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
     const combos = await db.runeCombo.findMany({
       orderBy: { comboId: 'asc' },
     });
@@ -47,23 +34,11 @@ export async function GET() {
 
 // POST: Create or update rune combo
 export async function POST(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request);
+  if (!authorization.ok) return authorization.response;
+  const userId = authorization.userId!;
+
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
     const body = await request.json();
     const { id, comboId, members, revealCopy, cosmeticBurst, isActive } = body;
 
