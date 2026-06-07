@@ -2231,6 +2231,9 @@ enum LedgerType {
 
 enum OrderStatus {
   pending
+  paid
+  failed
+  refunded
   pending_fulfillment
   pending_mapping
   in_production
