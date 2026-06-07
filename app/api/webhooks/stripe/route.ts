@@ -222,6 +222,12 @@ export async function POST(req: Request) {
 
     switch (event.type) {
       case 'checkout.session.completed': {
+        // Payment truth: this webhook is the only place an order transitions
+        // from the pre-payment `pending` state (set by
+        // /api/v1/checkout/session) to `pending_fulfillment`. The transition is
+        // reconciliation-safe — it is idempotent via beginWebhookProcessing and
+        // keyed on the local_order_id / stripeId, so replays do not double-pay
+        // or double-fulfill.
         const session = event.data.object as Stripe.Checkout.Session;
 
         const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
@@ -366,25 +372,53 @@ export async function POST(req: Request) {
           break;
         }
 
-        const amountRefunded = charge.amount_refunded ?? 0;
-        const refundedAt = amountRefunded > 0 ? new Date() : undefined;
+        // `charge.amount_refunded` is CUMULATIVE across all refunds on the
+        // charge. The ledger must record the per-event delta so multiple
+        // partial refunds each post their own incremental amount instead of
+        // re-posting the running total. Prefer the latest refund object's
+        // amount; otherwise derive the delta from the event's
+        // previous_attributes snapshot of amount_refunded.
+        const cumulativeRefunded = charge.amount_refunded ?? 0;
+        const latestRefundAmount = charge.refunds?.data?.[0]?.amount;
+        const previousRefunded =
+          typeof (event.data.previous_attributes as { amount_refunded?: unknown } | undefined)
+            ?.amount_refunded === 'number'
+            ? ((event.data.previous_attributes as { amount_refunded: number }).amount_refunded)
+            : null;
+
+        let refundDelta: number;
+        if (typeof latestRefundAmount === 'number') {
+          refundDelta = latestRefundAmount;
+        } else if (previousRefunded !== null) {
+          refundDelta = cumulativeRefunded - previousRefunded;
+        } else {
+          refundDelta = cumulativeRefunded;
+        }
+        refundDelta = Math.max(0, refundDelta);
+
+        const refundedAt = cumulativeRefunded > 0 ? new Date() : undefined;
+        // The order keeps the cumulative refunded total for display/state.
         await prisma.order.update({
           where: { id: order.id },
           data: {
-            refundAmount: amountRefunded,
+            refundAmount: cumulativeRefunded,
             ...(refundedAt ? { refundedAt } : {}),
           },
         });
-        await recordStripeRefundLedger({
-          orderId: order.id,
-          currency: charge.currency ?? order.currency,
-          amountRefunded,
-          sourceEventId: event.id,
-          sourceReference: charge.id,
-          occurredAt: refundedAt,
-        });
 
-        responsePayload = { ok: true, refundLedger: 'recorded' };
+        if (refundDelta > 0) {
+          await recordStripeRefundLedger({
+            orderId: order.id,
+            currency: charge.currency ?? order.currency,
+            amountRefunded: refundDelta,
+            sourceEventId: event.id,
+            sourceReference: charge.id,
+            occurredAt: refundedAt,
+          });
+          responsePayload = { ok: true, refundLedger: 'recorded' };
+        } else {
+          responsePayload = { ok: true, refundLedger: 'no-delta' };
+        }
         break;
       }
 

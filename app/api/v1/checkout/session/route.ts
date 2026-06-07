@@ -324,6 +324,13 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'create_order';
+      // Pre-payment, the order is created as `pending`. This is the first half
+      // of a reconciliation-safe transition: the Stripe webhook
+      // (checkout.session.completed) is the source of payment truth and moves
+      // the order to `pending_fulfillment` only after Stripe confirms payment.
+      // No fulfillment or ledger revenue is recorded until that webhook fires,
+      // so a `pending` order that never pays is simply abandoned (no behavior
+      // change here — this comment documents the existing contract).
       const order = await prisma.order.create({
         data: {
           User: { connect: { id: user.id } },

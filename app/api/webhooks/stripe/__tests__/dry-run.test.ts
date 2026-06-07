@@ -240,6 +240,81 @@ describe('Stripe webhook fulfillment dry-run', () => {
     expect(dispatchFulfillmentMock).not.toHaveBeenCalled();
   });
 
+  it('records per-event deltas for two partial charge.refunded events', async () => {
+    dbMock.order.findFirst.mockResolvedValue({ id: 'order_partial', currency: 'USD' });
+    dbMock.order.update.mockResolvedValue({ id: 'order_partial' });
+
+    // First partial refund: $5.00 of a larger charge. refunds.data[0].amount
+    // is the incremental amount for this event.
+    constructEventMock.mockReturnValue({
+      id: 'evt_refund_partial_1',
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_partial',
+          payment_intent: 'pi_partial',
+          amount_refunded: 500,
+          currency: 'usd',
+          refunds: { data: [{ amount: 500 }] },
+        },
+        previous_attributes: { amount_refunded: 0 },
+      },
+    });
+
+    const { POST } = await import('../route');
+
+    const first = await POST(
+      new Request('https://preview.test/api/webhooks/stripe', {
+        method: 'POST',
+        body: JSON.stringify({ id: 'evt_refund_partial_1' }),
+      }),
+    );
+    expect((await first.json())).toEqual({ ok: true, refundLedger: 'recorded' });
+    expect(recordStripeRefundLedgerMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        orderId: 'order_partial',
+        amountRefunded: 500,
+        sourceEventId: 'evt_refund_partial_1',
+        sourceReference: 'ch_partial',
+      }),
+    );
+
+    // Second partial refund: an additional $7.00. Cumulative is now $12.00 but
+    // the ledger must record only the $7.00 delta.
+    constructEventMock.mockReturnValue({
+      id: 'evt_refund_partial_2',
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_partial',
+          payment_intent: 'pi_partial',
+          amount_refunded: 1200,
+          currency: 'usd',
+          refunds: { data: [{ amount: 700 }] },
+        },
+        previous_attributes: { amount_refunded: 500 },
+      },
+    });
+
+    const second = await POST(
+      new Request('https://preview.test/api/webhooks/stripe', {
+        method: 'POST',
+        body: JSON.stringify({ id: 'evt_refund_partial_2' }),
+      }),
+    );
+    expect((await second.json())).toEqual({ ok: true, refundLedger: 'recorded' });
+    expect(recordStripeRefundLedgerMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        orderId: 'order_partial',
+        amountRefunded: 700,
+        sourceEventId: 'evt_refund_partial_2',
+        sourceReference: 'ch_partial',
+      }),
+    );
+
+    expect(recordStripeRefundLedgerMock).toHaveBeenCalledTimes(2);
+  });
+
   it('returns duplicate refund responses without writing another refund row', async () => {
     constructEventMock.mockReturnValue({
       id: 'evt_test_refund',
