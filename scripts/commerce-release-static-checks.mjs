@@ -97,6 +97,26 @@ const checks = [
     pattern: /Math\.max\([\s\S]*localBalance/,
     absent: true,
   },
+  {
+    name: 'Printify order creation is guarded before the provider request',
+    file: 'app/api/shop/orders/route.ts',
+    pattern: /authorizeProviderWrite\(request\)[\s\S]*if \(!guard\.ok\) return guard\.response[\s\S]*fetch\(/,
+  },
+  {
+    name: 'EasyPost label purchase is guarded before the provider request',
+    file: 'app/api/shipping/buy/route.ts',
+    pattern: /authorizeProviderWrite\(req\)[\s\S]*if \(!guard\.ok\) return guard\.response[\s\S]*EP\.buyShipment\(/,
+  },
+  {
+    name: 'Printify product diagnostics require admin or internal authorization',
+    file: 'app/api/printify/products/route.ts',
+    pattern: /authorizeAdminApi\(request,\s*'clerk_admin_or_internal_service'\)[\s\S]*if \(!authorization\.ok\) return authorization\.response[\s\S]*fetch\(/,
+  },
+  {
+    name: 'Metrics GET requires admin or internal authorization',
+    file: 'app/api/metrics/route.ts',
+    pattern: /export async function GET\(req[\s\S]*authorizeAdminApi\(req,\s*'clerk_admin_or_internal_service'\)[\s\S]*if \(!authorization\.ok\) return authorization\.response/,
+  },
 ];
 
 let failures = 0;

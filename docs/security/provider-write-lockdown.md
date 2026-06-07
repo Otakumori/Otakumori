@@ -175,8 +175,8 @@ behavior change.
   guaranteed to be reproducible against `pnpm-lock.yaml` (CI uses
   `--frozen-lockfile`). This PR intentionally does **not** change `vercel.json`.
   Proposed follow-up branch `ci/vercel-frozen-install-proof`: verify a frozen
-  install succeeds in a Vercel preview, pin pnpm `10.15.1`, then flip
-  `vercel.json` to `--frozen-lockfile` after preview verification.
+  install succeeds in a Vercel preview with the supported pnpm `9.15.9` path,
+  then flip `vercel.json` to `--frozen-lockfile` after preview verification.
 - **Achievement / rune unlock criteria not verified.** Petal rewards from
   achievement/rune unlock paths still rely on their own server logic; the unlock
   criteria were not audited in this pass.
@@ -187,3 +187,13 @@ behavior change.
 - **Dual petal grant stacks.** Legacy `/api/petals/*` and canonical
   `/api/v1/petals/*` both exist; they now both route through `grantPetals`, but
   consolidating onto a single stack remains future cleanup.
+- **Development dependency advisories remain.** The required CI security gate
+  covers production dependencies at critical severity. Remaining advisories in
+  development-only tooling, including Vitest, Handlebars, Basic FTP, and Cesium
+  dependency paths, belong in a separate `security/dependency-remediation` PR
+  so this containment change does not absorb unrelated major upgrades.
+- **Database-backed catalog integration remains separate.** Infrastructure-free
+  smoke tests prove application boot and public routing only. `/api/v1/products`
+  requires an explicit ephemeral PostgreSQL integration lane with migrations
+  and minimal catalog fixtures; locked provider diagnostics are never valid
+  public smoke substitutes.
