@@ -37,7 +37,7 @@ if (!guard.ok) return guard.response; // fail-closed NextResponse
 | `app/api/shipping/rates/route.ts` | POST | `authorizeProviderWrite` |
 | `app/api/v1/sync-external/route.ts` | POST | `authorizeAdminApi('clerk_admin_or_internal_service')` |
 | `app/api/v1/printify/inventory/sync/route.ts` | GET, POST | `authorizeAdminApi('clerk_admin_or_internal_service')` |
-| `app/api/metrics/route.ts` | POST | `authorizeAdminApi('clerk_admin_or_internal_service')` |
+| `app/api/metrics/route.ts` | GET, POST | `authorizeAdminApi('clerk_admin_or_internal_service')` |
 
 ### Test/debug triggers (development-only unless admin/internal)
 
@@ -68,6 +68,18 @@ if (!guard.ok) return guard.response; // fail-closed NextResponse
 |-------|---------|----------|
 | `app/api/health/route.ts` | GET | Returns only `{ ok, status }`. `ok` still reflects DB connectivity + required-config presence, but the env-presence/provider map is removed. `?strict=1` returns 503 when not ok. |
 | `app/api/route.ts` | GET | Returns `{ ok, status }` only (no env, version, or feature map). |
+| `app/api/v1/products/route.ts` | GET | Public Prisma-backed catalog (search, shop UI). |
+| `app/api/search/route.ts` | GET | Public autocomplete; sources `/api/v1/products`, not locked Printify routes. |
+
+### Public catalog consumers (post-lockdown)
+
+After locking provider product-fetch diagnostics, these callers were migrated to
+the public catalog:
+
+- `app/api/search/route.ts` → `/api/v1/products?q=…`
+- `app/(shop)/products/page.tsx` (legacy `/products` route) → `/api/v1/products`
+- `tests/e2e/smoke.spec.ts` → asserts public `/api/v1/products` and that
+  `/api/printify/products` returns 401/403
 
 Already-guarded `debug*`, `diagnostic`, `system-check`, and `internal/*` routes
 were left as-is.

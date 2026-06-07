@@ -7,9 +7,12 @@ import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authorization = await authorizeAdminApi(req, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   try {
-    // Get metrics from Redis
+    // Internal monitor metrics — not public telemetry.
     const metrics = await monitor.getMetrics();
     const { logger } = await import('@/app/lib/logger');
     logger.warn(`Metrics requested: ${Object.keys(metrics).length} metric types`);

@@ -51,11 +51,19 @@ test('Footer components work', async ({ page }) => {
   expect(noisy).not.toMatch(/Failed to fetch RSC payload/i);
 });
 
-test('API routes return 200', async ({ page }) => {
-  const routes = ['/api/health', '/api/printify/products'];
+test('Public API routes return 200', async ({ page }) => {
+  const routes = ['/api/health', '/api/v1/products?limit=1'];
 
   for (const route of routes) {
     const res = await page.goto(route);
     expect(res?.ok()).toBeTruthy();
   }
+});
+
+test('Protected provider product route requires authorization', async ({ page }) => {
+  const res = await page.goto('/api/printify/products');
+  const status = res?.status() ?? 0;
+
+  expect(status).toBeGreaterThanOrEqual(401);
+  expect(status).toBeLessThanOrEqual(403);
 });

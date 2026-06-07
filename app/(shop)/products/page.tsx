@@ -18,7 +18,15 @@ interface Product {
 interface ProductsResponse {
   ok: boolean;
   data: {
-    products: Product[];
+    products: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      image?: string | null;
+      images?: string[];
+      price?: number | null;
+      available?: boolean;
+    }>;
     pagination: {
       currentPage: number;
       totalPages: number;
@@ -27,16 +35,28 @@ interface ProductsResponse {
   };
 }
 
+// Legacy route group: `/products` (app/(shop)/products). The canonical shop
+// catalog lives under `/shop`; this page remains reachable but must use the
+// public Prisma-backed catalog, not the locked Printify diagnostic endpoint.
 async function fetchProducts(): Promise<Product[]> {
   try {
-    const response = await fetch('/api/printify/products');
+    const response = await fetch('/api/v1/products?limit=50');
 
     if (!response.ok) {
       throw new Error(`Failed to fetch products: ${response.status}`);
     }
 
     const data: ProductsResponse = await response.json();
-    return data.ok ? data.data.products : [];
+    if (!data.ok || !data.data?.products) return [];
+
+    return data.data.products.map((product) => ({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      image: product.image ?? product.images?.[0] ?? '',
+      price: typeof product.price === 'number' ? product.price : 0,
+      available: product.available ?? false,
+    }));
   } catch (error) {
     logger.error('Error fetching products', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return [];
