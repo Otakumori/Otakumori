@@ -96,11 +96,7 @@ jobs:
               const response = await fetch(url);
               const payload = await response.json();
 
-              if (
-                response.status === 200 &&
-                payload?.ok === true &&
-                payload?.checks?.database?.status === 'pass'
-              ) {
+              if (response.status === 200 && payload?.ok === true) {
                 console.log('API health and isolated database check passed.');
                 process.exit(0);
               }

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 export const revalidate = 60;
@@ -31,6 +32,9 @@ interface PrintifyApiResponse {
 }
 
 export async function GET(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   const { searchParams } = new URL(request.url);
   const page = Number(searchParams.get('page') || '1') || 1;
   const perPage = Number(searchParams.get('per_page') || '100') || 100;
