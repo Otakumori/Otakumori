@@ -1,17 +1,33 @@
-
 import { logger } from '@/app/lib/logger';
-import { NextResponse } from 'next/server';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
 import { env } from '@/env';
+import { type NextRequest, NextResponse } from 'next/server';
 
-const PRINTIFY_API_URL = 'https://api.printify.com/v1';
+const PRINTIFY_API_URL = env.PRINTIFY_API_URL || 'https://api.printify.com/v1';
 const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';
 const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY || '';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const blocked = await authorizeProviderWrite(request, 'printify_order_create');
+  if (blocked) return blocked;
+
   try {
     const { items, shippingAddress } = await request.json();
 
-    // Create order with Printify
+    if (!PRINTIFY_SHOP_ID || !PRINTIFY_API_KEY) {
+      return NextResponse.json(
+        { ok: false, error: 'PRINTIFY_NOT_CONFIGURED' },
+        { status: 503 },
+      );
+    }
+
+    if (!Array.isArray(items) || items.length === 0 || !shippingAddress) {
+      return NextResponse.json(
+        { ok: false, error: 'INVALID_ORDER_PAYLOAD' },
+        { status: 400 },
+      );
+    }
+
     const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/orders.json`, {
       method: 'POST',
       headers: {
@@ -25,7 +41,7 @@ export async function POST(request: Request) {
           variant_id: item.variantId,
           quantity: item.quantity,
         })),
-        shipping_method: 1, // Standard shipping
+        shipping_method: 1,
         shipping_address: {
           first_name: shippingAddress.first_name,
           last_name: shippingAddress.last_name,
@@ -46,20 +62,16 @@ export async function POST(request: Request) {
     }
 
     const order = await response.json();
-
-    // TODO: Store order in your database if needed
-    // For now, just return the Printify order ID
-
-    return NextResponse.json({ orderId: order.id });
+    return NextResponse.json({ ok: true, orderId: order.id });
   } catch (error) {
     logger.error(
-      'Error creating order:',
+      'Error creating Printify order',
       undefined,
       undefined,
       error instanceof Error ? error : new Error(String(error)),
     );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create order' },
+      { ok: false, error: 'FAILED_TO_CREATE_PRINTIFY_ORDER' },
       { status: 500 },
     );
   }
