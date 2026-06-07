@@ -14,7 +14,7 @@ concurrency:
 
 env:
   NODE_VERSION: '20.20.2'
-  PNPM_VERSION: '10.15.1'
+  PNPM_VERSION: '9.15.9'
   CI: 'true'
   NEXT_TELEMETRY_DISABLED: '1'
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/otakumori_ci
@@ -57,20 +57,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
       - name: Generate Prisma client
         run: pnpm prisma generate
