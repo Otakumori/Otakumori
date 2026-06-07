@@ -168,11 +168,10 @@ export async function appendLedgerEntry(input: LedgerEntryInput) {
     sourceReference: input.sourceReference,
   });
 
-  const existing = await prisma.taxLedgerEntry.findUnique({ where: { idempotencyKey } });
-  if (existing) return existing;
-
-  return prisma.taxLedgerEntry.create({
-    data: {
+  return prisma.taxLedgerEntry.upsert({
+    where: { idempotencyKey },
+    update: {},
+    create: {
       orderId: input.orderId ?? undefined,
       businessExpenseId: input.businessExpenseId ?? undefined,
       entryType: input.entryType,

@@ -43,11 +43,17 @@ describe('admin accounting summary', () => {
       {
         order: { count },
         taxLedgerEntry: { aggregate },
+        financialTransaction: {
+          groupBy: vi.fn(async () => [
+            { type: 'sale', _sum: { amount: 10000 }, _count: { _all: 1 } },
+            { type: 'refund', _sum: { amount: -1200 }, _count: { _all: 1 } },
+          ]),
+        },
       },
       new Date('2026-06-04T12:00:00.000Z'),
     );
 
-    expect(summary.totalRevenue).toBe(10600);
+    expect(summary.totalRevenue).toBe(9900);
     expect(summary.totalRefunds).toBe(1200);
     expect(summary.pendingFulfillmentOrders).toBe(3);
     expect(summary.ledger).toEqual(
@@ -56,7 +62,18 @@ describe('admin accounting summary', () => {
         providerProductionCost: 3000,
         providerShippingCost: 700,
         businessExpenses: 250,
-        netRevenueEstimate: 5450,
+        grossRevenueEstimate: 9900,
+        grossMarginEstimate: 5000,
+        netRevenueEstimate: 4650,
+        profitEstimate: 4400,
+      }),
+    );
+    expect(summary.taxCollected).toBe(700);
+    expect(summary.financialTransactionCompatibility).toEqual(
+      expect.objectContaining({
+        status: 'parity',
+        mappedTransactions: 2,
+        unmappedTransactions: 0,
       }),
     );
   });

@@ -1,138 +1,57 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { TaxLedgerEntryType } from '@prisma/client';
 import { requireAdmin } from '@/app/lib/auth/admin';
 import { createApiError } from '@/app/lib/api-contracts';
 import { db } from '@/app/lib/db';
 import { generateRequestId } from '@/app/lib/request-id';
+import {
+  ACCOUNTING_EXPORT_KINDS,
+  type AccountingExportKind,
+  buildBusinessExpenseExportCsv,
+  buildLedgerExportCsv,
+  ledgerTypesForExport,
+  parseAccountingDateRange,
+} from '@/lib/accounting/exports';
 
 export const runtime = 'nodejs';
 
-const LEDGER_KIND_TYPES: Record<string, TaxLedgerEntryType[]> = {
-  ledger: [],
-  sales: [
-    TaxLedgerEntryType.SALE_GROSS,
-    TaxLedgerEntryType.DISCOUNT,
-    TaxLedgerEntryType.SHIPPING_CHARGED,
-  ],
-  fees: [TaxLedgerEntryType.STRIPE_FEE],
-  'stripe-fees': [TaxLedgerEntryType.STRIPE_FEE],
-  refunds: [TaxLedgerEntryType.REFUND],
-  'provider-costs': [
-    TaxLedgerEntryType.PROVIDER_PRODUCTION_COST,
-    TaxLedgerEntryType.PROVIDER_SHIPPING_COST,
-  ],
-  'tax-collected': [TaxLedgerEntryType.TAX_COLLECTED],
-  expenses: [TaxLedgerEntryType.BUSINESS_EXPENSE],
-  'profit-estimate': [TaxLedgerEntryType.NET_REVENUE_ESTIMATE],
-};
-
-function parseDateRange(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const from = searchParams.get('from');
-  const to = searchParams.get('to');
-  const createdAt: { gte?: Date; lte?: Date } = {};
-
-  if (from) {
-    const date = new Date(from);
-    if (!Number.isNaN(date.getTime())) createdAt.gte = date;
-  }
-
-  if (to) {
-    const date = new Date(to);
-    if (!Number.isNaN(date.getTime())) {
-      date.setHours(23, 59, 59, 999);
-      createdAt.lte = date;
-    }
-  }
-
-  return Object.keys(createdAt).length > 0 ? createdAt : undefined;
-}
-function escapeCsv(value: unknown) {
-  const text = String(value ?? '');
-  if (/[",\n\r]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
-  return text;
-}
-
-function buildCsv(headers: string[], rows: unknown[][]) {
-  return [headers, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\n');
-}
-
-function dollars(cents: number) {
-  return (cents / 100).toFixed(2);
-}
-
-async function exportExpenses(createdAt?: { gte?: Date; lte?: Date }) {
+async function exportExpenses(incurredAt: { gte: Date; lte: Date }) {
   const expenses = await db.businessExpense.findMany({
-    where: createdAt ? { incurredAt: createdAt } : undefined,
+    where: { incurredAt },
     orderBy: { incurredAt: 'desc' },
     take: 10000,
+    select: {
+      incurredAt: true,
+      category: true,
+      vendor: true,
+      description: true,
+      amountCents: true,
+      currency: true,
+    },
   });
 
-  return buildCsv(
-    [
-      'Date',
-      'Category',
-      'Vendor',
-      'Description',
-      'Amount',
-      'Currency',
-      'Paid At',
-      'Source Provider',
-      'Source Reference Present',
-      'Order ID',
-    ],
-    expenses.map((expense) => [
-      expense.incurredAt.toISOString(),
-      expense.category,
-      expense.vendor ?? '',
-      expense.description,
-      dollars(expense.amountCents),
-      expense.currency,
-      expense.paidAt?.toISOString() ?? '',
-      expense.sourceProvider ?? '',
-      expense.sourceReference ? 'yes' : 'no',
-      expense.orderId ?? '',
-    ]),
-  );
+  return buildBusinessExpenseExportCsv(expenses);
 }
 
-async function exportLedger(kind: string, createdAt?: { gte?: Date; lte?: Date }) {
-  const types = LEDGER_KIND_TYPES[kind] ?? [];
+async function exportLedger(kind: AccountingExportKind, occurredAt: { gte: Date; lte: Date }) {
+  const types = ledgerTypesForExport(kind);
   const entries = await db.taxLedgerEntry.findMany({
     where: {
       ...(types.length > 0 ? { entryType: { in: types } } : {}),
-      ...(createdAt ? { occurredAt: createdAt } : {}),
+      occurredAt,
     },
     orderBy: { occurredAt: 'desc' },
     take: 10000,
+    select: {
+      occurredAt: true,
+      entryType: true,
+      amountCents: true,
+      currency: true,
+      customerJurisdiction: true,
+      sourceProvider: true,
+    },
   });
 
-  return buildCsv(
-    [
-      'Date',
-      'Entry Type',
-      'Amount',
-      'Currency',
-      'Order ID',
-      'Jurisdiction',
-      'Source Provider',
-      'Source Reference Present',
-      'Source Event Present',
-      'Reversal Of Entry ID',
-    ],
-    entries.map((entry) => [
-      entry.occurredAt.toISOString(),
-      entry.entryType,
-      dollars(entry.amountCents),
-      entry.currency,
-      entry.orderId ?? '',
-      entry.customerJurisdiction ?? '',
-      entry.sourceProvider,
-      entry.sourceReference ? 'yes' : 'no',
-      entry.sourceEventId ? 'yes' : 'no',
-      entry.reversalOfEntryId ?? '',
-    ]),
-  );
+  return buildLedgerExportCsv(kind, entries);
 }
 
 export async function GET(req: NextRequest) {
@@ -151,10 +70,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const allowedKinds = new Set([
-      ...Object.keys(LEDGER_KIND_TYPES),
-      'business-expenses',
-    ]);
+    const allowedKinds = new Set<string>(ACCOUNTING_EXPORT_KINDS);
     if (!allowedKinds.has(kind)) {
       return NextResponse.json(
         createApiError('VALIDATION_ERROR', 'Unsupported accounting export kind', requestId),
@@ -162,11 +78,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const dateRange = parseDateRange(req);
+    const parsedRange = parseAccountingDateRange(searchParams);
+    if (!parsedRange.ok) {
+      return NextResponse.json(
+        createApiError('VALIDATION_ERROR', parsedRange.error, requestId),
+        { status: 400 },
+      );
+    }
+
+    const exportKind = kind as AccountingExportKind;
     const csv =
       kind === 'business-expenses' || kind === 'expenses'
-        ? await exportExpenses(dateRange)
-        : await exportLedger(kind, dateRange);
+        ? await exportExpenses(parsedRange.range)
+        : await exportLedger(exportKind, parsedRange.range);
 
     return new NextResponse(csv, {
       headers: {

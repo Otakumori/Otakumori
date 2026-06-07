@@ -17,6 +17,13 @@ type AccountingSummaryDb = {
       _sum: { amountCents: true };
     }): Promise<{ _sum: { amountCents: number | null } }>;
   };
+  financialTransaction: {
+    groupBy(args: {
+      by: ['type'];
+      _sum: { amount: true };
+      _count: { _all: true };
+    }): Promise<Array<{ type: string; _sum: { amount: number | null }; _count: { _all: number } }>>;
+  };
 };
 
 type LedgerTotals = {
@@ -30,10 +37,34 @@ type LedgerTotals = {
   providerShippingCost: number;
   businessExpenses: number;
   netRevenueEstimate: number;
+  grossRevenueEstimate: number;
+  grossMarginEstimate: number;
+  profitEstimate: number;
+};
+
+type FinancialTransactionReconciliation = {
+  status: 'empty' | 'parity' | 'drift' | 'unmapped';
+  mappedTransactions: number;
+  unmappedTransactions: number;
+  legacyAmountCents: number;
+  ledgerAmountCents: number;
+  deltaCents: number;
+  byType: Record<string, number>;
 };
 
 export type AdminOrderSummary = {
   totalRevenue: number;
+  grossSales: number;
+  discounts: number;
+  shippingCollected: number;
+  taxCollected: number;
+  stripeFees: number;
+  refunds: number;
+  providerCosts: number;
+  grossMarginEstimate: number;
+  netRevenueEstimate: number;
+  businessExpenses: number;
+  profitEstimate: number;
   totalOrders: number;
   pendingOrders: number;
   pendingFulfillmentOrders: number;
@@ -45,14 +76,25 @@ export type AdminOrderSummary = {
   thisYear: number;
   totalRefunds: number;
   ledger: LedgerTotals;
+  financialTransactionCompatibility: FinancialTransactionReconciliation;
 };
 
 const TOTAL_REVENUE_TYPES = [
   TaxLedgerEntryType.SALE_GROSS,
   TaxLedgerEntryType.DISCOUNT,
   TaxLedgerEntryType.SHIPPING_CHARGED,
-  TaxLedgerEntryType.TAX_COLLECTED,
 ];
+
+const FINANCIAL_TRANSACTION_TYPE_MAP: Record<string, keyof Pick<
+  LedgerTotals,
+  'saleGross' | 'shippingCharged' | 'taxCollected' | 'stripeFees' | 'refunds'
+>> = {
+  sale: 'saleGross',
+  shipping: 'shippingCharged',
+  tax: 'taxCollected',
+  fee: 'stripeFees',
+  refund: 'refunds',
+};
 
 function abs(cents: number) {
   return Math.abs(cents);
@@ -84,7 +126,6 @@ async function ledgerTotals(db: AccountingSummaryDb): Promise<LedgerTotals> {
     providerProductionCost,
     providerShippingCost,
     businessExpenses,
-    netRevenueEstimate,
   ] = await Promise.all([
     sumLedger(db, TaxLedgerEntryType.SALE_GROSS),
     sumLedger(db, TaxLedgerEntryType.DISCOUNT),
@@ -95,8 +136,16 @@ async function ledgerTotals(db: AccountingSummaryDb): Promise<LedgerTotals> {
     sumLedger(db, TaxLedgerEntryType.PROVIDER_PRODUCTION_COST),
     sumLedger(db, TaxLedgerEntryType.PROVIDER_SHIPPING_COST),
     sumLedger(db, TaxLedgerEntryType.BUSINESS_EXPENSE),
-    sumLedger(db, TaxLedgerEntryType.NET_REVENUE_ESTIMATE),
   ]);
+
+  const grossRevenueEstimate = saleGross + discount + shippingCharged;
+  const grossMarginEstimate =
+    grossRevenueEstimate -
+    abs(refunds) -
+    abs(providerProductionCost) -
+    abs(providerShippingCost);
+  const derivedNetRevenueEstimate = grossMarginEstimate - abs(stripeFees);
+  const profitEstimate = derivedNetRevenueEstimate - abs(businessExpenses);
 
   return {
     saleGross,
@@ -108,7 +157,66 @@ async function ledgerTotals(db: AccountingSummaryDb): Promise<LedgerTotals> {
     providerProductionCost: abs(providerProductionCost),
     providerShippingCost: abs(providerShippingCost),
     businessExpenses: abs(businessExpenses),
-    netRevenueEstimate,
+    // Snapshot rows remain available for audit, but the authoritative figure is
+    // derived from signed atomic entries so later refunds and costs are included.
+    netRevenueEstimate: derivedNetRevenueEstimate,
+    grossRevenueEstimate,
+    grossMarginEstimate,
+    profitEstimate,
+  };
+}
+
+async function reconcileFinancialTransactions(
+  db: AccountingSummaryDb,
+  totals: LedgerTotals,
+): Promise<FinancialTransactionReconciliation> {
+  const groups = await db.financialTransaction.groupBy({
+    by: ['type'],
+    _sum: { amount: true },
+    _count: { _all: true },
+  });
+  const byType: Record<string, number> = {};
+  let mappedTransactions = 0;
+  let unmappedTransactions = 0;
+  let legacyAmountCents = 0;
+  let ledgerAmountCents = 0;
+
+  for (const group of groups) {
+    const type = group.type.trim().toLowerCase();
+    const amount = group._sum.amount ?? 0;
+    byType[type] = (byType[type] ?? 0) + amount;
+    const ledgerKey = FINANCIAL_TRANSACTION_TYPE_MAP[type];
+    if (!ledgerKey) {
+      unmappedTransactions += group._count._all;
+      continue;
+    }
+
+    mappedTransactions += group._count._all;
+    legacyAmountCents += amount;
+    const ledgerValue = totals[ledgerKey];
+    ledgerAmountCents +=
+      ledgerKey === 'stripeFees' || ledgerKey === 'refunds' ? -ledgerValue : ledgerValue;
+  }
+
+  const deltaCents = legacyAmountCents - ledgerAmountCents;
+  const transactionCount = mappedTransactions + unmappedTransactions;
+  const status =
+    transactionCount === 0
+      ? 'empty'
+      : unmappedTransactions > 0
+        ? 'unmapped'
+        : deltaCents === 0
+          ? 'parity'
+          : 'drift';
+
+  return {
+    status,
+    mappedTransactions,
+    unmappedTransactions,
+    legacyAmountCents,
+    ledgerAmountCents,
+    deltaCents,
+    byType,
   };
 }
 
@@ -146,9 +254,22 @@ export async function buildAdminOrderSummary(
     sumLedger(db, TOTAL_REVENUE_TYPES, { gte: thisYearStart }),
     ledgerTotals(db),
   ]);
+  const financialTransactionCompatibility = await reconcileFinancialTransactions(db, totals);
+  const providerCosts = totals.providerProductionCost + totals.providerShippingCost;
 
   return {
     totalRevenue,
+    grossSales: totals.saleGross,
+    discounts: abs(totals.discount),
+    shippingCollected: totals.shippingCharged,
+    taxCollected: totals.taxCollected,
+    stripeFees: totals.stripeFees,
+    refunds: totals.refunds,
+    providerCosts,
+    grossMarginEstimate: totals.grossMarginEstimate,
+    netRevenueEstimate: totals.netRevenueEstimate,
+    businessExpenses: totals.businessExpenses,
+    profitEstimate: totals.profitEstimate,
     totalOrders,
     pendingOrders,
     pendingFulfillmentOrders,
@@ -160,5 +281,6 @@ export async function buildAdminOrderSummary(
     thisYear,
     totalRefunds: totals.refunds,
     ledger: totals,
+    financialTransactionCompatibility,
   };
 }

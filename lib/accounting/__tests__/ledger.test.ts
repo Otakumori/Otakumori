@@ -4,13 +4,13 @@ import { TaxLedgerEntryType } from '@prisma/client';
 vi.mock('@/lib/db', () => ({
   db: {
     taxLedgerEntry: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
+      upsert: vi.fn(async ({ create }) => ({ id: 'ledger_test', ...create })),
     },
   },
 }));
 
 import {
+  appendLedgerEntry,
   buildLedgerIdempotencyKey,
   buildStripePaidOrderLedgerEntries,
 } from '@/lib/accounting/ledger';
@@ -32,6 +32,24 @@ describe('accounting ledger helpers', () => {
         sourceReference: 'cs_123',
       }),
     ).toBe('order_123:SALE_GROSS:evt_123:cs_123');
+  });
+
+  it('uses an atomic upsert for append-only ledger idempotency', async () => {
+    const input = {
+      orderId: 'order_123',
+      entryType: TaxLedgerEntryType.SALE_GROSS,
+      amountCents: 5000,
+      currency: 'USD',
+      sourceProvider: 'stripe',
+      sourceEventId: 'evt_123',
+      sourceReference: 'cs_123',
+      occurredAt: new Date('2026-06-03T00:00:00.000Z'),
+    };
+
+    const first = await appendLedgerEntry(input);
+    const duplicate = await appendLedgerEntry(input);
+
+    expect(first).toEqual(duplicate);
   });
 
   it('builds the paid-order ledger row set without raw Stripe payloads', () => {
