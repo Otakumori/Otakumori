@@ -1,21 +1,26 @@
 import { NextRequest } from 'next/server';
+import { vi } from 'vitest';
 import { auth } from '@clerk/nextjs/server';
 import { GET as getCart, POST as updateCart } from '@/app/api/v1/cart/route';
+import { db } from '@/lib/db';
 
 // Mock Clerk auth
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(),
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: vi.fn(),
 }));
 
 // Mock Prisma
-jest.mock('@/lib/db', () => ({
+vi.mock('@/lib/db', () => ({
   db: {
+    cart: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
     cartItem: {
-      findMany: jest.fn(),
-      upsert: jest.fn(),
+      upsert: vi.fn(),
     },
     product: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -30,21 +35,28 @@ describe('Cart API', () => {
       const mockAuth = auth as any;
       mockAuth.mockResolvedValue({ userId: 'user_123' });
 
-      // Use the already-mocked db object directly, no need to import dynamically
-      const mockDb = require('@/lib/db');
-      (mockDb.db.cartItem.findMany as jest.Mock).mockResolvedValue([
-        {
-          id: 'cart_1',
-          productId: 'prod_1',
-          variantId: 'var_1',
-          quantity: 2,
-          product: {
-            id: 'prod_1',
-            name: 'Test Product',
-            variants: [{ id: 'var_1', name: 'Small' }],
+      vi.mocked(db.cart.findUnique).mockResolvedValue({
+        id: 'cart_1',
+        userId: 'user_123',
+        CartItem: [
+          {
+            id: 'item_1',
+            productId: 'prod_1',
+            productVariantId: 'var_1',
+            quantity: 2,
+            Product: {
+              id: 'prod_1',
+              name: 'Test Product',
+              primaryImageUrl: null,
+            },
+            ProductVariant: {
+              id: 'var_1',
+              title: 'Small',
+              priceCents: 1000,
+            },
           },
-        },
-      ]);
+        ],
+      } as any);
 
       const req = new NextRequest('http://localhost/api/v1/cart');
       const response = await getCart(req);
@@ -56,42 +68,51 @@ describe('Cart API', () => {
       expect(data.data[0].productId).toBe('prod_1');
     });
 
-    it('should return 401 for unauthenticated user', async () => {
-      const mockAuth = auth as any;
-      mockAuth.mockResolvedValue({ userId: null });
+    it('should return an empty guest cart for unauthenticated users', async () => {
+      vi.mocked(auth).mockResolvedValue({ userId: null } as any);
 
       const req = new NextRequest('http://localhost/api/v1/cart');
       const response = await getCart(req);
       const data = await response.json();
 
-      expect(response.status).toBe(401);
-      expect(data.ok).toBe(false);
-      expect(data.error).toBe('Unauthorized');
+      expect(response.status).toBe(200);
+      expect(data).toEqual({ ok: true, data: [], guest: true });
+      expect(db.cart.findUnique).not.toHaveBeenCalled();
     });
   });
 
   describe('POST /api/v1/cart', () => {
     it('should add item to cart for authenticated user', async () => {
-      const mockAuth = auth as any;
-      mockAuth.mockResolvedValue({ userId: 'user_123' });
-
-      const mockDb = await import('@/lib/db');
-      (mockDb.db.product.findUnique as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
+      vi.mocked(db.product.findUnique).mockResolvedValue({
         id: 'prod_1',
-        name: 'Test Product',
-        variants: [{ id: 'var_1', name: 'Small' }],
-      });
-      (mockDb.db.cartItem.upsert as jest.Mock).mockResolvedValue({
-        id: 'cart_1',
+        ProductVariant: [
+          {
+            id: 'var_1',
+            title: 'Small',
+            priceCents: 1000,
+            isEnabled: true,
+            inStock: true,
+          },
+        ],
+      } as any);
+      vi.mocked(db.cart.findUnique).mockResolvedValue({ id: 'cart_1', userId: 'user_123' } as any);
+      vi.mocked(db.cartItem.upsert).mockResolvedValue({
+        id: 'item_1',
         productId: 'prod_1',
-        variantId: 'var_1',
+        productVariantId: 'var_1',
         quantity: 2,
-        product: {
+        Product: {
           id: 'prod_1',
           name: 'Test Product',
-          variants: [{ id: 'var_1', name: 'Small' }],
+          primaryImageUrl: null,
         },
-      });
+        ProductVariant: {
+          id: 'var_1',
+          title: 'Small',
+          priceCents: 1000,
+        },
+      } as any);
 
       const req = new NextRequest('http://localhost/api/v1/cart', {
         method: 'POST',
@@ -111,11 +132,8 @@ describe('Cart API', () => {
     });
 
     it('should return 404 for non-existent product', async () => {
-      const mockAuth = auth as any;
-      mockAuth.mockResolvedValue({ userId: 'user_123' });
-
-      const mockDb = await import('@/lib/db');
-      (mockDb.db.product.findUnique as any).mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
+      vi.mocked(db.product.findUnique).mockResolvedValue(null);
 
       const req = new NextRequest('http://localhost/api/v1/cart', {
         method: 'POST',

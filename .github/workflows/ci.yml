@@ -276,8 +276,18 @@ jobs:
           cat next-server.log
           exit 1
 
+      - name: Install Chromium for target verification
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify Lighthouse target
+        id: lighthouse_target
+        shell: bash
+        continue-on-error: true
+        run: node scripts/verify-local-test-target.mjs http://127.0.0.1:3000 /
+
       - name: Run Lighthouse CI
         id: lighthouse
+        if: steps.lighthouse_target.outcome == 'success'
         uses: treosh/lighthouse-ci-action@v12
         timeout-minutes: 10
         continue-on-error: true
@@ -287,7 +297,7 @@ jobs:
           temporaryPublicStorage: true
 
       - name: Report advisory Lighthouse failure
-        if: steps.lighthouse.outcome != 'success'
+        if: steps.lighthouse_target.outcome != 'success' || steps.lighthouse.outcome != 'success'
         shell: bash
         run: echo "::warning::Lighthouse diagnostics failed or timed out; this lane remains advisory until stabilized."
 

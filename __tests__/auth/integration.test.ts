@@ -89,8 +89,8 @@ describe('Authentication Integration Tests', () => {
   });
 
   describe('Client-Side Authentication', () => {
-    it('should provide user data to client components', () => {
-      const { useUser } = vi.mocked(require('@clerk/nextjs'));
+    it('should provide user data to client components', async () => {
+      const { useUser } = await import('@clerk/nextjs');
 
       const mockUser = {
         id: 'user_123',
@@ -117,8 +117,8 @@ describe('Authentication Integration Tests', () => {
       expect(isSignedIn).toBe(true);
     });
 
-    it('should handle loading state on client', () => {
-      const { useUser } = vi.mocked(require('@clerk/nextjs'));
+    it('should handle loading state on client', async () => {
+      const { useUser } = await import('@clerk/nextjs');
 
       useUser.mockReturnValue({
         user: null,
@@ -133,8 +133,8 @@ describe('Authentication Integration Tests', () => {
       expect(isSignedIn).toBe(false);
     });
 
-    it('should provide auth methods to client components', () => {
-      const { useAuth } = vi.mocked(require('@clerk/nextjs'));
+    it('should provide auth methods to client components', async () => {
+      const { useAuth } = await import('@clerk/nextjs');
 
       const mockSignIn = vi.fn();
       const mockSignOut = vi.fn();
