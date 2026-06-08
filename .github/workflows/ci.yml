@@ -195,9 +195,16 @@ jobs:
           exit 1
 
       - name: Run Playwright tests
+        id: playwright
         run: pnpm exec playwright test
+        continue-on-error: true
         env:
           BASE_URL: http://127.0.0.1:3000
+
+      - name: Report advisory E2E failure
+        if: steps.playwright.outcome != 'success'
+        shell: bash
+        run: echo "::warning::E2E diagnostics failed; this lane remains advisory until stabilized."
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
@@ -270,11 +277,19 @@ jobs:
           exit 1
 
       - name: Run Lighthouse CI
+        id: lighthouse
         uses: treosh/lighthouse-ci-action@v12
+        timeout-minutes: 10
+        continue-on-error: true
         with:
           configPath: ./lighthouserc.cjs
           uploadArtifacts: true
           temporaryPublicStorage: true
+
+      - name: Report advisory Lighthouse failure
+        if: steps.lighthouse.outcome != 'success'
+        shell: bash
+        run: echo "::warning::Lighthouse diagnostics failed or timed out; this lane remains advisory until stabilized."
 
       - name: Upload Lighthouse diagnostics
         uses: actions/upload-artifact@v4

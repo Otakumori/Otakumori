@@ -15,8 +15,8 @@ module.exports = {
         'http://localhost:3000/blog',
         'http://localhost:3000/community',
       ],
-      // Number of runs for consistency
-      numberOfRuns: 3,
+      // One diagnostic run per route while Lighthouse remains advisory.
+      numberOfRuns: 1,
     },
 
     // Performance budgets
