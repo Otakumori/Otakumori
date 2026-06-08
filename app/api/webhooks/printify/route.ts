@@ -1,4 +1,5 @@
 
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 import { logger } from '@/app/lib/logger';
@@ -6,21 +7,27 @@ import { newRequestId } from '@/app/lib/requestId';
 
 export const runtime = 'nodejs'; // HMAC + raw body requires Node
 
-// Placeholder HMAC verification — replace with Printify's official algorithm + header names
-async function verifySignature(
-  rawBody: string,
-  signatureHeader: string | null,
-  secret: string | undefined,
-) {
-  if (!secret) return true; // allow when not configured (dev)
+/**
+ * Compare two hex digests in constant time. Returns false on length mismatch
+ * (timingSafeEqual throws when the buffers differ in length).
+ */
+function timingSafeHexEqual(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a, 'utf8');
+  const bBuf = Buffer.from(b, 'utf8');
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
+}
+
+/**
+ * Verify the Printify webhook HMAC signature.
+ *
+ * Fails closed: a missing/invalid signature returns false. The secret is
+ * required by the caller before this runs, so it is always present here.
+ */
+function verifySignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
   if (!signatureHeader) return false;
-  try {
-    const crypto = await import('node:crypto');
-    const hmac = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-    return hmac === signatureHeader;
-  } catch {
-    return false;
-  }
+  const hmac = createHmac('sha256', secret).update(rawBody).digest('hex');
+  return timingSafeHexEqual(hmac, signatureHeader);
 }
 
 export async function POST(req: NextRequest) {
@@ -30,15 +37,25 @@ export async function POST(req: NextRequest) {
   try {
     const raw = await req.text();
 
+    // Fail closed when the webhook secret is not configured.
+    const secret = env.PRINTIFY_WEBHOOK_SECRET;
+    if (!secret) {
+      logger.error('webhook secret not configured', { requestId, route });
+      return NextResponse.json(
+        { ok: false, error: 'WEBHOOK_SECRET_NOT_CONFIGURED' },
+        { status: 503 },
+      );
+    }
+
     const signature =
       req.headers.get('x-printify-webhook-signature') ||
       req.headers.get('x-printify-signature') ||
       req.headers.get('x-hmac-signature');
 
-    const ok = await verifySignature(raw, signature, env.PRINTIFY_WEBHOOK_SECRET);
+    const ok = verifySignature(raw, signature, secret);
     if (!ok) {
       logger.warn('signature verification failed', undefined, { requestId, route });
-      return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'INVALID_SIGNATURE' }, { status: 401 });
     }
 
     let payload: any;
@@ -46,9 +63,10 @@ export async function POST(req: NextRequest) {
       payload = JSON.parse(raw);
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));
+      // Never log the raw body — it may contain provider/customer data.
       logger.error(
         'invalid json',
-        { requestId, route, extra: { parseError: error.message, rawSnippet: raw.slice(0, 200) } },
+        { requestId, route, extra: { parseError: error.message } },
         undefined,
         error,
       );

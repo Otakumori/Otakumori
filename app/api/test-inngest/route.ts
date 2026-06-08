@@ -7,11 +7,17 @@
  *
  * Not meant for production use.
  */
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '../../../inngest/client';
 import { env } from '@/env';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
 
-export async function GET() {
+export const runtime = 'nodejs';
+
+export async function GET(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request, { developmentOnly: true });
+  if (!guard.ok) return guard.response;
+
   try {
     // Check if we're in development and Inngest dev server is available
     const isDevelopment = env.NODE_ENV === 'development';
@@ -67,7 +73,10 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const guard = await authorizeProviderWrite(request, { developmentOnly: true });
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
 

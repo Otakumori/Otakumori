@@ -38,87 +38,38 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { localBalance, localTransactions } = SyncPetalsSchema.parse(body);
+    // localBalance/localTransactions are accepted for reconciliation reporting
+    // only. They are NEVER used to inflate the server-authoritative balance,
+    // because the client cannot be trusted to report its own petal totals.
+    const { localBalance } = SyncPetalsSchema.parse(body);
 
-    // Get cloud wallet
-    const cloudWallet = await db.petalWallet.findUnique({
+    // The PetalWallet is the source of truth. Sync is a reconciliation READ:
+    // we surface the authoritative cloud balance to the client and let the
+    // client reconcile downward. We never raise the cloud balance to match a
+    // higher client-reported total, and we never write client-supplied
+    // balances or transactions into the ledger.
+    const cloudWallet = await db.petalWallet.upsert({
       where: { userId },
+      update: {},
+      create: {
+        userId,
+        balance: 0,
+        lifetimeEarned: 0,
+        lastCollectedAt: new Date(),
+      },
     });
 
-    if (!cloudWallet) {
-      // Create wallet if it doesn't exist
-      const newWallet = await db.petalWallet.create({
-        data: {
-          userId,
-          balance: localBalance,
-          lifetimeEarned: localBalance,
-          lastCollectedAt: new Date(),
-        },
-      });
-
-      return NextResponse.json({
-        ok: true,
-        data: {
-          syncedBalance: newWallet.balance,
-          cloudBalance: newWallet.balance,
-          localBalance,
-          conflict: false,
-        },
-        requestId,
-      });
-    }
-
-    // Conflict resolution: Use the higher balance (last-write-wins with merge)
     const cloudBalance = cloudWallet.balance;
-    const syncedBalance = Math.max(cloudBalance, localBalance);
-
-    // If cloud balance is higher, update local
-    // If local balance is higher, update cloud
-    if (syncedBalance !== cloudBalance) {
-      await db.petalWallet.update({
-        where: { userId },
-        data: {
-          balance: syncedBalance,
-          // Only update lifetimeEarned if synced balance is higher
-          lifetimeEarned: Math.max(cloudWallet.lifetimeEarned, syncedBalance),
-        },
-      });
-    }
-
-    // Merge transactions if provided
-    if (localTransactions && localTransactions.length > 0) {
-      // Check for duplicate transactions and merge
-      for (const localTx of localTransactions) {
-        const existingTx = await db.petalTransaction.findFirst({
-          where: {
-            userId,
-            amount: localTx.amount,
-            source: localTx.source,
-            createdAt: new Date(localTx.timestamp),
-          },
-        });
-
-        if (!existingTx) {
-          // Create missing transaction
-          await db.petalTransaction.create({
-            data: {
-              userId,
-              amount: localTx.amount,
-              source: localTx.source,
-              description: `Synced transaction from device`,
-            },
-          });
-        }
-      }
-    }
 
     return NextResponse.json({
       ok: true,
       data: {
-        syncedBalance,
+        syncedBalance: cloudBalance,
         cloudBalance,
         localBalance,
-        conflict: syncedBalance !== localBalance && syncedBalance !== cloudBalance,
+        // A conflict simply means the client reported a different total; the
+        // cloud value always wins.
+        conflict: localBalance !== cloudBalance,
         lastSyncedAt: new Date().toISOString(),
       },
       requestId,

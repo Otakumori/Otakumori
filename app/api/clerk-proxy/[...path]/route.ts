@@ -2,10 +2,14 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env';
+import { authorizeProviderWrite } from '@/app/lib/security/providerWriteGuard';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+  const guard = await authorizeProviderWrite(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const path = params.path.join('/');
@@ -42,6 +46,9 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
 }
 
 export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
+  const guard = await authorizeProviderWrite(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const path = params.path.join('/');
     const body = await request.json();

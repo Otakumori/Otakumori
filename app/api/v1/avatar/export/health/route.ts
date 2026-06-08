@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { generateRequestId } from '../../../../../lib/request-id';
 import { logger } from '@/app/lib/logger';
 import { env } from '@/env.mjs';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
@@ -12,6 +13,9 @@ export const runtime = 'nodejs';
  * Checks database connectivity, blob storage availability, and recent export success rate
  */
 export async function GET(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   const requestId = generateRequestId();
   const startTime = Date.now();
 

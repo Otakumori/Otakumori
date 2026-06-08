@@ -1,10 +1,14 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { syncAllExternalData } from '../../../../lib/external-sync';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   try {
     // Log sync request for audit
     logger.warn('External data sync triggered from:', undefined, { value: request.headers.get('user-agent') });

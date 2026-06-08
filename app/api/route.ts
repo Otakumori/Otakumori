@@ -1,21 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
 
+// Public API liveness. Intentionally minimal — no environment, version, or
+// feature-flag details are exposed to unauthenticated callers.
 export async function GET() {
-  return NextResponse.json({
-    status: 'healthy',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-    environment: env.NODE_ENV,
-    features: {
-      authentication: true,
-      database: true,
-      search: true,
-      notifications: true,
-      contentModeration: true,
-      userActivity: true,
-      trendingContent: true,
-    },
-  });
+  return NextResponse.json({ ok: true, status: 'healthy' });
 }

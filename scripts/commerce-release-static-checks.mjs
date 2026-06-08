@@ -58,13 +58,74 @@ const checks = [
     file: 'app/api/v1/checkout/session/route.ts',
     pattern: /metadata:\s*{[\s\S]*local_order_id[\s\S]*idempotency_key[\s\S]*request_id[\s\S]*source:\s*'otakumori_checkout'/,
   },
+  // Provider write lockdown / petal authority static guarantees.
+  {
+    name: 'Refund ledger records the per-event delta, not the cumulative total',
+    file: 'app/api/webhooks/stripe/route.ts',
+    pattern: /previous_attributes[\s\S]*recordStripeRefundLedger\(\s*{[\s\S]*amountRefunded:\s*refundDelta/,
+  },
+  {
+    name: 'Petal click route derives the reward server-side via grantPetals',
+    file: 'app/api/petals/route.ts',
+    pattern: /resolveClickReward\([\s\S]*grantPetals\(/,
+  },
+  {
+    name: 'Petal click route does not write a ledger amount from the request body',
+    file: 'app/api/petals/route.ts',
+    pattern: /petalBalance:\s*\{\s*increment|petalLedger\.create/,
+    absent: true,
+  },
+  {
+    name: 'Petal earn route derives the reward server-side via grantPetals',
+    file: 'app/api/petals/earn/route.ts',
+    pattern: /resolveClickReward\([\s\S]*grantPetals\(/,
+  },
+  {
+    name: 'Petal earn route does not write a ledger amount from the request body',
+    file: 'app/api/petals/earn/route.ts',
+    pattern: /petalBalance:\s*\{\s*increment|petalLedger\.create|petalTransaction\.create/,
+    absent: true,
+  },
+  {
+    name: 'Petal grant route gates admin_grant behind admin/internal authorization',
+    file: 'app/api/v1/petals/grant/route.ts',
+    pattern: /source === 'admin_grant'[\s\S]*authorizeAdminApi\(req,\s*'clerk_admin_or_internal_service'\)/,
+  },
+  {
+    name: 'Petal sync route does not inflate the server balance from client input',
+    file: 'app/api/v1/petals/sync/route.ts',
+    pattern: /Math\.max\([\s\S]*localBalance/,
+    absent: true,
+  },
+  {
+    name: 'Printify order creation is guarded before the provider request',
+    file: 'app/api/shop/orders/route.ts',
+    pattern: /authorizeProviderWrite\(request\)[\s\S]*if \(!guard\.ok\) return guard\.response[\s\S]*fetch\(/,
+  },
+  {
+    name: 'EasyPost label purchase is guarded before the provider request',
+    file: 'app/api/shipping/buy/route.ts',
+    pattern: /authorizeProviderWrite\(req\)[\s\S]*if \(!guard\.ok\) return guard\.response[\s\S]*EP\.buyShipment\(/,
+  },
+  {
+    name: 'Printify product diagnostics require admin or internal authorization',
+    file: 'app/api/printify/products/route.ts',
+    pattern: /authorizeAdminApi\(request,\s*'clerk_admin_or_internal_service'\)[\s\S]*if \(!authorization\.ok\) return authorization\.response[\s\S]*fetch\(/,
+  },
+  {
+    name: 'Metrics GET requires admin or internal authorization',
+    file: 'app/api/metrics/route.ts',
+    pattern: /export async function GET\(req[\s\S]*authorizeAdminApi\(req,\s*'clerk_admin_or_internal_service'\)[\s\S]*if \(!authorization\.ok\) return authorization\.response/,
+  },
 ];
 
 let failures = 0;
 
 for (const check of checks) {
   const source = readFileSync(check.file, 'utf8');
-  if (check.pattern.test(source)) {
+  const matched = check.pattern.test(source);
+  const passed = check.absent ? !matched : matched;
+  if (passed) {
     console.log(`PASS ${check.name}`);
   } else {
     failures += 1;

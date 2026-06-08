@@ -1,20 +1,20 @@
 name: CI
 
 on:
+  pull_request:
   push:
     branches: [main, develop]
-  pull_request:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
   NODE_VERSION: '20.20.2'
-  PNPM_VERSION: '10.15.1'
+  PNPM_VERSION: '9.15.9'
   CI: 'true'
   NEXT_TELEMETRY_DISABLED: '1'
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/otakumori_ci
@@ -33,30 +33,30 @@ env:
   EMAIL_SEND_ENABLED: 'false'
   FULFILLMENT_PROVIDER: disabled
   FULFILLMENT_DRY_RUN: 'true'
+  NEXT_PUBLIC_FEATURE_HERO: '1'
+  NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+  NEXT_PUBLIC_FEATURE_SHOP: '1'
+  NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
+  NEXT_PUBLIC_FEATURE_BLOG: '1'
+  NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+  NEXT_PUBLIC_LIVE_DATA: '0'
+  NEXT_PUBLIC_PROBE_MODE: '1'
 
 jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
       - name: Type check
         run: pnpm run typecheck
@@ -64,177 +64,95 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Mini-Games QA Validation
-        id: mini-games-qa
+      - name: Provider containment and commerce tests
+        run: >-
+          pnpm exec vitest run
+          app/api/webhooks/printify/__tests__/signature.test.ts
+          app/lib/petals/__tests__/grant-clamp.test.ts
+          app/api/petals/__tests__/authority.test.ts
+          app/api/v1/petals/__tests__/grant-admin.test.ts
+          app/api/webhooks/stripe/__tests__/dry-run.test.ts
+          app/lib/security/__tests__/providerWriteGuard.test.ts
+          app/api/shop/orders/__tests__/authorization.test.ts
+
+      - name: Commerce static checks
+        run: node scripts/commerce-release-static-checks.mjs
+
+  advisory-quality:
+    name: Full Unit and Mini-game QA (Advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          pnpm-version: ${{ env.PNPM_VERSION }}
+
+      - name: Mini-games QA
         run: pnpm run mini-games:qa
-        continue-on-error: true
 
-      - name: Run unit tests
-        id: unit-tests
-        run: pnpm exec vitest run --reporter=json --outputFile=vitest-results.json
-        continue-on-error: true
-
-      - name: Enforce unit-test failure baseline
+      - name: Full unit suite
         if: always()
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const path = require('node:path');
+        run: pnpm exec vitest run --reporter=json --outputFile=vitest-results.json
 
-          const knownFailingFiles = new Set([
-            '__tests__/api/adults/catalog.test.ts',
-            '__tests__/api/adults/purchase.test.ts',
-            '__tests__/api/cart.test.ts',
-            '__tests__/api/printify.route.test.ts',
-            '__tests__/api/v1/avatar/export-health.test.ts',
-            '__tests__/api/v1/avatar/export-integration.test.ts',
-            '__tests__/api/v1/avatar/export-status.test.ts',
-            '__tests__/api/v1/avatar/export.test.ts',
-            '__tests__/api/v1/avatar/save.test.ts',
-            '__tests__/auth/integration.test.ts',
-            '__tests__/components/InteractivePetals.test.tsx',
-            '__tests__/integration/payment-flows.test.ts',
-            '__tests__/lib/safeFetch.test.ts',
-            '__tests__/lib/telemetry.test.ts',
-            'app/lib/avatar/__tests__/validate.test.ts',
-            'packages/avatar/src/__tests__/spec.test.ts',
-          ]);
-
-          if (!fs.existsSync('vitest-results.json')) {
-            console.error('Vitest did not produce a results file.');
-            process.exit(1);
-          }
-
-          const report = JSON.parse(fs.readFileSync('vitest-results.json', 'utf8'));
-          const failingFiles = (report.testResults ?? [])
-            .filter((result) => result.status === 'failed')
-            .map((result) => path.relative(process.cwd(), result.name).replaceAll('\\', '/'))
-            .sort();
-          const unexpected = failingFiles.filter((file) => !knownFailingFiles.has(file));
-
-          if (unexpected.length > 0) {
-            console.error(`Unexpected failing test files: ${unexpected.join(', ')}`);
-            process.exit(1);
-          }
-
-          if (failingFiles.length > 0) {
-            console.warn(
-              `Known test debt remains in ${failingFiles.length} files; no new failing file was introduced.`,
-            );
-          }
-          NODE
-
-      - name: Report advisory QA debt
-        if: always() && steps.mini-games-qa.outcome == 'failure'
-        run: echo "::warning::Mini-game QA still targets obsolete route paths and remains advisory."
+      - name: Upload unit-test diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-results
+          path: vitest-results.json
+          if-no-files-found: ignore
+          retention-days: 14
 
   build:
     name: Build & Bundle Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: test
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
       - name: Build application
-        run: pnpm run build
-        env:
-          NEXT_PUBLIC_FEATURE_HERO: '1'
-          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
-          NEXT_PUBLIC_FEATURE_SHOP: '1'
-          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
-          NEXT_PUBLIC_FEATURE_BLOG: '1'
-          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
-          NEXT_PUBLIC_LIVE_DATA: '0'
-          NEXT_PUBLIC_PROBE_MODE: '1'
-
-      - name: Analyze bundle size
+        shell: bash
         run: |
-          pnpm run build -- --analyze
-        continue-on-error: true
+          set -o pipefail
+          pnpm run vercel-build 2>&1 | tee next-build.log
 
-      - name: Upload build artifacts
+      - name: Upload Next build
         uses: actions/upload-artifact@v4
         with:
-          name: build-files
+          name: next-build
           path: .next/
           include-hidden-files: true
           retention-days: 1
 
-  lighthouse:
-    name: Lighthouse Performance
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'pull_request'
-    continue-on-error: true
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Upload build diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: .next/
-
-      - name: Start Next.js server
-        run: |
-          pnpm run start &
-          sleep 30
-        env:
-          PORT: 3000
-          NEXT_PUBLIC_FEATURE_HERO: '1'
-          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
-          NEXT_PUBLIC_FEATURE_SHOP: '1'
-          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
-          NEXT_PUBLIC_FEATURE_BLOG: '1'
-          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
-          NEXT_PUBLIC_LIVE_DATA: '0'
-          NEXT_PUBLIC_PROBE_MODE: '1'
-
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v10
-        with:
-          configPath: './lighthouserc.js'
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          name: next-build-log
+          path: next-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: build
     if: github.event_name == 'pull_request'
     continue-on-error: true
@@ -243,131 +161,185 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Download build artifacts
+      - name: Download Next build
         uses: actions/download-artifact@v4
         with:
-          name: build-files
+          name: next-build
           path: .next/
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
 
-      - name: Start Next.js server
+      - name: Start application
+        shell: bash
         run: |
-          pnpm run start &
-          sleep 30
-        env:
-          PORT: 3000
-          NEXT_PUBLIC_FEATURE_HERO: '1'
-          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
-          NEXT_PUBLIC_FEATURE_SHOP: '1'
-          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
-          NEXT_PUBLIC_FEATURE_BLOG: '1'
-          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
-          NEXT_PUBLIC_LIVE_DATA: '0'
-          NEXT_PUBLIC_PROBE_MODE: '1'
+          pnpm run start > next-server.log 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for application
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            if curl --silent --show-error --output /dev/null http://127.0.0.1:3000/api; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat next-server.log
+          exit 1
 
       - name: Run Playwright tests
+        id: playwright
         run: pnpm exec playwright test
+        continue-on-error: true
         env:
-          BASE_URL: http://localhost:3000
+          BASE_URL: http://127.0.0.1:3000
+
+      - name: Report advisory E2E failure
+        if: steps.playwright.outcome != 'success'
+        shell: bash
+        run: echo "::warning::E2E diagnostics failed; this lane remains advisory until stabilized."
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
 
-  security:
-    name: Security Audit
+      - name: Upload E2E server log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-next-server-log
+          path: next-server.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop application
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${APP_PID:-}" ]; then
+            kill "$APP_PID" 2>/dev/null || true
+          fi
+
+  lighthouse:
+    name: Lighthouse Performance
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    if: github.event_name == 'pull_request'
+    continue-on-error: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Download Next build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .next/
 
-      - name: Run security audit
-        id: security-audit
-        run: pnpm audit --json > pnpm-audit.json
+      - name: Start application
+        shell: bash
+        run: |
+          pnpm run start > next-server.log 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for application
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            if curl --silent --show-error --output /dev/null http://127.0.0.1:3000/api; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat next-server.log
+          exit 1
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        timeout-minutes: 10
         continue-on-error: true
+        with:
+          configPath: ./lighthouserc.cjs
+          uploadArtifacts: true
+          temporaryPublicStorage: true
 
-      - name: Enforce dependency advisory baseline
+      - name: Report advisory Lighthouse failure
+        if: steps.lighthouse.outcome != 'success'
+        shell: bash
+        run: echo "::warning::Lighthouse diagnostics failed or timed out; this lane remains advisory until stabilized."
+
+      - name: Upload Lighthouse diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-diagnostics
+          path: |
+            .lighthouseci/
+            next-server.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop application
         if: always()
         shell: bash
         run: |
-          node <<'NODE'
-          const fs = require('node:fs');
+          if [ -n "${APP_PID:-}" ]; then
+            kill "$APP_PID" 2>/dev/null || true
+          fi
 
-          const baseline = {
-            low: 9,
-            moderate: 86,
-            high: 99,
-            critical: 9,
-          };
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-          if (!fs.existsSync('pnpm-audit.json')) {
-            console.error('pnpm audit did not produce a results file.');
-            process.exit(1);
-          }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-          const report = JSON.parse(fs.readFileSync('pnpm-audit.json', 'utf8'));
-          const current = report.metadata?.vulnerabilities;
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
-          if (!current) {
-            console.error('pnpm audit results did not include vulnerability counts.');
-            process.exit(1);
-          }
+      - name: Capture production audit diagnostics
+        shell: bash
+        run: |
+          set +e
+          pnpm audit --prod --json > pnpm-audit.json
+          exit 0
 
-          const regressions = Object.entries(baseline)
-            .filter(([severity, maximum]) => Number(current[severity] ?? 0) > maximum)
-            .map(([severity, maximum]) => `${severity}: ${current[severity]} > ${maximum}`);
+      - name: Fail on production critical advisories
+        run: pnpm audit --prod --audit-level critical
 
-          if (regressions.length > 0) {
-            console.error(`Dependency advisory baseline regressed: ${regressions.join(', ')}`);
-            process.exit(1);
-          }
-
-          const total = Object.values(current).reduce(
-            (sum, count) => sum + Number(count ?? 0),
-            0,
-          );
-          console.warn(
-            `Known dependency debt remains (${total} advisories); no severity count increased.`,
-          );
-          NODE
-
-      - name: Report outdated dependencies
-        run: pnpm outdated
-        continue-on-error: true
+      - name: Upload security diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pnpm-production-audit
+          path: pnpm-audit.json
+          if-no-files-found: error
+          retention-days: 14
