@@ -4,6 +4,9 @@ import path from 'node:path';
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  esbuild: {
+    jsx: 'automatic',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
@@ -17,6 +20,7 @@ export default defineConfig({
     },
   },
   test: {
+    globals: true,
     environment: 'jsdom',
     include: [
       '__tests__/**/*.{test,spec}.{ts,tsx}',
@@ -36,8 +40,10 @@ export default defineConfig({
       '**/*.disabled.safe.*',
     ],
     setupFiles: ['./vitest.setup.ts', './__tests__/setup.ts'],
-    deps: {
-      inline: [/^(?!@?vitest).*/],
+    server: {
+      deps: {
+        inline: [/^(?!@?vitest).*/],
+      },
     },
   },
 });

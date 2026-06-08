@@ -48,12 +48,24 @@ vi.mock('next/headers', () => ({
 
 vi.mock('next/server', () => {
   class NextRequest {
-    url = '';
-    constructor(url: string) {
+    url: string;
+    method: string;
+    headers: Headers;
+    nextUrl: URL;
+    private readonly requestBody?: BodyInit | null;
+
+    constructor(url: string, init: RequestInit = {}) {
       this.url = url;
+      this.method = init.method ?? 'GET';
+      this.headers = new Headers(init.headers);
+      this.nextUrl = new URL(url);
+      this.requestBody = init.body;
     }
+
     async json() {
-      return {};
+      if (typeof this.requestBody === 'string') return JSON.parse(this.requestBody);
+      if (this.requestBody == null) return {};
+      throw new TypeError('The shared NextRequest test mock only supports string JSON bodies.');
     }
   }
   class NextResponse {
