@@ -12,139 +12,136 @@ type HomeSectionCard = {
   description: string;
   href: string;
   cta: string;
-  status: string;
 };
 
 const HOME_SECTION_CARDS: HomeSectionCard[] = [
   {
-    eyebrow: 'Commerce',
-    title: 'Shop the grove',
+    eyebrow: 'Relics',
+    title: 'Shop the collection',
     description:
-      'A fast path into Otaku-mori merch without mixing catalog, cart, or checkout ownership into the homepage.',
+      'Apparel, pins, charms, and limited-run relics curated for travelers who linger in the grove.',
     href: '/shop',
-    cta: 'Visit the shop',
-    status: 'Route-owned',
+    cta: 'Browse the catalog',
   },
   {
     eyebrow: 'Play',
-    title: 'Mini-games',
+    title: 'Enter the game realm',
     description:
-      'A light entry point for games, rewards, and future petal loops while keeping the homepage bundle calm.',
+      'Mini-games, petal rewards, and small rituals await in the cube beyond the blossoms.',
     href: '/mini-games',
     cta: 'Play mini-games',
-    status: 'Preview-safe',
   },
   {
     eyebrow: 'Community',
-    title: 'Community shrine',
+    title: 'Fellow travelers',
     description:
-      'A landing surface for social features and soapstone-style messages, gated before any live posting path opens.',
+      'Leave a sign for fellow wanderers, send praise, and gather at the community shrine.',
     href: '/community',
     cta: 'Join the community',
-    status: 'Live-data gated',
   },
   {
-    eyebrow: 'Identity',
-    title: 'Traveler profile',
+    eyebrow: 'Petals',
+    title: 'The petals remember you',
     description:
-      'The future personal grove for petals, runes, shrine progress, and Petal Pouch state after the homepage stabilizes.',
+      'Gather petals, unlock small pieces of the world, and carry your grove progress forward.',
     href: '/profile',
-    cta: 'Open profile',
-    status: 'Follow-up surface',
+    cta: 'Open your grove',
   },
 ];
 
 function SectionHeader() {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <p className="font-ui text-sm font-medium uppercase tracking-[0.32em] text-sakura-50/70">
-        The path through the grove
-      </p>
-      <h2 className="font-display mt-4 text-balance text-3xl font-semibold tracking-tight text-white md:text-5xl">
-        A clear, fast skeleton for shop, play, community, and profile.
+      <p className="mori-ui text-sm">Beyond the blossoms</p>
+      <h2 className="mori-display mt-4 text-balance text-3xl md:text-5xl">
+        Relics, games, and small rituals await
       </h2>
-      <p className="font-body mt-5 text-base leading-8 text-white/70 md:text-lg">
-        The Sakura tree is the emotional entry point. The sections below it stay server-rendered,
-        low-motion, and route-owned so the site feels intentional without adding memory-heavy client
-        behavior.
+      <p className="mori-body mx-auto mt-5 max-w-2xl text-base leading-8 md:text-lg">
+        Step deeper into Otaku-mori — a dark storybook catalog where commerce, play, and community
+        share the same quiet shrine mood.
       </p>
+    </div>
+  );
+}
+
+function ShopCtaBand() {
+  return (
+    <div className="mori-frame mori-paper-texture mx-auto mt-14 max-w-3xl rounded-sm px-6 py-8 text-center md:px-10">
+      <p className="mori-ui text-xs">Featured path</p>
+      <h2 className="mori-display mt-3 text-3xl md:text-4xl">Shop the collection</h2>
+      <p className="mori-body mx-auto mt-4 max-w-xl text-base">
+        Relics and apparel from the Mori — framed for travelers, not for architects.
+      </p>
+      <Link href="/shop" className="mori-cta-primary mt-6 inline-flex rounded-sm">
+        Enter the shop
+      </Link>
     </div>
   );
 }
 
 function HomeSectionCard({ card }: { card: HomeSectionCard }) {
   return (
-    <article className="glass-card card-stroke group relative overflow-hidden rounded-3xl p-6 transition-transform duration-200 hover:-translate-y-1 focus-within:border-sakura-300/50 md:p-7">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,126,179,0.18),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_48%)] opacity-75 transition-opacity duration-200 group-hover:opacity-100" />
+    <article className="mori-card group relative overflow-hidden rounded-sm p-6 md:p-7">
       <div className="relative z-10 flex h-full flex-col">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <p className="font-ui text-xs font-semibold uppercase tracking-[0.26em] text-sakura-50/70">
-            {card.eyebrow}
-          </p>
-          <span className="font-ui rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-white/60">
-            {card.status}
-          </span>
-        </div>
+        <p className="mori-ui text-xs">{card.eyebrow}</p>
 
-        <h3 className="font-display text-2xl font-semibold text-white">{card.title}</h3>
-        <p className="font-body mt-4 flex-1 text-sm leading-7 text-white/68">{card.description}</p>
+        <h3 className="mori-display mt-4 text-2xl">{card.title}</h3>
+        <p className="mori-body mt-4 flex-1 text-sm leading-7">{card.description}</p>
 
-        <Link
-          href={card.href}
-          className="font-ui focus-ring mt-7 inline-flex w-fit items-center rounded-full border border-sakura-300/25 bg-sakura-300/10 px-4 py-2 text-sm font-medium text-sakura-50 transition hover:border-sakura-50/50 hover:bg-sakura-300/18"
-        >
-          {card.cta}
+        <Link href={card.href} className="mori-ui focus-ring mt-7 inline-flex w-fit text-sm">
+          {card.cta} →
         </Link>
       </div>
     </article>
   );
 }
 
-function PerformanceGuardrails() {
+function WorldTeasers() {
   return (
-    <section
-      aria-labelledby="home-guardrails-title"
-      className="glass-panel card-stroke mx-auto mt-24 max-w-5xl rounded-3xl p-6 text-white/75 md:p-8"
-      style={containSectionStyle}
-    >
-      <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
-        Build standard
-      </p>
-      <h2 id="home-guardrails-title" className="font-display mt-3 text-2xl font-semibold text-white">
-        UI, UX, performance, memory, and data safety carry equal weight.
-      </h2>
-      <div className="font-body mt-6 grid gap-4 text-sm leading-7 md:grid-cols-2">
-        <p>
-          This skeleton is server-first and static by default. It does not add timers, observers,
-          third-party scripts, external fetches, or arbitrary client-trusted grant calls to the
-          homepage path.
+    <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-2">
+      <article className="mori-card rounded-sm p-6">
+        <p className="mori-ui text-xs">Petal rewards</p>
+        <h3 className="mori-display mt-3 text-2xl">Gather petals. Unlock the world.</h3>
+        <p className="mori-body mt-3 text-sm leading-7">
+          Click blossoms as they drift from the tree. Small rewards and shrine progress follow the
+          patient traveler.
         </p>
-        <p>
-          Homepage tree petals may use a thin authenticated collection session later. Full profile,
-          purchase, achievement, and mini-game reward logic stays on owned routes and server-validated
-          claim paths.
+      </article>
+      <article className="mori-card rounded-sm p-6">
+        <p className="mori-ui text-xs">World lore</p>
+        <h3 className="mori-display mt-3 text-2xl">Community chronicles</h3>
+        <p className="mori-body mt-3 text-sm leading-7">
+          Read tales from the grove — dev logs, traveler notes, and the quiet history of Otaku-mori.
         </p>
-      </div>
-    </section>
+        <Link href="/blog" className="mori-ui focus-ring mt-5 inline-flex text-sm">
+          Read the blog →
+        </Link>
+      </article>
+    </div>
   );
 }
 
 export default function HomeMain() {
   return (
-    <main className="relative z-20 bg-[#080611] px-4 py-20 text-white sm:px-6 lg:px-8">
+    <main className="mori-surface mori-paper-texture relative z-20 px-4 py-20 sm:px-6 lg:px-8">
       <section aria-labelledby="home-sections-title" className="mx-auto max-w-7xl" style={containSectionStyle}>
         <SectionHeader />
         <h2 id="home-sections-title" className="sr-only">
           Otaku-mori site sections
         </h2>
+
+        <ShopCtaBand />
+
+        <div className="mori-divider mx-auto mt-14 max-w-4xl" aria-hidden="true" />
+
         <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {HOME_SECTION_CARDS.map((card) => (
             <HomeSectionCard key={card.href} card={card} />
           ))}
         </div>
-      </section>
 
-      <PerformanceGuardrails />
+        <WorldTeasers />
+      </section>
     </main>
   );
 }
