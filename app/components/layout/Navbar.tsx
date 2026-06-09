@@ -116,22 +116,22 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : 'border-b border-white/5'}`}
-      style={{ backgroundColor: 'var(--color-background)', opacity: isScrolled ? 0.9 : 0.7, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+      className={`navbar-scroll mori-ui relative z-50 w-full transition-all duration-300 ${isScrolled ? 'scrolled border-b border-white/10 shadow-lg shadow-black/60' : 'border-b border-white/5'}`}
+      style={{ backgroundColor: '#080611', opacity: isScrolled ? 0.94 : 0.82, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
     >
       <a href="#main-content" className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only">Skip to main content</a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         <Link href={paths.home()} className="flex items-center group py-1">
-          <div className="relative w-32 h-32 md:w-36 md:h-36">
-            <Image src="/assets/images/circlelogo.png" alt="Otaku-mori" fill className="object-contain" />
+          <div className="relative h-16 w-16 md:h-20 md:w-20">
+            <Image src="/assets/images/circlelogo.png" alt="Otaku-mori" fill className="object-contain" sizes="80px" />
           </div>
         </Link>
 
         <div className="hidden sm:flex items-center gap-8" ref={megaMenuRef}>
-          <Link href={paths.home()} className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === paths.home() ? 'text-text-link-hover border-b-2 border-primary' : ''}`}>Home</Link>
+          <Link href={paths.home()} className={`mori-ui min-h-[44px] flex items-center px-2 text-sm uppercase tracking-[0.18em] text-text-link hover:text-text-link-hover transition-colors ${pathname === paths.home() ? 'text-text-link-hover border-b border-primary/70' : ''}`}>Home</Link>
 
           <div className="relative">
-            <button onClick={() => setActiveDropdown(activeDropdown === 'shop' ? null : 'shop')} className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/shop') ? 'text-text-link-hover border-b-2 border-primary' : ''}`} aria-expanded={activeDropdown === 'shop'} aria-label="Shop menu">
+            <button onClick={() => setActiveDropdown(activeDropdown === 'shop' ? null : 'shop')} className={`mori-ui min-h-[44px] flex items-center gap-1 px-2 text-sm uppercase tracking-[0.18em] text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/shop') ? 'text-text-link-hover border-b border-primary/70' : ''}`} aria-expanded={activeDropdown === 'shop'} aria-label="Shop menu">
               Shop
               <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'shop' ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
@@ -169,7 +169,7 @@ export default function Navbar() {
           </div>
 
           <div className="relative">
-            <button onClick={() => setActiveDropdown(activeDropdown === 'games' ? null : 'games')} className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/mini-games') ? 'text-text-link-hover border-b-2 border-primary' : ''}`} aria-expanded={activeDropdown === 'games'} aria-label="Mini-games menu">
+            <button onClick={() => setActiveDropdown(activeDropdown === 'games' ? null : 'games')} className={`mori-ui min-h-[44px] flex items-center gap-1 px-2 text-sm uppercase tracking-[0.18em] text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/mini-games') ? 'text-text-link-hover border-b border-primary/70' : ''}`} aria-expanded={activeDropdown === 'games'} aria-label="Mini-games menu">
               Mini-Games
               <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'games' ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
@@ -211,8 +211,8 @@ export default function Navbar() {
             )}
           </div>
 
-          <Link href={paths.blogIndex()} className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/blog') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}>Blog</Link>
-          <Link href="/about" className={`min-h-[44px] flex items-center px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/about' ? 'text-text-link-hover border-b-2 border-primary' : ''}`}>About</Link>
+          <Link href={paths.blogIndex()} className={`mori-ui min-h-[44px] flex items-center px-2 text-sm uppercase tracking-[0.18em] text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/blog') ? 'text-text-link-hover border-b border-primary/70' : ''}`}>Blog</Link>
+          <Link href="/about" className={`mori-ui min-h-[44px] flex items-center px-2 text-sm uppercase tracking-[0.18em] text-text-link hover:text-text-link-hover transition-colors ${pathname === '/about' ? 'text-text-link-hover border-b border-primary/70' : ''}`}>About</Link>
           <button onClick={handleWishlistClick} className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/wishlist' ? 'text-text-link-hover border-b-2 border-primary' : ''}`} aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}><Heart className="w-5 h-5" aria-hidden="true" /></button>
           <button onClick={handleSoapstoneClick} className={`min-h-[44px] flex items-center gap-1 px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''}`} aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}><MessageCircle className="w-5 h-5" aria-hidden="true" /></button>
         </div>

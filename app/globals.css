@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 /* Tailwind CSS directives - these are processed by PostCSS */
 @tailwind base;
 @tailwind components;
@@ -2231,5 +2233,186 @@ textarea,
   
   .snap-y {
     scroll-snap-type: none;
+  }
+}
+
+/* ========================================
+   Mori storybook homepage utilities
+   ======================================== */
+
+.mori-display {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #f5f0e8;
+}
+
+.mori-body {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(245, 240, 232, 0.82);
+}
+
+.mori-ui {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: rgba(245, 240, 232, 0.78);
+}
+
+.mori-surface {
+  background-color: #080611;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.03), transparent 42%),
+    linear-gradient(180deg, rgba(18, 14, 22, 0.92), rgba(8, 6, 17, 0.98));
+}
+
+.mori-paper-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.mori-frame {
+  border: 1px solid rgba(245, 240, 232, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 126, 179, 0.08),
+    0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.mori-card {
+  background: linear-gradient(145deg, rgba(22, 18, 28, 0.88), rgba(10, 8, 16, 0.94));
+  border: 1px solid rgba(245, 240, 232, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.mori-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 126, 179, 0.28);
+}
+
+.mori-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 126, 179, 0.35) 20%,
+    rgba(245, 240, 232, 0.2) 50%,
+    rgba(255, 126, 179, 0.35) 80%,
+    transparent
+  );
+}
+
+.mori-cta-primary {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.5rem;
+  border: 1px solid rgba(245, 240, 232, 0.35);
+  background: linear-gradient(180deg, rgba(255, 126, 179, 0.12), rgba(8, 6, 17, 0.55));
+  color: #f5f0e8;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+}
+
+.mori-cta-primary:hover {
+  border-color: rgba(255, 126, 179, 0.45);
+  background: linear-gradient(180deg, rgba(255, 126, 179, 0.2), rgba(8, 6, 17, 0.65));
+  transform: translateY(-1px);
+}
+
+.mori-cta-primary:focus-visible {
+  outline: 2px solid rgba(255, 126, 179, 0.65);
+  outline-offset: 3px;
+}
+
+.mori-icon-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 5.5rem;
+  min-width: 5.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(245, 240, 232, 0.2);
+  background: rgba(8, 6, 17, 0.45);
+  color: #f5f0e8;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.mori-icon-tile:hover {
+  border-color: rgba(255, 126, 179, 0.35);
+  background: rgba(255, 126, 179, 0.08);
+}
+
+.mori-icon-tile:focus-visible {
+  outline: 2px solid rgba(255, 126, 179, 0.65);
+  outline-offset: 2px;
+}
+
+.mori-icon-glyph {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid rgba(245, 240, 232, 0.35);
+  transform: rotate(45deg);
+}
+
+.mori-icon-glyph--flower {
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 200, 220, 0.5), transparent 65%);
+}
+
+.mori-icon-glyph--blade {
+  border-radius: 2px;
+  background: linear-gradient(135deg, rgba(245, 240, 232, 0.15), transparent);
+}
+
+.mori-icon-glyph--sigil {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: rgba(255, 126, 179, 0.15);
+}
+
+.mori-icon-glyph--heart {
+  border-radius: 9999px 9999px 2px 2px;
+  background: rgba(255, 126, 179, 0.12);
+}
+
+@keyframes moriTreePetalDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.85);
+  }
+  10% {
+    opacity: 0.72;
+  }
+  55% {
+    transform: translate3d(
+        calc(var(--petal-drift) * 0.55 + var(--petal-gust)),
+        calc(var(--petal-fall) * 0.55),
+        0
+      )
+      rotate(calc(var(--petal-rotate) * 0.45))
+      scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--petal-drift), var(--petal-fall), 0) rotate(var(--petal-rotate))
+      scale(0.78);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mori-cta-primary:hover,
+  .mori-card:hover,
+  .mori-icon-tile:hover {
+    transform: none;
   }
 }

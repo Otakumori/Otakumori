@@ -6,7 +6,7 @@ import HeroContent from './HeroContent';
 
 export default function HeroRoot() {
   return (
-    <section className="relative isolate min-h-[100svh] w-full overflow-hidden bg-[#080611]">
+    <section className="mori-surface mori-paper-texture relative isolate min-h-[100svh] w-full overflow-hidden">
       <HeroScene />
       <HeroOverlay />
       <HeroContent />
