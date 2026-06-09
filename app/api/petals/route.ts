@@ -2,14 +2,18 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
+import { grantPetals } from '@/app/lib/petals/grant';
+import { resolveClickReward } from '@/app/lib/petals/serverRewards';
 
 async function getDb() {
   const { db } = await import('@/lib/db');
   return db;
 }
 
+// The client may signal *which* action occurred, but never how many petals it
+// is worth. The reward is derived server-side via resolveClickReward and the
+// grant is funneled through grantPetals() (per-source caps + rate limits).
 const earnPetalsSchema = z.object({
-  amount: z.number().int().positive(),
   reason: z.string().min(1).max(100),
 });
 
@@ -20,58 +24,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { amount, reason } = earnPetalsSchema.parse(body);
+    const body = await request.json().catch(() => ({}));
+    const { reason } = earnPetalsSchema.parse(body);
 
-    const db = await getDb();
+    // Server-owned reward — client-supplied amounts are ignored.
+    const { amount, source } = resolveClickReward(reason);
 
-    // Check daily click limit
-    const today = new Date().toISOString().split('T')[0];
-    const user = await db.user.findUnique({
-      where: { clerkId: userId },
-      select: { id: true, dailyClicks: true, lastClickDayUTC: true },
+    const result = await grantPetals({
+      userId,
+      amount,
+      source,
+      description: `Petal click (${reason})`,
+      req: request,
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!result.success) {
+      const status =
+        result.errorCode === 'RATE_LIMITED'
+          ? 429
+          : result.errorCode === 'AUTH_REQUIRED'
+            ? 401
+            : result.errorCode === 'VALIDATION_ERROR'
+              ? 400
+              : 500;
+      return NextResponse.json({ error: result.error ?? 'Failed to earn petals' }, { status });
     }
-
-    // Reset daily clicks if it's a new day
-    let dailyClicks = user.dailyClicks;
-    if (user.lastClickDayUTC.toISOString().split('T')[0] !== today) {
-      dailyClicks = 0;
-    }
-
-    // Check if user has exceeded daily limit (assuming 100 clicks per day)
-    if (dailyClicks >= 100) {
-      return NextResponse.json({ error: 'Daily click limit reached' }, { status: 429 });
-    }
-
-    // Update user's petal balance and daily clicks
-    const updatedUser = await db.user.update({
-      where: { id: user.id },
-      data: {
-        petalBalance: { increment: amount },
-        dailyClicks: { increment: 1 },
-        lastClickDayUTC: new Date(),
-      },
-    });
-
-    // Record the transaction
-    await db.petalLedger.create({
-      data: {
-        userId: user.id,
-        type: 'earn',
-        amount,
-        reason,
-      },
-    });
 
     return NextResponse.json({
       data: {
-        newBalance: updatedUser.petalBalance,
-        dailyClicks: updatedUser.dailyClicks,
-        message: `Earned ${amount} petals for ${reason}`,
+        newBalance: result.newBalance,
+        earned: result.granted,
+        limited: result.limited ?? false,
+        message: `Earned ${result.granted} petals for ${reason}`,
       },
     });
   } catch (error) {

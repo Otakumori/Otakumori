@@ -9,7 +9,25 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import * as THREE from 'three';
 import { EnhancedProceduralMesh } from './enhanced-procedural-mesh';
 import type { FullCharacterConfig } from '@/app/test/character-creator/types';
-import { logger } from '@/app/lib/logger';
+const logger = {
+  info: async (...args: unknown[]) => {
+    const { logger } = await import('@/app/lib/logger');
+    return (logger.info as (...args: unknown[]) => unknown)(...args);
+  },
+  warn: async (...args: unknown[]) => {
+    const { logger } = await import('@/app/lib/logger');
+    return (logger.warn as (...args: unknown[]) => unknown)(...args);
+  },
+  error: async (...args: unknown[]) => {
+    const { logger } = await import('@/app/lib/logger');
+    return (logger.error as (...args: unknown[]) => unknown)(...args);
+  },
+  debug: async (...args: unknown[]) => {
+    const { logger } = await import('@/app/lib/logger');
+    return (logger.debug as (...args: unknown[]) => unknown)(...args);
+  },
+};
+
 
 export interface GLBGenerationOptions {
   quality?: 'low' | 'medium' | 'high' | 'ultra';

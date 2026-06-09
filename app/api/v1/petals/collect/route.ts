@@ -18,6 +18,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { ok: false, error: 'AUTH_REQUIRED', requestId },
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+
     const body = await req.json();
     const validation = CollectPetalsSchema.safeParse(body);
 
@@ -28,6 +35,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // The client-supplied `amount` is only a signal; grantPetals clamps it to
+    // the mapped source's server-owned PETAL_RULES before writing the ledger.
     const { amount, source, metadata } = validation.data;
 
     // Map legacy source names to new PetalSource types
@@ -73,20 +82,6 @@ export async function POST(req: NextRequest) {
         },
         { status: statusCode },
       );
-    }
-
-    // Guest user handling - return early for guests
-    if (!userId) {
-      return NextResponse.json({
-        ok: true,
-        data: {
-          balance: null,
-          earned: result.granted,
-          guestPetals: result.granted,
-          isGuest: true,
-        },
-        requestId,
-      });
     }
 
     // For authenticated users, return full result

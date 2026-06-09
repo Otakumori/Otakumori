@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
-import { auth, currentUser } from '@clerk/nextjs/server';
 import { env } from '@/env';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
@@ -13,18 +13,12 @@ function ensureBlobToken(): string {
   return token;
 }
 
-async function requireAdmin() {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
-  const user = await currentUser();
-  const isAdmin = user?.publicMetadata?.role === 'admin';
-  if (!isAdmin) throw new Error('Forbidden');
-}
-
 export async function POST(req: Request) {
+  const authorization = await authorizeAdminApi(req);
+  if (!authorization.ok) return authorization.response;
+
   try {
     const token = ensureBlobToken();
-    await requireAdmin();
 
     const form = await req.formData();
     const file = form.get('file') as File | null;

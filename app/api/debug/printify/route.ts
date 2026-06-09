@@ -1,44 +1,42 @@
-import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
+import { withAdminAuth } from '@/app/lib/auth/admin';
+import { logger } from '@/app/lib/logger';
 import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
-  try {
-    // Log debug request for audit
-    logger.warn('Printify debug requested from:', undefined, {
-      userAgent: request.headers.get('user-agent'),
-    });
+export const GET = withAdminAuth(async (request: NextRequest) => {
+  logger.warn('Printify debug check requested', undefined, {
+    path: request.nextUrl.pathname,
+  });
 
-    // Check if environment variables are loaded
-    const printifyApiKey = env.PRINTIFY_API_KEY;
-    const printifyApiUrl = env.PRINTIFY_API_URL;
-    const printifyShopId = env.PRINTIFY_SHOP_ID;
+  const hasApiKey = !!env.PRINTIFY_API_KEY;
+  const hasShopId = !!env.PRINTIFY_SHOP_ID;
+  const hasApiUrl = !!env.PRINTIFY_API_URL;
 
-    // Don't expose the full API key, just show if it exists and first few characters
-    const maskedApiKey = printifyApiKey ? `${printifyApiKey.substring(0, 20)}...` : 'NOT_FOUND';
-
-    return NextResponse.json({
-      ok: true,
-      debug: {
-        PRINTIFY_API_KEY: maskedApiKey,
-        PRINTIFY_API_KEY_LENGTH: printifyApiKey?.length || 0,
-        PRINTIFY_API_URL: printifyApiUrl || 'NOT_FOUND',
-        PRINTIFY_SHOP_ID: printifyShopId || 'NOT_FOUND',
-        NODE_ENV: env.NODE_ENV,
-        // Test the actual API call
-        testApiCall: await testPrintifyApi(),
+  if (!hasApiKey || !hasShopId || !hasApiUrl) {
+    return NextResponse.json(
+      {
+        ok: false,
+        printify: {
+          configured: false,
+          hasApiKey,
+          hasShopId,
+          hasApiUrl,
+        },
       },
-    });
-  } catch (error: any) {
-    return NextResponse.json({
-      ok: false,
-      error: error.message,
-      stack: error.stack,
-    });
+      { status: 503 },
+    );
   }
-}
+
+  return NextResponse.json({
+    ok: true,
+    printify: {
+      configured: true,
+      testApiCall: await testPrintifyApi(),
+    },
+  });
+});
 
 async function testPrintifyApi() {
   try {
@@ -55,14 +53,14 @@ async function testPrintifyApi() {
     );
 
     return {
+      ok: res.ok,
       status: res.status,
       statusText: res.statusText,
-      headers: Object.fromEntries(res.headers.entries()),
-      body: res.ok ? await res.text() : await res.text(),
     };
-  } catch (error: any) {
+  } catch {
     return {
-      error: error.message,
+      ok: false,
+      error: 'Printify API check failed',
     };
   }
 }

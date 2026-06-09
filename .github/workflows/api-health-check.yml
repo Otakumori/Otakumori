@@ -4,51 +4,108 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.20.2'
+  PNPM_VERSION: '9.15.9'
+  CI: 'true'
+  NEXT_TELEMETRY_DISABLED: '1'
+  DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/otakumori_ci
+  DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/otakumori_ci
+  STRIPE_SECRET_KEY: sk_test_ci_placeholder
+  STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+  STRIPE_WEBHOOK_FULFILLMENT_DRY_RUN: 'true'
+  CLERK_SECRET_KEY: sk_test_ci_placeholder
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktdGVzdC5jbGVyay5hY2NvdW50cy5kZXYk
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+  PRINTIFY_API_KEY: ci-read-disabled
+  PRINTIFY_SHOP_ID: ci-read-disabled
+  UPSTASH_REDIS_REST_URL: https://ci.invalid
+  UPSTASH_REDIS_REST_TOKEN: ci-read-disabled
+  EMAIL_DRY_RUN: 'true'
+  EMAIL_SEND_ENABLED: 'false'
+  FULFILLMENT_PROVIDER: disabled
+  FULFILLMENT_DRY_RUN: 'true'
 
 jobs:
   api-health-check:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: otakumori_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d otakumori_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup repository toolchain
+        uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+          node-version: ${{ env.NODE_VERSION }}
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm prisma generate
 
-      - name: Start development server
-        run: npm run dev &
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      - name: Build application
+        run: pnpm build
 
-      - name: Wait for server to start
-        run: sleep 30
+      - name: Start production server
+        shell: bash
+        run: |
+          pnpm start > "$RUNNER_TEMP/otakumori-next.log" 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
 
-      - name: Run API health check
-        run: npm run api:health
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      - name: Verify API health
+        shell: bash
+        run: |
+          node <<'NODE'
+          const url = 'http://127.0.0.1:3000/api/health?strict=1';
+          const attempts = 30;
 
-      - name: Build project
-        run: npm run build
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          for (let attempt = 1; attempt <= attempts; attempt += 1) {
+            try {
+              const response = await fetch(url);
+              const payload = await response.json();
+
+              if (response.status === 200 && payload?.ok === true) {
+                console.log('API health and isolated database check passed.');
+                process.exit(0);
+              }
+            } catch {
+              // The server may still be starting.
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+
+          console.error('API health check did not pass within the startup window.');
+          process.exit(1);
+          NODE
+
+      - name: Stop production server
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${APP_PID:-}" ]; then
+            kill "$APP_PID" 2>/dev/null || true
+          fi

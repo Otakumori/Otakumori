@@ -1,11 +1,7 @@
 // lib/adminGuard.ts (server utilities)
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { requireAdminApi } from '@/app/lib/auth/admin';
 
 export async function requireAdminOrThrow() {
-  const { userId } = await auth();
-  if (!userId) throw new Response('Unauthorized', { status: 401 });
-  const user = await currentUser();
-  const role = (user?.publicMetadata as any)?.role;
-  if (role !== 'admin') throw new Response('Forbidden', { status: 403 });
-  return { userId, user };
+  const admin = await requireAdminApi();
+  return { userId: admin.id, user: admin };
 }

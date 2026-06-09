@@ -1,4 +1,7 @@
+import { env } from '@/env/server';
+
 type JsonRecord = Record<string, unknown>;
+const MERCHIZE_FETCH_TIMEOUT_MS = 12_000;
 
 export interface MerchizeProductImage {
   url: string;
@@ -15,6 +18,19 @@ export interface MerchizeProduct {
   currency: string | null;
   price: number | null;
   images: MerchizeProductImage[];
+  variants: MerchizeVariant[];
+  raw: JsonRecord;
+}
+
+export interface MerchizeVariant {
+  id: string;
+  title: string | null;
+  sku: string | null;
+  status: string | null;
+  currency: string | null;
+  price: number | null;
+  cost: number | null;
+  imageUrl: string | null;
   raw: JsonRecord;
 }
 
@@ -29,9 +45,9 @@ export interface MerchizeConnectionResult {
 
 function getBaseUrl(): string {
   const baseUrl =
-    process.env.MERCHIZE_API_URL ||
-    process.env.MERCHIZE_STORE_API_URL ||
-    process.env.NEXT_PUBLIC_MERCHIZE_API_URL;
+    env.MERCHIZE_API_URL ||
+    env.MERCHIZE_STORE_API_URL ||
+    env.NEXT_PUBLIC_MERCHIZE_API_URL;
 
   if (!baseUrl) {
     throw new Error('Missing MERCHIZE_API_URL or MERCHIZE_STORE_API_URL');
@@ -41,7 +57,7 @@ function getBaseUrl(): string {
 }
 
 function getAccessToken(): string {
-  const token = process.env.MERCHIZE_ACCESS_TOKEN || process.env.MERCHIZE_API_TOKEN;
+  const token = env.MERCHIZE_ACCESS_TOKEN || env.MERCHIZE_API_TOKEN;
 
   if (!token) {
     throw new Error('Missing MERCHIZE_ACCESS_TOKEN or MERCHIZE_API_TOKEN');
@@ -179,6 +195,70 @@ function extractDefaultPrice(raw: JsonRecord): number | null {
   return null;
 }
 
+function normalizeVariant(rawValue: unknown, index: number, product: JsonRecord): MerchizeVariant | null {
+  if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+    return null;
+  }
+
+  const raw = rawValue as JsonRecord;
+  const id =
+    coerceString(raw.id) ||
+    coerceString(raw._id) ||
+    coerceString(raw.variantId) ||
+    coerceString(raw.variant_id) ||
+    coerceString(raw.sku) ||
+    `${coerceString(product.id) || coerceString(product._id) || coerceString(product.sku) || 'product'}-${index + 1}`;
+
+  const image =
+    coerceString(raw.image) ||
+    coerceString(raw.imageUrl) ||
+    coerceString(raw.image_url) ||
+    coerceString(raw.thumbnail);
+
+  return {
+    id,
+    title:
+      coerceString(raw.title) ||
+      coerceString(raw.name) ||
+      coerceString(raw.label),
+    sku: coerceString(raw.sku),
+    status:
+      coerceString(raw.status) ||
+      coerceString(raw.state) ||
+      coerceString(raw.availability),
+    currency:
+      coerceString(raw.currency) ||
+      coerceString(product.currency) ||
+      'USD',
+    price:
+      coerceNumber(raw.price) ||
+      coerceNumber(raw.retailPrice) ||
+      coerceNumber(raw.retail_price) ||
+      coerceNumber(raw.salePrice) ||
+      coerceNumber(raw.sale_price),
+    cost:
+      coerceNumber(raw.cost) ||
+      coerceNumber(raw.costPrice) ||
+      coerceNumber(raw.cost_price),
+    imageUrl: image,
+    raw,
+  };
+}
+
+function extractVariants(raw: JsonRecord): MerchizeVariant[] {
+  const variants = Array.isArray(raw.variants)
+    ? raw.variants
+    : Array.isArray(raw.skus)
+      ? raw.skus
+      : Array.isArray(raw.items)
+        ? raw.items
+        : [];
+
+  return variants
+    .map((item, index) => normalizeVariant(item, index, raw))
+    .filter((item): item is MerchizeVariant => Boolean(item));
+}
+
 function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | null {
   if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
     return null;
@@ -229,6 +309,7 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
     currency: 'USD',
     price: extractDefaultPrice(raw),
     images: extractImageUrls(raw),
+    variants: extractVariants(raw),
     raw,
   };
 }
@@ -288,22 +369,35 @@ export class MerchizeService {
   }
 
   private async request(path = '/product/catalog', query?: Record<string, string | number | undefined>): Promise<{ response: Response; body: unknown }> {
-    const response = await fetch(this.buildUrl(path, query), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'User-Agent': this.userAgent,
-      },
-      cache: 'no-store',
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), MERCHIZE_FETCH_TIMEOUT_MS);
+    let response: Response;
+
+    try {
+      response = await fetch(this.buildUrl(path, query), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'User-Agent': this.userAgent,
+        },
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Merchize API request timed out');
+      }
+      throw new Error('Merchize API request failed');
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const body = await parseResponseBody(response);
 
     if (!response.ok) {
-      const detail = typeof body === 'string' ? body : JSON.stringify(body);
-      throw new Error(`Merchize API error (${response.status}): ${detail}`);
+      throw new Error(`Merchize API error (${response.status})`);
     }
 
     return { response, body };
@@ -341,6 +435,23 @@ export class MerchizeService {
     return collection
       .map((item, index) => normalizeProduct(item, index))
       .filter((item): item is MerchizeProduct => Boolean(item));
+  }
+
+  async getAllProducts(options?: { limit?: number; maxPages?: number }): Promise<MerchizeProduct[]> {
+    const limit = options?.limit ?? 50;
+    const maxPages = options?.maxPages ?? 20;
+    const products: MerchizeProduct[] = [];
+
+    for (let page = 1; page <= maxPages; page++) {
+      const pageProducts = await this.getProducts({ limit, page });
+      products.push(...pageProducts);
+
+      if (pageProducts.length < limit) {
+        break;
+      }
+    }
+
+    return products;
   }
 }
 

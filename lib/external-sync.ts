@@ -1,4 +1,23 @@
 import { env } from '@/env';
+import { Pool } from 'pg';
+
+const globalForExternalSync = globalThis as unknown as {
+  externalSyncPool?: Pool;
+};
+
+const externalSyncPool =
+  globalForExternalSync.externalSyncPool ??
+  new Pool({
+    connectionString: env.DATABASE_URL,
+  });
+
+if (env.NODE_ENV !== 'production') {
+  globalForExternalSync.externalSyncPool = externalSyncPool;
+}
+
+async function executeExternalQuery(query: string, variables: unknown[]) {
+  await externalSyncPool.query(query, variables);
+}
 
 // Clerk API sync
 export async function syncClerkUsers() {
@@ -19,13 +38,8 @@ export async function syncClerkUsers() {
 
     // Insert/update users in external.clerk_users
     for (const user of users.data || []) {
-      await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: `
+      await executeExternalQuery(
+        `
             INSERT INTO external.clerk_users (id, identifier, identifier_type, instance_id, created_at, updated_at, attrs, invitation_id, last_synced_at)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
             ON CONFLICT (id) DO UPDATE SET
@@ -37,19 +51,18 @@ export async function syncClerkUsers() {
               attrs = EXCLUDED.attrs,
               invitation_id = EXCLUDED.invitation_id,
               last_synced_at = NOW()
-          `,
-          variables: [
-            user.id,
-            user.email_addresses?.[0]?.email_address || user.username,
-            'email',
-            user.id,
-            new Date(user.created_at),
-            new Date(user.updated_at),
-            JSON.stringify(user),
-            user.invitation_id || null,
-          ],
-        }),
-      });
+        `,
+        [
+          user.id,
+          user.email_addresses?.[0]?.email_address || user.username,
+          'email',
+          user.id,
+          new Date(user.created_at),
+          new Date(user.updated_at),
+          JSON.stringify(user),
+          user.invitation_id || null,
+        ],
+      );
     }
 
     return { success: true, count: users.data?.length || 0 };
@@ -77,13 +90,8 @@ export async function syncStripeCustomers() {
     const customers = await response.json();
 
     for (const customer of customers.data || []) {
-      await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: `
+      await executeExternalQuery(
+        `
             INSERT INTO external.stripe_customers (id, email, name, created, currency, metadata, last_synced_at)
             VALUES ($1, $2, $3, $4, $5, $6, NOW())
             ON CONFLICT (id) DO UPDATE SET
@@ -93,17 +101,16 @@ export async function syncStripeCustomers() {
               currency = EXCLUDED.currency,
               metadata = EXCLUDED.metadata,
               last_synced_at = NOW()
-          `,
-          variables: [
-            customer.id,
-            customer.email,
-            customer.name,
-            new Date(customer.created * 1000),
-            customer.currency,
-            JSON.stringify(customer.metadata),
-          ],
-        }),
-      });
+        `,
+        [
+          customer.id,
+          customer.email,
+          customer.name,
+          new Date(customer.created * 1000),
+          customer.currency,
+          JSON.stringify(customer.metadata),
+        ],
+      );
     }
 
     return { success: true, count: customers.data?.length || 0 };
@@ -130,13 +137,8 @@ export async function syncStripeProducts() {
     const products = await response.json();
 
     for (const product of products.data || []) {
-      await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: `
+      await executeExternalQuery(
+        `
             INSERT INTO external.stripe_products (id, name, active, created, description, metadata, last_synced_at)
             VALUES ($1, $2, $3, $4, $5, $6, NOW())
             ON CONFLICT (id) DO UPDATE SET
@@ -146,17 +148,16 @@ export async function syncStripeProducts() {
               description = EXCLUDED.description,
               metadata = EXCLUDED.metadata,
               last_synced_at = NOW()
-          `,
-          variables: [
-            product.id,
-            product.name,
-            product.active,
-            new Date(product.created * 1000),
-            product.description,
-            JSON.stringify(product.metadata),
-          ],
-        }),
-      });
+        `,
+        [
+          product.id,
+          product.name,
+          product.active,
+          new Date(product.created * 1000),
+          product.description,
+          JSON.stringify(product.metadata),
+        ],
+      );
     }
 
     return { success: true, count: products.data?.length || 0 };
@@ -187,13 +188,8 @@ export async function syncPrintifyProducts() {
     const products = await response.json();
 
     for (const product of products.data || []) {
-      await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: `
+      await executeExternalQuery(
+        `
             INSERT INTO external.printify_products (id, title, description, created_at, visible, last_synced_at)
             VALUES ($1, $2, $3, $4, $5, NOW())
             ON CONFLICT (id) DO UPDATE SET
@@ -202,16 +198,15 @@ export async function syncPrintifyProducts() {
               created_at = EXCLUDED.created_at,
               visible = EXCLUDED.visible,
               last_synced_at = NOW()
-          `,
-          variables: [
-            product.id.toString(),
-            product.title,
-            product.description,
-            new Date(product.created_at),
-            product.visible,
-          ],
-        }),
-      });
+        `,
+        [
+          product.id.toString(),
+          product.title,
+          product.description,
+          new Date(product.created_at),
+          product.visible,
+        ],
+      );
     }
 
     return { success: true, count: products.data?.length || 0 };

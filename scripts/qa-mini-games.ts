@@ -10,6 +10,7 @@
 
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { pathToFileURL } from 'url';
 import {
   validateAvatarIntegration,
   validateCelShadedMaterials,
@@ -31,27 +32,28 @@ const GAMES = [
   'puzzle-reveal',
 ] as const;
 
+const GAME_ROUTE_ROOT = join(process.cwd(), 'app', 'mini-games', '(games)');
+
+function pascalCaseSlug(gameSlug: string) {
+  return gameSlug
+    .split('-')
+    .map((s) => s[0].toUpperCase() + s.slice(1))
+    .join('');
+}
+
+export function resolveGamePath(gameSlug: string) {
+  const gamePath = join(GAME_ROUTE_ROOT, gameSlug);
+  const pagePath = join(gamePath, 'page.tsx');
+  const possibleFiles = [pagePath, join(gamePath, 'Game.tsx'), join(gamePath, `${pascalCaseSlug(gameSlug)}Game.tsx`)];
+
+  return possibleFiles.find((f) => existsSync(f)) || pagePath;
+}
+
 /**
  * Validate a single game
  */
 async function validateGame(gameSlug: string): Promise<GameQAResult> {
-  const gamePath = join(process.cwd(), 'app', 'mini-games', gameSlug);
-  const pagePath = join(gamePath, 'page.tsx');
-
-  // Try to find game component files
-  const possibleFiles = [
-    pagePath,
-    join(gamePath, 'Game.tsx'),
-    join(
-      gamePath,
-      `${gameSlug
-        .split('-')
-        .map((s) => s[0].toUpperCase() + s.slice(1))
-        .join('')}Game.tsx`,
-    ),
-  ];
-
-  const gameFile = possibleFiles.find((f) => existsSync(f)) || pagePath;
+  const gameFile = resolveGamePath(gameSlug);
 
   // Run all validators
   const avatarCheck = validateAvatarIntegration(gameSlug, gameFile);
@@ -134,8 +136,11 @@ async function runQA(): Promise<{ passed: boolean; summary: ReturnType<typeof ge
   return { passed, summary };
 }
 
+const isCli = process.argv[1] ? pathToFileURL(process.argv[1]).href === import.meta.url : false;
+
 // CLI entry point - run if executed directly
-runQA()
+if (isCli) {
+  runQA()
   .then(({ passed, summary }) => {
     if (!passed) {
       console.error('\n❌ QA Validation FAILED - Hard failures detected');
@@ -153,6 +158,7 @@ runQA()
     console.error('❌ QA script error:', error);
     process.exit(1);
   });
+}
 
 // Export for programmatic use
 export { runQA, validateGame };

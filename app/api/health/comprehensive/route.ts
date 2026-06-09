@@ -1,8 +1,9 @@
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env';
 import { prisma } from '@/app/lib/prisma';
 import { getPrintifyService } from '@/app/lib/printify/service';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -11,7 +12,10 @@ function ms(start: number) {
   return Math.round(performance.now() - start);
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
+  if (!authorization.ok) return authorization.response;
+
   const started = performance.now();
   const checks: Record<string, { ok: boolean; ms: number; error?: string }> = {};
 

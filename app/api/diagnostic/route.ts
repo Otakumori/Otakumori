@@ -1,85 +1,47 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withAdminAuth } from '@/app/lib/auth/admin';
 import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const diagnostics: Record<string, any> = {
+type DiagnosticStatus = 'configured' | 'missing' | 'reachable' | 'unreachable' | 'error';
+
+export const GET = withAdminAuth(async (_request: NextRequest) => {
+  const diagnostics: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV,
   };
 
-  // Check Inngest configuration
   diagnostics.inngest = {
     configured: {
       INNGEST_EVENT_KEY: !!env.INNGEST_EVENT_KEY,
       INNGEST_SIGNING_KEY: !!env.INNGEST_SIGNING_KEY,
-      INNGEST_SERVE_URL: env.INNGEST_SERVE_URL || 'not set',
+      INNGEST_SERVE_URL: !!env.INNGEST_SERVE_URL,
     },
     endpoint: '/api/inngest',
-    status: 'checking...',
+    status: await checkInternalEndpoint('/api/inngest'),
   };
 
-  // Test Inngest endpoint
-  try {
-    const inngestUrl = `${env.VERCEL_URL ? `https://${env.VERCEL_URL}` : 'http://localhost:3000'}/api/inngest`;
-    const res = await fetch(inngestUrl, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    diagnostics.inngest.status = res.ok ? 'reachable' : `error: ${res.status}`;
-    diagnostics.inngest.response = await res.text().catch(() => 'no body');
-  } catch (error: any) {
-    diagnostics.inngest.status = `unreachable: ${error.message}`;
-  }
-
-  // Check Printify configuration
   diagnostics.printify = {
     configured: {
       PRINTIFY_API_KEY: !!env.PRINTIFY_API_KEY,
-      PRINTIFY_API_KEY_LENGTH: env.PRINTIFY_API_KEY?.length || 0,
-      PRINTIFY_SHOP_ID: env.PRINTIFY_SHOP_ID || 'not set',
-      PRINTIFY_API_URL: env.PRINTIFY_API_URL || 'not set',
+      PRINTIFY_SHOP_ID: !!env.PRINTIFY_SHOP_ID,
+      PRINTIFY_API_URL: !!env.PRINTIFY_API_URL,
       PRINTIFY_WEBHOOK_SECRET: !!env.PRINTIFY_WEBHOOK_SECRET,
     },
-    status: 'checking...',
+    status: await checkPrintify(),
   };
 
-  // Test Printify API
-  try {
-    const printifyUrl = `${env.PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json?page=1&limit=1`;
-    const res = await fetch(printifyUrl, {
-      headers: {
-        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
-    diagnostics.printify.status = res.ok ? 'reachable' : `error: ${res.status} ${res.statusText}`;
-
-    if (!res.ok) {
-      diagnostics.printify.error = await res.text().catch(() => 'no error body');
-    } else {
-      const data = await res.json();
-      diagnostics.printify.productsFound = data.data?.length || 0;
-      diagnostics.printify.totalProducts = data.total || 0;
-    }
-  } catch (error: any) {
-    diagnostics.printify.status = `unreachable: ${error.message}`;
-  }
-
-  // Check Clerk configuration
   diagnostics.clerk = {
     configured: {
       CLERK_SECRET_KEY: !!env.CLERK_SECRET_KEY,
       CLERK_ENCRYPTION_KEY: !!env.CLERK_ENCRYPTION_KEY,
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: !!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set',
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: !!env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
     },
   };
 
-  // Check Database
   diagnostics.database = {
     configured: {
       DATABASE_URL: !!env.DATABASE_URL,
@@ -88,7 +50,6 @@ export async function GET() {
     status: 'Prisma client loaded',
   };
 
-  // Check Redis
   diagnostics.redis = {
     configured: {
       UPSTASH_REDIS_REST_URL: !!env.UPSTASH_REDIS_REST_URL,
@@ -96,7 +57,6 @@ export async function GET() {
     },
   };
 
-  // Check Stripe
   diagnostics.stripe = {
     configured: {
       STRIPE_SECRET_KEY: !!env.STRIPE_SECRET_KEY,
@@ -111,4 +71,40 @@ export async function GET() {
       'Cache-Control': 'no-store',
     },
   });
+});
+
+async function checkInternalEndpoint(pathname: string): Promise<DiagnosticStatus> {
+  try {
+    const baseUrl = env.VERCEL_URL ? `https://${env.VERCEL_URL}` : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}${pathname}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+
+    return res.ok ? 'reachable' : 'error';
+  } catch {
+    return 'unreachable';
+  }
+}
+
+async function checkPrintify(): Promise<DiagnosticStatus> {
+  if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID || !env.PRINTIFY_API_URL) {
+    return 'missing';
+  }
+
+  try {
+    const printifyUrl = `${env.PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json?page=1&limit=1`;
+    const res = await fetch(printifyUrl, {
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    return res.ok ? 'reachable' : 'error';
+  } catch {
+    return 'unreachable';
+  }
 }

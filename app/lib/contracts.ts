@@ -203,7 +203,16 @@ export const OrderItemSchema = z.object({
 export const OrderSchema = z.object({
   id: IdSchema,
   orderNumber: z.number().int().min(1),
-  status: z.enum(['pending', 'pending_mapping', 'in_production', 'shipped', 'cancelled']),
+  status: z.enum([
+    'pending',
+    'pending_fulfillment',
+    'pending_mapping',
+    'in_production',
+    'fulfillment_failed',
+    'manual_review',
+    'shipped',
+    'cancelled',
+  ]),
   total: z.number().min(0),
   currency: z.string().length(3),
   createdAt: z.string().datetime(),

@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateRequestId } from '@/lib/requestId';
 import { grantPetals, type PetalSource } from '@/app/lib/petals/grant';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';
@@ -57,7 +58,17 @@ export async function POST(req: NextRequest) {
 
     const { amount, source, metadata, description } = validation.data;
 
-    // Grant petals using centralized function
+    // Privileged source: admin_grant must come from a Clerk admin or an
+    // internal service principal. Any other caller is rejected before a grant.
+    if (source === 'admin_grant') {
+      const authorization = await authorizeAdminApi(req, 'clerk_admin_or_internal_service');
+      if (!authorization.ok) return authorization.response;
+    }
+
+    // The client-supplied `amount` is treated only as a requested ceiling, not
+    // as ledger authority: grantPetals clamps it to the source's server-owned
+    // PETAL_RULES (maxPerEvent / maxPerDay) and applies rate limiting before
+    // any ledger row is written.
     const result = await grantPetals({
       userId: userId || null,
       amount,

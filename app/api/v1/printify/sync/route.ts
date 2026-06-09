@@ -3,10 +3,16 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '@/inngest/client';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
+import { withAdminAuth } from '@/app/lib/auth/admin';
 
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+function sanitizeError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]').slice(0, 500);
+}
+
+export const POST = withAdminAuth(async (request: NextRequest) => {
   try {
     const { type = 'manual' } = await request.json();
 
@@ -74,9 +80,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : 'Sync failed',
+        error: sanitizeError(error),
       },
       { status: 500 },
     );
   }
-}
+});

@@ -24,8 +24,12 @@
  * - Admin grants: (future)
  */
 
-import { db } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 import type { NextRequest } from 'next/server';
 
 /**
@@ -309,7 +313,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       // Get today's earnings for this source
-      const todayEarnings = await db.petalTransaction.aggregate({
+      const todayEarnings = await (await getDb()).petalTransaction.aggregate({
         where: {
           userId,
           source,
@@ -326,7 +330,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
       if (earnedToday >= rules.maxPerDay) {
         // Daily limit reached - return no-op success
-        const wallet = await db.petalWallet.findUnique({
+        const wallet = await (await getDb()).petalWallet.findUnique({
           where: { userId },
           select: { balance: true, lifetimeEarned: true },
         });
@@ -346,7 +350,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
     }
 
     // Use transaction to update balance + log record
-    const result = await db.$transaction(async (tx) => {
+    const result = await (await getDb()).$transaction(async (tx) => {
       // Upsert PetalWallet (primary storage)
       const wallet = await tx.petalWallet.upsert({
         where: { userId },

@@ -14,6 +14,18 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
   // Fix lockfile detection warning
   outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    '/api/**/*': [
+      './node_modules/.prisma/client/**/*',
+      './node_modules/.pnpm/@prisma+client*/node_modules/.prisma/client/**/*',
+      './generated/prisma/**/*',
+    ],
+    '/*': [
+      './node_modules/.prisma/client/**/*',
+      './node_modules/.pnpm/@prisma+client*/node_modules/.prisma/client/**/*',
+      './generated/prisma/**/*',
+    ],
+  },
   // Temporarily disable ESLint during build for deployment
   eslint: {
     ignoreDuringBuilds: true,
@@ -89,12 +101,12 @@ const nextConfig = {
       "font-src 'self' data: https: https://fonts.gstatic.com",
       // Enhanced style-src for Google Fonts and inline styles
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      // Enhanced script-src for GTM and Clerk
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://otaku-mori.com https://www.otaku-mori.com https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://*.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
+      // Enhanced script-src for GTM, Clerk, and Clerk-managed Cloudflare Turnstile challenges
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://otaku-mori.com https://www.otaku-mori.com https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
       // Enhanced worker-src for service workers and blob workers
       "worker-src 'self' blob:",
-      // Enhanced frame-src for Vercel Live and Clerk
-      "frame-src 'self' https://vercel.live https://*.clerk.com https://*.clerk.accounts.dev",
+      // Enhanced frame-src for Vercel Live, Clerk, and Clerk-managed Cloudflare Turnstile challenges
+      "frame-src 'self' https://vercel.live https://*.clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
       "frame-ancestors 'self'",
     ];
 
@@ -103,6 +115,8 @@ const nextConfig = {
       "connect-src 'self' https: wss: " +
       // Clerk domains
       'https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com ' +
+      // Clerk-managed Cloudflare Turnstile challenge endpoint
+      'https://challenges.cloudflare.com ' +
       // Printify domains
       'https://api.printify.com https://*.printify.com ' +
       // Vercel domains
@@ -123,6 +137,8 @@ const nextConfig = {
       'ws://localhost:8787 ' +
       // Clerk domains (including dev)
       'https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://api.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com ' +
+      // Clerk-managed Cloudflare Turnstile challenge endpoint
+      'https://challenges.cloudflare.com ' +
       // Printify domains
       'https://api.printify.com https://*.printify.com ' +
       // Vercel domains (including preview)

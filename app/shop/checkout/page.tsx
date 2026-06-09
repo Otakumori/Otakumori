@@ -163,8 +163,7 @@ export default function CheckoutPage() {
       }));
 
       try {
-        const serialized = JSON.stringify({ items: orderItems, shippingInfo });
-        console.log('Checkout payload size:', serialized.length);
+        JSON.stringify({ items: orderItems, shippingInfo });
       } catch (serializationError) {
         console.error('Checkout payload serialization failed:', serializationError);
         setError('Payload serialization failed before request.');
@@ -191,15 +190,10 @@ export default function CheckoutPage() {
       let data: any = null;
       try {
         data = raw ? JSON.parse(raw) : null;
-      } catch (parseError) {
-        console.error('Checkout returned non-JSON response:', {
-          status: response.status,
-          statusText: response.statusText,
-          raw,
-          parseError,
-        });
-        const preview = raw ? raw.slice(0, 240) : '(empty response body)';
-        setError(`Checkout returned a non-JSON response. HTTP ${response.status} ${response.statusText}.\n\nResponse preview:\n${preview}`);
+      } catch {
+        setError(
+          `Checkout could not be started. Please try again or contact support. HTTP ${response.status}.`,
+        );
         return;
       }
 
@@ -214,13 +208,10 @@ export default function CheckoutPage() {
         setCartNeedsReview(true);
         setError(buildInvalidItemsMessage(invalidItems));
       } else {
-        console.error('Checkout session error:', data);
         setError(formatServerError(data));
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Checkout submit crash:', err);
-      setError(`Checkout crashed before redirect: ${message}`);
+    } catch {
+      setError('Checkout could not be started. Please try again or contact support.');
     } finally {
       setIsProcessing(false);
     }

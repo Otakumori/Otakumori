@@ -1,18 +1,15 @@
 
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 // import { redis } from '../../../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
 
 export async function POST(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     // Clear all cache keys (be careful with this in production!)
     // TODO: Integrate HTTP-based Redis client to clear cache keys
 
@@ -40,13 +37,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // Verify API key
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey !== env.API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authorization = await authorizeAdminApi(request, 'internal_service');
+  if (!authorization.ok) return authorization.response;
 
+  try {
     // TODO: Integrate HTTP-based Redis client to get cache statistics
     return NextResponse.json({
       cacheKeys: 0,

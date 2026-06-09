@@ -7,8 +7,8 @@ const require = createRequire(import.meta.url);
 (global as any).jest = {
   fn: vi.fn,
   spyOn: vi.spyOn,
-  mock: (moduleId: string, factory?: any) => vi.mock(moduleId, factory),
-  unmock: (moduleId: string) => vi.unmock(moduleId),
+  mock: vi.mock,
+  unmock: vi.unmock,
   clearAllMocks: vi.clearAllMocks,
   resetAllMocks: vi.resetAllMocks,
   restoreAllMocks: vi.restoreAllMocks,
@@ -48,20 +48,43 @@ vi.mock('next/headers', () => ({
 
 vi.mock('next/server', () => {
   class NextRequest {
-    url = '';
-    constructor(url: string) {
+    url: string;
+    method: string;
+    headers: Headers;
+    nextUrl: URL;
+    private readonly requestBody?: BodyInit | null;
+
+    constructor(url: string, init: RequestInit = {}) {
       this.url = url;
+      this.method = init.method ?? 'GET';
+      this.headers = new Headers(init.headers);
+      this.nextUrl = new URL(url);
+      this.requestBody = init.body;
     }
+
     async json() {
-      return {};
+      if (typeof this.requestBody === 'string') return JSON.parse(this.requestBody);
+      if (this.requestBody == null) return {};
+      throw new TypeError('The shared NextRequest test mock only supports string JSON bodies.');
     }
   }
   class NextResponse {
-    body?: any;
-    opts?: any;
+    body?: BodyInit | null;
+    opts?: ResponseInit;
+    status: number;
+    headers: Headers;
     constructor(body?: any, opts?: any) {
       this.body = body;
       this.opts = opts;
+      this.status = opts?.status ?? 200;
+      this.headers = new Headers(opts?.headers);
+    }
+    async json() {
+      if (typeof this.body === 'string') return JSON.parse(this.body);
+      return this.body ?? null;
+    }
+    async text() {
+      return typeof this.body === 'string' ? this.body : JSON.stringify(this.body ?? '');
     }
     static json(data: any, opts?: any) {
       return new NextResponse(data, opts);

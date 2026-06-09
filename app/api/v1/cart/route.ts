@@ -30,14 +30,11 @@ function serializeCartItem(item: {
   };
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const { logger } = await import('@/app/lib/logger');
-    logger.warn('Cart GET requested from:', undefined, { userAgent: req.headers.get('user-agent') });
-
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ ok: true, data: [], guest: true }, { status: 200 });
     }
 
     let cart = await prisma.cart.findUnique({
@@ -94,7 +91,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
     logger.error('Error fetching cart:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: true, data: [], degraded: true }, { status: 200 });
   }
 }
 
@@ -102,7 +99,7 @@ export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ ok: true, data: null, guest: true }, { status: 200 });
     }
 
     const body = await req.json();

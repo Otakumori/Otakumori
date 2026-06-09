@@ -6,28 +6,15 @@ export const runtime = 'nodejs';
 
 import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
 // GET: Fetch dashboard statistics
 export async function GET() {
+  const authorization = await authorizeAdminApi();
+  if (!authorization.ok) return authorization.response;
+
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
     // Fetch statistics in parallel
     const [totalUsers, totalPetals, totalOrders, totalRunes, activeCombos, recentActivity] =
       await Promise.all([
