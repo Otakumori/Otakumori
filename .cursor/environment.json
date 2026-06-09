@@ -1,6 +1,6 @@
 {
-  "install": "npm install",
-  "start": "npm run dev",
+  "install": "corepack prepare pnpm@9.15.9 --activate && corepack pnpm install --no-frozen-lockfile",
+  "start": "corepack pnpm run dev",
   "build": {
     "context": ".",
     "dockerfile": "Dockerfile"
