@@ -80,13 +80,17 @@ function missingMerchizeEnvKeys(): string[] {
   return missing;
 }
 
+function isMerchizeSyncConfigured(): boolean {
+  return missingMerchizeEnvKeys().length === 0;
+}
+
 function assertProviderEnvForSync(provider: SyncProvider): NextResponse | null {
   const missingKeys: string[] = [];
 
   if (provider === 'printify' || provider === 'all') {
     missingKeys.push(...missingPrintifyEnvKeys());
   }
-  if (provider === 'merchize' || provider === 'all') {
+  if (provider === 'merchize') {
     missingKeys.push(...missingMerchizeEnvKeys());
   }
 
@@ -113,7 +117,7 @@ function sanitizeCatalogSyncError(error: unknown): string {
   return message
     .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]')
     .replace(/(sk|pk)_(live|test)_[A-Za-z0-9_]+/gi, '$1_$2_[redacted]')
-    .replace(/([REDACTED](?:ql)?:\/\/)[^\s"']+/gi, '$1[redacted]')
+    .replace(/(postgres(?:ql)?:\/\/)[^\s"']+/gi, '$1[redacted]')
     .slice(0, 500);
 }
 
@@ -121,7 +125,7 @@ export const GET = withAdminAuth(async (_request: NextRequest) => {
   const blocked = assertCatalogSyncAllowedInRuntime();
   if (blocked) return blocked;
 
-  const providerEnvBlocked = assertProviderEnvForSync('all');
+  const providerEnvBlocked = assertProviderEnvForSync('printify');
   if (providerEnvBlocked) return providerEnvBlocked;
 
   const { getProviderCatalogDiagnostics } = await import('@/lib/catalog/providerSync');
@@ -173,7 +177,7 @@ export const POST = withAdminAuth(async (request: NextRequest) => {
       stage = 'printify_sync';
       results.push(await syncPrintifyCatalogFromProvider());
     }
-    if (provider === 'merchize' || provider === 'all') {
+    if (provider === 'merchize' || (provider === 'all' && isMerchizeSyncConfigured())) {
       stage = 'printify_sync';
       results.push(await syncMerchizeCatalogFromProvider());
     }
