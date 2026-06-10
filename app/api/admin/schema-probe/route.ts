@@ -3,7 +3,6 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/app/lib/auth/admin';
 import { ADMIN_EMAILS, isAdminEmail } from '@/app/lib/config/admin';
-import { env } from '@/env/server';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -43,8 +42,11 @@ function sanitizeSchemaProbeError(error: unknown): string {
     .slice(0, 500);
 }
 
+// Raw process.env for DATABASE_URL fingerprint only — @/env/server validates provider keys at module load.
+/* eslint-disable no-restricted-syntax -- build-safe schema probe without provider env validation */
+
 function databaseFingerprint() {
-  const value = env.DATABASE_URL ?? '';
+  const value = process.env.DATABASE_URL ?? '';
   const hash = createHash('sha256').update(value).digest('hex').slice(0, 12);
 
   try {
