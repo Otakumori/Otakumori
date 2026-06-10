@@ -1,24 +1,32 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env/server';
 import { authorizeAdminApi } from '@/app/lib/auth/admin';
 
-const SERVE_URL = env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// Raw process.env only — importing @/env/server validates provider keys at module load.
+/* eslint-disable no-restricted-syntax -- build-safe health diagnostics without full server env validation */
+
+function getInngestServeUrl(): string {
+  return process.env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
+}
 
 export async function GET(request: NextRequest) {
   const authorization = await authorizeAdminApi(request, 'clerk_admin_or_internal_service');
   if (!authorization.ok) return authorization.response;
 
+  const serveUrl = getInngestServeUrl();
   const results: Record<string, any> = {
-    serveUrl: SERVE_URL,
+    serveUrl,
     env: {
-      INNGEST_EVENT_KEY: Boolean(env.INNGEST_EVENT_KEY),
-      INNGEST_SIGNING_KEY: Boolean(env.INNGEST_SIGNING_KEY),
+      INNGEST_EVENT_KEY: Boolean(process.env.INNGEST_EVENT_KEY),
+      INNGEST_SIGNING_KEY: Boolean(process.env.INNGEST_SIGNING_KEY),
     },
   };
 
   // 1) GET the serve endpoint (auth gating will show up as 401/403)
   try {
-    const res = await fetch(SERVE_URL, { method: 'GET' });
+    const res = await fetch(serveUrl, { method: 'GET' });
     results.get = { status: res.status, ok: res.ok };
   } catch (err: any) {
     results.get = { error: err?.message || String(err) };
@@ -26,7 +34,7 @@ export async function GET(request: NextRequest) {
 
   // 2) POST a harmless test event
   try {
-    const res = await fetch(SERVE_URL, {
+    const res = await fetch(serveUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
