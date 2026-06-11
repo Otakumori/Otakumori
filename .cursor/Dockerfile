@@ -16,12 +16,11 @@ RUN apt-get update && \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js (LTS version)
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-    apt-get install -y nodejs
-
-# Install additional development tools
-RUN npm install -g npm@latest
+# Install the Node.js major supported by package.json engines.
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    corepack enable && \
+    corepack prepare pnpm@10.15.1 --activate
 
 # Create a non-root user and set workdir
 RUN useradd -ms /bin/bash ubuntu
