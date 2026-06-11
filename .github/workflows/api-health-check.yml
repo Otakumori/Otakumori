@@ -9,6 +9,7 @@ on:
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '10.15.1'
+  SKIP_ENV_VALIDATION: '1'
 
 jobs:
   api-health-check:
