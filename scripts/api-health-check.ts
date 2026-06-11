@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+import { pathToFileURL } from 'node:url';
+
 /**
  * Comprehensive API Health Check Suite
  * This script tests all critical API endpoints to ensure they're working correctly
@@ -158,13 +160,12 @@ class APIHealthChecker {
   }
 }
 
-// Run the health check
 async function main() {
   const checker = new APIHealthChecker();
   await checker.runAllTests();
 }
 
-if (require.main === module) {
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   main().catch(console.error);
 }
 
