@@ -14,10 +14,28 @@ env:
 jobs:
   api-health-check:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
+      PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Ensure DIRECT_URL for Prisma
+        run: |
+          if [ -z "${DIRECT_URL}" ] && [ -n "${DATABASE_URL}" ]; then
+            echo "DIRECT_URL=${DATABASE_URL}" >> $GITHUB_ENV
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,27 +55,12 @@ jobs:
 
       - name: Start development server
         run: pnpm run dev &
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: Wait for server to start
         run: sleep 30
 
       - name: Run API health check
         run: pnpm run api:health
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: Build project
         run: pnpm run build
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}

@@ -1,5 +1,7 @@
 type JsonRecord = Record<string, unknown>;
 
+import { env } from '@/env.mjs';
+
 export interface MerchizeProductImage {
   url: string;
   alt?: string | null;
@@ -29,9 +31,9 @@ export interface MerchizeConnectionResult {
 
 function getBaseUrl(): string {
   const baseUrl =
-    process.env.MERCHIZE_API_URL ||
-    process.env.MERCHIZE_STORE_API_URL ||
-    process.env.NEXT_PUBLIC_MERCHIZE_API_URL;
+    env.MERCHIZE_API_URL ||
+    env.MERCHIZE_STORE_API_URL ||
+    env.NEXT_PUBLIC_MERCHIZE_API_URL;
 
   if (!baseUrl) {
     throw new Error('Missing MERCHIZE_API_URL or MERCHIZE_STORE_API_URL');
@@ -41,7 +43,7 @@ function getBaseUrl(): string {
 }
 
 function getAccessToken(): string {
-  const token = process.env.MERCHIZE_ACCESS_TOKEN || process.env.MERCHIZE_API_TOKEN;
+  const token = env.MERCHIZE_ACCESS_TOKEN || env.MERCHIZE_API_TOKEN;
 
   if (!token) {
     throw new Error('Missing MERCHIZE_ACCESS_TOKEN or MERCHIZE_API_TOKEN');

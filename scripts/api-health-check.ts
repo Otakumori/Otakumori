@@ -21,6 +21,7 @@ interface TestResult {
 class APIHealthChecker {
   private baseUrl: string;
   private results: TestResult[] = [];
+  private failedCount = 0;
 
   constructor(baseUrl: string = 'http://localhost:3000') {
     this.baseUrl = baseUrl;
@@ -116,6 +117,10 @@ class APIHealthChecker {
     this.printResults();
   }
 
+  getFailedCount(): number {
+    return this.failedCount;
+  }
+
   private printResults(): void {
     const passed = this.results.filter((r) => r.status === 'PASS').length;
     const failed = this.results.filter((r) => r.status === 'FAIL').length;
@@ -157,12 +162,18 @@ class APIHealthChecker {
     } else {
       console.warn('\nAll tests passed. API looks healthy ✅');
     }
+
+    this.failedCount = failed;
   }
 }
 
 async function main() {
   const checker = new APIHealthChecker();
   await checker.runAllTests();
+  const failed = checker.getFailedCount();
+  if (failed > 0) {
+    process.exitCode = 1;
+  }
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
