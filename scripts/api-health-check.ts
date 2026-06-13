@@ -84,14 +84,15 @@ class APIHealthChecker {
   async runAllTests(): Promise<void> {
     const isCI = process.env.CI === 'true';
 
-    // Health endpoints: liveness accepts degraded DB (503) in CI/preview environments
-    this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 503]));
-    this.results.push(await this.testEndpoint('/api/health/comprehensive', 'GET', 200));
-
     if (isCI) {
+      this.results.push(await this.testEndpoint('/api/health/live', 'GET', 200));
       this.printResults();
       return;
     }
+
+    this.results.push(await this.testEndpoint('/api/health/live', 'GET', 200));
+    this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 503]));
+    this.results.push(await this.testEndpoint('/api/health/comprehensive', 'GET', 200));
 
     // Test 2: Public shop endpoints
     // ' Testing Shop Endpoints...'

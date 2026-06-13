@@ -65,6 +65,9 @@ jobs:
       - name: Generate Prisma client
         run: pnpm prisma generate
 
+      - name: Build project
+        run: pnpm run build
+
       - name: Start development server
         run: pnpm run dev &
 
@@ -73,6 +76,3 @@ jobs:
 
       - name: Run API health check
         run: pnpm run api:health
-
-      - name: Build project
-        run: pnpm run build

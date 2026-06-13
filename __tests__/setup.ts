@@ -1,20 +1,4 @@
 import { vi } from 'vitest';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
-// Jest compatibility shim - map jest.* to vitest vi.*
-(global as any).jest = {
-  fn: vi.fn,
-  spyOn: vi.spyOn,
-  mock: (moduleId: string, factory?: any) => vi.mock(moduleId, factory),
-  unmock: (moduleId: string) => vi.unmock(moduleId),
-  clearAllMocks: vi.clearAllMocks,
-  resetAllMocks: vi.resetAllMocks,
-  restoreAllMocks: vi.restoreAllMocks,
-  requireActual: (mod: string) => require(mod),
-  isMockFunction: (fn: any) => !!(fn && fn._isMockFunction),
-};
 
 // ------------------
 // Safe fetch shim (if node env does not have fetch)
@@ -49,7 +33,7 @@ vi.mock('next/headers', () => ({
 vi.mock('next/server', () => {
   class NextRequest {
     url = '';
-    constructor(url: string) {
+    constructor(url) {
       this.url = url;
     }
     async json() {
@@ -57,13 +41,13 @@ vi.mock('next/server', () => {
     }
   }
   class NextResponse {
-    body?: any;
-    opts?: any;
-    constructor(body?: any, opts?: any) {
+    body;
+    opts;
+    constructor(body, opts) {
       this.body = body;
       this.opts = opts;
     }
-    static json(data: any, opts?: any) {
+    static json(data, opts) {
       return new NextResponse(data, opts);
     }
     static redirect() {
@@ -83,11 +67,11 @@ vi.mock('@clerk/nextjs', () => ({
     signOut: vi.fn(),
     signUp: vi.fn(),
   })),
-  SignInButton: ({ children }: any) => children,
-  SignUpButton: ({ children }: any) => children,
+  SignInButton: ({ children }) => children,
+  SignUpButton: ({ children }) => children,
   UserButton: () => null,
   SignedIn: () => null,
-  SignedOut: ({ children }: any) => children,
+  SignedOut: ({ children }) => children,
 }));
 
 // Mock server-side Clerk helpers
@@ -98,8 +82,8 @@ vi.mock('@clerk/nextjs/server', () => ({
 
 // Mock @om/avatar package
 vi.mock('@om/avatar', () => ({
-  clampAllMorphs: (x: any) => x,
-  clampMorph: (x: any) => x,
+  clampAllMorphs: (x) => x,
+  clampMorph: (x) => x,
   isNSFWSlot: () => false,
   resolvePolicy: () => ({ allowed: true }),
   AvatarSpecV15: {
