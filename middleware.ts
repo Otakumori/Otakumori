@@ -105,7 +105,6 @@ export default clerkMiddleware(async (auth, req) => {
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
-    const { userId, sessionClaims } = await auth();
 
     const reqId =
       req.headers.get('x-request-id') ||
@@ -124,6 +123,8 @@ export default clerkMiddleware(async (auth, req) => {
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       });
     }
+
+    const { userId, sessionClaims } = await auth();
 
     const isApex = host === 'otaku-mori.com';
     const isAccounts = host.startsWith('accounts.');
