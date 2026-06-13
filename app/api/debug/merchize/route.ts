@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
 import { getMerchizeService } from '@/app/lib/merchize/service';
 
 export const runtime = 'nodejs';
@@ -14,11 +13,11 @@ export async function GET(request: NextRequest) {
     requestedFrom: request.headers.get('user-agent'),
     envPreview: {
       MERCHIZE_API_URL:
-        env.MERCHIZE_API_URL ||
-        env.MERCHIZE_STORE_API_URL ||
+        process.env.MERCHIZE_API_URL ||
+        process.env.MERCHIZE_STORE_API_URL ||
         'NOT_SET',
       MERCHIZE_ACCESS_TOKEN:
-        env.MERCHIZE_ACCESS_TOKEN || env.MERCHIZE_API_TOKEN
+        process.env.MERCHIZE_ACCESS_TOKEN || process.env.MERCHIZE_API_TOKEN
           ? 'SET'
           : 'NOT_SET',
     },

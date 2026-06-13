@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { env } from '@/env.mjs';
 import { db as prisma } from '@/lib/db';
 
-const WEBHOOK_SECRET = env.MERCHIZE_WEBHOOK_SECRET;
+const WEBHOOK_SECRET = process.env.MERCHIZE_WEBHOOK_SECRET;
 
 function safeCompare(left: string, right: string) {
   const leftBuffer = Buffer.from(left);
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
     const data = event.data ?? event.order ?? event.payload ?? {};
     const merchizeOrderId = String(data.id ?? data.order_id ?? data.orderId ?? '');
 
-    console.warn('Merchize webhook received:', {
+    console.log('Merchize webhook received:', {
       eventType,
       merchizeOrderId,
     });

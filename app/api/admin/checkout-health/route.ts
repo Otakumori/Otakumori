@@ -1,7 +1,6 @@
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
 import { prisma } from '@/app/lib/prisma';
 
 type HealthStatus = 'pass' | 'warn' | 'fail';
@@ -22,25 +21,8 @@ function mask(value: string | undefined) {
   return value.length <= 8 ? 'configured' : `${value.slice(0, 4)}...${value.slice(-4)}`;
 }
 
-const CHECKOUT_ENV_VALUES: Record<string, string | undefined> = {
-  STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-  STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
-  DATABASE_URL: env.DATABASE_URL,
-  CLERK_SECRET_KEY: env.CLERK_SECRET_KEY,
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  NEXT_PUBLIC_SITE_URL: env.NEXT_PUBLIC_SITE_URL,
-  NEXT_PUBLIC_APP_URL: env.NEXT_PUBLIC_APP_URL,
-  PRINTIFY_API_KEY: env.PRINTIFY_API_KEY,
-  PRINTIFY_SHOP_ID: env.PRINTIFY_SHOP_ID,
-  INNGEST_EVENT_KEY: env.INNGEST_EVENT_KEY,
-  INNGEST_SIGNING_KEY: env.INNGEST_SIGNING_KEY,
-  RESEND_API_KEY: env.RESEND_API_KEY,
-  EMAIL_FROM: env.EMAIL_FROM,
-};
-
 function checkEnv(name: string, optional = false): HealthCheck {
-  const value = CHECKOUT_ENV_VALUES[name];
+  const value = process.env[name];
 
   if (!hasValue(value)) {
     return {
@@ -61,9 +43,9 @@ function checkEnv(name: string, optional = false): HealthCheck {
 }
 
 function requireInternalAccess(request: Request) {
-  if (env.NODE_ENV !== 'production') return null;
+  if (process.env.NODE_ENV !== 'production') return null;
 
-  const expected = env.INTERNAL_AUTH_TOKEN;
+  const expected = process.env.INTERNAL_AUTH_TOKEN;
   if (!hasValue(expected)) {
     return NextResponse.json({ ok: false, error: 'Not found' }, { status: 404 });
   }

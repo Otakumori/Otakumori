@@ -100,16 +100,12 @@ function buildAccountsUrl(path: string, redirectUrl?: string) {
 export default clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
-
-    if (url.pathname.startsWith('/api/health')) {
-      return NextResponse.next();
-    }
-
     const host = req.headers.get('host') || '';
     const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
+    const { userId, sessionClaims } = await auth();
 
     const reqId =
       req.headers.get('x-request-id') ||
@@ -128,8 +124,6 @@ export default clerkMiddleware(async (auth, req) => {
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       });
     }
-
-    const { userId, sessionClaims } = await auth();
 
     const isApex = host === 'otaku-mori.com';
     const isAccounts = host.startsWith('accounts.');
@@ -177,6 +171,6 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    '/((?!_next|_vercel|favicon.ico|robots.txt|sitemap.xml|public/|assets/|api/health|.*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/((?!_next|_vercel|favicon.ico|robots.txt|sitemap.xml|public/|assets/|.*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
   ],
 };

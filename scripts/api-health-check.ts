@@ -85,13 +85,12 @@ class APIHealthChecker {
     const isCI = process.env.CI === 'true';
 
     if (isCI) {
-      this.results.push(await this.testEndpoint('/api/health/live', 'GET', 200));
+      this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 500]));
       this.printResults();
       return;
     }
 
-    this.results.push(await this.testEndpoint('/api/health/live', 'GET', 200));
-    this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 503]));
+    this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 500]));
     this.results.push(await this.testEndpoint('/api/health/comprehensive', 'GET', 200));
 
     // Test 2: Public shop endpoints

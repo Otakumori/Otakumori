@@ -164,7 +164,7 @@ export default function CheckoutPage() {
 
       try {
         const serialized = JSON.stringify({ items: orderItems, shippingInfo });
-        console.warn('Checkout payload size:', serialized.length);
+        console.log('Checkout payload size:', serialized.length);
       } catch (serializationError) {
         console.error('Checkout payload serialization failed:', serializationError);
         setError('Payload serialization failed before request.');

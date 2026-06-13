@@ -55,9 +55,7 @@ jobs:
         run: pnpm run mini-games:qa
 
       - name: Run unit tests
-        # Full suite has pre-existing failures; harness fix in __tests__/setup.ts restores collection.
         run: pnpm run test
-        continue-on-error: true
 
   build:
     name: Build & Bundle Analysis

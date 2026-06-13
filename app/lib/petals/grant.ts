@@ -24,6 +24,7 @@
  * - Admin grants: (future)
  */
 
+import { db } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
 import type { NextRequest } from 'next/server';
 
@@ -297,8 +298,6 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
   }
 
   try {
-    const { db } = await import('@/lib/db');
-
     // Check daily limit if defined
     let finalAmount = clampedAmount;
     let dailyRemaining: number | undefined;
