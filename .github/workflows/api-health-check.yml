@@ -68,11 +68,12 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Start development server
-        run: pnpm run dev &
-
-      - name: Wait for server to start
-        run: sleep 30
+      - name: Start production server
+        run: |
+          pnpm start &
+          sleep 20
+        env:
+          PORT: '3000'
 
       - name: Run API health check
         run: pnpm run api:health
