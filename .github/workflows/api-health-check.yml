@@ -37,6 +37,18 @@ jobs:
             echo "DIRECT_URL=${DATABASE_URL}" >> $GITHUB_ENV
           fi
 
+      - name: Configure CI env placeholders
+        run: |
+          if [ -z "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}" ]; then
+            echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ci00000000000000000000000" >> $GITHUB_ENV
+          fi
+          if [ -z "${UPSTASH_REDIS_REST_URL}" ]; then
+            echo "UPSTASH_REDIS_REST_URL=https://ci-placeholder.upstash.io" >> $GITHUB_ENV
+          fi
+          if [ -z "${UPSTASH_REDIS_REST_TOKEN}" ]; then
+            echo "UPSTASH_REDIS_REST_TOKEN=ci_upstash_placeholder_token" >> $GITHUB_ENV
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

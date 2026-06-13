@@ -32,11 +32,24 @@ const GAMES = [
 ] as const;
 
 /**
+ * Resolve the primary page file for a mini-game slug.
+ * Games live under the `(games)` route group since the hub refactor.
+ */
+function resolveGamePagePath(gameSlug: string): string {
+  const candidates = [
+    join(process.cwd(), 'app', 'mini-games', '(games)', gameSlug, 'page.tsx'),
+    join(process.cwd(), 'app', 'mini-games', gameSlug, 'page.tsx'),
+  ];
+
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
+}
+
+/**
  * Validate a single game
  */
 async function validateGame(gameSlug: string): Promise<GameQAResult> {
-  const gamePath = join(process.cwd(), 'app', 'mini-games', gameSlug);
-  const pagePath = join(gamePath, 'page.tsx');
+  const pagePath = resolveGamePagePath(gameSlug);
+  const gamePath = join(pagePath, '..');
 
   // Try to find game component files
   const possibleFiles = [
