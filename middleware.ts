@@ -100,6 +100,11 @@ function buildAccountsUrl(path: string, redirectUrl?: string) {
 export default clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
+
+    if (url.pathname.startsWith('/api/health')) {
+      return NextResponse.next();
+    }
+
     const host = req.headers.get('host') || '';
     const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
     const isApi = url.pathname.startsWith('/api/');
