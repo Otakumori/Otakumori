@@ -114,6 +114,7 @@ jobs:
         with:
           name: build-files
           path: .next/
+          include-hidden-files: true
           retention-days: 1
 
   lighthouse:
