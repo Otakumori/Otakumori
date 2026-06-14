@@ -7,8 +7,8 @@ const require = createRequire(import.meta.url);
 (global as any).jest = {
   fn: vi.fn,
   spyOn: vi.spyOn,
-  mock: (moduleId: string, factory?: any) => vi.mock(moduleId, factory),
-  unmock: (moduleId: string) => vi.unmock(moduleId),
+  mock: vi.mock.bind(vi),
+  unmock: vi.unmock.bind(vi),
   clearAllMocks: vi.clearAllMocks,
   resetAllMocks: vi.resetAllMocks,
   restoreAllMocks: vi.restoreAllMocks,
