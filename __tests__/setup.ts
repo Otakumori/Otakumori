@@ -1,6 +1,9 @@
 import { vi } from 'vitest';
 import { createRequire } from 'module';
 
+process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??= 'pk_test_vitest';
+process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ??= 'pk_test_vitest';
+
 const require = createRequire(import.meta.url);
 
 // Jest compatibility shim - map jest.* to vitest vi.*
@@ -31,7 +34,7 @@ if (typeof (globalThis as any).fetch !== 'function') {
   });
 }
 
-// Mock Next.js server internals
+// Mock Next.js request-scoped helpers.
 vi.mock('next/headers', () => ({
   cookies: vi.fn(() => ({
     get: () => undefined,
@@ -45,33 +48,6 @@ vi.mock('next/headers', () => ({
     entries: () => [],
   })),
 }));
-
-vi.mock('next/server', () => {
-  class NextRequest {
-    url = '';
-    constructor(url: string) {
-      this.url = url;
-    }
-    async json() {
-      return {};
-    }
-  }
-  class NextResponse {
-    body?: any;
-    opts?: any;
-    constructor(body?: any, opts?: any) {
-      this.body = body;
-      this.opts = opts;
-    }
-    static json(data: any, opts?: any) {
-      return new NextResponse(data, opts);
-    }
-    static redirect() {
-      return new NextResponse();
-    }
-  }
-  return { NextRequest, NextResponse };
-});
 
 // Mock client-side Clerk hooks
 vi.mock('@clerk/nextjs', () => ({
