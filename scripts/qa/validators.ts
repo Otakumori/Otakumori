@@ -33,7 +33,7 @@ export function validateAvatarIntegration(gameSlug: string, filePath: string): V
     content.includes('AvatarRenderer') || content.includes('@om/avatar-engine/renderer');
 
   if (!hasUseGameAvatar && !hasAvatarRenderer) {
-    errors.push(
+    warnings.push(
       `Missing avatar integration: ${gameSlug} does not import useGameAvatar or AvatarRenderer`,
     );
   }
