@@ -62,8 +62,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      CLERK_PROXY_URL: 'http://localhost:3000'
-      NEXT_PUBLIC_CLERK_PROXY_URL: 'http://localhost:3000'
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_PROXY_URL: ''
+      NEXT_PUBLIC_CLERK_PROXY_URL: ''
 
     steps:
       - name: Checkout code
@@ -155,7 +157,10 @@ jobs:
           sleep 30
         env:
           PORT: 3000
-          CLERK_PROXY_URL: 'http://localhost:3000'
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_PROXY_URL: ''
+          NEXT_PUBLIC_CLERK_PROXY_URL: ''
           NEXT_PUBLIC_FEATURE_HERO: '1'
           NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
           NEXT_PUBLIC_FEATURE_SHOP: '1'
@@ -210,7 +215,10 @@ jobs:
           sleep 30
         env:
           PORT: 3000
-          CLERK_PROXY_URL: 'http://localhost:3000'
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_PROXY_URL: ''
+          NEXT_PUBLIC_CLERK_PROXY_URL: ''
           NEXT_PUBLIC_FEATURE_HERO: '1'
           NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
           NEXT_PUBLIC_FEATURE_SHOP: '1'
