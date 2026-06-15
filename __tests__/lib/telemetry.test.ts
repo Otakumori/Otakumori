@@ -1,281 +1,178 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/env/client', () => ({
+  clientEnv: {
+    NODE_ENV: 'development',
+    NEXT_PUBLIC_TELEMETRY_ENABLED: '1',
+  },
+}));
+
 import { TelemetryService } from '@/lib/telemetry';
 
-// Mock console methods
-const mockConsoleLog = jest.fn();
-const mockConsoleError = jest.fn();
-
-beforeAll(() => {
-  global.console = {
-    ...console,
-    log: mockConsoleLog,
-    error: mockConsoleError,
-  };
-});
-
-beforeEach(() => {
-  jest.clearAllMocks();
-});
+const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
 describe('TelemetryService', () => {
-  describe('constructor', () => {
-    it('should initialize with provided config', () => {
-      const config = {
-        enabled: true,
-        debug: true,
-        vendor: 'console' as const,
-      };
-      const service = new TelemetryService(config);
-      expect(service).toBeDefined();
+  beforeEach(() => {
+    consoleWarn.mockClear();
+  });
+
+  it('initializes with the provided config', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
     });
 
-    it('should generate a unique session ID', () => {
-      const config = { enabled: true, debug: false, vendor: 'console' as const };
-      const service1 = new TelemetryService(config);
-      const service2 = new TelemetryService(config);
+    expect(service).toBeDefined();
+  });
 
-      // Access private sessionId through any method that uses it
-      service1.track('test', {});
-      service2.track('test', {});
+  it('generates a unique session ID', () => {
+    const config = { enabled: true, debug: false, vendor: 'console' as const };
+    const service1 = new TelemetryService(config);
+    const service2 = new TelemetryService(config);
 
-      // Should have been called twice (once for each service)
-      expect(mockConsoleLog).toHaveBeenCalledTimes(2);
+    expect((service1 as any).sessionId).not.toBe((service2 as any).sessionId);
+  });
+
+  it('logs events when enabled', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
+    });
+
+    service.track('test_event', { key: 'value' });
+
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: test_event]', { key: 'value' });
+  });
+
+  it('does not log events when disabled', () => {
+    const service = new TelemetryService({
+      enabled: false,
+      debug: true,
+      vendor: 'console',
+    });
+
+    service.track('test_event', { key: 'value' });
+
+    expect(consoleWarn).not.toHaveBeenCalled();
+  });
+
+  it('sanitizes PII from properties', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
+    });
+
+    service.track('test_event', {
+      email: 'user@example.com',
+      phone: '123-456-7890',
+      normalData: 'safe data',
+      password: 'secret123',
+    });
+
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: test_event]', {
+      email: '[REDACTED]',
+      phone: '[REDACTED]',
+      normalData: 'safe data',
+      password: '[REDACTED]',
     });
   });
 
-  describe('track', () => {
-    it('should log events when enabled', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
-
-      service.track('test_event', { key: 'value' });
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'test_event',
-          properties: { key: 'value' },
-          sessionId: expect.any(String),
-          timestamp: expect.any(Number),
-        }),
-      );
+  it('truncates long strings', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
     });
 
-    it('should not log events when disabled', () => {
-      const service = new TelemetryService({
-        enabled: false,
-        debug: true,
-        vendor: 'console',
-      });
+    service.track('test_event', { longString: 'a'.repeat(150) });
 
-      service.track('test_event', { key: 'value' });
-
-      expect(mockConsoleLog).not.toHaveBeenCalled();
-    });
-
-    it('should sanitize PII from properties', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
-
-      service.track('test_event', {
-        email: 'user@example.com',
-        phone: '123-456-7890',
-        normalData: 'safe data',
-        password: 'secret123',
-      });
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          properties: {
-            email: '[REDACTED]',
-            phone: '[REDACTED]',
-            normalData: 'safe data',
-            password: '[REDACTED]',
-          },
-        }),
-      );
-    });
-
-    it('should truncate long strings', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
-
-      const longString = 'a'.repeat(150);
-      service.track('test_event', { longString });
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          properties: {
-            longString: 'a'.repeat(100) + '...',
-          },
-        }),
-      );
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: test_event]', {
+      longString: `${'a'.repeat(100)}...`,
     });
   });
 
-  describe('identify', () => {
-    it('should track user identification', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
+  it('tracks user identification', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
+    });
 
-      service.identify('user123', { name: 'Test User' });
+    service.identify('user123', { name: 'Test User' });
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'user_identified',
-          properties: { name: 'Test User', userId: 'user123' },
-          userId: 'user123',
-        }),
-      );
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: user_identified]', {
+      name: 'Test User',
+      userId: 'user123',
     });
   });
 
-  describe('page', () => {
-    it('should track page views', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
+  it('tracks page views', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
+    });
 
-      service.page('home', { section: 'hero' });
+    service.page('home', { section: 'hero' });
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'page_view',
-          properties: { page: 'home', section: 'hero' },
-        }),
-      );
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: page_view]', {
+      page: 'home',
+      section: 'hero',
     });
   });
 
-  describe('error', () => {
-    it('should track errors with context', () => {
-      const service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
+  it('tracks errors with context', () => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
+    });
 
-      const error = new Error('Test error');
-      service.error(error, { component: 'test' });
+    service.error(new Error('Test error'), { component: 'test' });
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'error',
-          properties: {
-            error: 'Test error',
-            stack: expect.any(String),
-            component: 'test',
-          },
-        }),
-      );
+    expect(consoleWarn).toHaveBeenCalledWith('[Telemetry: error]', {
+      error: 'Test error',
+      stack: expect.any(String),
+      component: 'test',
     });
   });
 
-  describe('specific event helpers', () => {
-    let service: TelemetryService;
-
-    beforeEach(() => {
-      service = new TelemetryService({
-        enabled: true,
-        debug: true,
-        vendor: 'console',
-      });
+  it.each([
+    ['shop.fetch', (service: TelemetryService) => service.trackShopFetch(true, 'live', 150), {
+      success: true,
+      source: 'live',
+      duration: 150,
+    }],
+    ['petal.collect', (service: TelemetryService) => service.trackPetalCollect('hero', { x: 50, y: 100 }), {
+      variant: 'hero',
+      position: { x: 50, y: 100 },
+    }],
+    ['soapstone.post', (service: TelemetryService) => service.trackSoapstonePost(true, 42), {
+      success: true,
+      textLength: 42,
+    }],
+    ['animation.performance', (service: TelemetryService) => service.trackAnimationPerformance('cherry-tree', 60, 2), {
+      component: 'cherry-tree',
+      fps: 60,
+      frameDrops: 2,
+    }],
+    ['user.interaction', (service: TelemetryService) => service.trackUserInteraction('click', 'button', { id: 'test-btn' }), {
+      action: 'click',
+      element: 'button',
+      id: 'test-btn',
+    }],
+  ])('tracks the %s helper', (event, track, properties) => {
+    const service = new TelemetryService({
+      enabled: true,
+      debug: true,
+      vendor: 'console',
     });
 
-    it('should track shop fetch events', () => {
-      service.trackShopFetch(true, 'live', 150);
+    track(service);
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'shop.fetch',
-          properties: {
-            success: true,
-            source: 'live',
-            duration: 150,
-          },
-        }),
-      );
-    });
-
-    it('should track petal collect events', () => {
-      service.trackPetalCollect('hero', { x: 50, y: 100 });
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'petal.collect',
-          properties: {
-            variant: 'hero',
-            position: { x: 50, y: 100 },
-          },
-        }),
-      );
-    });
-
-    it('should track soapstone post events', () => {
-      service.trackSoapstonePost(true, 42);
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'soapstone.post',
-          properties: {
-            success: true,
-            textLength: 42,
-          },
-        }),
-      );
-    });
-
-    it('should track animation performance', () => {
-      service.trackAnimationPerformance('cherry-tree', 60, 2);
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'animation.performance',
-          properties: {
-            component: 'cherry-tree',
-            fps: 60,
-            frameDrops: 2,
-          },
-        }),
-      );
-    });
-
-    it('should track user interactions', () => {
-      service.trackUserInteraction('click', 'button', { id: 'test-btn' });
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Telemetry]',
-        expect.objectContaining({
-          event: 'user.interaction',
-          properties: {
-            action: 'click',
-            element: 'button',
-            id: 'test-btn',
-          },
-        }),
-      );
-    });
+    expect(consoleWarn).toHaveBeenCalledWith(`[Telemetry: ${event}]`, properties);
   });
 });

@@ -24,7 +24,7 @@ interface TelemetryConfig {
   apiKey?: string;
 }
 
-class TelemetryService {
+export class TelemetryService {
   private config: TelemetryConfig;
   private sessionId: string;
 

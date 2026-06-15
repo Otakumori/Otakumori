@@ -17,11 +17,6 @@ module.exports = {
       ],
       // Number of runs for consistency
       numberOfRuns: 3,
-      // Start server command
-      startServerCommand: 'npm run start',
-      // Server startup timeout
-      startServerReadyPattern: 'ready on',
-      startServerReadyTimeout: 30000,
     },
 
     // Performance budgets
