@@ -3,6 +3,11 @@ import { NextResponse } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const AGE_GATE_COOKIE = 'om_age_ok';
+const MATURE_MINI_GAME_PATHS = new Set([
+  '/mini-games/dungeon-of-desire',
+  '/mini-games/thigh-coliseum',
+]);
 
 const isProtected = createRouteMatcher([
   '/account(.*)',
@@ -97,6 +102,16 @@ function buildAccountsUrl(path: string, redirectUrl?: string) {
   return url;
 }
 
+function isAgeGatedRoute(pathname: string) {
+  return MATURE_MINI_GAME_PATHS.has(pathname);
+}
+
+function buildAgeCheckUrl(reqUrl: string, returnTo: string) {
+  const url = new URL('/age-check', reqUrl);
+  url.searchParams.set('returnTo', returnTo);
+  return url;
+}
+
 export default clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
@@ -105,7 +120,6 @@ export default clerkMiddleware(async (auth, req) => {
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
-    const { userId, sessionClaims } = await auth();
 
     const reqId =
       req.headers.get('x-request-id') ||
@@ -137,6 +151,12 @@ export default clerkMiddleware(async (auth, req) => {
       url.protocol = 'https:';
       return NextResponse.redirect(url, 308);
     }
+
+    if (isAgeGatedRoute(url.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
+      return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
+    }
+
+    const { userId, sessionClaims } = await auth();
 
     if (isAdmin(req) && !isMerchizeAdminProbe) {
       if (!userId) {
