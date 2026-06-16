@@ -174,8 +174,17 @@ jobs:
         uses: treosh/lighthouse-ci-action@v10
         with:
           configPath: './lighthouserc.cjs'
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse_results_${{ github.run_id }}_${{ github.run_attempt }}
+          path: .lighthouseci/
+          if-no-files-found: warn
+          retention-days: 30
 
   e2e:
     name: E2E Tests
