@@ -7,7 +7,7 @@ test.describe('Critical User Journey', () => {
   }: any) => {
     // Navigate to home page
     await page.goto('/');
-    await expect(page).toHaveTitle(/Otakumori/);
+    await expect(page).toHaveTitle(/Otaku-mori/);
 
     // Navigate to shop
     await page.click('a[href="/shop"]');
