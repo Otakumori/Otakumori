@@ -58,13 +58,13 @@ test.describe('Critical User Journey', () => {
     // Verify cart items
     await page.waitForSelector('[data-testid="cart-items"]', { timeout: 10000 });
     const cartItems = page.locator('[data-testid="cart-item"]');
-    await expect(cartItems).toHaveCount({ min: 1 });
+    expect(await cartItems.count()).toBeGreaterThan(0);
 
     // Proceed to checkout
     await page.click('[data-testid="checkout-button"]');
 
-    // Should redirect to Stripe checkout (test mode)
-    await expect(page).toHaveURL(/checkout\.stripe\.com/, { timeout: 15000 });
+    // The cart hands off to the internal checkout route before Stripe session creation.
+    await expect(page).toHaveURL('/checkout', { timeout: 15000 });
 
     // Note: We don't complete the actual payment in e2e tests
     // In a real test environment, you'd use Stripe test cards

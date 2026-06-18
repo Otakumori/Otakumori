@@ -13,8 +13,7 @@ test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /shop/i })).toBeVisible();
 
   // First product
-  const first = page.getByRole('link', { name: /view/i }).first();
-  await first.click();
+  await page.getByTestId('product-card').first().click();
   await page.getByRole('button', { name: /add to cart/i }).click();
 
   // Cart page
@@ -35,9 +34,9 @@ test('Footer components work', async ({ page }) => {
   await page.getByRole('button', { name: /close soapstone/i }).click();
 
   // Nav links visible and navigable (public routes)
-  const routes = ['/shop', '/blog', '/games', '/community', '/about'];
+  const routes = ['/shop', '/blog', '/mini-games', '/community', '/about'];
   for (const href of routes) {
-    await page.getByRole('link', { name: new RegExp(href.replace('/', ''), 'i') }).hover();
+    await page.locator(`a[href="${href}"]`).first().hover();
   }
 
   // No scary console errors
