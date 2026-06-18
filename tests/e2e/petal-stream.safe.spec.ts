@@ -38,7 +38,7 @@ test.describe('Homepage petal stream guardrail', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByRole('heading', { name: /Welcome, Traveler/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Enter the Realm/i })).toBeVisible();
     await expect(page.getByText('Petal stream unavailable')).toHaveCount(0);
   });
 
