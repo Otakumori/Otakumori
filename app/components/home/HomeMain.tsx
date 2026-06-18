@@ -129,6 +129,32 @@ function PerformanceGuardrails() {
   );
 }
 
+function HomeFooter() {
+  return (
+    <footer className="mx-auto mt-20 max-w-5xl text-center" style={containSectionStyle}>
+      <section className="glass-panel card-stroke rounded-3xl p-6 text-white/75 md:p-8">
+        <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
+          Community signs
+        </p>
+        <h2 className="font-display mt-3 text-2xl font-semibold text-white">
+          Leave a sign for fellow travelers
+        </h2>
+        <p className="font-body mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/68">
+          Soapstone posting stays behind its owned route and auth flow; the homepage keeps the
+          public invitation visible without depending on live community data.
+        </p>
+      </section>
+
+      <div className="mt-8 border-t border-white/10 pt-6 text-sm text-white/55">
+        <p>Otakumori {'\u2122'} made with {'\u2661'}</p>
+        <p className="mt-2 text-xs">
+          {'\u00a9'} {new Date().getFullYear()} Otaku-mori. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
+
 export default function HomeMain() {
   return (
     <main className="relative z-20 bg-[#080611] px-4 py-20 text-white sm:px-6 lg:px-8">
@@ -145,6 +171,7 @@ export default function HomeMain() {
       </section>
 
       <PerformanceGuardrails />
+      <HomeFooter />
     </main>
   );
 }

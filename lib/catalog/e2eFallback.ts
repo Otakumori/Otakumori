@@ -7,6 +7,11 @@ export function shouldUseE2ECatalogFallback() {
   return env.CI === 'true' || env.NODE_ENV === 'test';
 }
 
+export function getE2EFallbackProduct(id: string): CatalogProduct | undefined {
+  if (!shouldUseE2ECatalogFallback()) return undefined;
+  return getE2EFallbackProducts().find((item) => item.id === id || item.slug === id);
+}
+
 export function getE2EFallbackProducts(): CatalogProduct[] {
   return [
     {

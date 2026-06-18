@@ -14,7 +14,7 @@ import {
   createApiSuccess,
 } from '@/app/lib/api-contracts';
 import { getPrintifyService } from '@/app/lib/printify/service';
-import { getE2EFallbackProducts, shouldUseE2ECatalogFallback } from '@/lib/catalog/e2eFallback';
+import { getE2EFallbackProduct } from '@/lib/catalog/e2eFallback';
 
 export const runtime = 'nodejs';
 
@@ -31,6 +31,19 @@ export async function GET(
       return NextResponse.json(
         createApiError('VALIDATION_ERROR', 'Invalid product ID', requestId),
         { status: 400 },
+      );
+    }
+
+    const fallbackProduct = getE2EFallbackProduct(id);
+    if (fallbackProduct) {
+      return NextResponse.json(
+        createApiSuccess(fallbackProduct, requestId),
+        {
+          headers: {
+            'Cache-Control': 'no-store',
+            'X-OTM-Source': 'ci-fallback',
+          },
+        },
       );
     }
 
@@ -60,21 +73,6 @@ export async function GET(
           },
         },
       );
-    }
-
-    if (shouldUseE2ECatalogFallback()) {
-      const fallbackProduct = getE2EFallbackProducts().find((item) => item.id === id || item.slug === id);
-      if (fallbackProduct) {
-        return NextResponse.json(
-          createApiSuccess(fallbackProduct, requestId),
-          {
-            headers: {
-              'Cache-Control': 'no-store',
-              'X-OTM-Source': 'ci-fallback',
-            },
-          },
-        );
-      }
     }
 
     // Product not found in Prisma - try Printify fallback
