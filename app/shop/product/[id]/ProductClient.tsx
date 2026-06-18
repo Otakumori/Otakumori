@@ -288,8 +288,11 @@ export default function ProductClient({ productId }: { productId: string }) {
             </HeaderButton>
 
             {added ? (
-              <div className="text-sm text-green-300" data-testid="cart-success">
-                Added to cart!
+              <div className="space-y-2 text-sm text-green-300" data-testid="cart-success">
+                <p>Added to cart!</p>
+                <Link href="/cart" className="inline-flex text-pink-200 underline underline-offset-4 hover:text-pink-100">
+                  View cart
+                </Link>
               </div>
             ) : null}
 

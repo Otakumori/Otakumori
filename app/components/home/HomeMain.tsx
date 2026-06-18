@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
+import HomeSoapstoneDialog from './HomeSoapstoneDialog';
 
 const containSectionStyle: CSSProperties = {
   contentVisibility: 'auto',
@@ -143,6 +144,7 @@ function HomeFooter() {
           Soapstone posting stays behind its owned route and auth flow; the homepage keeps the
           public invitation visible without depending on live community data.
         </p>
+        <HomeSoapstoneDialog />
       </section>
 
       <div className="mt-8 border-t border-white/10 pt-6 text-sm text-white/55">
