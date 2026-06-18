@@ -10,7 +10,7 @@ test.describe('Homepage', () => {
     await expect(page.locator('h1')).toContainText('Enter the Realm');
 
     // Check that the cherry tree is present
-    await expect(page.locator('img[alt="Cherry Blossom Tree"]')).toBeVisible();
+    await expect(page.locator('img[alt="Otakumori sakura tree scene at night"]')).toBeVisible();
   });
 
   test('should respect reduced motion preference', async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe('Homepage', () => {
     await page.reload();
 
     // Check that animations are disabled
-    const cherryTree = page.locator('img[alt="Cherry Blossom Tree"]');
+    const cherryTree = page.locator('img[alt="Otakumori sakura tree scene at night"]');
     await expect(cherryTree).toBeVisible();
 
     // Verify no animation styles are applied
