@@ -212,15 +212,20 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
 
-      // Tab to first button
-      await page.keyboard.press('Tab');
-      let focused = await page.evaluate(() => document.activeElement?.tagName);
-      expect(focused).toBe('BUTTON');
+      const activeLabel = async () =>
+        page.evaluate(() => document.activeElement?.getAttribute('aria-label') || '');
+
+      // Global skip/nav controls precede the age gate, so tab until the first action button.
+      for (let i = 0; i < 20; i += 1) {
+        await page.keyboard.press('Tab');
+        if ((await activeLabel()).match(/18 or older/i)) break;
+      }
+
+      expect(await activeLabel()).toMatch(/18 or older/i);
 
       // Tab to second button
       await page.keyboard.press('Tab');
-      focused = await page.evaluate(() => document.activeElement?.tagName);
-      expect(focused).toBe('BUTTON');
+      expect(await activeLabel()).toMatch(/go back/i);
 
       // Press Enter to activate button
       await page.keyboard.press('Enter');
