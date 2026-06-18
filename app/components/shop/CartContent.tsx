@@ -101,10 +101,10 @@ export default function CartContent() {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Cart Items */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 space-y-4" data-testid="cart-items">
         <PetalBalanceDisplay />
         {items.map((item) => (
-          <GlassPanel key={item.id} className="p-4">
+          <GlassPanel key={item.id} className="p-4" data-testid="cart-item">
             <div className="flex items-center gap-4">
               <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl">
                 <Image
@@ -252,6 +252,7 @@ export default function CartContent() {
               } as any
             }
             className="mt-6 block w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 text-center font-semibold text-white hover:bg-fuchsia-500 transition-colors"
+            data-testid="checkout-button"
           >
             {t('cart', 'checkoutClarity')}
           </Link>

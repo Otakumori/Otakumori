@@ -26,7 +26,8 @@ test('Footer components work', async ({ page }) => {
   await page.goto('/');
 
   // Footer copyright
-  await expect(page.getByText(/© \d{4} Otaku-mori\. Made with /)).toBeVisible();
+  await expect(page.getByText(/Otakumori ™ made with ♡/)).toBeVisible();
+  await expect(page.getByText(/© \d{4} Otaku-mori\. All rights reserved\./)).toBeVisible();
 
   // Soapstone CTA opens modal
   await page.getByRole('button', { name: /soapstone/i }).click();
@@ -52,10 +53,10 @@ test('Footer components work', async ({ page }) => {
 });
 
 test('API routes return 200', async ({ page }) => {
-  const routes = ['/api/health', '/api/printify/products'];
+  const routes = ['/api/health', '/api/shop/products'];
 
   for (const route of routes) {
-    const res = await page.goto(route);
+    const res = await page.request.get(route);
     expect(res?.ok()).toBeTruthy();
   }
 });

@@ -51,6 +51,7 @@ export default function ProductClient({ productId }: { productId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<CatalogVariant | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const { addProduct } = useRecentlyViewed();
   const { success, error: showError } = useToastContext();
   const { addItem } = useCart();
@@ -193,6 +194,8 @@ export default function ProductClient({ productId }: { productId: string }) {
       window.dispatchEvent(new Event('cart-updated'));
     }
 
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
     success(`Added ${product.title} to cart!`);
   };
 
@@ -227,7 +230,7 @@ export default function ProductClient({ productId }: { productId: string }) {
 
         {isNSFW && <NSFWAffirmNote />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12" data-testid="product-details">
           <div className="space-y-4">
             <div className="relative aspect-square overflow-hidden rounded-2xl glass-card">
               <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
@@ -245,10 +248,10 @@ export default function ProductClient({ productId }: { productId: string }) {
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl font-bold text-pink-200">{product.title}</h1>
+                <h1 className="text-4xl font-bold text-pink-200" data-testid="product-name">{product.title}</h1>
               </div>
               <div className="flex items-center gap-4 mb-6">
-                <p className="text-3xl font-bold text-pink-400">{currency === 'USD' ? '$' : currency}{currentPrice.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-pink-400" data-testid="product-price">{currency === 'USD' ? '$' : currency}{currentPrice.toFixed(2)}</p>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
               <PetalDiscountBadge productPrice={currentPrice} />
@@ -275,7 +278,20 @@ export default function ProductClient({ productId }: { productId: string }) {
               <input id="quantity" type="number" min="1" max="99" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white" />
             </div>
 
-            <HeaderButton onClick={handleAddToCart} disabled={!variantAvailable} className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">Add to Cart</HeaderButton>
+            <HeaderButton
+              onClick={handleAddToCart}
+              disabled={!variantAvailable}
+              className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              data-testid="add-to-cart"
+            >
+              Add to Cart
+            </HeaderButton>
+
+            {added ? (
+              <div className="text-sm text-green-300" data-testid="cart-success">
+                Added to cart!
+              </div>
+            ) : null}
 
             <div className="glass-panel rounded-xl p-6 space-y-3">
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>

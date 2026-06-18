@@ -18,7 +18,7 @@ test.describe('Critical User Journey', () => {
 
     // Check that products are displayed
     const productCards = page.locator('[data-testid="product-card"]');
-    await expect(productCards).toHaveCount({ min: 1 });
+    await expect(productCards.first()).toBeVisible();
 
     // Click on first product
     await productCards.first().click();
