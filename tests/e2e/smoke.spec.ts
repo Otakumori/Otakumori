@@ -4,9 +4,9 @@ test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('navigation')).toBeVisible();
 
-  // Clerk link (guest)
-  await page.getByRole('link', { name: /sign in/i }).click();
-  await expect(page).toHaveURL(/sign-in/);
+  // Clerk modal entry point (guest)
+  await page.getByRole('button', { name: /^sign in$/i }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
 
   // Back to shop
   await page.goto('/shop');
