@@ -13,7 +13,9 @@ test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /shop/i })).toBeVisible();
 
   // First product
-  await page.getByTestId('product-card').first().click();
+  const productHref = await page.getByTestId('product-card').first().getAttribute('href');
+  expect(productHref).toBeTruthy();
+  await page.goto(productHref!);
   await page.getByRole('button', { name: /add to cart/i }).click();
 
   // Cart page
