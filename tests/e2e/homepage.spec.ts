@@ -7,7 +7,7 @@ test.describe('Homepage', () => {
 
   test('should load homepage with hero section', async ({ page }) => {
     // Check that the hero section is visible
-    await expect(page.locator('h1')).toContainText('Welcome home, traveler');
+    await expect(page.locator('h1')).toContainText('Enter the Realm');
 
     // Check that the cherry tree is present
     await expect(page.locator('img[alt="Cherry Blossom Tree"]')).toBeVisible();
