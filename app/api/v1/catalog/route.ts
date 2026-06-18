@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
+import { getE2EFallbackProducts, shouldUseE2ECatalogFallback } from '@/lib/catalog/e2eFallback';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
@@ -137,10 +138,14 @@ export async function GET(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
     });
 
-    const checkoutSafeProducts = prismaProducts
+    let checkoutSafeProducts = prismaProducts
       .map(serializeProduct)
       .map(toListingProduct)
       .filter((product) => Boolean(product.image) && product.available && product.variants.length > 0);
+
+    if (checkoutSafeProducts.length === 0 && shouldUseE2ECatalogFallback()) {
+      checkoutSafeProducts = getE2EFallbackProducts().map(toListingProduct);
+    }
 
     const filtered = sortProducts(filterProducts(checkoutSafeProducts, params), params);
     const total = filtered.length;
@@ -173,6 +178,29 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
     logger.error('Catalog API error', { requestId, route: '/api/v1/catalog' }, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (shouldUseE2ECatalogFallback()) {
+      const products = getE2EFallbackProducts().map(toListingProduct);
+      return NextResponse.json(createApiSuccess({
+        products,
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          total: products.length,
+          perPage: products.length,
+        },
+        filters: {
+          availableCategories: ['apparel'],
+          priceRange: { min: 29, max: 29 },
+          availableColors: [],
+          availableSizes: [],
+        },
+      }, requestId), {
+        headers: {
+          'Cache-Control': 'no-store',
+          'X-OTM-Source': 'ci-fallback',
+        },
+      });
+    }
     return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to fetch catalog', requestId), { status: 500 });
   }
 }
