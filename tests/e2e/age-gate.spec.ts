@@ -281,7 +281,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       const headers = response.headers();
       expect(headers['set-cookie']).toContain('om_age_ok=1');
       expect(headers['set-cookie']).toContain('HttpOnly');
-      expect(headers['set-cookie']).toContain('SameSite=Lax');
+      expect(headers['set-cookie']).toMatch(/SameSite=lax/i);
     });
 
     test('should require returnTo parameter', async ({ page }) => {
