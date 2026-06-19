@@ -62,7 +62,7 @@
     "build:analyze": "ANALYZE=true prisma generate --no-engine && node scripts/build-with-env.js",
     "perf:budget": "npx tsx scripts/check-performance-budget.ts",
     "perf:analyze": "npm run build:analyze && npm run perf:budget",
-    "vercel-build": "prisma generate --no-engine && node scripts/build-with-env.js",
+    "vercel-build": "prisma generate && node scripts/build-with-env.js",
     "start": "next start",
     "lint": "eslint . --max-warnings=400",
     "lint:fix": "next lint --no-inline-config --fix",

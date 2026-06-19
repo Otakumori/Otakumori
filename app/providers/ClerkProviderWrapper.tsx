@@ -15,6 +15,11 @@ interface ClerkProviderWrapperProps {
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 
+function shouldUseConfiguredClerkOrigin() {
+  if (typeof window === 'undefined') return false;
+  return !window.location.hostname.endsWith('.vercel.app');
+}
+
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -31,6 +36,7 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
+  const useConfiguredClerkOrigin = shouldUseConfiguredClerkOrigin();
 
   const clerkProps: any = {
     publishableKey,
@@ -40,11 +46,11 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  if (configuredDomain) {
+  if (configuredDomain && useConfiguredClerkOrigin) {
     clerkProps.domain = configuredDomain;
   }
 
-  if (configuredProxyUrl) {
+  if (configuredProxyUrl && useConfiguredClerkOrigin) {
     clerkProps.proxyUrl = configuredProxyUrl;
   }
 
