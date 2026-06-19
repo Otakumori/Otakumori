@@ -132,6 +132,7 @@ export default function HeroScene() {
         alt={scene.asset.alt}
         fill
         priority
+        unoptimized
         sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out"
         onError={() => {

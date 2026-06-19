@@ -26,7 +26,6 @@ export default function StaticPublicNavbar() {
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
               fill
-              priority
               sizes="(min-width: 768px) 96px, 80px"
               className="object-contain"
             />

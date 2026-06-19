@@ -109,7 +109,7 @@ export default function BuyReadyShopCatalog() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" data-testid="product-grid">
-      {visibleProducts.map((product) => {
+      {visibleProducts.map((product, index) => {
         const image = product.image ?? product.images?.[0] ?? '';
         const summary = cleanSummary(product.description || '');
         const hasMultipleOptions = Boolean(product.variants?.length && product.variants.length > 1);
@@ -118,7 +118,15 @@ export default function BuyReadyShopCatalog() {
           <article key={product.id} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-lg">
             <Link href={productHref} className="block" data-testid="product-card">
               <div className="relative aspect-[4/5] bg-black/20">
-                <Image src={image} alt={product.title} fill className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" unoptimized />
+                <Image
+                  src={image}
+                  alt={product.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                  priority={index === 0}
+                  unoptimized
+                />
                 {product.provider ? <div className="absolute right-3 top-3 rounded-lg bg-black/70 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-white">{product.provider}</div> : null}
               </div>
             </Link>

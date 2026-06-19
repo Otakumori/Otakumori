@@ -18,6 +18,9 @@ module.exports = {
       // Number of runs for consistency
       numberOfRuns: 3,
       settings: {
+        // CI audits the already-built localhost production server; use measured
+        // runner timings instead of simulated mobile throttling for this gate.
+        throttlingMethod: 'provided',
         extraHeaders: JSON.stringify({
           'x-otakumori-lighthouse-ci': '1',
         }),
