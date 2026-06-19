@@ -17,6 +17,11 @@ module.exports = {
       ],
       // Number of runs for consistency
       numberOfRuns: 3,
+      settings: {
+        extraHeaders: {
+          'x-otakumori-lighthouse-ci': '1',
+        },
+      },
     },
 
     // Performance budgets
