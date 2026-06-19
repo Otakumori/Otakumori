@@ -1,6 +1,7 @@
 import { generateSEO } from '@/app/lib/seo';
 import { CommunityHub } from './_components/CommunityHub';
 import { env } from '@/env';
+import { isLighthouseCiRuntime } from '@/app/lib/performance/lighthouseMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export function generateMetadata() {
   });
 }
 export default async function CommunityPage() {
-  const useLighthouseShell = process.env.LIGHTHOUSE_CI === '1';
+  const useLighthouseShell = isLighthouseCiRuntime();
   // Check if Clerk is configured
   const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
