@@ -127,7 +127,14 @@ export default function Navbar() {
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         <Link href={paths.home()} className="flex items-center group py-1">
           <div className="relative w-32 h-32 md:w-36 md:h-36">
-            <Image src="/assets/images/circlelogo.png" alt="Otaku-mori" fill className="object-contain" />
+            <Image
+              src="/assets/images/circlelogo.png"
+              alt="Otaku-mori"
+              fill
+              priority
+              sizes="(min-width: 768px) 144px, 128px"
+              className="object-contain"
+            />
           </div>
         </Link>
 
