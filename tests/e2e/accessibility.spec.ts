@@ -8,7 +8,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 const routes = [
   { path: '/', name: 'Home' },
-  { path: '/arcade', name: 'Arcade' },
+  { path: '/mini-games', name: 'Mini-Games' },
   { path: '/age-check', name: 'Age Check' },
 ];
 

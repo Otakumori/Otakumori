@@ -7,12 +7,13 @@ test.describe('Navbar Single Rendering', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
-    // Count navbar elements - should be exactly 1
-    const navbarCount = await page.locator('nav, [role="navigation"], header').count();
+    // Count the exposed navigation landmark. The header container is separate
+    // from the nested nav and should not be treated as a duplicate navbar.
+    const navbarCount = await page.getByRole('navigation').count();
     expect(navbarCount).toBe(1);
 
     // Verify the navbar is visible
-    const navbar = page.locator('nav, [role="navigation"], header').first();
+    const navbar = page.getByRole('navigation').first();
     await expect(navbar).toBeVisible();
   });
 
@@ -22,12 +23,13 @@ test.describe('Navbar Single Rendering', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
-    // Count navbar elements - should be exactly 1
-    const navbarCount = await page.locator('nav, [role="navigation"], header').count();
+    // Count the exposed navigation landmark. The header container is separate
+    // from the nested nav and should not be treated as a duplicate navbar.
+    const navbarCount = await page.getByRole('navigation').count();
     expect(navbarCount).toBe(1);
 
     // Verify the navbar is visible
-    const navbar = page.locator('nav, [role="navigation"], header').first();
+    const navbar = page.getByRole('navigation').first();
     await expect(navbar).toBeVisible();
   });
 

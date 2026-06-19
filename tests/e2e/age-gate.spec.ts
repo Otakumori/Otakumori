@@ -1,14 +1,17 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+
+const MATURE_GAME_PATH = '/mini-games/dungeon-of-desire';
+const SECOND_MATURE_GAME_PATH = '/mini-games/thigh-coliseum';
 
 test.describe('Age Gate - Session-Only R18 Protection', () => {
   // Test 1: Anonymous user flow
   test.describe('Anonymous User', () => {
-    test('should show age gate when visiting /mini-games without cookie', async ({ page }) => {
-      // Visit mini-games without any cookies
-      await page.goto('/mini-games');
+    test('should show age gate when visiting mature mini-game content without cookie', async ({ page }) => {
+      // Visit mature mini-game content without any cookies
+      await page.goto(MATURE_GAME_PATH);
 
       // Should be rewritten to age-check with returnTo param
-      await expect(page).toHaveURL(/\/age-check\?returnTo=%2Fmini-games/);
+      await expect(page).toHaveURL(/\/age-check\?returnTo=%2Fmini-games%2Fdungeon-of-desire/);
 
       // Verify age check page content is visible
       await expect(page.locator('h1')).toContainText('Age Verification Required');
@@ -17,8 +20,8 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
     });
 
     test('should set session cookie and redirect after confirmation', async ({ page }) => {
-      // Visit mini-games
-      await page.goto('/mini-games');
+      // Visit mature mini-game content
+      await page.goto(MATURE_GAME_PATH);
 
       // Wait for age check page
       await expect(page).toHaveURL(/\/age-check/);
@@ -27,7 +30,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       await page.getByRole('button', { name: /18 or older/i }).click();
 
       // Should redirect to original destination
-      await expect(page).toHaveURL(/\/mini-games/);
+      await expect(page).toHaveURL(new RegExp(MATURE_GAME_PATH));
 
       // Verify session cookie is set
       const cookies = await page.context().cookies();
@@ -41,18 +44,18 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
 
     test('should allow access to other protected routes with cookie', async ({ page }) => {
       // First, get the cookie by confirming age
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
       await page.getByRole('button', { name: /18 or older/i }).click();
+      await expect(page).toHaveURL(new RegExp(MATURE_GAME_PATH));
+
+      // Now visit another mature mini-game - should NOT show age gate
+      await page.goto(SECOND_MATURE_GAME_PATH);
+      await expect(page).not.toHaveURL(/\/age-check/);
+
+      // Public mini-games hub remains accessible
+      await page.goto('/mini-games');
       await expect(page).toHaveURL(/\/mini-games/);
-
-      // Now visit /arcade - should NOT show age gate
-      await page.goto('/arcade');
-      await expect(page).not.toHaveURL(/\/age-check/);
-
-      // Visit /products/nsfw - should NOT show age gate
-      await page.goto('/products/nsfw/test');
-      await expect(page).not.toHaveURL(/\/age-check/);
     });
 
     test('should show age gate again in new browser context (session ended)', async ({
@@ -61,16 +64,16 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       // First context: confirm age
       const context1 = await browser.newContext();
       const page1 = await context1.newPage();
-      await page1.goto('/mini-games');
+      await page1.goto(MATURE_GAME_PATH);
       await expect(page1).toHaveURL(/\/age-check/);
       await page1.getByRole('button', { name: /18 or older/i }).click();
-      await expect(page1).toHaveURL(/\/mini-games/);
+      await expect(page1).toHaveURL(new RegExp(MATURE_GAME_PATH));
       await context1.close();
 
       // Second context (simulates browser restart): should show age gate again
       const context2 = await browser.newContext();
       const page2 = await context2.newPage();
-      await page2.goto('/mini-games');
+      await page2.goto(MATURE_GAME_PATH);
 
       // Should be back at age-check
       await expect(page2).toHaveURL(/\/age-check/);
@@ -78,7 +81,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
     });
 
     test('should redirect to home when clicking "Go Back"', async ({ page }) => {
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
 
       // Click "Go Back" button
@@ -104,7 +107,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       // await signInTestUser(page, { adultVerified: false });
 
       // Visit mini-games
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
 
       // Should still show age gate
       await expect(page).toHaveURL(/\/age-check/);
@@ -153,12 +156,12 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       // await signInTestUser(page, { adultVerified: true });
 
       // Visit mini-games - should NOT show age gate
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).not.toHaveURL(/\/age-check/);
       await expect(page).toHaveURL(/\/mini-games/);
 
-      // Visit arcade - should NOT show age gate
-      await page.goto('/arcade');
+      // Visit a second mature game - should NOT show age gate
+      await page.goto(SECOND_MATURE_GAME_PATH);
       await expect(page).not.toHaveURL(/\/age-check/);
 
       // No session cookie should be needed
@@ -188,7 +191,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
   // Accessibility tests
   test.describe('Accessibility', () => {
     test('should have proper ARIA attributes on age check page', async ({ page }) => {
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
 
       // Check heading structure
@@ -206,18 +209,23 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
     });
 
     test('should support keyboard navigation', async ({ page }) => {
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
 
-      // Tab to first button
-      await page.keyboard.press('Tab');
-      let focused = await page.evaluate(() => document.activeElement?.tagName);
-      expect(focused).toBe('BUTTON');
+      const activeLabel = async () =>
+        page.evaluate(() => document.activeElement?.getAttribute('aria-label') || '');
+
+      // Global skip/nav controls precede the age gate, so tab until the first action button.
+      for (let i = 0; i < 20; i += 1) {
+        await page.keyboard.press('Tab');
+        if ((await activeLabel()).match(/18 or older/i)) break;
+      }
+
+      expect(await activeLabel()).toMatch(/18 or older/i);
 
       // Tab to second button
       await page.keyboard.press('Tab');
-      focused = await page.evaluate(() => document.activeElement?.tagName);
-      expect(focused).toBe('BUTTON');
+      expect(await activeLabel()).toMatch(/go back/i);
 
       // Press Enter to activate button
       await page.keyboard.press('Enter');
@@ -228,7 +236,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
 
     test('should respect reduced motion preference', async ({ page }) => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.goto('/mini-games');
+      await page.goto(MATURE_GAME_PATH);
       await expect(page).toHaveURL(/\/age-check/);
 
       // Page should load without motion animations
@@ -262,18 +270,18 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
 
     test('should accept valid relative paths', async ({ page }) => {
       const response = await page.request.post('/api/age/confirm', {
-        data: { returnTo: '/mini-games' },
+        data: { returnTo: MATURE_GAME_PATH },
       });
 
       const data = await response.json();
       expect(data.ok).toBe(true);
-      expect(data.data.redirectTo).toBe('/mini-games');
+      expect(data.data.redirectTo).toBe(MATURE_GAME_PATH);
 
       // Verify cookie was set in response
       const headers = response.headers();
       expect(headers['set-cookie']).toContain('om_age_ok=1');
       expect(headers['set-cookie']).toContain('HttpOnly');
-      expect(headers['set-cookie']).toContain('SameSite=Lax');
+      expect(headers['set-cookie']).toMatch(/SameSite=lax/i);
     });
 
     test('should require returnTo parameter', async ({ page }) => {

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { resolveHomeScene, type HomeSceneState } from './homeScene';
 
@@ -126,15 +127,17 @@ export default function HeroScene() {
 
   return (
     <div className="absolute inset-0 z-0 bg-[#080611]">
-      <img
+      <Image
         src={encodeURI(imageSrc)}
         alt={scene.asset.alt}
+        fill
+        priority
+        unoptimized
+        sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out"
         onError={() => {
           if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
         }}
-        decoding="async"
-        fetchPriority="high"
       />
 
       <div

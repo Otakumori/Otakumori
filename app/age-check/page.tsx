@@ -95,7 +95,7 @@ export default function AgeCheckPage() {
             <button
               onClick={handleConfirm}
               disabled={loading}
-              className="w-full rounded-xl bg-pink-500 px-6 py-3 font-semibold text-white transition-all hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-purple-900 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-xl bg-pink-600 px-6 py-3 font-semibold text-white transition-all hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-purple-900 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Confirm you are 18 or older"
             >
               {loading ? 'Confirming...' : "I'm 18 or Older"}

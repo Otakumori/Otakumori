@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, fix/ci-baseline-health-gates]
 
 env:
   NODE_VERSION: '20'
@@ -157,6 +157,7 @@ jobs:
           sleep 30
         env:
           PORT: 3000
+          LIGHTHOUSE_CI: '1'
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           CLERK_PROXY_URL: ''
@@ -174,8 +175,18 @@ jobs:
         uses: treosh/lighthouse-ci-action@v10
         with:
           configPath: './lighthouserc.cjs'
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse_results_${{ github.run_id }}_${{ github.run_attempt }}
+          path: .lighthouseci/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
 
   e2e:
     name: E2E Tests
@@ -239,6 +250,16 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Playwright traces
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-test-results
+          path: test-results/
+          if-no-files-found: warn
           retention-days: 30
 
   security:

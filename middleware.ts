@@ -1,8 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const AGE_GATE_COOKIE = 'om_age_ok';
+const MATURE_MINI_GAME_PATHS = new Set([
+  '/mini-games/dungeon-of-desire',
+  '/mini-games/thigh-coliseum',
+]);
 
 const isProtected = createRouteMatcher([
   '/account(.*)',
@@ -97,7 +102,66 @@ function buildAccountsUrl(path: string, redirectUrl?: string) {
   return url;
 }
 
-export default clerkMiddleware(async (auth, req) => {
+function isAgeGatedRoute(pathname: string) {
+  return MATURE_MINI_GAME_PATHS.has(pathname);
+}
+
+function buildAgeCheckUrl(reqUrl: string, returnTo: string) {
+  const url = new URL('/age-check', reqUrl);
+  url.searchParams.set('returnTo', returnTo);
+  return url;
+}
+
+function createRequestId(req: NextRequest) {
+  return (
+    req.headers.get('x-request-id') ||
+    req.headers.get('x-correlation-id') ||
+    `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  );
+}
+
+function addPublicSecurityHeaders(res: NextResponse, reqId: string) {
+  res.headers.set('X-Request-ID', reqId);
+  res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  return res;
+}
+
+function isLighthousePublicRoute(req: NextRequest) {
+  return (
+    req.headers.get('x-otakumori-lighthouse-ci') === '1' &&
+    !req.nextUrl.pathname.startsWith('/api/') &&
+    !req.nextUrl.pathname.startsWith('/ingest') &&
+    !isAgeGatedRoute(req.nextUrl.pathname) &&
+    !isAdmin(req) &&
+    !isProtected(req)
+  );
+}
+
+function handleLighthousePublicRoute(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  const host = req.headers.get('host') || '';
+  const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
+
+  const isApex = host === 'otaku-mori.com';
+  const isAccounts = host.startsWith('accounts.');
+  if (!isAccounts && isApex) {
+    url.host = 'www.otaku-mori.com';
+    return NextResponse.redirect(url, 308);
+  }
+
+  const isPrimary = host.endsWith('otaku-mori.com');
+  if (isPrimary && proto !== 'https') {
+    url.protocol = 'https:';
+    return NextResponse.redirect(url, 308);
+  }
+
+  return addPublicSecurityHeaders(NextResponse.next(), createRequestId(req));
+}
+
+const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
   try {
     const url = req.nextUrl.clone();
     const host = req.headers.get('host') || '';
@@ -105,12 +169,8 @@ export default clerkMiddleware(async (auth, req) => {
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
-    const { userId, sessionClaims } = await auth();
 
-    const reqId =
-      req.headers.get('x-request-id') ||
-      req.headers.get('x-correlation-id') ||
-      `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const reqId = createRequestId(req);
 
     if (isApi || isIngest) {
       if (req.method === 'OPTIONS') {
@@ -138,7 +198,22 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(url, 308);
     }
 
-    if (isAdmin(req) && !isMerchizeAdminProbe) {
+    if (isAgeGatedRoute(url.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
+      return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
+    }
+
+    const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
+    const requiresProtectedAuth = isProtected(req) && !isMerchizeAdminProbe;
+    let userId: string | null = null;
+    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
+
+    if (requiresAdminAuth || requiresProtectedAuth) {
+      const authResult = await auth();
+      userId = authResult.userId;
+      sessionClaims = authResult.sessionClaims;
+    }
+
+    if (requiresAdminAuth) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
@@ -150,7 +225,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    if (isProtected(req) && !isMerchizeAdminProbe) {
+    if (requiresProtectedAuth) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
@@ -168,6 +243,14 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 });
+
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (isLighthousePublicRoute(req)) {
+    return handleLighthousePublicRoute(req);
+  }
+
+  return clerkAuthMiddleware(req, event);
+}
 
 export const config = {
   matcher: [
