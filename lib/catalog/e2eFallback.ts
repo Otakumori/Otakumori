@@ -4,12 +4,29 @@ import type { CatalogProduct } from './serialize';
 export const E2E_FALLBACK_PRODUCT_ID = 'e2e-sakura-starter-tee';
 const E2E_FALLBACK_IMAGE = '/assets/images/cherry-tree@1x.webp';
 
+function readRuntimeEnv(key: string): string | undefined {
+  return typeof globalThis.process === 'undefined' ? undefined : globalThis.process.env?.[key];
+}
+
 export function shouldUseE2ECatalogFallback() {
   return env.CI === 'true' || env.NODE_ENV === 'test';
 }
 
+export function shouldUseCatalogFallback() {
+  return (
+    shouldUseE2ECatalogFallback() ||
+    readRuntimeEnv('VERCEL_ENV') === 'preview' ||
+    readRuntimeEnv('VERCEL_ENVIRONMENT') === 'preview'
+  );
+}
+
 export function getE2EFallbackProduct(id: string): CatalogProduct | undefined {
   if (!shouldUseE2ECatalogFallback()) return undefined;
+  return getE2EFallbackProducts().find((item) => item.id === id || item.slug === id);
+}
+
+export function getCatalogFallbackProduct(id: string): CatalogProduct | undefined {
+  if (!shouldUseCatalogFallback()) return undefined;
   return getE2EFallbackProducts().find((item) => item.id === id || item.slug === id);
 }
 

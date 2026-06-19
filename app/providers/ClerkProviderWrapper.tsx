@@ -20,6 +20,10 @@ function shouldUseConfiguredClerkOrigin() {
   return !window.location.hostname.endsWith('.vercel.app');
 }
 
+function resolveConfiguredClerkOrigin(value: string) {
+  return () => (shouldUseConfiguredClerkOrigin() ? value : undefined);
+}
+
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -36,8 +40,6 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
-  const useConfiguredClerkOrigin = shouldUseConfiguredClerkOrigin();
-
   const clerkProps: any = {
     publishableKey,
     signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
@@ -46,12 +48,12 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  if (configuredDomain && useConfiguredClerkOrigin) {
-    clerkProps.domain = configuredDomain;
+  if (configuredDomain && typeof window !== 'undefined') {
+    clerkProps.domain = resolveConfiguredClerkOrigin(configuredDomain);
   }
 
-  if (configuredProxyUrl && useConfiguredClerkOrigin) {
-    clerkProps.proxyUrl = configuredProxyUrl;
+  if (configuredProxyUrl && typeof window !== 'undefined') {
+    clerkProps.proxyUrl = resolveConfiguredClerkOrigin(configuredProxyUrl);
   }
 
   return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;

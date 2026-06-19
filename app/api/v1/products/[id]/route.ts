@@ -14,7 +14,7 @@ import {
   createApiSuccess,
 } from '@/app/lib/api-contracts';
 import { getPrintifyService } from '@/app/lib/printify/service';
-import { getE2EFallbackProduct } from '@/lib/catalog/e2eFallback';
+import { getCatalogFallbackProduct } from '@/lib/catalog/e2eFallback';
 
 export const runtime = 'nodejs';
 
@@ -34,7 +34,7 @@ export async function GET(
       );
     }
 
-    const fallbackProduct = getE2EFallbackProduct(id);
+    const fallbackProduct = getCatalogFallbackProduct(id);
     if (fallbackProduct) {
       return NextResponse.json(
         createApiSuccess(fallbackProduct, requestId),

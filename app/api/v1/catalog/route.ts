@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
-import { getE2EFallbackProducts, shouldUseE2ECatalogFallback } from '@/lib/catalog/e2eFallback';
+import { getE2EFallbackProducts, shouldUseCatalogFallback } from '@/lib/catalog/e2eFallback';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
       .map(toListingProduct)
       .filter((product) => Boolean(product.image) && product.available && product.variants.length > 0);
 
-    if (checkoutSafeProducts.length === 0 && shouldUseE2ECatalogFallback()) {
+    if (checkoutSafeProducts.length === 0 && shouldUseCatalogFallback()) {
       checkoutSafeProducts = getE2EFallbackProducts().map(toListingProduct);
     }
 
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
     logger.error('Catalog API error', { requestId, route: '/api/v1/catalog' }, undefined, error instanceof Error ? error : new Error(String(error)));
-    if (shouldUseE2ECatalogFallback()) {
+    if (shouldUseCatalogFallback()) {
       const products = getE2EFallbackProducts().map(toListingProduct);
       return NextResponse.json(createApiSuccess({
         products,
