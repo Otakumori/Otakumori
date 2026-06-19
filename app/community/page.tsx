@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import { auth } from '@clerk/nextjs/server';
 import { CommunityHub } from './_components/CommunityHub';
 import { env } from '@/env';
 
@@ -34,8 +33,6 @@ export default async function CommunityPage() {
       </div>
     );
   }
-
-  const { userId } = await auth();
 
   // Allow guest access - CommunityHub will handle auth-gated features
   return (

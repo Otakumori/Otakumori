@@ -2,6 +2,7 @@ import { env } from '@/env.mjs';
 import type { CatalogProduct } from './serialize';
 
 export const E2E_FALLBACK_PRODUCT_ID = 'e2e-sakura-starter-tee';
+const E2E_FALLBACK_IMAGE = '/assets/images/cherry-tree@1x.webp';
 
 export function shouldUseE2ECatalogFallback() {
   return env.CI === 'true' || env.NODE_ENV === 'test';
@@ -19,8 +20,8 @@ export function getE2EFallbackProducts(): CatalogProduct[] {
       title: 'Sakura Starter Tee',
       slug: E2E_FALLBACK_PRODUCT_ID,
       description: 'Stable CI storefront product used when live catalog data is unavailable.',
-      image: '/assets/bg/5nighttree.png',
-      images: ['/assets/bg/5nighttree.png'],
+      image: E2E_FALLBACK_IMAGE,
+      images: [E2E_FALLBACK_IMAGE],
       tags: ['apparel', 'sakura'],
       category: 'apparel',
       categorySlug: 'apparel',
@@ -42,7 +43,7 @@ export function getE2EFallbackProducts(): CatalogProduct[] {
           isEnabled: true,
           printifyVariantId: 0,
           optionValues: [],
-          previewImageUrl: '/assets/bg/5nighttree.png',
+          previewImageUrl: E2E_FALLBACK_IMAGE,
         },
       ],
       integrationRef: null,

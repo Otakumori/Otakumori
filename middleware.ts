@@ -156,9 +156,18 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
     }
 
-    const { userId, sessionClaims } = await auth();
+    const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
+    const requiresProtectedAuth = isProtected(req) && !isMerchizeAdminProbe;
+    let userId: string | null = null;
+    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
 
-    if (isAdmin(req) && !isMerchizeAdminProbe) {
+    if (requiresAdminAuth || requiresProtectedAuth) {
+      const authResult = await auth();
+      userId = authResult.userId;
+      sessionClaims = authResult.sessionClaims;
+    }
+
+    if (requiresAdminAuth) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
@@ -170,7 +179,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    if (isProtected(req) && !isMerchizeAdminProbe) {
+    if (requiresProtectedAuth) {
       if (!userId) {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
