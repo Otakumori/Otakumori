@@ -55,7 +55,7 @@ function MiniGamesIntro({ onEnter }: { onEnter: () => void }) {
             <button
               type="button"
               onClick={onEnter}
-              className="rounded-full bg-pink-500 px-6 py-3 font-semibold text-white shadow-lg shadow-pink-950/40 transition hover:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200"
+              className="rounded-full bg-pink-700 px-6 py-3 font-semibold text-white shadow-lg shadow-pink-950/40 transition hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-200"
             >
               Enter Arcade Hub
             </button>
