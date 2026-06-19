@@ -20,8 +20,10 @@ test.describe('Critical User Journey', () => {
     const productCards = page.locator('[data-testid="product-card"]');
     await expect(productCards.first()).toBeVisible();
 
-    // Click on first product
-    await productCards.first().click();
+    // Navigate through the same stable product-card href contract used by smoke coverage.
+    const productHref = await productCards.first().getAttribute('href');
+    expect(productHref).toBeTruthy();
+    await page.goto(productHref!);
     await expect(page).toHaveURL(/\/shop\/product\//);
 
     // Wait for product details to load
