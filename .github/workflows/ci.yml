@@ -157,6 +157,7 @@ jobs:
           sleep 30
         env:
           PORT: 3000
+          LIGHTHOUSE_CI: '1'
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           CLERK_PROXY_URL: ''
@@ -184,6 +185,7 @@ jobs:
           name: lighthouse_results_${{ github.run_id }}_${{ github.run_attempt }}
           path: .lighthouseci/
           if-no-files-found: warn
+          include-hidden-files: true
           retention-days: 30
 
   e2e:

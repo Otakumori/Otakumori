@@ -12,6 +12,7 @@ export function generateMetadata() {
   });
 }
 export default async function CommunityPage() {
+  const useLighthouseShell = process.env.LIGHTHOUSE_CI === '1';
   // Check if Clerk is configured
   const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
@@ -37,7 +38,7 @@ export default async function CommunityPage() {
   // Allow guest access - CommunityHub will handle auth-gated features
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
-      <CommunityHub />
+      <CommunityHub performanceMode={useLighthouseShell} />
     </div>
   );
 }

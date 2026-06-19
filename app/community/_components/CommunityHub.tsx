@@ -44,7 +44,27 @@ function TabLoading({ label }: { label: string }) {
   );
 }
 
-export function CommunityHub() {
+export function CommunityHub({ performanceMode = false }: { performanceMode?: boolean }) {
+  if (performanceMode) {
+    return (
+      <div className="min-h-screen p-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8">
+            <h1 className="mb-2 text-4xl font-bold text-white">Community Hub</h1>
+            <p className="text-zinc-300">
+              Share your avatars, explore the community, and connect with fellow travelers
+            </p>
+          </div>
+          <CommunityOverview onSelectTab={() => undefined} />
+        </div>
+      </div>
+    );
+  }
+
+  return <CommunityHubInteractive />;
+}
+
+function CommunityHubInteractive() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
 
