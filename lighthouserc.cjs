@@ -18,9 +18,9 @@ module.exports = {
       // Number of runs for consistency
       numberOfRuns: 3,
       settings: {
-        extraHeaders: {
+        extraHeaders: JSON.stringify({
           'x-otakumori-lighthouse-ci': '1',
-        },
+        }),
       },
     },
 
