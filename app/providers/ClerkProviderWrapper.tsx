@@ -11,20 +11,30 @@ async function getLogger() {
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
   nonce?: string | undefined;
+  requestHost?: string | undefined;
 }
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const PRODUCTION_HOSTS = new Set(['otaku-mori.com', 'www.otaku-mori.com', 'accounts.otaku-mori.com']);
 
-function shouldUseConfiguredClerkOrigin() {
-  if (typeof window === 'undefined') return false;
-  return !window.location.hostname.endsWith('.vercel.app');
+function normalizeHost(host: string | undefined) {
+  return host?.split(':')[0]?.trim().toLowerCase();
 }
 
-function resolveConfiguredClerkOrigin(value: string) {
-  return () => (shouldUseConfiguredClerkOrigin() ? value : undefined);
+function isProductionClerkHost(host: string | undefined) {
+  const normalizedHost = normalizeHost(host);
+  return Boolean(normalizedHost && PRODUCTION_HOSTS.has(normalizedHost));
 }
 
-export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
+function disabledClerkOrigin() {
+  return undefined;
+}
+
+export default function ClerkProviderWrapper({
+  children,
+  nonce,
+  requestHost,
+}: ClerkProviderWrapperProps) {
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
@@ -40,6 +50,7 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
+  const useProductionClerkOrigin = isProductionClerkHost(requestHost);
   const clerkProps: any = {
     publishableKey,
     signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
@@ -48,12 +59,12 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  if (configuredDomain && typeof window !== 'undefined') {
-    clerkProps.domain = resolveConfiguredClerkOrigin(configuredDomain);
+  if (configuredDomain) {
+    clerkProps.domain = useProductionClerkOrigin ? configuredDomain : disabledClerkOrigin;
   }
 
-  if (configuredProxyUrl && typeof window !== 'undefined') {
-    clerkProps.proxyUrl = resolveConfiguredClerkOrigin(configuredProxyUrl);
+  if (configuredProxyUrl) {
+    clerkProps.proxyUrl = useProductionClerkOrigin ? configuredProxyUrl : disabledClerkOrigin;
   }
 
   return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;

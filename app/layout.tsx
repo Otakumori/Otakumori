@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const headersList = await headers();
   const nonce = headersList.get('x-nonce') ?? undefined;
+  const requestHost = headersList.get('host') ?? undefined;
   const useLighthouseShell = isLighthouseCiRuntime();
 
   if (useLighthouseShell) {
@@ -38,7 +39,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   }
 
   return (
-    <ClerkProviderWrapper nonce={nonce || undefined}>
+    <ClerkProviderWrapper nonce={nonce || undefined} requestHost={requestHost}>
       <html lang="en">
         <body>
           <AuthProvider>
