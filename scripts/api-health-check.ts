@@ -15,7 +15,7 @@ interface TestResult {
   statusCode?: number;
   responseTime?: number;
   error?: string;
-  details?: any;
+  details?: unknown;
 }
 
 class APIHealthChecker {
@@ -49,7 +49,7 @@ class APIHealthChecker {
       const responseTime = Date.now() - startTime;
       const isSuccess = allowedStatuses.includes(response.status);
 
-      let details;
+      let details: unknown;
       try {
         // Clone the response to avoid "body already read" errors
         const clonedResponse = response.clone();
