@@ -129,6 +129,13 @@ function addPublicSecurityHeaders(res: NextResponse, reqId: string) {
   return res;
 }
 
+function apiAuthError(status: 401 | 403, message: string, reqId: string) {
+  return addPublicSecurityHeaders(
+    NextResponse.json({ ok: false, error: message }, { status }),
+    reqId,
+  );
+}
+
 function isLighthousePublicRoute(req: NextRequest) {
   return (
     req.headers.get('x-otakumori-lighthouse-ci') === '1' &&
@@ -169,20 +176,12 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
     const isApi = url.pathname.startsWith('/api/');
     const isIngest = url.pathname.startsWith('/ingest');
     const isMerchizeAdminProbe = url.pathname === '/admin/merchize';
+    const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
 
     const reqId = createRequestId(req);
 
-    if (isApi || isIngest) {
-      if (req.method === 'OPTIONS') {
-        return handleCorsPreflight(req);
-      }
-
-      const res = NextResponse.next();
-      res.headers.set('X-Request-ID', reqId);
-
-      return withCors(res, req.headers.get('origin'), {
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-      });
+    if (req.method === 'OPTIONS' && (isApi || isIngest)) {
+      return handleCorsPreflight(req);
     }
 
     const isApex = host === 'otaku-mori.com';
@@ -202,45 +201,59 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
     }
 
-    const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
-    const requiresProtectedAuth = isProtected(req) && !isMerchizeAdminProbe;
     let userId: string | null = null;
     let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
 
-    if (requiresAdminAuth || requiresProtectedAuth) {
+    if (requiresAdminAuth) {
       const authResult = await auth();
       userId = authResult.userId;
       sessionClaims = authResult.sessionClaims;
-    }
 
-    if (requiresAdminAuth) {
       if (!userId) {
+        if (isApi) return apiAuthError(401, 'Unauthorized', reqId);
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
+
       const isAdminUser =
         (sessionClaims as any)?.metadata?.role === 'admin' ||
         (sessionClaims as any)?.public_metadata?.role === 'admin';
       if (!isAdminUser) {
+        if (isApi) return apiAuthError(403, 'Forbidden', reqId);
         return NextResponse.redirect(buildAccountsUrl('/unauthorized-sign-in', req.url));
       }
     }
 
-    if (requiresProtectedAuth) {
-      if (!userId) {
-        return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
-      }
+    if (isApi || isIngest) {
+      const res = addPublicSecurityHeaders(NextResponse.next(), reqId);
+      return withCors(res, req.headers.get('origin'), {
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+      });
     }
 
-    const res = NextResponse.next();
-    res.headers.set('X-Request-ID', reqId);
-    res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    res.headers.set('X-Content-Type-Options', 'nosniff');
-    res.headers.set('X-Frame-Options', 'SAMEORIGIN');
-    res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    if (userId) res.headers.set('X-User-ID', userId);
-    return res;
+    const requiresProtectedAuth = isProtected(req) && !isMerchizeAdminProbe;
+    if (requiresProtectedAuth && !userId) {
+      const authResult = await auth();
+      userId = authResult.userId;
+    }
+
+    if (requiresProtectedAuth && !userId) {
+      return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
+    }
+
+    return addPublicSecurityHeaders(NextResponse.next(), reqId);
   } catch {
-    return NextResponse.next();
+    const reqId = createRequestId(req);
+    const isSensitiveRoute =
+      req.nextUrl.pathname.startsWith('/api/') || isAdmin(req) || isProtected(req);
+
+    if (isSensitiveRoute) {
+      return addPublicSecurityHeaders(
+        new NextResponse('Service unavailable', { status: 503 }),
+        reqId,
+      );
+    }
+
+    return addPublicSecurityHeaders(NextResponse.next(), reqId);
   }
 });
 
