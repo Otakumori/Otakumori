@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const data = event.data ?? event.order ?? event.payload ?? {};
     const merchizeOrderId = String(data.id ?? data.order_id ?? data.orderId ?? '');
 
-    console.log('Merchize webhook received:', {
+    console.warn('Merchize webhook received:', {
       eventType,
       merchizeOrderId,
     });
