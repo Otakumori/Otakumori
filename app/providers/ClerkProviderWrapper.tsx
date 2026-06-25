@@ -26,10 +26,6 @@ function isProductionClerkHost(host: string | undefined) {
   return Boolean(normalizedHost && PRODUCTION_HOSTS.has(normalizedHost));
 }
 
-function disabledClerkOrigin() {
-  return undefined;
-}
-
 export default function ClerkProviderWrapper({
   children,
   nonce,
@@ -59,12 +55,12 @@ export default function ClerkProviderWrapper({
     nonce,
   };
 
-  if (configuredDomain) {
-    clerkProps.domain = useProductionClerkOrigin ? configuredDomain : disabledClerkOrigin;
+  if (useProductionClerkOrigin && configuredDomain) {
+    clerkProps.domain = configuredDomain;
   }
 
-  if (configuredProxyUrl) {
-    clerkProps.proxyUrl = useProductionClerkOrigin ? configuredProxyUrl : disabledClerkOrigin;
+  if (useProductionClerkOrigin && configuredProxyUrl) {
+    clerkProps.proxyUrl = configuredProxyUrl;
   }
 
   return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;
