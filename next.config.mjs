@@ -2,12 +2,42 @@ import { withSentryConfig } from '@sentry/nextjs';
 import path from 'node:path';
 import { env } from './env.mjs';
 
+const isVercelPreview = process.env.VERCEL_ENV === 'preview';
+
+if (isVercelPreview) {
+  for (const key of [
+    'NEXT_PUBLIC_CLERK_PROXY_URL',
+    'NEXT_PUBLIC_CLERK_DOMAIN',
+    'NEXT_PUBLIC_CLERK_FRONTEND_API',
+    'NEXT_PUBLIC_CLERK_JS_URL',
+    'NEXT_PUBLIC_CLERK_IS_SATELLITE',
+    'CLERK_PROXY_URL',
+    'CLERK_DOMAIN',
+    'CLERK_FRONTEND_API',
+    'CLERK_JS_URL',
+    'CLERK_IS_SATELLITE',
+  ]) {
+    delete process.env[key];
+  }
+}
+
+const previewClerkPublicEnv = isVercelPreview
+  ? {
+      NEXT_PUBLIC_CLERK_PROXY_URL: '',
+      NEXT_PUBLIC_CLERK_DOMAIN: '',
+      NEXT_PUBLIC_CLERK_FRONTEND_API: '',
+      NEXT_PUBLIC_CLERK_JS_URL: '',
+      NEXT_PUBLIC_CLERK_IS_SATELLITE: '',
+    }
+  : undefined;
+
 // Bundle analyzer disabled for now - @next/bundle-analyzer is a dev dependency
 // To enable: move @next/bundle-analyzer to dependencies and uncomment the import
 const withBundleAnalyzer = (config) => config;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: previewClerkPublicEnv,
   // safety net during build; real fix is dynamic rendering
   staticPageGenerationTimeout: 300,
   // Enable source maps for Edge Tools debugging

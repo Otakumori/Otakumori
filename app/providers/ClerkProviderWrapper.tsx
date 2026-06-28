@@ -11,11 +11,26 @@ async function getLogger() {
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
   nonce?: string | undefined;
+  requestHost?: string | undefined;
 }
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
+const PRODUCTION_HOSTS = new Set(['otaku-mori.com', 'www.otaku-mori.com', 'accounts.otaku-mori.com']);
 
-export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {
+function normalizeHost(host: string | undefined) {
+  return host?.split(':')[0]?.trim().toLowerCase();
+}
+
+function isProductionClerkHost(host: string | undefined) {
+  const normalizedHost = normalizeHost(host);
+  return Boolean(normalizedHost && PRODUCTION_HOSTS.has(normalizedHost));
+}
+
+export default function ClerkProviderWrapper({
+  children,
+  nonce,
+  requestHost,
+}: ClerkProviderWrapperProps) {
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
@@ -31,7 +46,7 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
-
+  const useProductionClerkOrigin = isProductionClerkHost(requestHost);
   const clerkProps: any = {
     publishableKey,
     signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
@@ -40,11 +55,11 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  if (configuredDomain) {
+  if (useProductionClerkOrigin && configuredDomain) {
     clerkProps.domain = configuredDomain;
   }
 
-  if (configuredProxyUrl) {
+  if (useProductionClerkOrigin && configuredProxyUrl) {
     clerkProps.proxyUrl = configuredProxyUrl;
   }
 

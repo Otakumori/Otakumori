@@ -117,13 +117,24 @@ export default function Navbar() {
   return (
     <header
       className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : 'border-b border-white/5'}`}
-      style={{ backgroundColor: 'var(--color-background)', opacity: isScrolled ? 0.9 : 0.7, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+      style={{
+        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.95)' : 'rgba(26, 24, 22, 0.7)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
     >
       <a href="#main-content" className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only">Skip to main content</a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         <Link href={paths.home()} className="flex items-center group py-1">
           <div className="relative w-32 h-32 md:w-36 md:h-36">
-            <Image src="/assets/images/circlelogo.png" alt="Otaku-mori" fill className="object-contain" />
+            <Image
+              src="/assets/images/circlelogo.png"
+              alt="Otaku-mori"
+              fill
+              priority
+              sizes="(min-width: 768px) 144px, 128px"
+              className="object-contain"
+            />
           </div>
         </Link>
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { callGET } from './helpers/route';
+import { callGET } from '@/tests/helpers/route';
 
 // Mock the env module
 vi.mock('@/env', () => ({

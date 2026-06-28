@@ -32,6 +32,10 @@ vi.mock('@/app/lib/3d/comprehensive-glb-generator', () => ({
   generateComprehensiveGLB: vi.fn(),
 }));
 
+vi.mock('@/app/lib/3d/character-config-bridge', () => ({
+  avatarConfigToCreatorConfig: vi.fn(() => ({})),
+}));
+
 vi.mock('@/app/lib/blob/client', () => ({
   putBlobFile: vi.fn(),
 }));
@@ -62,7 +66,7 @@ vi.mock('@/app/lib/monitoring', () => ({
   },
 }));
 
-vi.mock('../../../../lib/request-id', () => ({
+vi.mock('@/app/lib/request-id', () => ({
   generateRequestId: vi.fn(() => `test_request_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`),
 }));
 
@@ -105,14 +109,14 @@ describe('Avatar Export Integration Flow', () => {
 
   describe('Synchronous Export Flow', () => {
     it('should complete full synchronous export flow: request → generate → upload → return URL', async () => {
-      const mockGLBData = {
-        buffer: Buffer.from('mock glb file data'),
-        size: 2048,
-      };
+      const glbBuffer = Uint8Array.from(Buffer.from('mock glb file data')).buffer;
       const mockBlobUrl = 'https://blob.vercel-storage.com/test-avatar.glb';
 
-      vi.mocked(generateComprehensiveGLB).mockResolvedValue(mockGLBData as any);
-      vi.mocked(putBlobFile).mockResolvedValue(mockBlobUrl);
+      vi.mocked(generateComprehensiveGLB).mockResolvedValue({
+        success: true,
+        glbBuffer,
+      } as any);
+      vi.mocked(putBlobFile).mockResolvedValue({ url: mockBlobUrl } as any);
 
       // Step 1: Request export
       const exportRequest = new NextRequest('https://example.com/api/v1/avatar/export', {
@@ -132,7 +136,7 @@ describe('Avatar Export Integration Flow', () => {
       expect(exportData.ok).toBe(true);
       expect(exportData.data.downloadUrl).toBe(mockBlobUrl);
       expect(exportData.data.format).toBe('glb');
-      expect(exportData.data.size).toBe(2048);
+      expect(exportData.data.size).toBe(glbBuffer.byteLength);
 
       // Verify generation and upload were called
       expect(generateComprehensiveGLB).toHaveBeenCalled();

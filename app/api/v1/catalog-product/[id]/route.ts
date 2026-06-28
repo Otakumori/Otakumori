@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { getMerchizeService } from '@/app/lib/merchize/service';
 import { serializeProduct } from '@/lib/catalog/serialize';
+import { getCatalogFallbackProduct } from '@/lib/catalog/e2eFallback';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
@@ -70,6 +71,16 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
 
     if (!id) {
       return NextResponse.json(createApiError('VALIDATION_ERROR', 'Missing product id', requestId), { status: 400 });
+    }
+
+    const fallbackProduct = getCatalogFallbackProduct(id);
+    if (fallbackProduct) {
+      return NextResponse.json(createApiSuccess(fallbackProduct, requestId), {
+        headers: {
+          'Cache-Control': 'no-store',
+          'X-OTM-Source': 'preview-fallback',
+        },
+      });
     }
 
     if (id.startsWith('merchize:')) {

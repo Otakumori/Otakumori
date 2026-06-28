@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { env } from '@/env.mjs';
 import { db as prisma } from '@/lib/db';
 
-const WEBHOOK_SECRET = process.env.MERCHIZE_WEBHOOK_SECRET;
+const WEBHOOK_SECRET = env.MERCHIZE_WEBHOOK_SECRET;
 
 function safeCompare(left: string, right: string) {
   const leftBuffer = Buffer.from(left);

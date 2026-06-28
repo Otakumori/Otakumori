@@ -49,7 +49,8 @@ export async function safeFetch<T = any>(
   // If probe only mode, issue HEAD request or GET with ?probe=1
   if (probeOnly && isProbeModeEnabled) {
     try {
-      const url = new URL(input.toString());
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+      const url = new URL(input.toString(), baseUrl);
       url.searchParams.set('probe', '1');
 
       const controller = new AbortController();

@@ -31,7 +31,7 @@ vi.mock('@/app/lib/3d/comprehensive-glb-generator', () => ({
 }));
 
 vi.mock('@/app/lib/3d/character-config-bridge', () => ({
-  avatarConfigToCreatorConfig: vi.fn(),
+  avatarConfigToCreatorConfig: vi.fn(() => ({})),
 }));
 
 vi.mock('@/app/lib/blob/client', () => ({
@@ -64,7 +64,7 @@ vi.mock('@/app/lib/monitoring', () => ({
   },
 }));
 
-vi.mock('../../../../lib/request-id', () => ({
+vi.mock('@/app/lib/request-id', () => ({
   generateRequestId: vi.fn(() => 'test_request_id_123'),
 }));
 
@@ -104,10 +104,10 @@ describe('/api/v1/avatar/export', () => {
     vi.mocked(auth).mockResolvedValue({ userId: mockUserId } as any);
     vi.mocked(db.user.findUnique).mockResolvedValue(mockUser as any);
     vi.mocked(db.avatarConfiguration.findFirst).mockResolvedValue(mockAvatarConfigRecord as any);
-    vi.mocked(putBlobFile).mockResolvedValue('https://blob.vercel-storage.com/test.glb');
+    vi.mocked(putBlobFile).mockResolvedValue({ url: 'https://blob.vercel-storage.com/test.glb' } as any);
     vi.mocked(generateComprehensiveGLB).mockResolvedValue({
-      buffer: Buffer.from('mock glb data'),
-      size: 1024,
+      success: true,
+      glbBuffer: Uint8Array.from(Buffer.from('mock glb data')).buffer,
     } as any);
   });
 
@@ -147,7 +147,7 @@ describe('/api/v1/avatar/export', () => {
 
       expect(response.status).toBe(400);
       expect(data.ok).toBe(false);
-      expect(data.error).toBe('Format is required');
+      expect(data.error).toEqual(expect.objectContaining({ code: 'VALIDATION_ERROR' }));
     });
 
     it('should return 400 when format is invalid', async () => {
@@ -164,7 +164,7 @@ describe('/api/v1/avatar/export', () => {
 
       expect(response.status).toBe(400);
       expect(data.ok).toBe(false);
-      expect(data.error).toBe('Invalid format specified');
+      expect(data.error).toEqual(expect.objectContaining({ code: 'VALIDATION_ERROR' }));
     });
 
     it('should accept valid formats: glb, fbx, obj, png, jpg, svg', async () => {
@@ -178,8 +178,8 @@ describe('/api/v1/avatar/export', () => {
         // Mock format-specific export functions
         if (format === 'glb') {
           vi.mocked(generateComprehensiveGLB).mockResolvedValue({
-            buffer: Buffer.from('mock data'),
-            size: 1024,
+            success: true,
+            glbBuffer: Uint8Array.from(Buffer.from('mock data')).buffer,
           } as any);
         }
 
@@ -351,13 +351,15 @@ describe('/api/v1/avatar/export', () => {
 
   describe('Synchronous Export', () => {
     it('should generate and return download URL for GLB format', async () => {
-      const mockGLBData = {
-        buffer: Buffer.from('mock glb file data'),
-        size: 2048,
-      };
+      const glbBuffer = Uint8Array.from(Buffer.from('mock glb file data')).buffer;
 
-      vi.mocked(generateComprehensiveGLB).mockResolvedValue(mockGLBData as any);
-      vi.mocked(putBlobFile).mockResolvedValue('https://blob.vercel-storage.com/test-avatar.glb');
+      vi.mocked(generateComprehensiveGLB).mockResolvedValue({
+        success: true,
+        glbBuffer,
+      } as any);
+      vi.mocked(putBlobFile).mockResolvedValue({
+        url: 'https://blob.vercel-storage.com/test-avatar.glb',
+      } as any);
 
       const request = new NextRequest('https://example.com/api/v1/avatar/export', {
         method: 'POST',
@@ -376,7 +378,7 @@ describe('/api/v1/avatar/export', () => {
       expect(data.data.downloadUrl).toBe('https://blob.vercel-storage.com/test-avatar.glb');
       expect(data.data.format).toBe('glb');
       expect(data.data.quality).toBe('high');
-      expect(data.data.size).toBe(2048);
+      expect(data.data.size).toBe(glbBuffer.byteLength);
       expect(data.data.expiresAt).toBeDefined();
 
       expect(generateComprehensiveGLB).toHaveBeenCalled();
@@ -394,13 +396,15 @@ describe('/api/v1/avatar/export', () => {
     });
 
     it('should use default quality of "high" when not specified', async () => {
-      const mockGLBData = {
-        buffer: Buffer.from('mock glb file data'),
-        size: 2048,
-      };
+      const glbBuffer = Uint8Array.from(Buffer.from('mock glb file data')).buffer;
 
-      vi.mocked(generateComprehensiveGLB).mockResolvedValue(mockGLBData as any);
-      vi.mocked(putBlobFile).mockResolvedValue('https://blob.vercel-storage.com/test-avatar.glb');
+      vi.mocked(generateComprehensiveGLB).mockResolvedValue({
+        success: true,
+        glbBuffer,
+      } as any);
+      vi.mocked(putBlobFile).mockResolvedValue({
+        url: 'https://blob.vercel-storage.com/test-avatar.glb',
+      } as any);
 
       const request = new NextRequest('https://example.com/api/v1/avatar/export', {
         method: 'POST',
@@ -417,8 +421,10 @@ describe('/api/v1/avatar/export', () => {
       expect(data.data.quality).toBe('high');
       expect(generateComprehensiveGLB).toHaveBeenCalledWith(
         expect.any(Object),
-        'high',
-        undefined,
+        expect.objectContaining({
+          quality: 'high',
+          gameId: undefined,
+        }),
       );
     });
   });
@@ -468,13 +474,13 @@ describe('/api/v1/avatar/export', () => {
       expect(data.requestId).toBeDefined();
     });
 
-    it('should handle blob storage upload errors', async () => {
-      const mockGLBData = {
-        buffer: Buffer.from('mock glb file data'),
-        size: 2048,
-      };
+    it('should fall back to a data URL when a small blob upload fails', async () => {
+      const glbBuffer = Uint8Array.from(Buffer.from('mock glb file data')).buffer;
 
-      vi.mocked(generateComprehensiveGLB).mockResolvedValue(mockGLBData as any);
+      vi.mocked(generateComprehensiveGLB).mockResolvedValue({
+        success: true,
+        glbBuffer,
+      } as any);
       vi.mocked(putBlobFile).mockRejectedValue(new Error('Blob upload failed'));
 
       const request = new NextRequest('https://example.com/api/v1/avatar/export', {
@@ -488,9 +494,9 @@ describe('/api/v1/avatar/export', () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.ok).toBe(false);
-      expect(data.error).toBe('Blob upload failed');
+      expect(response.status).toBe(200);
+      expect(data.ok).toBe(true);
+      expect(data.data.downloadUrl).toMatch(/^data:model\/gltf-binary;base64,/);
     });
   });
 
@@ -522,13 +528,15 @@ describe('/api/v1/avatar/export', () => {
     });
 
     it('should track export completion with performance metrics', async () => {
-      const mockGLBData = {
-        buffer: Buffer.from('mock glb file data'),
-        size: 1024 * 1024, // 1MB
-      };
+      const glbBuffer = new ArrayBuffer(1024 * 1024);
 
-      vi.mocked(generateComprehensiveGLB).mockResolvedValue(mockGLBData as any);
-      vi.mocked(putBlobFile).mockResolvedValue('https://blob.vercel-storage.com/test-avatar.glb');
+      vi.mocked(generateComprehensiveGLB).mockResolvedValue({
+        success: true,
+        glbBuffer,
+      } as any);
+      vi.mocked(putBlobFile).mockResolvedValue({
+        url: 'https://blob.vercel-storage.com/test-avatar.glb',
+      } as any);
 
       const request = new NextRequest('https://example.com/api/v1/avatar/export', {
         method: 'POST',
