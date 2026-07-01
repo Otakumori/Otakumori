@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env/server';
 
 const DEFAULT_METHODS = 'GET,POST,PUT,PATCH,DELETE,OPTIONS';
 const DEFAULT_HEADERS = 'Content-Type, Authorization, X-Requested-With, X-Request-ID';
@@ -10,20 +9,30 @@ type AllowOriginEntry = {
   normalized: string;
 };
 
+type RuntimeWithEnv = typeof globalThis & {
+  process?: {
+    env?: Record<string, string | undefined>;
+  };
+};
+
+function readRuntimeEnv(key: string) {
+  return (globalThis as RuntimeWithEnv).process?.env?.[key];
+}
+
 function normalizeOrigin(origin: string) {
   return origin.replace(/\/$/, '').toLowerCase();
 }
 
 function buildAllowList(): AllowOriginEntry[] {
-  const fromEnv = (env.API_CORS_ALLOW_ORIGINS ?? '')
+  const fromEnv = (readRuntimeEnv('API_CORS_ALLOW_ORIGINS') ?? '')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
 
   const candidates = [
     ...fromEnv,
-    env.NEXT_PUBLIC_APP_URL ?? '',
-    env.NEXT_PUBLIC_SITE_URL ?? '',
+    readRuntimeEnv('NEXT_PUBLIC_APP_URL') ?? '',
+    readRuntimeEnv('NEXT_PUBLIC_SITE_URL') ?? '',
     ...DEFAULT_ORIGINS,
   ].filter(Boolean);
 

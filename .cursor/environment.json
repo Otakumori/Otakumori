@@ -1,8 +1,8 @@
 {
-  "install": "npm install",
-  "start": "npm run dev",
+  "install": "corepack prepare pnpm@10.15.1 --activate && corepack pnpm install --prod=false --no-frozen-lockfile && corepack pnpm prisma generate",
+  "start": "corepack pnpm dev",
   "build": {
-    "context": ".",
+    "context": "..",
     "dockerfile": "Dockerfile"
   }
 }

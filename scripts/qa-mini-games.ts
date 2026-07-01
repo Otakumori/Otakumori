@@ -31,12 +31,28 @@ const GAMES = [
   'puzzle-reveal',
 ] as const;
 
+/** App Router route-group segment for mini-game pages. */
+const MINI_GAMES_ROUTE_GROUP = '(games)';
+
+/**
+ * Resolve the primary page file for a mini-game slug.
+ * Checks legacy flat paths first, then the `(games)` route group.
+ */
+function resolveMiniGamePagePath(gameSlug: string): string {
+  const candidates = [
+    join(process.cwd(), 'app', 'mini-games', gameSlug, 'page.tsx'),
+    join(process.cwd(), 'app', 'mini-games', MINI_GAMES_ROUTE_GROUP, gameSlug, 'page.tsx'),
+  ];
+
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
+}
+
 /**
  * Validate a single game
  */
 async function validateGame(gameSlug: string): Promise<GameQAResult> {
-  const gamePath = join(process.cwd(), 'app', 'mini-games', gameSlug);
-  const pagePath = join(gamePath, 'page.tsx');
+  const pagePath = resolveMiniGamePagePath(gameSlug);
+  const gamePath = join(pagePath, '..');
 
   // Try to find game component files
   const possibleFiles = [
@@ -51,7 +67,7 @@ async function validateGame(gameSlug: string): Promise<GameQAResult> {
     ),
   ];
 
-  const gameFile = possibleFiles.find((f) => existsSync(f)) || pagePath;
+  const gameFile = possibleFiles.find((f) => existsSync(f)) ?? pagePath;
 
   // Run all validators
   const avatarCheck = validateAvatarIntegration(gameSlug, gameFile);

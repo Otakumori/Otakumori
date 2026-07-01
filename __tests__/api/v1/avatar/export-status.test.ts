@@ -23,7 +23,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
-vi.mock('../../../../../lib/request-id', () => ({
+vi.mock('@/app/lib/request-id', () => ({
   generateRequestId: vi.fn(() => 'test_request_id_status_123'),
 }));
 
@@ -149,7 +149,7 @@ describe('/api/v1/avatar/export/status', () => {
       expect(data.ok).toBe(true);
       expect(data.data.status).toBe('completed');
       expect(data.data.downloadUrl).toBe('https://blob.vercel-storage.com/test-avatar.glb');
-      expect(data.data.generatedAt).toEqual(generatedAt);
+      expect(data.data.generatedAt).toBe(generatedAt.toISOString());
       expect(data.data.format).toBe('glb');
     });
 

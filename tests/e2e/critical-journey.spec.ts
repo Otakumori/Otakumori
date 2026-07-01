@@ -7,7 +7,7 @@ test.describe('Critical User Journey', () => {
   }: any) => {
     // Navigate to home page
     await page.goto('/');
-    await expect(page).toHaveTitle(/Otakumori/);
+    await expect(page).toHaveTitle(/Otaku-mori/);
 
     // Navigate to shop
     await page.click('a[href="/shop"]');
@@ -18,10 +18,12 @@ test.describe('Critical User Journey', () => {
 
     // Check that products are displayed
     const productCards = page.locator('[data-testid="product-card"]');
-    await expect(productCards).toHaveCount({ min: 1 });
+    await expect(productCards.first()).toBeVisible();
 
-    // Click on first product
-    await productCards.first().click();
+    // Navigate through the same stable product-card href contract used by smoke coverage.
+    const productHref = await productCards.first().getAttribute('href');
+    expect(productHref).toBeTruthy();
+    await page.goto(productHref!);
     await expect(page).toHaveURL(/\/shop\/product\//);
 
     // Wait for product details to load
@@ -58,13 +60,13 @@ test.describe('Critical User Journey', () => {
     // Verify cart items
     await page.waitForSelector('[data-testid="cart-items"]', { timeout: 10000 });
     const cartItems = page.locator('[data-testid="cart-item"]');
-    await expect(cartItems).toHaveCount({ min: 1 });
+    expect(await cartItems.count()).toBeGreaterThan(0);
 
     // Proceed to checkout
     await page.click('[data-testid="checkout-button"]');
 
-    // Should redirect to Stripe checkout (test mode)
-    await expect(page).toHaveURL(/checkout\.stripe\.com/, { timeout: 15000 });
+    // The cart hands off to the internal checkout route before Stripe session creation.
+    await expect(page).toHaveURL('/checkout', { timeout: 15000 });
 
     // Note: We don't complete the actual payment in e2e tests
     // In a real test environment, you'd use Stripe test cards

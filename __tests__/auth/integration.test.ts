@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useAuth, useUser } from '@clerk/nextjs';
 
 // Mock Clerk auth
 vi.mock('@clerk/nextjs/server', () => ({
@@ -90,8 +91,6 @@ describe('Authentication Integration Tests', () => {
 
   describe('Client-Side Authentication', () => {
     it('should provide user data to client components', () => {
-      const { useUser } = vi.mocked(require('@clerk/nextjs'));
-
       const mockUser = {
         id: 'user_123',
         emailAddresses: [
@@ -104,7 +103,7 @@ describe('Authentication Integration Tests', () => {
         },
       };
 
-      useUser.mockReturnValue({
+      vi.mocked(useUser).mockReturnValue({
         user: mockUser,
         isLoaded: true,
         isSignedIn: true,
@@ -118,9 +117,7 @@ describe('Authentication Integration Tests', () => {
     });
 
     it('should handle loading state on client', () => {
-      const { useUser } = vi.mocked(require('@clerk/nextjs'));
-
-      useUser.mockReturnValue({
+      vi.mocked(useUser).mockReturnValue({
         user: null,
         isLoaded: false,
         isSignedIn: false,
@@ -134,13 +131,11 @@ describe('Authentication Integration Tests', () => {
     });
 
     it('should provide auth methods to client components', () => {
-      const { useAuth } = vi.mocked(require('@clerk/nextjs'));
-
       const mockSignIn = vi.fn();
       const mockSignOut = vi.fn();
       const mockSignUp = vi.fn();
 
-      useAuth.mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         signIn: mockSignIn,
         signOut: mockSignOut,
         signUp: mockSignUp,

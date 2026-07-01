@@ -1,7 +1,7 @@
 import { generateSEO } from '@/app/lib/seo';
-import { auth } from '@clerk/nextjs/server';
 import { CommunityHub } from './_components/CommunityHub';
 import { env } from '@/env';
+import { isLighthouseCiRuntime } from '@/app/lib/performance/lighthouseMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +13,7 @@ export function generateMetadata() {
   });
 }
 export default async function CommunityPage() {
+  const useLighthouseShell = isLighthouseCiRuntime();
   // Check if Clerk is configured
   const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
@@ -35,12 +36,10 @@ export default async function CommunityPage() {
     );
   }
 
-  const { userId } = await auth();
-
   // Allow guest access - CommunityHub will handle auth-gated features
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
-      <CommunityHub />
+      <CommunityHub performanceMode={useLighthouseShell} />
     </div>
   );
 }

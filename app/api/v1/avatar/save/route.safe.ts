@@ -234,9 +234,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const cachedResponse = await checkIdempotency(idempotencyKey);
-    if (cachedResponse) {
-      return NextResponse.json(cachedResponse);
+    const idempotency = await checkIdempotency(idempotencyKey);
+    if (!idempotency.isNew && idempotency.response !== undefined) {
+      return NextResponse.json(idempotency.response);
     }
 
     // Rate limiting

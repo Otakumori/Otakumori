@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { GET } from '@/app/api/adults/catalog/route.safe';
+import { env } from '@/env';
 
 // Mock environment variables
 vi.mock('@/env', () => ({
@@ -22,11 +24,15 @@ global.fetch = vi.fn();
 describe('/api/adults/catalog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    env.FEATURE_ADULT_ZONE = 'true';
+    env.FEATURE_GATED_COSMETICS = 'true';
+    env.ADULTS_STORAGE_INDEX_URL = 'https://example.com/packs.json';
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
   });
 
   it('should return 503 when feature flags are disabled', async () => {
     // Mock disabled feature flags
-    vi.mocked(require('@/env').env).FEATURE_ADULT_ZONE = 'false';
+    env.FEATURE_ADULT_ZONE = 'false';
 
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
@@ -38,7 +44,7 @@ describe('/api/adults/catalog', () => {
 
   it('should return 401 when user is not authenticated', async () => {
     // Mock no user
-    vi.mocked(require('@clerk/nextjs/server').auth).mockResolvedValue({ userId: null });
+    vi.mocked(auth).mockResolvedValue({ userId: null } as any);
 
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
@@ -50,7 +56,7 @@ describe('/api/adults/catalog', () => {
 
   it('should return 503 when storage is not configured', async () => {
     // Mock missing storage URL
-    vi.mocked(require('@/env').env).ADULTS_STORAGE_INDEX_URL = '';
+    env.ADULTS_STORAGE_INDEX_URL = '';
 
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);

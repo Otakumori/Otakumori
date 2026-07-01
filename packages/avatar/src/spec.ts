@@ -90,7 +90,10 @@ export const STANDARD_RIG_BONES = [
  */
 export const AvatarSpecV15 = z.object({
   version: z.literal('1.5'),
-  baseMeshUrl: z.string().url(),
+  baseMeshUrl: z.string().refine(
+    (value) => value.startsWith('/') || z.string().url().safeParse(value).success,
+    'Base mesh URL must be root-relative or an absolute URL',
+  ),
   rig: z.object({
     root: z.string(),
     bones: z.array(z.string()).default([...STANDARD_RIG_BONES]),

@@ -4,51 +4,80 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - 'cursor/**'
+      - 'fix/**'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.15.1'
+  SKIP_ENV_VALIDATION: '1'
 
 jobs:
   api-health-check:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
+      PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Ensure DIRECT_URL for Prisma
+        run: |
+          if [ -z "${DIRECT_URL}" ] && [ -n "${DATABASE_URL}" ]; then
+            echo "DIRECT_URL=${DATABASE_URL}" >> $GITHUB_ENV
+          fi
+
+      - name: Configure CI env placeholders
+        run: |
+          if [ -z "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}" ]; then
+            echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ci00000000000000000000000" >> $GITHUB_ENV
+          fi
+          if [ -z "${UPSTASH_REDIS_REST_URL}" ]; then
+            echo "UPSTASH_REDIS_REST_URL=https://ci-placeholder.upstash.io" >> $GITHUB_ENV
+          fi
+          if [ -z "${UPSTASH_REDIS_REST_TOKEN}" ]; then
+            echo "UPSTASH_REDIS_REST_TOKEN=ci_upstash_placeholder_token" >> $GITHUB_ENV
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Start development server
-        run: npm run dev &
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-
-      - name: Wait for server to start
-        run: sleep 30
-
-      - name: Run API health check
-        run: npm run api:health
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+        run: pnpm prisma generate
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
+
+      - name: Start production server
+        run: |
+          pnpm start &
+          sleep 20
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          PORT: '3000'
+
+      - name: Run API health check
+        run: pnpm run api:health

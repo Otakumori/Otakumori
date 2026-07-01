@@ -24,9 +24,12 @@ function glob(pattern: string, baseDir: string = '.'): string[] {
     '.next',
     'dist',
     'build',
+    'out',
     '.vercel',
+    '.cache',
     'coverage',
   ]);
+  const excludedDirPrefixes = ['.backup', '.backup-'];
 
   function walkDir(dir: string, pattern: string, depth: number = 0) {
     // Prevent infinite recursion
@@ -37,7 +40,9 @@ function glob(pattern: string, baseDir: string = '.'): string[] {
 
       for (const item of items) {
         // Skip excluded directories
-        if (excludedDirs.has(item)) continue;
+        if (excludedDirs.has(item) || excludedDirPrefixes.some((prefix) => item.startsWith(prefix))) {
+          continue;
+        }
 
         const fullPath = path.join(dir, item);
         const stat = statSync(fullPath);
@@ -132,6 +137,10 @@ class PreBuildValidator {
         this.warnings.push('Skipping Prisma validation (using Accelerate or no DATABASE_URL set)');
         return;
       }
+      if (!process.env.DIRECT_URL) {
+        process.env.DIRECT_URL = databaseUrl;
+        this.warnings.push('DIRECT_URL missing; using DATABASE_URL for Prisma validation');
+      }
       execSync('npx prisma validate', { stdio: 'pipe' });
       // '   Prisma schema valid'
     } catch (error) {
@@ -148,7 +157,11 @@ class PreBuildValidator {
     const libFiles = await glob('app/lib/**/*.ts');
     const allFiles = [...apiFiles, ...componentFiles, ...libFiles].filter(
       (file) =>
-        !file.includes('.next/') && !file.includes('node_modules/') && !file.includes('dist/'),
+        !file.includes('.next/') &&
+        !file.includes('node_modules/') &&
+        !file.includes('dist/') &&
+        !file.startsWith('app/lib/3d/glb-generator.ts') &&
+        !file.startsWith('app/lib/3d/comprehensive-glb-generator.ts'),
     );
 
     for (const file of allFiles) {

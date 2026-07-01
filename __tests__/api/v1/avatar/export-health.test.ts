@@ -20,7 +20,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
-vi.mock('../../../../../lib/request-id', () => ({
+vi.mock('@/app/lib/request-id', () => ({
   generateRequestId: vi.fn(() => 'test_health_request_id_123'),
 }));
 
@@ -30,6 +30,8 @@ import { db } from '@/lib/db';
 describe('/api/v1/avatar/export/health', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(db.$queryRaw).mockReset();
+    vi.mocked(db.avatarConfiguration.count).mockReset();
     // Default to healthy state
     vi.mocked(db.$queryRaw).mockResolvedValue([{ '?column?': 1 }] as any);
     vi.mocked(db.avatarConfiguration.count)
@@ -58,7 +60,7 @@ describe('/api/v1/avatar/export/health', () => {
 
     await GET(request);
 
-    expect(db.$queryRaw).toHaveBeenCalledWith(expect.any(String));
+    expect(db.$queryRaw).toHaveBeenCalledWith(['SELECT 1']);
   });
 
   it('should return unhealthy status when database check fails', async () => {
@@ -76,6 +78,7 @@ describe('/api/v1/avatar/export/health', () => {
   });
 
   it('should check recent export success rate', async () => {
+    vi.mocked(db.avatarConfiguration.count).mockReset();
     vi.mocked(db.avatarConfiguration.count)
       .mockResolvedValueOnce(8) // 8 successful exports
       .mockResolvedValueOnce(10); // 10 total attempts (80% success rate)
@@ -91,6 +94,7 @@ describe('/api/v1/avatar/export/health', () => {
   });
 
   it('should return degraded status when success rate is below 80%', async () => {
+    vi.mocked(db.avatarConfiguration.count).mockReset();
     vi.mocked(db.avatarConfiguration.count)
       .mockResolvedValueOnce(7) // 7 successful exports
       .mockResolvedValueOnce(10); // 10 total attempts (70% success rate - below 80%)
@@ -107,6 +111,7 @@ describe('/api/v1/avatar/export/health', () => {
   });
 
   it('should handle no recent exports gracefully', async () => {
+    vi.mocked(db.avatarConfiguration.count).mockReset();
     vi.mocked(db.avatarConfiguration.count)
       .mockResolvedValueOnce(0) // No recent exports
       .mockResolvedValueOnce(0); // No recent attempts

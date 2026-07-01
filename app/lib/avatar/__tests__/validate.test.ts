@@ -195,6 +195,17 @@ describe('Avatar Validation', () => {
               type: 'Head',
             },
           ],
+          [
+            'asset-2',
+            {
+              id: 'asset-2',
+              url: 'https://assets.otakumori.com/torso.glb',
+              contentRating: 'sfw',
+              slot: 'Torso',
+              name: 'Default Torso',
+              type: 'Torso',
+            },
+          ],
         ]),
       );
 
@@ -230,6 +241,17 @@ describe('Avatar Validation', () => {
               slot: 'Head',
               name: 'Default Head',
               type: 'Head',
+            },
+          ],
+          [
+            'asset-2',
+            {
+              id: 'asset-2',
+              url: 'https://assets.otakumori.com/torso.glb',
+              contentRating: 'sfw',
+              slot: 'Torso',
+              name: 'Default Torso',
+              type: 'Torso',
             },
           ],
         ]),

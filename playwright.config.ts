@@ -6,7 +6,9 @@ const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 const config: PlaywrightTestConfig = {
   testDir: 'tests/e2e',
   fullyParallel: true,
-  reporter: [['list']],
+  reporter: process.env.CI
+    ? [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]]
+    : [['list']],
   use: {
     baseURL,
     trace: 'retain-on-failure',
