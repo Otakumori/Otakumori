@@ -264,19 +264,10 @@ export async function syncPrintifyProducts(
 
   for (const product of products) {
     try {
-      const internalId = await syncProductRecord(db, product);
+      await db.$transaction(async (tx) => {
+        await syncProductRecord(tx, product);
+      });
       incomingIds.add(String(product.id));
-
-      // Keep primary image fresh
-      if (product.images && product.images.length > 0) {
-        const defaultImage = product.images.find((img) => img.is_default) ?? product.images[0];
-        if (defaultImage?.src) {
-          await db.product.update({
-            where: { id: internalId },
-            data: { primaryImageUrl: defaultImage.src },
-          });
-        }
-      }
       stats.upserted += 1;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
