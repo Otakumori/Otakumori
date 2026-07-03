@@ -65,8 +65,9 @@ test.describe('Critical User Journey', () => {
     // Proceed to checkout
     await page.click('[data-testid="checkout-button"]');
 
-    // The cart hands off to the internal checkout route before Stripe session creation.
-    await expect(page).toHaveURL('/checkout', { timeout: 15000 });
+    // The internal checkout route is protected. Without a real Clerk session,
+    // this journey must fail closed and preserve the intended return path.
+    await expect(page).toHaveURL(/\/sign-in\?redirect_url=\/checkout$/, { timeout: 15000 });
 
     // Note: We don't complete the actual payment in e2e tests
     // In a real test environment, you'd use Stripe test cards
