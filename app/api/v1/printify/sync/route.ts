@@ -1,5 +1,7 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { auth } from '@clerk/nextjs/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { logger } from '@/app/lib/logger';
@@ -11,17 +13,35 @@ import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
 export const runtime = 'nodejs';
 
 const ROUTE = '/api/v1/printify/sync';
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 60;
+const APPLY_LOCK_KEY = 'otakumori:catalog-sync:apply-lock';
+const APPLY_LOCK_TTL_SECONDS = 10 * 60;
+const RELEASE_APPLY_LOCK_SCRIPT = `
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+  return redis.call("DEL", KEYS[1])
+end
+return 0
+`;
+
+const redis = new Redis({
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+const preflightRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, '10 m'),
+  prefix: 'otakumori:catalog-sync:preflight-rate',
+});
+
+const applyRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(1, '10 m'),
+  prefix: 'otakumori:catalog-sync:apply-rate',
+});
 
 type AuthContext = {
   kind: 'internal' | 'admin';
   userId?: string;
-};
-
-type RateLimitState = {
-  count: number;
-  resetAt: number;
 };
 
 type ValidationIssue = {
@@ -57,9 +77,6 @@ type PreflightSummary = {
   safeToApply: boolean;
   issues: ValidationIssue[];
 };
-
-const rateLimits = new Map<string, RateLimitState>();
-let activeApply: { requestId: string; startedAt: string } | null = null;
 
 function hasValue(value: string | undefined | null): value is string {
   return typeof value === 'string' && value.trim().length > 0;
@@ -161,28 +178,98 @@ async function authorize(request: NextRequest, requestId: string): Promise<AuthC
   return { kind: 'admin', userId: authResult.userId };
 }
 
-function enforceRateLimit(authContext: AuthContext, requestId: string) {
-  const now = Date.now();
-  const key = authContext.kind === 'internal' ? 'internal' : `admin:${authContext.userId}`;
-  const current = rateLimits.get(key);
+function rateLimitIdentity(authContext: AuthContext) {
+  return authContext.kind === 'internal' ? 'internal' : `admin:${authContext.userId ?? 'unknown'}`;
+}
 
-  if (!current || now > current.resetAt) {
-    rateLimits.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return null;
-  }
+async function enforceDistributedRateLimit(
+  authContext: AuthContext,
+  operation: 'preflight' | 'apply',
+  requestId: string,
+) {
+  const limiter = operation === 'apply' ? applyRateLimit : preflightRateLimit;
+  const key = `${operation}:${rateLimitIdentity(authContext)}`;
 
-  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
-    const retryAfterSeconds = Math.max(1, Math.ceil((current.resetAt - now) / 1000));
+  try {
+    const result = await limiter.limit(key);
+    if (result.success) return null;
+
+    const retryAfterSeconds = Math.max(1, Math.ceil((result.reset - Date.now()) / 1000));
     return json(
       { ok: false, error: 'Rate limit exceeded', requestId },
-      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(retryAfterSeconds),
+          'X-RateLimit-Limit': String(result.limit),
+          'X-RateLimit-Remaining': String(result.remaining),
+          'X-RateLimit-Reset': String(Math.ceil(result.reset / 1000)),
+        },
+      },
+      requestId,
+    );
+  } catch {
+    logger.error('printify_catalog_sync_rate_limit_unavailable', {
+      requestId,
+      route: ROUTE,
+      extra: { operation },
+    });
+    return json(
+      { ok: false, error: 'Catalog sync rate limit unavailable.', requestId },
+      { status: 503 },
       requestId,
     );
   }
+}
 
-  current.count += 1;
-  rateLimits.set(key, current);
-  return null;
+async function acquireApplyLock(requestId: string) {
+  const ownerToken = randomUUID();
+
+  try {
+    const acquired = await redis.set(APPLY_LOCK_KEY, ownerToken, {
+      nx: true,
+      ex: APPLY_LOCK_TTL_SECONDS,
+    });
+
+    if (acquired !== 'OK') {
+      return {
+        ownerToken: null,
+        response: json(
+          { ok: false, error: 'Catalog sync already running.', requestId },
+          { status: 409 },
+          requestId,
+        ),
+      };
+    }
+
+    return { ownerToken, response: null };
+  } catch {
+    logger.error('printify_catalog_sync_lock_unavailable', {
+      requestId,
+      route: ROUTE,
+      extra: { operation: 'apply' },
+    });
+    return {
+      ownerToken: null,
+      response: json(
+        { ok: false, error: 'Catalog sync lock unavailable.', requestId },
+        { status: 503 },
+        requestId,
+      ),
+    };
+  }
+}
+
+async function releaseApplyLock(ownerToken: string, requestId: string) {
+  try {
+    await redis.eval(RELEASE_APPLY_LOCK_SCRIPT, [APPLY_LOCK_KEY], [ownerToken]);
+  } catch {
+    logger.error('printify_catalog_sync_lock_release_failed', {
+      requestId,
+      route: ROUTE,
+      extra: { operation: 'apply' },
+    });
+  }
 }
 
 async function parseBody(request: NextRequest): Promise<CatalogSyncRequestBody> {
@@ -343,7 +430,44 @@ async function buildPreflight(
 
 async function fetchCatalogForPreflight(requestId: string) {
   try {
-    return await getPrintifyService().getAllProducts();
+    const service = getPrintifyService();
+    const products: PrintifyProduct[] = [];
+    let page = 1;
+    let expectedTotal: number | null = null;
+    let expectedLastPage: number | null = null;
+
+    for (;;) {
+      const result = await service.getProducts(page, 50);
+      const pageProducts = Array.isArray(result.data) ? result.data : null;
+
+      if (
+        !pageProducts ||
+        !Number.isFinite(result.total) ||
+        !Number.isFinite(result.last_page) ||
+        result.last_page < 1 ||
+        result.current_page !== page
+      ) {
+        throw new Error('Printify pagination metadata invalid.');
+      }
+
+      if (expectedTotal === null) {
+        expectedTotal = result.total;
+        expectedLastPage = result.last_page;
+      } else if (result.total !== expectedTotal || result.last_page !== expectedLastPage) {
+        throw new Error('Printify pagination metadata changed during fetch.');
+      }
+
+      products.push(...pageProducts);
+
+      if (page >= result.last_page) break;
+      page += 1;
+    }
+
+    if (expectedTotal !== null && products.length !== expectedTotal) {
+      throw new Error('Printify pagination incomplete.');
+    }
+
+    return products;
   } catch (error) {
     logger.error(
       'printify_catalog_fetch_failed',
@@ -378,7 +502,7 @@ async function handlePreflight(request: NextRequest) {
   const authContext = await authorize(request, requestId);
   if (authContext instanceof Response) return authContext;
 
-  const rateLimitFailure = enforceRateLimit(authContext, requestId);
+  const rateLimitFailure = await enforceDistributedRateLimit(authContext, 'preflight', requestId);
   if (rateLimitFailure) return rateLimitFailure;
 
   try {
@@ -401,9 +525,6 @@ export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const authContext = await authorize(request, requestId);
   if (authContext instanceof Response) return authContext;
-
-  const rateLimitFailure = enforceRateLimit(authContext, requestId);
-  if (rateLimitFailure) return rateLimitFailure;
 
   let body: CatalogSyncRequestBody;
   try {
@@ -428,6 +549,9 @@ export async function POST(request: NextRequest) {
   }
 
   if (operation === 'preflight') {
+    const rateLimitFailure = await enforceDistributedRateLimit(authContext, 'preflight', requestId);
+    if (rateLimitFailure) return rateLimitFailure;
+
     try {
       const { preflight } = await runPreflight(requestId, false);
       return json(
@@ -452,6 +576,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const rateLimitFailure = await enforceDistributedRateLimit(authContext, 'apply', requestId);
+  if (rateLimitFailure) return rateLimitFailure;
+
   if (body.apply !== true) {
     return json(
       { ok: false, error: 'Catalog apply requires apply=true.', requestId },
@@ -472,21 +599,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (activeApply) {
+  const lease = await acquireApplyLock(requestId);
+  if (lease.response) return lease.response;
+  const ownerToken = lease.ownerToken;
+  if (!ownerToken) {
     return json(
-      {
-        ok: false,
-        error: 'Catalog sync already running.',
-        requestId,
-        activeRequestId: activeApply.requestId,
-        activeStartedAt: activeApply.startedAt,
-      },
-      { status: 409 },
+      { ok: false, error: 'Catalog sync lock unavailable.', requestId },
+      { status: 503 },
       requestId,
     );
   }
-
-  activeApply = { requestId, startedAt: new Date().toISOString() };
 
   try {
     const { products, preflight } = await runPreflight(requestId, false);
@@ -548,6 +670,6 @@ export async function POST(request: NextRequest) {
     );
     return json({ ok: false, error: sanitizeError(error), requestId }, { status: 500 }, requestId);
   } finally {
-    activeApply = null;
+    await releaseApplyLock(ownerToken, requestId);
   }
 }
