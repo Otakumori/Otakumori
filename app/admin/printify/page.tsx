@@ -182,7 +182,8 @@ export default function PrintifyAdminPage() {
 
     activeApplyRef.current = true;
     setIsApplyLoading(true);
-    setResult(null);
+    setPreflight(null);
+    setConfirmation('');
 
     try {
       const response = await fetch('/api/v1/printify/sync', {

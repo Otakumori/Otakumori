@@ -48,6 +48,23 @@ function mockFetchOnce(body: unknown, status = 200) {
   vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(body, status));
 }
 
+function applySuccessBody(requestId = 'req-apply') {
+  return {
+    ok: true,
+    requestId,
+    data: {
+      operation: 'apply',
+      result: {
+        productCount: 2,
+        upserted: 2,
+        hidden: 0,
+        errorCount: 0,
+        errors: [],
+      },
+    },
+  };
+}
+
 function requestBodyAt(index: number) {
   const init = vi.mocked(fetch).mock.calls[index]?.[1];
   return JSON.parse(String(init?.body));
@@ -147,20 +164,7 @@ describe('Printify admin catalog control page', () => {
       requestId: 'req-preflight',
       data: { operation: 'preflight', preflight: safePreflight },
     });
-    mockFetchOnce({
-      ok: true,
-      requestId: 'req-apply',
-      data: {
-        operation: 'apply',
-        result: {
-          productCount: 2,
-          upserted: 2,
-          hidden: 0,
-          errorCount: 0,
-          errors: [],
-        },
-      },
-    });
+    mockFetchOnce(applySuccessBody());
 
     render(<PrintifyAdminPage />);
 
@@ -181,20 +185,116 @@ describe('Printify admin catalog control page', () => {
     });
   });
 
+  it('consumes a clean preflight after one completed apply attempt', async () => {
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    mockFetchOnce(applySuccessBody());
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    fireEvent.click(applyButton);
+    await screen.findByText('req-apply');
+
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+    expect(screen.getByText('req-apply')).toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('requires a fresh preflight before a second apply can become available', async () => {
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight-1',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    mockFetchOnce(applySuccessBody('req-apply-1'));
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight-2',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    mockFetchOnce(applySuccessBody('req-apply-2'));
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply printify catalog/i }));
+    await screen.findByText('req-apply-1');
+
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply printify catalog/i }));
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-2');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply printify catalog/i }));
+    await screen.findByText('req-apply-2');
+
+    expect(fetch).toHaveBeenCalledTimes(4);
+    expect(requestBodyAt(3)).toEqual({
+      operation: 'apply',
+      apply: true,
+      hideMissing: false,
+    });
+  });
+
+  it('consumes the old preflight authorization after a rejected apply request', async () => {
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('network down'));
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    fireEvent.click(applyButton);
+    await screen.findByText(/Apply request failed/i);
+
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.getByText(/Apply request failed/i)).toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it('does not send stale manual or products operations', async () => {
     mockFetchOnce({
       ok: true,
       requestId: 'req-preflight',
       data: { operation: 'preflight', preflight: safePreflight },
     });
-    mockFetchOnce({
-      ok: true,
-      requestId: 'req-apply',
-      data: {
-        operation: 'apply',
-        result: { productCount: 2, upserted: 2, hidden: 0, errorCount: 0, errors: [] },
-      },
-    });
+    mockFetchOnce(applySuccessBody());
 
     render(<PrintifyAdminPage />);
 
