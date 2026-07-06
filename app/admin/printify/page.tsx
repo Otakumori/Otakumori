@@ -135,6 +135,8 @@ export default function PrintifyAdminPage() {
   const runPreflight = async () => {
     if (isPreflightLoading || isApplyLoading) return;
 
+    setPreflight(null);
+    setConfirmation('');
     setIsPreflightLoading(true);
     setResult(null);
 
@@ -148,7 +150,6 @@ export default function PrintifyAdminPage() {
       const summary = body.data?.preflight ?? null;
 
       setPreflight(summary);
-      setConfirmation('');
       setResult({
         operation: 'preflight',
         ok: body.ok,

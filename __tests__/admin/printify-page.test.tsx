@@ -65,6 +65,14 @@ function applySuccessBody(requestId = 'req-apply') {
   };
 }
 
+function preflightBody(summary = safePreflight, requestId = 'req-preflight', ok = true) {
+  return {
+    ok,
+    requestId,
+    data: { operation: 'preflight', preflight: summary },
+  };
+}
+
 function requestBodyAt(index: number) {
   const init = vi.mocked(fetch).mock.calls[index]?.[1];
   return JSON.parse(String(init?.body));
@@ -156,6 +164,164 @@ describe('Printify admin catalog control page', () => {
 
     expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeDisabled();
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('consumes authorization immediately when a preflight refresh begins', async () => {
+    let resolveRefresh: (value: Response) => void = () => undefined;
+
+    mockFetchOnce(preflightBody(safePreflight, 'req-preflight-1'));
+    vi.mocked(fetch).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveRefresh = resolve;
+      }),
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    expect(applyButton).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+
+    await waitFor(() => expect(applyButton).toBeDisabled());
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    resolveRefresh(jsonResponse(preflightBody(safePreflight, 'req-preflight-2')));
+    await screen.findByText('req-preflight-2');
+  });
+
+  it('keeps apply locked when a preflight refresh rejects', async () => {
+    mockFetchOnce(preflightBody(safePreflight, 'req-preflight-1'));
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('network down'));
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText(/Preflight request failed/i);
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+    expect(screen.getByText(/Preflight request failed/i)).toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps apply locked when a preflight refresh returns malformed JSON', async () => {
+    mockFetchOnce(preflightBody(safePreflight, 'req-preflight-1'));
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response('{not valid json', {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText(/Preflight request failed/i);
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps apply locked when a preflight refresh returns an error without a summary', async () => {
+    mockFetchOnce(preflightBody(safePreflight, 'req-preflight-1'));
+    mockFetchOnce(
+      {
+        ok: false,
+        requestId: 'req-preflight-error',
+        error: 'Provider request timed out.',
+      },
+      503,
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-error');
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+    expect(screen.getByText('Provider request timed out.')).toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses only the newest successful preflight after refresh', async () => {
+    const firstPreflight = { ...safePreflight, productCount: 2, wouldInsert: 2 };
+    const secondPreflight = { ...safePreflight, productCount: 3, wouldInsert: 3 };
+
+    mockFetchOnce(preflightBody(firstPreflight, 'req-preflight-1'));
+    mockFetchOnce(preflightBody(secondPreflight, 'req-preflight-2'));
+    mockFetchOnce(applySuccessBody());
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-1');
+    expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight-2');
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(applyButton).toBeDisabled();
+    expect(screen.getAllByText('3').length).toBeGreaterThan(0);
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    fireEvent.click(applyButton);
+    await screen.findByText('req-apply');
+    expect(fetch).toHaveBeenCalledTimes(3);
   });
 
   it('sends the exact controlled apply body after clean preflight and confirmation', async () => {
