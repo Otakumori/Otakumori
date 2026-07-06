@@ -332,11 +332,17 @@ async function buildPreflight(
   hideMissing: boolean,
 ): Promise<PreflightSummary> {
   const productIds = products.map((product) => String(product.id || ''));
-  const variantIds = products.flatMap((product) =>
-    (product.variants ?? []).map((variant) => String(variant.id)),
+  const productScopedVariantIds = products.flatMap((product, productIndex) =>
+    (product.variants ?? []).map((variant) => {
+      const productId = String(product.id || '');
+      const productScope = hasValue(productId) ? productId : `missing-product-${productIndex}`;
+      const variantId =
+        typeof variant.id === 'number' && Number.isFinite(variant.id) ? String(variant.id) : '';
+      return `${productScope}:${variantId}`;
+    }),
   );
   const duplicatePrintifyProductIdCount = countDuplicates(productIds.filter(Boolean));
-  const duplicateVariantIdCount = countDuplicates(variantIds.filter(Boolean));
+  const duplicateVariantIdCount = countDuplicates(productScopedVariantIds.filter(Boolean));
   const issues: ValidationIssue[] = [];
 
   let variantCount = 0;
@@ -358,6 +364,11 @@ async function buildPreflight(
 
     if (!hasValue(productId)) pushIssue(issues, productId, 'missing_product_id');
     if (!hasValue(product.title)) pushIssue(issues, productId, 'missing_title');
+    for (const variant of variants) {
+      if (typeof variant.id !== 'number' || !Number.isFinite(variant.id)) {
+        pushIssue(issues, productId, 'missing_variant_id');
+      }
+    }
     if (!hasUsableImage(product)) {
       productsMissingUsableImages += 1;
       pushIssue(issues, productId, 'missing_usable_image');

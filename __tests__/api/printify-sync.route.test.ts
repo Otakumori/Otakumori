@@ -126,13 +126,32 @@ const product = {
   is_economy_shipping_enabled: false,
 };
 
-const productTwo = {
-  ...product,
-  id: 'printify-product-2',
-  title: 'Moonlit Hoodie',
-  variants: [{ ...product.variants[0], id: 202, title: 'Medium' }],
-  images: [{ ...product.images[0], variant_ids: [202] }],
-};
+function productWithVariants(
+  id: string,
+  variantIds: number[],
+  overrides: Partial<typeof product> = {},
+) {
+  return {
+    ...product,
+    id,
+    title: `Product ${id}`,
+    variants: variantIds.map((variantId, index) => ({
+      ...product.variants[0],
+      id: variantId,
+      title: `Variant ${variantId}-${index}`,
+      sku: `${id}-${variantId}-${index}`,
+      is_default: index === 0,
+    })),
+    images: [
+      {
+        ...product.images[0],
+        src: `https://images.example/${id}.webp`,
+        variant_ids: variantIds,
+      },
+    ],
+    ...overrides,
+  };
+}
 
 type PrintifyServiceMock = {
   getProducts: ReturnType<typeof vi.fn>;
@@ -281,6 +300,11 @@ describe('Printify protected catalog sync API', () => {
     expect(json.data.preflight.enabledInStockVariantCount).toBe(1);
     expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
     expect(service.getProducts).toHaveBeenCalledWith(1, 50);
+    expect(service.createProduct).not.toHaveBeenCalled();
+    expect(service.updateProduct).not.toHaveBeenCalled();
+    expect(service.deleteProduct).not.toHaveBeenCalled();
+    expect(service.publishProduct).not.toHaveBeenCalled();
+    expect(service.createOrder).not.toHaveBeenCalled();
     expect(service.getAllProducts).not.toHaveBeenCalled();
   });
 
@@ -459,18 +483,130 @@ describe('Printify protected catalog sync API', () => {
     expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
   });
 
-  it('blocks apply for duplicate variant IDs', async () => {
+  it('allows repeated raw variant IDs across different products during preflight', async () => {
     service.getProducts.mockResolvedValue(
       page(
         [
-          product,
-          {
-            ...productTwo,
-            variants: [{ ...productTwo.variants[0], id: product.variants[0].id }],
-          },
+          productWithVariants('printify-product-a', [101]),
+          productWithVariants('printify-product-b', [101]),
         ],
         { total: 2, to: 2 },
       ),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.duplicatePrintifyProductIdCount).toBe(0);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(true);
+    expect(json.data.preflight.issues).not.toContainEqual(
+      expect.objectContaining({ reason: 'duplicate_printify_variant_ids' }),
+    );
+    expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
+  });
+
+  it('blocks apply for duplicate variant IDs within the same product', async () => {
+    service.getProducts.mockResolvedValue(
+      page([productWithVariants('printify-product-a', [101, 101])]),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'apply', apply: true },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(422);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(1);
+    expect(json.data.preflight.safeToApply).toBe(false);
+    expect(json.data.preflight.issues).toContainEqual(
+      expect.objectContaining({ productId: 'catalog', reason: 'duplicate_printify_variant_ids' }),
+    );
+    expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
+  });
+
+  it('counts distinct duplicated product-scoped variant keys', async () => {
+    service.getProducts.mockResolvedValue(
+      page(
+        [
+          productWithVariants('printify-product-a', [101, 101, 101]),
+          productWithVariants('printify-product-b', [202, 202]),
+        ],
+        { total: 2, to: 2 },
+      ),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(2);
+    expect(json.data.preflight.safeToApply).toBe(false);
+    expect(json.data.preflight.issues).toContainEqual(
+      expect.objectContaining({ productId: 'catalog', reason: 'duplicate_printify_variant_ids' }),
+    );
+  });
+
+  it('keeps duplicate product IDs unsafe after product-scoped variant validation', async () => {
+    service.getProducts.mockResolvedValue(
+      page(
+        [
+          productWithVariants('printify-product-a', [101]),
+          productWithVariants('printify-product-a', [202]),
+        ],
+        { total: 2, to: 2 },
+      ),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.duplicatePrintifyProductIdCount).toBe(1);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(false);
+    expect(json.data.preflight.issues).toContainEqual(
+      expect.objectContaining({ productId: 'catalog', reason: 'duplicate_printify_product_ids' }),
+    );
+  });
+
+  it('treats production-shaped cross-product variant overlap as safe', async () => {
+    const productionShapedProducts = Array.from({ length: 16 }, (_, index) => {
+      const productIndex = index + 1;
+      return productWithVariants(`printify-product-${productIndex}`, [101, 202, 303]);
+    });
+    service.getProducts.mockResolvedValue(
+      page(productionShapedProducts, { total: productionShapedProducts.length, to: 16 }),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.productCount).toBe(16);
+    expect(json.data.preflight.variantCount).toBe(48);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(0);
+    expect(json.data.preflight.invalidProductCount).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(true);
+  });
+
+  it('blocks apply for true product-scoped duplicate variant IDs', async () => {
+    service.getProducts.mockResolvedValue(
+      page([productWithVariants('printify-product-a', [101, 101])]),
     );
 
     const { res, json } = await callPOST(
