@@ -297,7 +297,13 @@ describe('Printify protected catalog sync API', () => {
     expect(res.status).toBe(200);
     expect(json.ok).toBe(true);
     expect(json.data.preflight.variantCount).toBe(1);
+    expect(json.data.preflight.rawVariantCount).toBe(1);
+    expect(json.data.preflight.selectedVariantCount).toBe(1);
+    expect(json.data.preflight.selectedInStockVariantCount).toBe(1);
+    expect(json.data.preflight.selectedOutOfStockVariantCount).toBe(0);
     expect(json.data.preflight.enabledInStockVariantCount).toBe(1);
+    expect(json.data.preflight.rawImageCount).toBe(1);
+    expect(json.data.preflight.selectedUsableImageCount).toBe(1);
     expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
     expect(service.getProducts).toHaveBeenCalledWith(1, 50);
     expect(service.createProduct).not.toHaveBeenCalled();
@@ -448,7 +454,7 @@ describe('Printify protected catalog sync API', () => {
     expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
   });
 
-  it('blocks apply for products without enabled in-stock variants', async () => {
+  it('blocks apply for products without selected variants', async () => {
     service.getProducts.mockResolvedValue(
       page([
         {
@@ -465,7 +471,39 @@ describe('Printify protected catalog sync API', () => {
     );
 
     expect(res.status).toBe(422);
+    expect(json.data.preflight.productsMissingSelectedVariants).toBe(1);
     expect(json.data.preflight.productsMissingEnabledVariants).toBe(1);
+    expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
+  });
+
+  it('allows a selected but out-of-stock variant during preflight', async () => {
+    service.getProducts.mockResolvedValue(
+      page([
+        {
+          ...product,
+          variants: [
+            {
+              ...product.variants[0],
+              is_enabled: true,
+              is_available: false,
+            },
+          ],
+        },
+      ]),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.selectedVariantCount).toBe(1);
+    expect(json.data.preflight.selectedInStockVariantCount).toBe(0);
+    expect(json.data.preflight.selectedOutOfStockVariantCount).toBe(1);
+    expect(json.data.preflight.productsMissingSelectedVariants).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(true);
     expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
   });
 
@@ -584,7 +622,19 @@ describe('Printify protected catalog sync API', () => {
   it('treats production-shaped cross-product variant overlap as safe', async () => {
     const productionShapedProducts = Array.from({ length: 16 }, (_, index) => {
       const productIndex = index + 1;
-      return productWithVariants(`printify-product-${productIndex}`, [101, 202, 303]);
+      const selected = productWithVariants(`printify-product-${productIndex}`, [101, 202, 303]);
+      return {
+        ...selected,
+        variants: [
+          ...selected.variants,
+          {
+            ...product.variants[0],
+            id: 404,
+            is_enabled: false,
+            is_available: false,
+          },
+        ],
+      };
     });
     service.getProducts.mockResolvedValue(
       page(productionShapedProducts, { total: productionShapedProducts.length, to: 16 }),
@@ -598,10 +648,73 @@ describe('Printify protected catalog sync API', () => {
 
     expect(res.status).toBe(200);
     expect(json.data.preflight.productCount).toBe(16);
-    expect(json.data.preflight.variantCount).toBe(48);
+    expect(json.data.preflight.variantCount).toBe(64);
+    expect(json.data.preflight.rawVariantCount).toBe(64);
+    expect(json.data.preflight.selectedVariantCount).toBe(48);
     expect(json.data.preflight.duplicateVariantIdCount).toBe(0);
     expect(json.data.preflight.invalidProductCount).toBe(0);
     expect(json.data.preflight.safeToApply).toBe(true);
+  });
+
+  it('ignores duplicate raw variant IDs when all duplicates are disabled', async () => {
+    service.getProducts.mockResolvedValue(
+      page([
+        {
+          ...productWithVariants('printify-product-a', [101]),
+          variants: [
+            { ...product.variants[0], id: 101, is_enabled: true, is_available: true },
+            { ...product.variants[0], id: 202, is_enabled: false, is_available: false },
+            { ...product.variants[0], id: 202, is_enabled: false, is_available: false },
+          ],
+        },
+      ]),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.rawVariantCount).toBe(3);
+    expect(json.data.preflight.selectedVariantCount).toBe(1);
+    expect(json.data.preflight.duplicateVariantIdCount).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(true);
+    expect(json.data.preflight.issues).not.toContainEqual(
+      expect.objectContaining({ reason: 'duplicate_printify_variant_ids' }),
+    );
+  });
+
+  it('reports fifteen existing products plus one missing product as updates and one insert', async () => {
+    const existingProducts = Array.from({ length: 15 }, (_, index) =>
+      productWithVariants(`printify-product-${index + 1}`, [101, 202, 303]),
+    );
+    const missingProduct = productWithVariants('minimal-cleavage-code-tee', [101, 202, 303]);
+    vi.mocked(db.product.findMany).mockResolvedValue(
+      existingProducts.map((existingProduct) => ({
+        printifyProductId: existingProduct.id,
+      })) as never,
+    );
+    service.getProducts.mockResolvedValue(
+      page([...existingProducts, missingProduct], { total: 16, to: 16 }),
+    );
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(200);
+    expect(json.data.preflight.productCount).toBe(16);
+    expect(json.data.preflight.existingPrintifyProductCount).toBe(15);
+    expect(json.data.preflight.wouldUpdate).toBe(15);
+    expect(json.data.preflight.wouldInsert).toBe(1);
+    expect(json.data.preflight.wouldHide).toBe(0);
+    expect(json.data.preflight.wouldSkip).toBe(0);
+    expect(json.data.preflight.safeToApply).toBe(true);
+    expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
   });
 
   it('blocks apply for true product-scoped duplicate variant IDs', async () => {
@@ -696,6 +809,7 @@ describe('Printify protected catalog sync API', () => {
     );
     expect(vi.mocked(syncPrintifyProducts)).toHaveBeenCalledWith([product], {
       hideMissing: false,
+      requestId: expect.any(String),
     });
   });
 
@@ -779,9 +893,11 @@ describe('Printify protected catalog sync API', () => {
     expect(vi.mocked(syncPrintifyProducts)).toHaveBeenCalledTimes(2);
     expect(vi.mocked(syncPrintifyProducts)).toHaveBeenNthCalledWith(1, [product], {
       hideMissing: false,
+      requestId: expect.any(String),
     });
     expect(vi.mocked(syncPrintifyProducts)).toHaveBeenNthCalledWith(2, [product], {
       hideMissing: false,
+      requestId: expect.any(String),
     });
   });
 

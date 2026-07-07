@@ -59,11 +59,18 @@ type CatalogSyncRequestBody = {
 
 type PreflightSummary = {
   productCount: number;
+  rawVariantCount: number;
+  selectedVariantCount: number;
+  selectedInStockVariantCount: number;
+  selectedOutOfStockVariantCount: number;
   variantCount: number;
   enabledInStockVariantCount: number;
+  rawImageCount: number;
+  selectedUsableImageCount: number;
   imageCount: number;
   invalidProductCount: number;
   productsMissingUsableImages: number;
+  productsMissingSelectedVariants: number;
   productsMissingEnabledVariants: number;
   productsMissingValidPrices: number;
   duplicatePrintifyProductIdCount: number;
@@ -317,14 +324,36 @@ function hasUsableImage(product: PrintifyProduct) {
   return (product.images ?? []).some((image) => hasValue(image?.src));
 }
 
+function selectedVariants(product: PrintifyProduct) {
+  return (product.variants ?? []).filter((variant) => variant.is_enabled !== false);
+}
+
 function enabledInStockVariants(product: PrintifyProduct) {
-  return (product.variants ?? []).filter(
+  return selectedVariants(product).filter(
     (variant) =>
-      variant.is_enabled !== false &&
-      variant.is_available !== false &&
-      typeof variant.price === 'number' &&
-      variant.price > 0,
+      variant.is_available !== false && typeof variant.price === 'number' && variant.price > 0,
   );
+}
+
+function selectedOutOfStockVariants(product: PrintifyProduct) {
+  return selectedVariants(product).filter((variant) => variant.is_available === false);
+}
+
+function selectedVariantIds(product: PrintifyProduct) {
+  return new Set(selectedVariants(product).map((variant) => variant.id));
+}
+
+function hasSelectedUsableImage(product: PrintifyProduct) {
+  const selectedIds = selectedVariantIds(product);
+  return (product.images ?? []).some((image) => {
+    if (!hasValue(image?.src)) return false;
+    if (image.is_default) return true;
+
+    const imageVariantIds = image.variant_ids ?? [];
+    if (imageVariantIds.length === 0) return true;
+
+    return imageVariantIds.some((variantId) => selectedIds.has(variantId));
+  });
 }
 
 async function buildPreflight(
@@ -333,7 +362,7 @@ async function buildPreflight(
 ): Promise<PreflightSummary> {
   const productIds = products.map((product) => String(product.id || ''));
   const productScopedVariantIds = products.flatMap((product, productIndex) =>
-    (product.variants ?? []).map((variant) => {
+    selectedVariants(product).map((variant) => {
       const productId = String(product.id || '');
       const productScope = hasValue(productId) ? productId : `missing-product-${productIndex}`;
       const variantId =
@@ -345,41 +374,58 @@ async function buildPreflight(
   const duplicateVariantIdCount = countDuplicates(productScopedVariantIds.filter(Boolean));
   const issues: ValidationIssue[] = [];
 
-  let variantCount = 0;
-  let enabledInStockVariantCount = 0;
-  let imageCount = 0;
+  let rawVariantCount = 0;
+  let selectedVariantCount = 0;
+  let selectedInStockVariantCount = 0;
+  let selectedOutOfStockVariantCount = 0;
+  let rawImageCount = 0;
+  let selectedUsableImageCount = 0;
   let productsMissingUsableImages = 0;
-  let productsMissingEnabledVariants = 0;
+  let productsMissingSelectedVariants = 0;
   let productsMissingValidPrices = 0;
 
   for (const product of products) {
     const productId = String(product.id || '');
     const images = product.images ?? [];
     const variants = product.variants ?? [];
+    const selected = selectedVariants(product);
     const sellableVariants = enabledInStockVariants(product);
+    const outOfStockSelected = selectedOutOfStockVariants(product);
+    const selectedIds = selectedVariantIds(product);
 
-    variantCount += variants.length;
-    enabledInStockVariantCount += sellableVariants.length;
-    imageCount += images.filter((image) => hasValue(image?.src)).length;
+    rawVariantCount += variants.length;
+    selectedVariantCount += selected.length;
+    selectedInStockVariantCount += sellableVariants.length;
+    selectedOutOfStockVariantCount += outOfStockSelected.length;
+    rawImageCount += images.filter((image) => hasValue(image?.src)).length;
+    selectedUsableImageCount += images.filter((image) => {
+      if (!hasValue(image?.src)) return false;
+      if (image.is_default) return true;
+
+      const imageVariantIds = image.variant_ids ?? [];
+      if (imageVariantIds.length === 0) return true;
+
+      return imageVariantIds.some((variantId) => selectedIds.has(variantId));
+    }).length;
 
     if (!hasValue(productId)) pushIssue(issues, productId, 'missing_product_id');
     if (!hasValue(product.title)) pushIssue(issues, productId, 'missing_title');
-    for (const variant of variants) {
+    for (const variant of selected) {
       if (typeof variant.id !== 'number' || !Number.isFinite(variant.id)) {
         pushIssue(issues, productId, 'missing_variant_id');
       }
     }
-    if (!hasUsableImage(product)) {
+    if (!hasUsableImage(product) || !hasSelectedUsableImage(product)) {
       productsMissingUsableImages += 1;
       pushIssue(issues, productId, 'missing_usable_image');
     }
-    if (sellableVariants.length === 0) {
-      productsMissingEnabledVariants += 1;
-      pushIssue(issues, productId, 'missing_enabled_in_stock_variant');
+    if (selected.length === 0) {
+      productsMissingSelectedVariants += 1;
+      pushIssue(issues, productId, 'missing_selected_variant');
     }
     if (
-      variants.length > 0 &&
-      !variants.some((variant) => typeof variant.price === 'number' && variant.price > 0)
+      selected.length > 0 &&
+      !selected.some((variant) => typeof variant.price === 'number' && variant.price > 0)
     ) {
       productsMissingValidPrices += 1;
       pushIssue(issues, productId, 'missing_valid_variant_price');
@@ -419,12 +465,19 @@ async function buildPreflight(
 
   return {
     productCount: products.length,
-    variantCount,
-    enabledInStockVariantCount,
-    imageCount,
+    rawVariantCount,
+    selectedVariantCount,
+    selectedInStockVariantCount,
+    selectedOutOfStockVariantCount,
+    variantCount: rawVariantCount,
+    enabledInStockVariantCount: selectedInStockVariantCount,
+    rawImageCount,
+    selectedUsableImageCount,
+    imageCount: rawImageCount,
     invalidProductCount,
     productsMissingUsableImages,
-    productsMissingEnabledVariants,
+    productsMissingSelectedVariants,
+    productsMissingEnabledVariants: productsMissingSelectedVariants,
     productsMissingValidPrices,
     duplicatePrintifyProductIdCount,
     duplicateVariantIdCount,
@@ -636,7 +689,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await syncPrintifyProducts(products, { hideMissing: false });
+    const result = await syncPrintifyProducts(products, { hideMissing: false, requestId });
     const sanitizedErrors = result.errors
       .slice(0, 25)
       .map(() => 'Product sync failed for one item. Check server logs by request ID.');
