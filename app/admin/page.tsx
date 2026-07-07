@@ -9,7 +9,7 @@ import { requireAdmin } from '@/app/lib/auth/admin';
 import { env } from '@/env.mjs';
 import AdminConsoleClient from './AdminConsoleClient';
 import Link from 'next/link';
-import { Users, Flower, Palette, Ticket, Shield, BarChart3 } from 'lucide-react';
+import { Users, Flower, Palette, Ticket, Shield, BarChart3, ShoppingBag } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -64,6 +64,23 @@ export default async function AdminPage() {
 
         {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Link
+            href="/admin/products"
+            className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
+          >
+            <div className="flex items-center gap-4 mb-3">
+              <div className="rounded-lg bg-pink-500/20 p-3">
+                <ShoppingBag className="h-6 w-6 text-pink-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Shop Products
+              </h2>
+            </div>
+            <p className="text-sm text-zinc-400">
+              Hide, restore, or archive storefront products without deleting provider records
+            </p>
+          </Link>
+
           <Link
             href="/admin/users"
             className="group rounded-xl border border-white/10 bg-black/50 p-6 hover:border-pink-500/50 hover:bg-black/70 transition-all"
