@@ -16,6 +16,8 @@ import { HeaderButton } from '@/components/ui/header-button';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalDiscountBadge } from '@/app/components/shop/PetalDiscountBadge';
+import { StorefrontPanel } from '@/app/components/shop/StorefrontPrimitives';
+import { productImageMode } from '@/app/components/shop/StorefrontProductCard';
 
 type CatalogVariant = CatalogProduct['variants'][number];
 
@@ -34,7 +36,10 @@ function formatProductDescription(description: string | null | undefined): strin
     .filter(Boolean);
 }
 
-function resolveDisplayImage(product: CatalogProduct | null, variant: CatalogVariant | null): string | null {
+function resolveDisplayImage(
+  product: CatalogProduct | null,
+  variant: CatalogVariant | null,
+): string | null {
   if (variant?.previewImageUrl && variant.previewImageUrl.trim()) {
     return variant.previewImageUrl;
   }
@@ -59,7 +64,10 @@ export default function ProductClient({ productId }: { productId: string }) {
     () => formatProductDescription(product?.description),
     [product?.description],
   );
-  const displayImageUrl = useMemo(() => resolveDisplayImage(product, selectedVariant), [product, selectedVariant]);
+  const displayImageUrl = useMemo(
+    () => resolveDisplayImage(product, selectedVariant),
+    [product, selectedVariant],
+  );
   const variantAvailable = Boolean(selectedVariant?.isEnabled && selectedVariant?.inStock);
 
   useEffect(() => {
@@ -118,12 +126,18 @@ export default function ProductClient({ productId }: { productId: string }) {
           })),
         };
 
-        const defaultVariant = normalizedProduct.variants.find((variant) => variant.isEnabled && variant.inStock)
-          ?? normalizedProduct.variants[0]
-          ?? null;
+        const defaultVariant =
+          normalizedProduct.variants.find((variant) => variant.isEnabled && variant.inStock) ??
+          normalizedProduct.variants[0] ??
+          null;
 
         const finalImage = resolveDisplayImage(normalizedProduct, defaultVariant);
-        if (!finalImage || finalImage.includes('placeholder') || finalImage.includes('seed:') || finalImage.trim() === '') {
+        if (
+          !finalImage ||
+          finalImage.includes('placeholder') ||
+          finalImage.includes('seed:') ||
+          finalImage.trim() === ''
+        ) {
           setError('Product image not available');
           setLoading(false);
           return;
@@ -134,8 +148,14 @@ export default function ProductClient({ productId }: { productId: string }) {
         setProduct(normalizedProduct);
         setSelectedVariant(defaultVariant);
 
-        const displayPrice = normalizedProduct.price ?? (normalizedProduct.priceRange.min != null ? Math.round(normalizedProduct.priceRange.min) / 100 : 0);
-        const normalizedPriceCents = normalizedProduct.priceCents ?? (displayPrice != null ? Math.round(displayPrice * 100) : 0);
+        const displayPrice =
+          normalizedProduct.price ??
+          (normalizedProduct.priceRange.min != null
+            ? Math.round(normalizedProduct.priceRange.min) / 100
+            : 0);
+        const normalizedPriceCents =
+          normalizedProduct.priceCents ??
+          (displayPrice != null ? Math.round(displayPrice * 100) : 0);
 
         if (!isCancelled && finalImage) {
           addProduct({
@@ -147,9 +167,15 @@ export default function ProductClient({ productId }: { productId: string }) {
         }
       } catch (err) {
         if (isCancelled) return;
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching the product';
+        const errorMessage =
+          err instanceof Error ? err.message : 'An error occurred while fetching the product';
         setError(errorMessage);
-        logger.error('Error fetching product:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+        logger.error(
+          'Error fetching product:',
+          undefined,
+          undefined,
+          err instanceof Error ? err : new Error(String(err)),
+        );
         showError('Failed to fetch product details. Please try again.');
       } finally {
         if (!isCancelled) setLoading(false);
@@ -175,7 +201,11 @@ export default function ProductClient({ productId }: { productId: string }) {
       showError('Product image not available');
       return;
     }
-    const currentPriceCents = selectedVariant.priceCents ?? (product.priceRange.min != null ? Math.round(product.priceRange.min) : (product.priceCents ?? null));
+    const currentPriceCents =
+      selectedVariant.priceCents ??
+      (product.priceRange.min != null
+        ? Math.round(product.priceRange.min)
+        : (product.priceCents ?? null));
     const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : (product.price ?? 0);
 
     addItem({
@@ -200,83 +230,195 @@ export default function ProductClient({ productId }: { productId: string }) {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black flex items-center justify-center"><div className="text-center"><div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-500 border-r-transparent" /><p className="mt-4 text-pink-200">Loading treasure...</p></div></div>;
+    return (
+      <div className="min-h-screen bg-[#080611] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-300 border-r-transparent" />
+          <p className="mt-4 text-pink-100">Loading treasure...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error || !product) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Not Found</h1><p className="text-zinc-300 mb-6">{error || 'This treasure has gone missing.'}</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
+    return (
+      <div className="min-h-screen bg-[#080611]">
+        <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
+          <StorefrontPanel className="p-8 text-center">
+            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
+              Product Not Found
+            </h1>
+            <p className="text-[#f5d6dc]/70 mb-6">{error || 'This treasure has gone missing.'}</p>
+            <Link href={paths.shop()}>
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+                Return to Shop
+              </Button>
+            </Link>
+          </StorefrontPanel>
+        </div>
+      </div>
+    );
   }
 
   const imageUrl = displayImageUrl;
   if (!imageUrl) {
-    return <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20"><div className="text-center glass-panel rounded-2xl p-8"><h1 className="text-3xl font-bold text-pink-200 mb-4">Product Image Not Available</h1><p className="text-zinc-300 mb-6">This product is missing required images.</p><Link href={paths.shop()}><Button className="bg-gradient-to-r from-pink-500 to-purple-500">Return to Shop</Button></Link></div></div></div>;
+    return (
+      <div className="min-h-screen bg-[#080611]">
+        <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
+          <StorefrontPanel className="p-8 text-center">
+            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
+              Product Image Not Available
+            </h1>
+            <p className="text-[#f5d6dc]/70 mb-6">This product is missing required images.</p>
+            <Link href={paths.shop()}>
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+                Return to Shop
+              </Button>
+            </Link>
+          </StorefrontPanel>
+        </div>
+      </div>
+    );
   }
 
-  const currentPriceCents = selectedVariant?.priceCents ?? (product.priceRange.min != null ? Math.round(product.priceRange.min) : (product.priceCents ?? null));
+  const currentPriceCents =
+    selectedVariant?.priceCents ??
+    (product.priceRange.min != null
+      ? Math.round(product.priceRange.min)
+      : (product.priceCents ?? null));
   const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : (product.price ?? 0);
   const currency = 'USD';
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen overflow-hidden bg-[#080611] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,148,201,0.16),transparent_30%),radial-gradient(circle_at_84%_18%,rgba(132,92,255,0.14),transparent_28%),linear-gradient(180deg,rgba(8,6,17,0.1),rgba(8,6,17,0.94))]" />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <nav className="mb-8">
-          <ol className="flex items-center space-x-2 text-sm text-muted">
-            <li><Link href={paths.shop()} className="hover:text-primary transition-colors">{t('nav', 'shop')}</Link></li>
-            <li>/</li>
-            <li className="text-primary">{product.title}</li>
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-[#f5d6dc]/60">
+            <li>
+              <Link href={paths.shop()} className="hover:text-pink-100 transition-colors">
+                {t('nav', 'shop')}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li className="text-pink-100">{product.title}</li>
           </ol>
         </nav>
 
         {isNSFW && <NSFWAffirmNote />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12" data-testid="product-details">
+        <div
+          className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(26rem,0.82fr)] lg:gap-12"
+          data-testid="product-details"
+        >
           <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-2xl glass-card">
-              <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
+            <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-pink-100/14 bg-[radial-gradient(circle_at_center,rgba(255,235,245,0.09),rgba(12,8,18,0.92)_62%)] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.36)]">
+              <div className="relative h-full overflow-hidden rounded-[1.55rem]">
+                <Image
+                  src={imageUrl}
+                  alt={product.title}
+                  fill
+                  className={productImageMode(product)}
+                  priority
+                />
+              </div>
+              <div className="pointer-events-none absolute inset-6 rounded-[1.35rem] border border-white/8" />
             </div>
 
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full">{tag}</span>
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full"
+                  >
+                    {tag}
+                  </span>
                 ))}
               </div>
             )}
           </div>
 
           <div className="space-y-6">
-            <div>
+            <StorefrontPanel className="p-5 sm:p-7">
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl font-bold text-pink-200" data-testid="product-name">{product.title}</h1>
+                <h1
+                  className="font-display text-3xl font-semibold text-[#f7eadf] sm:text-4xl"
+                  data-testid="product-name"
+                >
+                  {product.title}
+                </h1>
               </div>
               <div className="flex items-center gap-4 mb-6">
-                <p className="text-3xl font-bold text-pink-400" data-testid="product-price">{currency === 'USD' ? '$' : currency}{currentPrice.toFixed(2)}</p>
+                <p
+                  className="font-display text-3xl font-semibold text-pink-100"
+                  data-testid="product-price"
+                >
+                  {currency === 'USD' ? '$' : currency}
+                  {currentPrice.toFixed(2)}
+                </p>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
               <PetalDiscountBadge productPrice={currentPrice} />
-              <div className="space-y-4 text-zinc-300 text-lg leading-relaxed">
-                {descriptionParagraphs.length > 0 ? descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>) : <p>Premium quality print-on-demand merchandise.</p>}
+              <div className="space-y-4 text-base leading-8 text-[#f5d6dc]/72">
+                {descriptionParagraphs.length > 0 ? (
+                  descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+                ) : (
+                  <p>Premium quality print-on-demand merchandise.</p>
+                )}
               </div>
-            </div>
+            </StorefrontPanel>
 
             {product.variants && product.variants.length > 0 && (
-              <div className="glass-panel rounded-xl p-4">
-                <label htmlFor="variant-select" className="block text-sm font-medium text-pink-200 mb-2">Select Variant</label>
-                <select id="variant-select" value={selectedVariant?.id || ''} onChange={(e) => { const variant = product.variants?.find((v) => v.id === e.target.value); if (variant) setSelectedVariant(variant); }} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white">
+              <StorefrontPanel className="p-4">
+                <label
+                  htmlFor="variant-select"
+                  className="block text-sm font-medium text-pink-200 mb-2"
+                >
+                  Select Variant
+                </label>
+                <select
+                  id="variant-select"
+                  value={selectedVariant?.id || ''}
+                  onChange={(e) => {
+                    const variant = product.variants?.find((v) => v.id === e.target.value);
+                    if (variant) setSelectedVariant(variant);
+                  }}
+                  className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
+                >
                   {product.variants.map((variant) => (
-                    <option key={variant.id} value={variant.id} disabled={!variant.isEnabled || !variant.inStock} className="bg-purple-900">
-                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - ${(((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100)).toFixed(2)}{!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
+                    <option
+                      key={variant.id}
+                      value={variant.id}
+                      disabled={!variant.isEnabled || !variant.inStock}
+                      className="bg-purple-900"
+                    >
+                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
+                      {(
+                        (variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100
+                      ).toFixed(2)}
+                      {!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
                     </option>
                   ))}
                 </select>
-              </div>
+              </StorefrontPanel>
             )}
 
-            <div className="glass-panel rounded-xl p-4">
-              <label htmlFor="quantity" className="block text-sm font-medium text-pink-200 mb-2">Quantity</label>
-              <input id="quantity" type="number" min="1" max="99" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white" />
-            </div>
+            <StorefrontPanel className="p-4">
+              <label htmlFor="quantity" className="block text-sm font-medium text-pink-200 mb-2">
+                Quantity
+              </label>
+              <input
+                id="quantity"
+                type="number"
+                min="1"
+                max="99"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
+              />
+            </StorefrontPanel>
 
             <HeaderButton
               onClick={handleAddToCart}
@@ -290,20 +432,33 @@ export default function ProductClient({ productId }: { productId: string }) {
             {added ? (
               <div className="space-y-2 text-sm text-green-300" data-testid="cart-success">
                 <p>Added to cart!</p>
-                <Link href="/cart" className="inline-flex text-pink-200 underline underline-offset-4 hover:text-pink-100">
+                <Link
+                  href="/cart"
+                  className="inline-flex text-pink-200 underline underline-offset-4 hover:text-pink-100"
+                >
                   View cart
                 </Link>
               </div>
             ) : null}
 
-            <div className="glass-panel rounded-xl p-6 space-y-3">
+            <StorefrontPanel className="p-6 space-y-3">
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
-              <div className="space-y-2 text-sm text-zinc-300">
-                <p><span className="font-medium">SKU:</span> {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}</p>
-                {product.category && <p><span className="font-medium">Category:</span> {product.category}</p>}
-                <p><span className="font-medium">Availability:</span> {variantAvailable ? 'In Stock' : 'Unavailable'}</p>
+              <div className="space-y-2 text-sm text-[#f5d6dc]/70">
+                <p>
+                  <span className="font-medium">SKU:</span>{' '}
+                  {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}
+                </p>
+                {product.category && (
+                  <p>
+                    <span className="font-medium">Category:</span> {product.category}
+                  </p>
+                )}
+                <p>
+                  <span className="font-medium">Availability:</span>{' '}
+                  {variantAvailable ? 'In Stock' : 'Unavailable'}
+                </p>
               </div>
-            </div>
+            </StorefrontPanel>
           </div>
         </div>
       </div>
