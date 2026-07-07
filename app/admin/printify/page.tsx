@@ -23,11 +23,18 @@ type ValidationIssue = {
 
 type PreflightSummary = {
   productCount: number;
+  rawVariantCount: number;
+  selectedVariantCount: number;
+  selectedInStockVariantCount: number;
+  selectedOutOfStockVariantCount: number;
+  rawImageCount: number;
+  selectedUsableImageCount: number;
   variantCount: number;
   enabledInStockVariantCount: number;
   imageCount: number;
   invalidProductCount: number;
   productsMissingUsableImages: number;
+  productsMissingSelectedVariants: number;
   productsMissingEnabledVariants: number;
   productsMissingValidPrices: number;
   duplicatePrintifyProductIdCount: number;
@@ -78,15 +85,18 @@ const FORBIDDEN_MESSAGE = 'Your account does not have permission to run Printify
 
 const preflightRows: Array<{ key: keyof PreflightSummary; label: string }> = [
   { key: 'productCount', label: 'Products' },
-  { key: 'variantCount', label: 'Variants' },
-  { key: 'enabledInStockVariantCount', label: 'Enabled in-stock variants' },
-  { key: 'imageCount', label: 'Images' },
+  { key: 'rawVariantCount', label: 'Raw provider variants' },
+  { key: 'selectedVariantCount', label: 'Selected variants' },
+  { key: 'selectedInStockVariantCount', label: 'Selected in-stock variants' },
+  { key: 'selectedOutOfStockVariantCount', label: 'Selected out-of-stock variants' },
+  { key: 'rawImageCount', label: 'Raw provider images' },
+  { key: 'selectedUsableImageCount', label: 'Selected usable images' },
   { key: 'invalidProductCount', label: 'Invalid products' },
   { key: 'productsMissingUsableImages', label: 'Missing usable images' },
-  { key: 'productsMissingEnabledVariants', label: 'Missing enabled variants' },
+  { key: 'productsMissingSelectedVariants', label: 'Missing selected variants' },
   { key: 'productsMissingValidPrices', label: 'Missing valid prices' },
   { key: 'duplicatePrintifyProductIdCount', label: 'Duplicate Printify product IDs' },
-  { key: 'duplicateVariantIdCount', label: 'Duplicate variant IDs' },
+  { key: 'duplicateVariantIdCount', label: 'Duplicate selected variant IDs' },
   { key: 'existingPrintifyProductCount', label: 'Existing Printify products' },
   { key: 'wouldInsert', label: 'Would insert' },
   { key: 'wouldUpdate', label: 'Would update' },
@@ -101,7 +111,7 @@ function canApply(preflight: PreflightSummary | null) {
     preflight?.safeToApply === true &&
     preflight.invalidProductCount === 0 &&
     preflight.productsMissingUsableImages === 0 &&
-    preflight.productsMissingEnabledVariants === 0 &&
+    preflight.productsMissingSelectedVariants === 0 &&
     preflight.productsMissingValidPrices === 0 &&
     preflight.duplicatePrintifyProductIdCount === 0 &&
     preflight.duplicateVariantIdCount === 0 &&
