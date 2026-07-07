@@ -3,8 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useUser, useAuth } from '@clerk/nextjs';
 import { type User } from '@clerk/nextjs/server';
-import { useRouter } from 'next/navigation';
 import { OnboardingModal } from '@/app/components/onboarding/OnboardingModal';
+import { buildCanonicalSignInUrl, buildCanonicalSignUpUrl } from '@/app/lib/auth/accountUrls';
 
 interface AuthModalState {
   isOpen: boolean;
@@ -63,7 +63,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoaded = true;
   }
 
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [authModal, setAuthModal] = useState<AuthModalState>({
     isOpen: false,
@@ -94,14 +93,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoaded && user && !isLoading) {
       // Check if this is a new user (created in last 5 minutes) or hasn't seen onboarding
-      const hasSeenOnboarding = typeof window !== 'undefined' && 
+      const hasSeenOnboarding =
+        typeof window !== 'undefined' &&
         localStorage.getItem('otm-onboarding-completed') === 'true';
-      
+
       if (!hasSeenOnboarding) {
         // Check if user was created recently (within last 5 minutes)
         const createdAt = user.createdAt ? new Date(user.createdAt).getTime() : 0;
         const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-        
+
         if (createdAt > fiveMinutesAgo) {
           setShowOnboarding(true);
         }
@@ -173,21 +173,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const redirectToSignIn = (redirectUrl?: string) => {
-    const url = new URL('/sign-in', window.location.origin);
-    if (redirectUrl) {
-      url.searchParams.set('redirect_url', redirectUrl);
-    }
-    // Use Next.js router for client-side navigation
-    router.push(url.pathname + url.search);
+    window.location.assign(buildCanonicalSignInUrl(redirectUrl));
   };
 
   const redirectToSignUp = (redirectUrl?: string) => {
-    const url = new URL('/sign-up', window.location.origin);
-    if (redirectUrl) {
-      url.searchParams.set('redirect_url', redirectUrl);
-    }
-    // Use Next.js router for client-side navigation
-    router.push(url.pathname + url.search);
+    window.location.assign(buildCanonicalSignUpUrl(redirectUrl));
   };
 
   // Specific gated action implementations
@@ -273,11 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       <AuthModal />
-      {showOnboarding && (
-        <OnboardingModal
-          onComplete={() => setShowOnboarding(false)}
-        />
-      )}
+      {showOnboarding && <OnboardingModal onComplete={() => setShowOnboarding(false)} />}
     </AuthContext.Provider>
   );
 }
@@ -312,7 +298,11 @@ function AuthModal() {
 
             <div className="space-y-4">
               <a
-                href={`/sign-in${redirectUrl ? `?redirect_url=${encodeURIComponent(redirectUrl)}` : ''}`}
+                href={
+                  action === 'sign-in'
+                    ? buildCanonicalSignInUrl(redirectUrl)
+                    : buildCanonicalSignUpUrl(redirectUrl)
+                }
                 className="block w-full bg-pink-600 hover:bg-pink-700 text-white font-ui py-3 px-6 rounded-xl transition-colors"
               >
                 {action === 'sign-in' ? 'Sign In' : 'Sign Up'}
