@@ -7,19 +7,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PrintifyAdminPage from '@/app/admin/printify/page';
 
 const safePreflight = {
-  productCount: 2,
-  variantCount: 4,
-  enabledInStockVariantCount: 4,
-  imageCount: 2,
+  productCount: 16,
+  rawVariantCount: 1647,
+  selectedVariantCount: 212,
+  selectedInStockVariantCount: 209,
+  selectedOutOfStockVariantCount: 3,
+  rawImageCount: 389,
+  selectedUsableImageCount: 120,
+  variantCount: 1647,
+  enabledInStockVariantCount: 209,
+  imageCount: 389,
   invalidProductCount: 0,
   productsMissingUsableImages: 0,
+  productsMissingSelectedVariants: 0,
   productsMissingEnabledVariants: 0,
   productsMissingValidPrices: 0,
   duplicatePrintifyProductIdCount: 0,
   duplicateVariantIdCount: 0,
-  existingPrintifyProductCount: 0,
-  wouldInsert: 2,
-  wouldUpdate: 0,
+  existingPrintifyProductCount: 15,
+  wouldInsert: 1,
+  wouldUpdate: 15,
   wouldHide: 0,
   wouldSkip: 0,
   hideMissing: false,
@@ -123,15 +130,18 @@ describe('Printify admin catalog control page', () => {
 
     for (const label of [
       'Products',
-      'Variants',
-      'Enabled in-stock variants',
-      'Images',
+      'Raw provider variants',
+      'Selected variants',
+      'Selected in-stock variants',
+      'Selected out-of-stock variants',
+      'Raw provider images',
+      'Selected usable images',
       'Invalid products',
       'Missing usable images',
-      'Missing enabled variants',
+      'Missing selected variants',
       'Missing valid prices',
       'Duplicate Printify product IDs',
-      'Duplicate variant IDs',
+      'Duplicate selected variant IDs',
       'Existing Printify products',
       'Would insert',
       'Would update',
@@ -143,8 +153,34 @@ describe('Printify admin catalog control page', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
 
+    expect(screen.queryByText(/^Variants$/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Images$/)).not.toBeInTheDocument();
     expect(screen.getByText('printify-product-1')).toBeInTheDocument();
     expect(screen.getAllByText(/missing_usable_image/).length).toBeGreaterThan(0);
+  });
+
+  it('renders raw provider and merchant-selected preflight counts separately', async () => {
+    mockFetchOnce(preflightBody(safePreflight, 'req-selected-counts'));
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-selected-counts');
+
+    expect(screen.getByText('Raw provider variants')).toBeInTheDocument();
+    expect(screen.getByText('Selected variants')).toBeInTheDocument();
+    expect(screen.getByText('Selected in-stock variants')).toBeInTheDocument();
+    expect(screen.getByText('Selected out-of-stock variants')).toBeInTheDocument();
+    expect(screen.getByText('Raw provider images')).toBeInTheDocument();
+    expect(screen.getByText('Selected usable images')).toBeInTheDocument();
+    expect(screen.getByText('1647')).toBeInTheDocument();
+    expect(screen.getByText('212')).toBeInTheDocument();
+    expect(screen.getByText('209')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('389')).toBeInTheDocument();
+    expect(screen.getByText('120')).toBeInTheDocument();
+    expect(screen.queryByText(/^Variants$/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Images$/)).not.toBeInTheDocument();
   });
 
   it('keeps apply disabled when preflight is unsafe', async () => {
@@ -158,6 +194,78 @@ describe('Printify admin catalog control page', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
     await screen.findByText(/apply is blocked because preflight is not safe/i);
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeDisabled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps apply disabled when selected variant validation fails', async () => {
+    const missingSelectedVariantPreflight = {
+      ...safePreflight,
+      safeToApply: false,
+      productsMissingSelectedVariants: 1,
+      issues: [{ productId: 'printify-product-2', reason: 'missing_selected_variant' }],
+    };
+    mockFetchOnce(preflightBody(missingSelectedVariantPreflight, 'req-missing-selected', false));
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-missing-selected');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    expect(screen.getByText('Missing selected variants')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeDisabled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps apply disabled when preflight would hide products', async () => {
+    mockFetchOnce(
+      preflightBody(
+        {
+          ...safePreflight,
+          safeToApply: false,
+          wouldHide: 1,
+        },
+        'req-would-hide',
+        false,
+      ),
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-would-hide');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeDisabled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps apply disabled when hideMissing is true', async () => {
+    mockFetchOnce(
+      preflightBody(
+        {
+          ...safePreflight,
+          safeToApply: false,
+          hideMissing: true,
+        },
+        'req-hide-missing',
+        false,
+      ),
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-hide-missing');
     fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
       target: { value: 'APPLY PRINTIFY CATALOG' },
     });
