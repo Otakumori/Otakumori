@@ -28,7 +28,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ productId: string }> },
 ) {
-  return withAdminAuth(async (request: NextRequest) => {
+  return withAdminAuth(async (_request: NextRequest) => {
     const requestId = newRequestId();
     const { productId } = await params;
 
@@ -42,10 +42,14 @@ export async function GET(
         requestId,
       });
     } catch (error) {
-      logger.error('admin_printify_product_fetch_failed', { requestId }, {
-        productId,
-        error: String(error),
-      });
+      logger.error(
+        'admin_printify_product_fetch_failed',
+        { requestId },
+        {
+          productId,
+          error: String(error),
+        },
+      );
       return NextResponse.json(
         {
           ok: false,
@@ -95,10 +99,14 @@ export async function PUT(
         );
       }
 
-      logger.error('admin_printify_product_update_failed', { requestId }, {
-        productId,
-        error: String(error),
-      });
+      logger.error(
+        'admin_printify_product_update_failed',
+        { requestId },
+        {
+          productId,
+          error: String(error),
+        },
+      );
       return NextResponse.json(
         {
           ok: false,
@@ -116,35 +124,20 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ productId: string }> },
 ) {
-  return withAdminAuth(async (request: NextRequest) => {
+  return withAdminAuth(async (_request: NextRequest) => {
     const requestId = newRequestId();
     const { productId } = await params;
 
-    try {
-      const service = getPrintifyService();
-      await service.deleteProduct(productId);
+    logger.warn('admin_printify_provider_delete_blocked', { requestId }, { productId });
 
-      logger.info('admin_printify_product_deleted', { requestId }, { productId });
-
-      return NextResponse.json({
-        ok: true,
-        data: { success: true },
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'Provider-side product deletion is disabled. Use local hide or archive for storefront management.',
         requestId,
-      });
-    } catch (error) {
-      logger.error('admin_printify_product_deletion_failed', { requestId }, {
-        productId,
-        error: String(error),
-      });
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Failed to delete product',
-          requestId,
-        },
-        { status: 500 },
-      );
-    }
+      },
+      { status: 405 },
+    );
   })(req);
 }
-

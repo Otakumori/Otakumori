@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const dbMocks = vi.hoisted(() => {
   const tx = {
     product: {
+      findUnique: vi.fn(),
       upsert: vi.fn(),
     },
     productImage: {
@@ -146,6 +147,7 @@ function rawMatrixProduct() {
 describe('syncPrintifyProducts selected-variant import', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    dbMocks.tx.product.findUnique.mockResolvedValue(null);
     dbMocks.tx.product.upsert.mockImplementation(({ where }) =>
       Promise.resolve({ id: `db-${where.printifyProductId}`, printProviderId: 2 }),
     );
@@ -273,6 +275,40 @@ describe('syncPrintifyProducts selected-variant import', () => {
     expect(dbMocks.tx.product.upsert).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({ where: { printifyProductId: 'sneakers-b' } }),
+    );
+  });
+
+  it('preserves a locally hidden product during provider sync', async () => {
+    dbMocks.tx.product.findUnique.mockResolvedValueOnce({ active: true, visible: false });
+
+    await syncPrintifyProducts([product('hidden-product', { visible: true })], {
+      hideMissing: false,
+    });
+
+    expect(dbMocks.tx.product.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          active: true,
+          visible: false,
+        }),
+      }),
+    );
+  });
+
+  it('preserves a locally archived product during provider sync', async () => {
+    dbMocks.tx.product.findUnique.mockResolvedValueOnce({ active: false, visible: false });
+
+    await syncPrintifyProducts([product('archived-product', { visible: true })], {
+      hideMissing: false,
+    });
+
+    expect(dbMocks.tx.product.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          active: false,
+          visible: false,
+        }),
+      }),
     );
   });
 

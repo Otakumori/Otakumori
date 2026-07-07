@@ -8,20 +8,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
-import {
-  generateRequestId,
-  createApiError,
-  createApiSuccess,
-} from '@/app/lib/api-contracts';
+import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { getCatalogFallbackProduct } from '@/lib/catalog/e2eFallback';
 
 export const runtime = 'nodejs';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const requestId = generateRequestId();
 
   try {
@@ -36,18 +29,16 @@ export async function GET(
 
     const fallbackProduct = getCatalogFallbackProduct(id);
     if (fallbackProduct) {
-      return NextResponse.json(
-        createApiSuccess(fallbackProduct, requestId),
-        {
-          headers: {
-            'Cache-Control': 'no-store',
-            'X-OTM-Source': 'ci-fallback',
-          },
+      return NextResponse.json(createApiSuccess(fallbackProduct, requestId), {
+        headers: {
+          'Cache-Control': 'no-store',
+          'X-OTM-Source': 'ci-fallback',
         },
-      );
+      });
     }
 
-    // Try to find product in Prisma first
+    // Try to find product in Prisma first. Hidden/archived local catalog state
+    // must win over provider fallback so admins can safely remove items from shop.
     const product = await db.product.findUnique({
       where: { id },
       include: {
@@ -59,20 +50,24 @@ export async function GET(
     });
 
     if (product) {
+      if (!product.active || !product.visible) {
+        return NextResponse.json(
+          createApiError('NOT_FOUND', `Product with ID ${id} not found`, requestId),
+          { status: 404 },
+        );
+      }
+
       // Product found in Prisma cache
       const serialized = serializeProduct(product);
 
       // Return product directly in data to match expected format
-      return NextResponse.json(
-        createApiSuccess(serialized, requestId),
-        {
-          headers: {
-            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-            'X-OTM-Source': 'prisma-cache',
-            'X-OTM-Last-Synced': product.lastSyncedAt?.toISOString() ?? '',
-          },
+      return NextResponse.json(createApiSuccess(serialized, requestId), {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'X-OTM-Source': 'prisma-cache',
+          'X-OTM-Last-Synced': product.lastSyncedAt?.toISOString() ?? '',
         },
-      );
+      });
     }
 
     // Product not found in Prisma - try Printify fallback
@@ -91,20 +86,24 @@ export async function GET(
     });
 
     if (printifyProduct) {
+      if (!printifyProduct.active || !printifyProduct.visible) {
+        return NextResponse.json(
+          createApiError('NOT_FOUND', `Product with ID ${id} not found`, requestId),
+          { status: 404 },
+        );
+      }
+
       // Found by Printify ID
       const serialized = serializeProduct(printifyProduct);
 
       // Return product directly in data to match expected format
-      return NextResponse.json(
-        createApiSuccess(serialized, requestId),
-        {
-          headers: {
-            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-            'X-OTM-Source': 'prisma-cache',
-            'X-OTM-Last-Synced': printifyProduct.lastSyncedAt?.toISOString() ?? '',
-          },
+      return NextResponse.json(createApiSuccess(serialized, requestId), {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'X-OTM-Source': 'prisma-cache',
+          'X-OTM-Last-Synced': printifyProduct.lastSyncedAt?.toISOString() ?? '',
         },
-      );
+      });
     }
 
     // Try fetching from Printify API as last resort
@@ -115,9 +114,10 @@ export async function GET(
 
       if (printifyProductData) {
         // Transform Printify product to CatalogProduct format
-        const primaryImage = printifyProductData.images?.find((img) => img.is_default) 
-          ?? printifyProductData.images?.[0];
-        const priceRange = printifyProductData.variants?.length 
+        const primaryImage =
+          printifyProductData.images?.find((img) => img.is_default) ??
+          printifyProductData.images?.[0];
+        const priceRange = printifyProductData.variants?.length
           ? {
               min: Math.min(...printifyProductData.variants.map((v) => v.price)),
               max: Math.max(...printifyProductData.variants.map((v) => v.price)),
@@ -140,22 +140,24 @@ export async function GET(
             min: priceRange.min,
             max: priceRange.max,
           },
-          available: printifyProductData.variants?.some((v) => v.is_available && v.is_enabled) ?? false,
+          available:
+            printifyProductData.variants?.some((v) => v.is_available && v.is_enabled) ?? false,
           visible: printifyProductData.visible ?? true,
           active: true,
           isLocked: printifyProductData.is_locked ?? false,
-          variants: printifyProductData.variants?.map((v) => ({
-            id: String(v.id),
-            title: v.title ?? null,
-            sku: v.sku ?? null,
-            price: v.price ? v.price / 100 : null,
-            priceCents: v.price,
-            inStock: v.is_available ?? true,
-            isEnabled: v.is_enabled ?? true,
-            printifyVariantId: v.id,
-            optionValues: [],
-            previewImageUrl: null,
-          })) ?? [],
+          variants:
+            printifyProductData.variants?.map((v) => ({
+              id: String(v.id),
+              title: v.title ?? null,
+              sku: v.sku ?? null,
+              price: v.price ? v.price / 100 : null,
+              priceCents: v.price,
+              inStock: v.is_available ?? true,
+              isEnabled: v.is_enabled ?? true,
+              printifyVariantId: v.id,
+              optionValues: [],
+              previewImageUrl: null,
+            })) ?? [],
           integrationRef: null,
           printifyProductId: String(printifyProductData.id),
           blueprintId: printifyProductData.blueprint_id ?? null,
@@ -163,15 +165,12 @@ export async function GET(
           lastSyncedAt: null,
         };
 
-        return NextResponse.json(
-          createApiSuccess(catalogProduct, requestId),
-          {
-            headers: {
-              'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
-              'X-OTM-Source': 'printify-api',
-            },
+        return NextResponse.json(createApiSuccess(catalogProduct, requestId), {
+          headers: {
+            'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+            'X-OTM-Source': 'printify-api',
           },
-        );
+        });
       }
     } catch (printifyError) {
       // Printify fetch failed, continue to 404
@@ -186,7 +185,12 @@ export async function GET(
     );
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('[Products API] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[Products API] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       createApiError(
         'INTERNAL_ERROR',

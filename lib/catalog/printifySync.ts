@@ -124,6 +124,16 @@ async function syncProductRecord(
   const images = selectedImages(product);
   const defaultImage = images.find((img) => img.is_default) ?? images[0] ?? null;
   const primaryImageUrl = defaultImage?.src ?? null;
+  const existingProduct = await tx.product.findUnique({
+    where: { printifyProductId: String(product.id) },
+    select: { active: true, visible: true },
+  });
+  const providerVisible = product.visible ?? true;
+  const nextActive = existingProduct?.active === false ? false : providerVisible;
+  const nextVisible =
+    existingProduct?.active === false || existingProduct?.visible === false
+      ? false
+      : providerVisible;
   const specs = {
     safetyInformation: product.safety_information ?? null,
     salesChannelProperties: product.sales_channel_properties ?? null,
@@ -139,8 +149,8 @@ async function syncProductRecord(
       primaryImageUrl,
       category: product.tags?.[0] ?? null,
       categorySlug,
-      active: product.visible ?? true,
-      visible: product.visible ?? true,
+      active: nextActive,
+      visible: nextVisible,
       blueprintId: product.blueprint_id ?? null,
       printProviderId: product.print_provider_id ?? null,
       tags: product.tags ?? [],
@@ -155,8 +165,8 @@ async function syncProductRecord(
       primaryImageUrl,
       category: product.tags?.[0] ?? null,
       categorySlug,
-      active: product.visible ?? true,
-      visible: product.visible ?? true,
+      active: providerVisible,
+      visible: providerVisible,
       blueprintId: product.blueprint_id ?? null,
       printProviderId: product.print_provider_id ?? null,
       tags: product.tags ?? [],
