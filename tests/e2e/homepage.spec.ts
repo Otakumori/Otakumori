@@ -7,12 +7,10 @@ test.describe('Homepage', () => {
 
   test('should load homepage with hero section', async ({ page }) => {
     // Check that the hero section is visible
-    await expect(page.locator('h1')).toContainText('Enter the Realm');
+    await expect(page.locator('h1')).toContainText('Rest beneath the sakura tree');
 
     // Check that the cherry tree is present
-    await expect(
-      page.getByRole('img', { name: /Otakumori sakura tree scene/i }),
-    ).toBeVisible();
+    await expect(page.getByRole('img', { name: /Otakumori sakura tree scene/i })).toBeVisible();
   });
 
   test('should respect reduced motion preference', async ({ page }) => {

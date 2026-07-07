@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import HomeSoapstoneDialog from './HomeSoapstoneDialog';
+import { StorefrontPanel } from '@/app/components/shop/StorefrontPrimitives';
 
 const containSectionStyle: CSSProperties = {
   contentVisibility: 'auto',
@@ -62,12 +63,12 @@ function SectionHeader() {
         The path through the grove
       </p>
       <h2 className="font-display mt-4 text-balance text-3xl font-semibold tracking-tight text-white md:text-5xl">
-        A clear, fast skeleton for shop, play, community, and profile.
+        Shop, play, and return to a world that feels handmade.
       </h2>
       <p className="font-body mt-5 text-base leading-8 text-white/70 md:text-lg">
-        The Sakura tree is the emotional entry point. The sections below it stay server-rendered,
-        low-motion, and route-owned so the site feels intentional without adding memory-heavy client
-        behavior.
+        The sakura tree stays as the signature living landmark. The sections below it use quiet
+        ornamental frames, clear entry points, and server-owned routes so the atmosphere never gets
+        in the way of browsing.
       </p>
     </div>
   );
@@ -75,7 +76,7 @@ function SectionHeader() {
 
 function HomeSectionCard({ card }: { card: HomeSectionCard }) {
   return (
-    <article className="glass-card card-stroke group relative overflow-hidden rounded-3xl p-6 transition-transform duration-200 hover:-translate-y-1 focus-within:border-sakura-300/50 md:p-7">
+    <article className="group relative overflow-hidden rounded-[1.8rem] border border-pink-100/14 bg-[#120d17]/82 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.24)] transition-transform duration-200 hover:-translate-y-1 hover:border-sakura-300/38 focus-within:border-sakura-300/50 md:p-7">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,126,179,0.18),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_48%)] opacity-75 transition-opacity duration-200 group-hover:opacity-100" />
       <div className="relative z-10 flex h-full flex-col">
         <div className="mb-6 flex items-center justify-between gap-4">
@@ -103,15 +104,18 @@ function HomeSectionCard({ card }: { card: HomeSectionCard }) {
 
 function PerformanceGuardrails() {
   return (
-    <section
+    <StorefrontPanel
       aria-labelledby="home-guardrails-title"
-      className="glass-panel card-stroke mx-auto mt-24 max-w-5xl rounded-3xl p-6 text-white/75 md:p-8"
+      className="mx-auto mt-24 max-w-5xl p-6 text-white/75 md:p-8"
       style={containSectionStyle}
     >
       <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
         Build standard
       </p>
-      <h2 id="home-guardrails-title" className="font-display mt-3 text-2xl font-semibold text-white">
+      <h2
+        id="home-guardrails-title"
+        className="font-display mt-3 text-2xl font-semibold text-white"
+      >
         UI, UX, performance, memory, and data safety carry equal weight.
       </h2>
       <div className="font-body mt-6 grid gap-4 text-sm leading-7 md:grid-cols-2">
@@ -122,18 +126,18 @@ function PerformanceGuardrails() {
         </p>
         <p>
           Homepage tree petals may use a thin authenticated collection session later. Full profile,
-          purchase, achievement, and mini-game reward logic stays on owned routes and server-validated
-          claim paths.
+          purchase, achievement, and mini-game reward logic stays on owned routes and
+          server-validated claim paths.
         </p>
       </div>
-    </section>
+    </StorefrontPanel>
   );
 }
 
 function HomeFooter() {
   return (
     <footer className="mx-auto mt-20 max-w-5xl text-center" style={containSectionStyle}>
-      <section className="glass-panel card-stroke rounded-3xl p-6 text-white/75 md:p-8">
+      <StorefrontPanel className="p-6 text-white/75 md:p-8">
         <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
           Community signs
         </p>
@@ -145,10 +149,12 @@ function HomeFooter() {
           public invitation visible without depending on live community data.
         </p>
         <HomeSoapstoneDialog />
-      </section>
+      </StorefrontPanel>
 
       <div className="mt-8 border-t border-white/10 pt-6 text-sm text-white/55">
-        <p>Otakumori {'\u2122'} made with {'\u2661'}</p>
+        <p>
+          Otakumori {'\u2122'} made with {'\u2661'}
+        </p>
         <p className="mt-2 text-xs">
           {'\u00a9'} {new Date().getFullYear()} Otaku-mori. All rights reserved.
         </p>
@@ -160,7 +166,11 @@ function HomeFooter() {
 export default function HomeMain() {
   return (
     <main className="relative z-20 bg-[#080611] px-4 py-20 text-white sm:px-6 lg:px-8">
-      <section aria-labelledby="home-sections-title" className="mx-auto max-w-7xl" style={containSectionStyle}>
+      <section
+        aria-labelledby="home-sections-title"
+        className="mx-auto max-w-7xl"
+        style={containSectionStyle}
+      >
         <SectionHeader />
         <h2 id="home-sections-title" className="sr-only">
           Otaku-mori site sections

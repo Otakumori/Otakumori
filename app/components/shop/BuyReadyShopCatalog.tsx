@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
-import { stripHtml } from '@/lib/html';
-import { paths } from '@/lib/paths';
+import { ProductGrid } from './StorefrontProductCard';
+import { StorefrontPanel } from './StorefrontPrimitives';
 
 interface ApiResponse {
   ok?: boolean;
@@ -15,38 +13,25 @@ interface ApiResponse {
   products?: CatalogProduct[];
 }
 
-function getStartingPriceLabel(product: CatalogProduct) {
-  const min = product.priceRange?.min ?? product.priceCents ?? null;
-  if (typeof min === 'number') return `$${(min / 100).toFixed(2)}`;
-  if (typeof product.price === 'number') return `$${product.price.toFixed(2)}`;
-  return 'Price unavailable';
-}
-
 function normalizeTitle(title: string) {
-  return title.toLowerCase().replace(/&[a-z]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return title
+    .toLowerCase()
+    .replace(/&[a-z]+;/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function isBuyReadyProduct(product: CatalogProduct) {
-  const hasPrice = typeof product.price === 'number' || typeof product.priceCents === 'number' || typeof product.priceRange?.min === 'number';
+  const hasPrice =
+    typeof product.price === 'number' ||
+    typeof product.priceCents === 'number' ||
+    typeof product.priceRange?.min === 'number';
   const hasImage = Boolean((product.image ?? product.images?.[0] ?? '').trim());
-  const hasAvailableVariant = Boolean(product.variants?.some((variant) => variant.isEnabled && variant.inStock));
+  const hasAvailableVariant = Boolean(
+    product.variants?.some((variant) => variant.isEnabled && variant.inStock),
+  );
   return hasPrice && hasImage && hasAvailableVariant;
-}
-
-function cleanSummary(raw: string) {
-  return stripHtml(raw || '')
-    .replace(/&ldquo;|&rdquo;/g, '"')
-    .replace(/&rsquo;|&lsquo;/g, "'")
-    .replace(/&times;/g, 'x')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/\b(xs|s|m|l|xl|2xl|3xl|4xl)\b(\s+\b(xs|s|m|l|xl|2xl|3xl|4xl)\b)+/gi, ' ')
-    .replace(/\b(length|width|height|size guide|sizes?)\b[\s\S]*$/i, ' ')
-    .replace(/\bpadding:\s*\d+/gi, ' ')
-    .replace(/\bcolor:\s*#[0-9a-f]+/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 170);
 }
 
 function dedupeProducts(products: CatalogProduct[]) {
@@ -72,13 +57,17 @@ export default function BuyReadyShopCatalog() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/v1/catalog?limit=48', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        const response = await fetch('/api/v1/catalog?limit=48', {
+          credentials: 'same-origin',
+          headers: { Accept: 'application/json' },
+        });
         if (!response.ok) throw new Error(`Catalog request failed with ${response.status}`);
         const payload = (await response.json()) as ApiResponse;
         const loaded = payload.data?.products ?? payload.products ?? [];
         if (!cancelled) setProducts(dedupeProducts(loaded.filter(isBuyReadyProduct)));
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load buy-ready products');
+        if (!cancelled)
+          setError(err instanceof Error ? err.message : 'Failed to load buy-ready products');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -91,67 +80,51 @@ export default function BuyReadyShopCatalog() {
 
   const visibleProducts = useMemo(() => products.slice(0, 24), [products]);
 
-  if (loading) return <div className="text-zinc-300">Loading buy-ready storefront...</div>;
-  if (error) return <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-200"><h2 className="text-xl font-semibold mb-2">Unable to load storefront</h2><p>{error}</p></div>;
-  if (visibleProducts.length === 0) {
+  if (loading) {
     return (
       <div
-        className="rounded-3xl border border-pink-500/20 bg-white/5 p-8 text-center text-pink-100"
+        className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
         data-testid="product-grid"
       >
-        <h2 className="text-2xl font-semibold">No buy-ready products yet</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-pink-100/70">
-          The public shop is only showing products with images, prices, and in-stock variants right now. Sync or enable products in admin, then refresh this page.
-        </p>
+        {Array.from({ length: 6 }, (_, index) => (
+          <div
+            key={index}
+            className="min-h-[31rem] animate-pulse rounded-[1.8rem] border border-pink-100/10 bg-white/[0.045] p-3"
+          >
+            <div className="aspect-[4/5] rounded-[1.55rem] bg-white/[0.06]" />
+            <div className="mt-5 space-y-3 px-2">
+              <div className="h-5 w-3/4 rounded bg-white/[0.08]" />
+              <div className="h-4 w-1/3 rounded bg-white/[0.08]" />
+              <div className="h-16 rounded bg-white/[0.06]" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" data-testid="product-grid">
-      {visibleProducts.map((product, index) => {
-        const image = product.image ?? product.images?.[0] ?? '';
-        const summary = cleanSummary(product.description || '');
-        const hasMultipleOptions = Boolean(product.variants?.length && product.variants.length > 1);
-        const productHref = paths.product(product.id);
-        return (
-          <article key={product.id} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-lg">
-            <Link href={productHref} className="block" data-testid="product-card">
-              <div className="relative aspect-[4/5] bg-black/20">
-                <Image
-                  src={image}
-                  alt={product.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                  priority={index === 0}
-                  unoptimized
-                />
-                {product.provider ? <div className="absolute right-3 top-3 rounded-lg bg-black/70 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-white">{product.provider}</div> : null}
-              </div>
-            </Link>
-            <div className="space-y-3 p-5">
-              <div>
-                <Link href={productHref} className="block">
-                  <h2 className="line-clamp-2 text-lg font-semibold text-white hover:text-pink-200 transition-colors">{product.title}</h2>
-                </Link>
-                <div className="mt-1">
-                  {hasMultipleOptions ? <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Starting at</p> : null}
-                  <p className="text-pink-200 font-medium">{getStartingPriceLabel(product)}</p>
-                </div>
-              </div>
-              <p className="line-clamp-3 text-sm leading-6 text-zinc-300">{summary || 'No description available.'}</p>
-              <Link
-                href={productHref}
-                className="inline-flex items-center justify-center rounded-xl bg-pink-500/80 px-4 py-2 text-sm text-white hover:bg-pink-500 transition-colors"
-                aria-label={`View details for ${product.title}`}
-              >
-                Choose options
-              </Link>
-            </div>
-          </article>
-        );
-      })}
-    </div>
-  );
+  if (error) {
+    return (
+      <StorefrontPanel className="p-8 text-red-100">
+        <h2 className="font-display text-2xl font-semibold text-red-100">
+          Unable to load storefront
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-red-100/75">{error}</p>
+      </StorefrontPanel>
+    );
+  }
+
+  if (visibleProducts.length === 0) {
+    return (
+      <StorefrontPanel className="p-8 text-center text-pink-100" data-testid="product-grid">
+        <h2 className="font-display text-2xl font-semibold">No buy-ready products yet</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-pink-100/70">
+          The public shop is only showing products with images, prices, and in-stock variants right
+          now. Sync or enable products in admin, then refresh this page.
+        </p>
+      </StorefrontPanel>
+    );
+  }
+
+  return <ProductGrid products={visibleProducts} />;
 }
