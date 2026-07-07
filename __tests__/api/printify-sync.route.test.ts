@@ -287,6 +287,24 @@ describe('Printify protected catalog sync API', () => {
     expect(upstashMocks.rateLimitCalls.at(-1)?.key).toBe('preflight:admin:admin_123');
   });
 
+  it('allows Clerk metadata.role admin and preserves Supabase role=authenticated as non-admin', async () => {
+    vi.mocked(auth).mockReturnValue({
+      userId: 'admin_123',
+      sessionClaims: { role: 'authenticated', metadata: { role: 'admin' } },
+    } as any);
+
+    const adminResult = await callGET(await route());
+    expect(adminResult.res.status).toBe(200);
+
+    vi.mocked(auth).mockReturnValue({
+      userId: 'user_123',
+      sessionClaims: { role: 'authenticated' },
+    } as any);
+
+    const nonAdminResult = await callGET(await route());
+    expect(nonAdminResult.res.status).toBe(403);
+  });
+
   it('allows the internal token to run preflight without DB writes', async () => {
     const { res, json } = await callPOST(
       await route(),

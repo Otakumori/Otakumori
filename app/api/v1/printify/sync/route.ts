@@ -9,6 +9,7 @@ import { getPrintifyService, type PrintifyProduct } from '@/app/lib/printify/ser
 import { db } from '@/app/lib/db';
 import { env } from '@/env/server';
 import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
+import { hasAdminRole } from '@/app/lib/auth/adminRole';
 
 export const runtime = 'nodejs';
 
@@ -117,25 +118,6 @@ function extractInternalToken(request: NextRequest) {
   return bearerToken || internalHeader || '';
 }
 
-function readRole(claims: unknown) {
-  const record = claims as
-    | {
-        metadata?: { role?: unknown };
-        public_metadata?: { role?: unknown };
-        publicMetadata?: { role?: unknown };
-        private_metadata?: { role?: unknown };
-      }
-    | null
-    | undefined;
-
-  return (
-    record?.metadata?.role ||
-    record?.public_metadata?.role ||
-    record?.publicMetadata?.role ||
-    record?.private_metadata?.role
-  );
-}
-
 async function authorize(request: NextRequest, requestId: string): Promise<AuthContext | Response> {
   const suppliedInternalToken = extractInternalToken(request);
   const expectedInternalToken = env.INTERNAL_AUTH_TOKEN?.trim();
@@ -172,7 +154,7 @@ async function authorize(request: NextRequest, requestId: string): Promise<AuthC
     return json({ ok: false, error: 'Unauthorized', requestId }, { status: 401 }, requestId);
   }
 
-  if (readRole(authResult.sessionClaims) !== 'admin') {
+  if (!hasAdminRole(authResult.sessionClaims)) {
     logger.warn('printify_catalog_sync_forbidden', {
       requestId,
       route: ROUTE,

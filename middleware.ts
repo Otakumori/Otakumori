@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
+import { hasAdminRole } from '@/app/lib/auth/adminRole';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 const AGE_GATE_COOKIE = 'om_age_ok';
@@ -214,10 +215,7 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
         return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
       }
 
-      const isAdminUser =
-        (sessionClaims as any)?.metadata?.role === 'admin' ||
-        (sessionClaims as any)?.public_metadata?.role === 'admin';
-      if (!isAdminUser) {
+      if (!hasAdminRole(sessionClaims)) {
         if (isApi) return apiAuthError(403, 'Forbidden', reqId);
         return NextResponse.redirect(buildAccountsUrl('/unauthorized-sign-in', req.url));
       }

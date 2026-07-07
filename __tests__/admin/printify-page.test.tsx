@@ -454,6 +454,76 @@ describe('Printify admin catalog control page', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  it('locks apply and prompts reauthentication when apply returns 401', async () => {
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    mockFetchOnce(
+      {
+        ok: false,
+        requestId: 'req-stale-session',
+        error: 'Unauthorized',
+      },
+      401,
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+
+    const applyButton = screen.getByRole('button', { name: /apply printify catalog/i });
+    fireEvent.click(applyButton);
+
+    await screen.findByText('req-stale-session');
+    expect(screen.getByText(/Your session is no longer valid/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /sign in again/i })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/sign-in?redirect_url='),
+    );
+    expect(applyButton).toBeDisabled();
+    expect(screen.getByLabelText(/confirmation phrase/i)).toHaveValue('');
+    expect(screen.queryByText('Would insert')).not.toBeInTheDocument();
+
+    fireEvent.click(applyButton);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps apply locked and distinguishes insufficient permissions on 403', async () => {
+    mockFetchOnce({
+      ok: true,
+      requestId: 'req-preflight',
+      data: { operation: 'preflight', preflight: safePreflight },
+    });
+    mockFetchOnce(
+      {
+        ok: false,
+        requestId: 'req-forbidden',
+        error: 'Forbidden',
+      },
+      403,
+    );
+
+    render(<PrintifyAdminPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /run preflight/i }));
+    await screen.findByText('req-preflight');
+    fireEvent.change(screen.getByLabelText(/confirmation phrase/i), {
+      target: { value: 'APPLY PRINTIFY CATALOG' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply printify catalog/i }));
+
+    await screen.findByText('req-forbidden');
+    expect(screen.getByText(/does not have permission/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /sign in again/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /apply printify catalog/i })).toBeDisabled();
+  });
+
   it('does not send stale manual or products operations', async () => {
     mockFetchOnce({
       ok: true,
