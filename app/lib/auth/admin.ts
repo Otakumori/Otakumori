@@ -2,12 +2,13 @@
  * Admin Authentication Helpers
  *
  * Centralized admin access control for server-side routes and pages.
- * Uses email-based admin detection via ADMIN_EMAILS config.
+ * Uses Clerk metadata.role = admin as the canonical admin source.
  */
 
 import { currentUser, auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { isAdminEmail, ADMIN_EMAILS } from '@/app/lib/config/admin';
+import { hasAdminRole } from '@/app/lib/auth/adminRole';
 import { type NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -19,9 +20,8 @@ export function getAdminEmails(): readonly string[] {
   return ADMIN_EMAILS;
 }
 
-/**
- * Check if a Clerk user is an admin based on their email
- */
+// Legacy bootstrap helper only. Runtime admin authorization must use Clerk role claims
+// so server pages, middleware, and API routes agree for the same session.
 export function isAdmin(
   user: {
     emailAddresses?: Array<{ emailAddress?: string | null }>;
@@ -31,7 +31,7 @@ export function isAdmin(
   if (!user) return false;
 
   const email =
-    user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
+    user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? null;
 
   return isAdminEmail(email);
 }
@@ -44,21 +44,22 @@ export function isAdmin(
  * @throws Redirects to /admin/unauthorized if not admin
  */
 export async function requireAdmin(): Promise<{ id: string; email: string | null }> {
-  const user = await currentUser();
+  const authResult = await auth();
 
-  if (!user) {
+  if (!authResult.userId) {
     redirect('/sign-in?redirect_url=/admin');
   }
 
-  const email =
-    user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
-
-  if (!isAdminEmail(email)) {
+  if (!hasAdminRole(authResult.sessionClaims)) {
     redirect('/admin/unauthorized');
   }
 
+  const user = await currentUser();
+  const email =
+    user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? null;
+
   return {
-    id: user.id,
+    id: authResult.userId,
     email,
   };
 }
@@ -86,9 +87,8 @@ export function withAdminAuth<T extends NextRequest>(
       );
     }
 
-    // Get user from Clerk to check email
-    const user = await currentUser();
-    if (!isAdmin(user)) {
+    const authResult = await auth();
+    if (!hasAdminRole(authResult.sessionClaims)) {
       return NextResponse.json(
         { ok: false, error: 'FORBIDDEN' },
         { status: 403, headers: { 'x-otm-reason': 'FORBIDDEN' } },

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { AlertTriangle, CheckCircle, Database, RefreshCw, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Database, LogIn, RefreshCw, XCircle } from 'lucide-react';
 
 import { logger } from '@/app/lib/logger';
 import { Badge } from '../../../components/ui/badge';
@@ -73,6 +73,9 @@ type OperationResult = {
   errors?: string[];
 };
 
+const SESSION_EXPIRED_MESSAGE = 'Your session is no longer valid. Sign in again before continuing.';
+const FORBIDDEN_MESSAGE = 'Your account does not have permission to run Printify catalog sync.';
+
 const preflightRows: Array<{ key: keyof PreflightSummary; label: string }> = [
   { key: 'productCount', label: 'Products' },
   { key: 'variantCount', label: 'Variants' },
@@ -119,6 +122,19 @@ async function parseCatalogSyncResponse(response: Response): Promise<CatalogSync
   return parsed;
 }
 
+function authAwareError(response: Response, body: CatalogSyncResponse) {
+  if (response.status === 401) return SESSION_EXPIRED_MESSAGE;
+  if (response.status === 403) return FORBIDDEN_MESSAGE;
+  return body.error;
+}
+
+function signInHref() {
+  if (typeof window === 'undefined') return '/sign-in';
+  const url = new URL('/sign-in', window.location.origin);
+  url.searchParams.set('redirect_url', window.location.href);
+  return `${url.pathname}${url.search}`;
+}
+
 export default function PrintifyAdminPage() {
   const [preflight, setPreflight] = useState<PreflightSummary | null>(null);
   const [confirmation, setConfirmation] = useState('');
@@ -155,7 +171,7 @@ export default function PrintifyAdminPage() {
         ok: body.ok,
         status: response.status,
         requestId: body.requestId,
-        error: body.error,
+        error: authAwareError(response, body),
         productCount: summary?.productCount,
         errorCount: summary?.issues?.length,
         errors: summary?.issues?.map((issue) => `${issue.productId}: ${issue.reason}`),
@@ -200,7 +216,7 @@ export default function PrintifyAdminPage() {
         ok: body.ok,
         status: response.status,
         requestId: body.requestId,
-        error: body.error,
+        error: authAwareError(response, body),
         productCount: syncResult?.productCount,
         upserted: syncResult?.upserted,
         hidden: syncResult?.hidden,
@@ -378,7 +394,18 @@ export default function PrintifyAdminPage() {
               {result.errorCount ?? 'n/a'}
             </div>
             {result.error ? (
-              <div className="text-destructive md:col-span-2">{result.error}</div>
+              <div className="space-y-3 text-destructive md:col-span-2">
+                <p>{result.error}</p>
+                {result.status === 401 ? (
+                  <a
+                    href={signInHref()}
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-current px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Sign in again
+                  </a>
+                ) : null}
+              </div>
             ) : null}
             {result.errors?.length ? (
               <div className="md:col-span-2">

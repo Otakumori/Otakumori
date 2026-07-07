@@ -4,8 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAuth, useUser } from '@clerk/nextjs';
-import { SignInButton } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
 import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
@@ -53,8 +52,7 @@ const GAME_FACE_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const { requireAuthForSoapstone, requireAuthForWishlist, signOut } = useAuthContext();
   const { itemCount } = useCart();
 
@@ -66,6 +64,19 @@ export default function Navbar() {
 
   const userMenuAriaExpanded = useMemo(() => showUserMenu, [showUserMenu]);
   const mobileMenuAriaExpanded = useMemo(() => isMenuOpen, [isMenuOpen]);
+  const primaryEmail =
+    user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? '';
+  const displayName = user?.fullName || user?.firstName || primaryEmail.split('@')[0] || 'Traveler';
+  const initials =
+    displayName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('') ||
+    primaryEmail[0]?.toUpperCase() ||
+    'U';
+  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(pathname || '/')}`;
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -236,19 +247,25 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden sm:block relative" ref={userMenuRef}>
-            {isSignedIn ? (
+            {!isLoaded ? (
+              <div className="min-h-[44px] min-w-[132px] rounded-lg border border-white/10 bg-white/5 px-4 py-2" aria-busy="true" aria-label="Loading account state">
+                <span className="block h-3 w-20 rounded bg-white/15" />
+                <span className="mt-2 block h-2 w-14 rounded bg-white/10" />
+              </div>
+            ) : isSignedIn ? (
               <>
                 <button onClick={() => setShowUserMenu(!showUserMenu)} className="min-h-[44px] flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors" aria-label="User menu" aria-expanded={userMenuAriaExpanded}>
-                  {user?.imageUrl ? <Image src={user.imageUrl} alt={user.fullName || user.firstName || 'User'} width={32} height={32} className="rounded-full border border-white/20" /> : <div className="w-8 h-8 rounded-full bg-pink-500/20 border border-white/20 flex items-center justify-center text-white text-sm font-medium">{user?.firstName?.[0] || user?.emailAddresses?.[0]?.emailAddress?.[0] || 'U'}</div>}
-                  <span className="hidden sm:inline text-sm text-white">{user?.fullName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'User'}</span>
+                  {user?.imageUrl ? <Image src={user.imageUrl} alt={displayName} width={32} height={32} className="rounded-full border border-white/20" /> : <div className="w-8 h-8 rounded-full bg-pink-500/20 border border-white/20 flex items-center justify-center text-white text-sm font-medium">{initials}</div>}
+                  <span className="hidden sm:inline text-sm text-white">{displayName}</span>
                   <ChevronDown className={`w-4 h-4 text-white transition-transform ${showUserMenu ? 'rotate-180' : ''}`} aria-hidden="true" />
                 </button>
                 {showUserMenu && (
                   <div className="absolute right-0 top-full mt-2 w-56 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg shadow-lg z-50" onKeyDown={(e) => { if (e.key === 'Escape') setShowUserMenu(false); }} role="dialog" aria-label="User menu" tabIndex={-1}>
                     <div className="p-2">
                       <div className="px-4 py-3 border-b border-white/10">
-                        <p className="text-sm font-medium text-white truncate">{user?.fullName || user?.firstName || 'User'}</p>
-                        <p className="text-xs text-white/60 truncate">{user?.emailAddresses?.[0]?.emailAddress || ''}</p>
+                        <p className="text-xs uppercase tracking-wide text-white/50">Signed in as</p>
+                        <p className="text-sm font-medium text-white truncate">{displayName}</p>
+                        <p className="text-xs text-white/60 truncate">{primaryEmail}</p>
                       </div>
                       <Link href={paths.profile()} className="block min-h-[44px] px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg transition-colors" onClick={() => setShowUserMenu(false)}>Profile</Link>
                       <Link href={paths.account()} className="block min-h-[44px] px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg transition-colors" onClick={() => setShowUserMenu(false)}>Account Settings</Link>
@@ -260,7 +277,7 @@ export default function Navbar() {
                 )}
               </>
             ) : (
-              <SignInButton mode="modal"><button className="min-h-[44px] px-4 py-2 bg-transparent border border-current rounded-lg text-text-link hover:text-text-link-hover hover:border-primary transition-all duration-300">Sign In</button></SignInButton>
+              <a href={signInHref} className="inline-flex min-h-[44px] items-center rounded-lg border border-current bg-transparent px-4 py-2 text-text-link transition-all duration-300 hover:border-primary hover:text-text-link-hover">Sign In</a>
             )}
           </div>
         </div>
@@ -298,17 +315,25 @@ export default function Navbar() {
               </nav>
 
               <div className="p-4 border-t border-white/10">
-                {isSignedIn ? (
+                {!isLoaded ? (
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3" aria-busy="true" aria-label="Loading account state">
+                    <span className="block h-3 w-28 rounded bg-white/15" />
+                    <span className="mt-2 block h-2 w-20 rounded bg-white/10" />
+                  </div>
+                ) : isSignedIn ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-3 px-4 py-2">
-                      {user?.imageUrl ? <Image src={user.imageUrl} alt={user.fullName || user.firstName || 'User'} width={32} height={32} className="rounded-full border border-white/20" /> : <div className="w-8 h-8 rounded-full bg-pink-500/20 border border-white/20 flex items-center justify-center text-white text-sm font-medium">{user?.firstName?.[0] || user?.emailAddresses?.[0]?.emailAddress?.[0] || 'U'}</div>}
-                      <div className="flex-1 min-w-0"><p className="text-sm font-medium text-white truncate">{user?.fullName || user?.firstName || 'User'}</p><p className="text-xs text-white/60 truncate">{user?.emailAddresses?.[0]?.emailAddress || ''}</p></div>
+                      {user?.imageUrl ? <Image src={user.imageUrl} alt={displayName} width={32} height={32} className="rounded-full border border-white/20" /> : <div className="w-8 h-8 rounded-full bg-pink-500/20 border border-white/20 flex items-center justify-center text-white text-sm font-medium">{initials}</div>}
+                      <div className="flex-1 min-w-0"><p className="text-xs uppercase tracking-wide text-white/50">Signed in as</p><p className="text-sm font-medium text-white truncate">{displayName}</p><p className="text-xs text-white/60 truncate">{primaryEmail}</p></div>
                     </div>
                     <Link href={paths.profile()} onClick={() => setIsMenuOpen(false)} className="block min-h-[44px] px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors">Profile</Link>
+                    <Link href={paths.account()} onClick={() => setIsMenuOpen(false)} className="block min-h-[44px] px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors">Account Settings</Link>
+                    <Link href={paths.achievements()} onClick={() => setIsMenuOpen(false)} className="block min-h-[44px] px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors">Achievements</Link>
+                    <Link href="/wishlist" onClick={() => setIsMenuOpen(false)} className="block min-h-[44px] px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors">Wishlist</Link>
                     <button onClick={async () => { setIsMenuOpen(false); await signOut(); }} className="w-full text-left min-h-[44px] px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">Sign Out</button>
                   </div>
                 ) : (
-                  <SignInButton mode="modal"><button className="w-full min-h-[44px] px-4 py-3 bg-transparent border border-current rounded-lg text-white hover:bg-white/10 transition-colors">Sign In</button></SignInButton>
+                  <a href={signInHref} className="flex w-full min-h-[44px] items-center justify-center rounded-lg border border-current bg-transparent px-4 py-3 text-white transition-colors hover:bg-white/10">Sign In</a>
                 )}
               </div>
             </div>
