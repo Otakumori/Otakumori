@@ -9,7 +9,8 @@ export interface ShopProduct {
   printifyProductId: string | null;
   variants: Array<{
     id: string;
-    printifyVariantId: number;
+    providerVariantId: string | null;
+    printifyVariantId: number | null;
     priceCents: number | null;
     currency: string | null;
     isEnabled: boolean;
@@ -98,6 +99,9 @@ export async function getShopProducts(
       printifyProductId: product.printifyProductId,
       variants: product.ProductVariant.map((variant) => ({
         id: variant.id,
+        providerVariantId:
+          variant.providerVariantId ??
+          (variant.printifyVariantId != null ? String(variant.printifyVariantId) : null),
         printifyVariantId: variant.printifyVariantId,
         priceCents: variant.priceCents,
         currency: variant.currency,

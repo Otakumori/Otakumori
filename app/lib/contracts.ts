@@ -10,8 +10,10 @@ export type ApiEnvelope<T> = { ok: true; data: T } | { ok: false; error: string 
 export const ProductVariantSchema = z.object({
   id: z.string(),
   productId: z.string(),
+  provider: z.enum(['internal', 'printify', 'merchize']).optional(),
+  providerVariantId: z.string().nullable().optional(),
   previewImageUrl: z.string().nullable().optional(),
-  printifyVariantId: z.number(),
+  printifyVariantId: z.number().nullable().optional(),
   isEnabled: z.boolean(),
   inStock: z.boolean(),
   priceCents: z.number().int().nullable().optional(),
@@ -69,6 +71,7 @@ export const ProductDetailResponse = z.object({
 export const CheckoutItem = z.object({
   productId: z.string(),
   variantId: z.string(),
+  provider: z.enum(['internal', 'printify', 'merchize']).optional(),
   name: z.string(),
   description: z.string().optional(),
   images: z.array(z.string()).optional(),

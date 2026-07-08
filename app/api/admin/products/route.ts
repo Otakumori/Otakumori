@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { db } from '@/app/lib/db';
 import { newRequestId } from '@/app/lib/requestId';
+import { resolveCatalogProvider } from '@/lib/catalog/provider';
 
 export const runtime = 'nodejs';
 
@@ -11,13 +12,6 @@ const ProductActionSchema = z.object({
   action: z.enum(['hide', 'restore', 'archive']),
   productIds: z.array(z.string().min(1)).min(1).max(100),
 });
-
-function getProvider(product: { printifyProductId: string | null; integrationRef: string | null }) {
-  if (product.printifyProductId || product.integrationRef?.startsWith('printify:'))
-    return 'printify';
-  if (product.integrationRef?.startsWith('merchize:')) return 'merchize';
-  return 'internal';
-}
 
 function getStatus(product: { active: boolean; visible: boolean }) {
   if (!product.active) return 'archived';
@@ -86,7 +80,7 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
 
     const items = products
       .map((product) => {
-        const productProvider = getProvider(product);
+        const productProvider = resolveCatalogProvider(product);
         const sellableVariantCount = product.ProductVariant.filter(
           (variant) => variant.isEnabled && variant.inStock,
         ).length;

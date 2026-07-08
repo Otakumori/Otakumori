@@ -33,6 +33,8 @@ const baseProduct: CatalogProduct = {
   variants: [
     {
       id: 'variant-1',
+      provider: 'printify',
+      providerVariantId: '101',
       title: 'Small',
       sku: 'sku-1',
       price: 24,
@@ -45,6 +47,8 @@ const baseProduct: CatalogProduct = {
     },
     {
       id: 'variant-2',
+      provider: 'printify',
+      providerVariantId: '102',
       title: 'Medium',
       sku: 'sku-2',
       price: 32,
