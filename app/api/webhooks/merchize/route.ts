@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
+import { generateRequestId } from '@/app/lib/api-contracts';
 import { env } from '@/env.mjs';
-import { db as prisma } from '@/lib/db';
+
+export const runtime = 'nodejs';
 
 const WEBHOOK_SECRET = env.MERCHIZE_WEBHOOK_SECRET;
 
@@ -18,44 +20,82 @@ function verifyWebhookKey(webhookKey: string | null) {
   return safeCompare(webhookKey, WEBHOOK_SECRET);
 }
 
+function coerceString(value: unknown): string | null {
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return null;
+}
+
+function truncate(value: string | null, maxLength = 80) {
+  if (!value) return null;
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+}
+
 export async function POST(req: NextRequest) {
+  const requestId = generateRequestId();
   const rawBody = await req.text();
   const webhookKey = req.headers.get('merchize-webhook-key');
 
   if (!verifyWebhookKey(webhookKey)) {
-    return NextResponse.json({ error: 'Invalid webhook key' }, { status: 401 });
+    const { logger } = await import('@/app/lib/logger');
+    logger.warn('Merchize webhook rejected', {
+      requestId,
+      route: '/api/webhooks/merchize',
+      extra: { reason: WEBHOOK_SECRET ? 'invalid_key' : 'missing_secret' },
+    });
+    return NextResponse.json(
+      { ok: false, error: 'Invalid webhook key', requestId },
+      { status: 401 },
+    );
   }
 
-  let event: any;
+  let event: unknown;
   try {
     event = JSON.parse(rawBody);
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'Invalid JSON', requestId }, { status: 400 });
   }
 
-  try {
-    const eventType = event.type ?? event.event ?? event.name;
-    const data = event.data ?? event.order ?? event.payload ?? {};
-    const merchizeOrderId = String(data.id ?? data.order_id ?? data.orderId ?? '');
-
-    console.warn('Merchize webhook received:', {
-      eventType,
-      merchizeOrderId,
-    });
-
-    if (eventType === 'order_changed_tracking' && merchizeOrderId) {
-      const trackingNumber = data.tracking_number ?? data.trackingNumber;
-      if (trackingNumber) {
-        await prisma.order.updateMany({
-          where: { printifyId: merchizeOrderId },
-          data: { trackingNumber: String(trackingNumber) },
-        });
-      }
-    }
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error('Merchize webhook error:', err);
-    return NextResponse.json({ ok: true });
+  if (!event || typeof event !== 'object' || Array.isArray(event)) {
+    return NextResponse.json(
+      { ok: false, error: 'Invalid webhook payload', requestId },
+      { status: 400 },
+    );
   }
+
+  const record = event as Record<string, unknown>;
+  const eventType =
+    coerceString(record.type) ?? coerceString(record.event) ?? coerceString(record.name);
+  const data =
+    record.data && typeof record.data === 'object' && !Array.isArray(record.data)
+      ? (record.data as Record<string, unknown>)
+      : record.order && typeof record.order === 'object' && !Array.isArray(record.order)
+        ? (record.order as Record<string, unknown>)
+        : record.payload && typeof record.payload === 'object' && !Array.isArray(record.payload)
+          ? (record.payload as Record<string, unknown>)
+          : {};
+  const merchizeOrderId =
+    coerceString(data.id) ?? coerceString(data.order_id) ?? coerceString(data.orderId);
+
+  const { logger } = await import('@/app/lib/logger');
+  logger.info('Merchize webhook verified in read-only mode', {
+    requestId,
+    route: '/api/webhooks/merchize',
+    extra: {
+      eventType: truncate(eventType),
+      hasMerchizeOrderId: Boolean(merchizeOrderId),
+      action: 'accepted_noop',
+    },
+  });
+
+  return NextResponse.json(
+    {
+      ok: true,
+      requestId,
+      status: 'accepted_noop',
+      message:
+        'Merchize webhook verified. Order mutation is disabled until provider-neutral order mapping is implemented.',
+    },
+    { status: 202 },
+  );
 }
