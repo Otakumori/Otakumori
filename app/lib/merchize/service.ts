@@ -17,7 +17,9 @@ export interface MerchizeProduct {
   currency: string | null;
   price: number | null;
   images: MerchizeProductImage[];
-  raw: JsonRecord;
+  variantCount: number;
+  pricedVariantCount: number;
+  imageCount: number;
 }
 
 export interface MerchizeConnectionResult {
@@ -29,14 +31,54 @@ export interface MerchizeConnectionResult {
   sampleKeys?: string[];
 }
 
+export interface MerchizePreflightIssue {
+  code: string;
+  message: string;
+  count?: number;
+}
+
+export interface MerchizeCatalogPreflight {
+  connection: MerchizeConnectionResult;
+  productCount: number;
+  normalizedProductCount: number;
+  variantCount: number;
+  pricedVariantCount: number;
+  imageCount: number;
+  productsMissingImages: number;
+  productsMissingPrice: number;
+  duplicateProductIdCount: number;
+  duplicateSkuCount: number;
+  payloadShapeKeys: string[];
+  safeToImport: boolean;
+  issues: MerchizePreflightIssue[];
+  products: Array<{
+    id: string;
+    title: string;
+    sku: string | null;
+    status: string | null;
+    price: number | null;
+    imageCount: number;
+    variantCount: number;
+    pricedVariantCount: number;
+  }>;
+}
+
+class MerchizeServiceError extends Error {
+  constructor(
+    message: string,
+    readonly category: 'configuration' | 'provider' | 'network' | 'payload',
+    readonly status?: number,
+  ) {
+    super(message);
+    this.name = 'MerchizeServiceError';
+  }
+}
+
 function getBaseUrl(): string {
-  const baseUrl =
-    env.MERCHIZE_API_URL ||
-    env.MERCHIZE_STORE_API_URL ||
-    env.NEXT_PUBLIC_MERCHIZE_API_URL;
+  const baseUrl = env.MERCHIZE_API_URL || env.MERCHIZE_STORE_API_URL;
 
   if (!baseUrl) {
-    throw new Error('Missing MERCHIZE_API_URL or MERCHIZE_STORE_API_URL');
+    throw new MerchizeServiceError('Merchize server API URL is not configured', 'configuration');
   }
 
   return baseUrl.replace(/\/+$/, '');
@@ -46,7 +88,7 @@ function getAccessToken(): string {
   const token = env.MERCHIZE_ACCESS_TOKEN || env.MERCHIZE_API_TOKEN;
 
   if (!token) {
-    throw new Error('Missing MERCHIZE_ACCESS_TOKEN or MERCHIZE_API_TOKEN');
+    throw new MerchizeServiceError('Merchize server API token is not configured', 'configuration');
   }
 
   return token.trim();
@@ -61,6 +103,28 @@ async function parseResponseBody(response: Response): Promise<unknown> {
   } catch {
     return text;
   }
+}
+
+function sanitizeError(error: unknown): { message: string; category: string; status?: number } {
+  if (error instanceof MerchizeServiceError) {
+    return {
+      message: error.message,
+      category: error.category,
+      status: error.status,
+    };
+  }
+
+  if (error instanceof TypeError) {
+    return {
+      message: 'Merchize provider request failed',
+      category: 'network',
+    };
+  }
+
+  return {
+    message: 'Merchize provider request failed',
+    category: 'provider',
+  };
 }
 
 function coerceString(value: unknown): string | null {
@@ -87,6 +151,16 @@ function coerceNumber(value: unknown): number | null {
   }
 
   return null;
+}
+
+function countDuplicates(values: string[]): number {
+  const counts = new Map<string, number>();
+  for (const value of values) {
+    if (!value) continue;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+
+  return [...counts.values()].filter((count) => count > 1).length;
 }
 
 function extractImageUrls(raw: JsonRecord): MerchizeProductImage[] {
@@ -148,7 +222,18 @@ function extractImageUrls(raw: JsonRecord): MerchizeProductImage[] {
     }
   }
 
-  return urls.filter((image, index, arr) => arr.findIndex((item) => item.url === image.url) === index);
+  return urls.filter(
+    (image, index, arr) => arr.findIndex((item) => item.url === image.url) === index,
+  );
+}
+
+function extractVariants(raw: JsonRecord): JsonRecord[] {
+  const variants = raw.variants;
+  if (!Array.isArray(variants)) return [];
+  return variants.filter(
+    (variant): variant is JsonRecord =>
+      Boolean(variant) && typeof variant === 'object' && !Array.isArray(variant),
+  );
 }
 
 function extractDefaultPrice(raw: JsonRecord): number | null {
@@ -163,11 +248,9 @@ function extractDefaultPrice(raw: JsonRecord): number | null {
     return directPrice;
   }
 
-  const variants = Array.isArray(raw.variants) ? raw.variants : [];
+  const variants = extractVariants(raw);
   for (const variant of variants) {
-    if (!variant || typeof variant !== 'object' || Array.isArray(variant)) continue;
-    const record = variant as JsonRecord;
-    const tiers = Array.isArray(record.tiers) ? record.tiers : [];
+    const tiers = Array.isArray(variant.tiers) ? variant.tiers : [];
     for (const tier of tiers) {
       if (!tier || typeof tier !== 'object' || Array.isArray(tier)) continue;
       const tierRecord = tier as JsonRecord;
@@ -179,6 +262,22 @@ function extractDefaultPrice(raw: JsonRecord): number | null {
   }
 
   return null;
+}
+
+function hasVariantPrice(variant: JsonRecord): boolean {
+  if (
+    coerceNumber(variant.price) != null ||
+    coerceNumber(variant.retailPrice) != null ||
+    coerceNumber(variant.retail_price) != null
+  ) {
+    return true;
+  }
+
+  const tiers = Array.isArray(variant.tiers) ? variant.tiers : [];
+  return tiers.some((tier) => {
+    if (!tier || typeof tier !== 'object' || Array.isArray(tier)) return false;
+    return coerceNumber((tier as JsonRecord).price) != null;
+  });
 }
 
 function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | null {
@@ -203,35 +302,42 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
     `Merchize Product ${index + 1}`;
 
   const fulfillmentLocation =
-    raw.fulfillment_location && typeof raw.fulfillment_location === 'object' && !Array.isArray(raw.fulfillment_location)
-      ? raw.fulfillment_location as JsonRecord
+    raw.fulfillment_location &&
+    typeof raw.fulfillment_location === 'object' &&
+    !Array.isArray(raw.fulfillment_location)
+      ? (raw.fulfillment_location as JsonRecord)
       : null;
 
   const descriptionParts = [
     coerceString(raw.description),
     coerceString(raw.body),
     coerceString(raw.summary),
-    fulfillmentLocation ? `Fulfillment: ${coerceString(fulfillmentLocation.name) || coerceString(fulfillmentLocation.code) || 'Unknown'}` : null,
-    Array.isArray(raw.printing_methods) ? `Printing: ${raw.printing_methods.map((value) => coerceString(value)).filter(Boolean).join(', ')}` : null,
+    fulfillmentLocation
+      ? `Fulfillment: ${coerceString(fulfillmentLocation.name) || coerceString(fulfillmentLocation.code) || 'Unknown'}`
+      : null,
+    Array.isArray(raw.printing_methods)
+      ? `Printing: ${raw.printing_methods
+          .map((value) => coerceString(value))
+          .filter(Boolean)
+          .join(', ')}`
+      : null,
   ].filter(Boolean) as string[];
+  const variants = extractVariants(raw);
+  const images = extractImageUrls(raw);
 
   return {
     id,
     title,
     description: descriptionParts.length > 0 ? descriptionParts.join(' · ') : null,
     sku: coerceString(raw.sku),
-    handle:
-      coerceString(raw.handle) ||
-      coerceString(raw.slug) ||
-      coerceString(raw.permalink),
-    status:
-      coerceString(raw.status) ||
-      coerceString(raw.state) ||
-      'active',
+    handle: coerceString(raw.handle) || coerceString(raw.slug) || coerceString(raw.permalink),
+    status: coerceString(raw.status) || coerceString(raw.state) || 'active',
     currency: 'USD',
     price: extractDefaultPrice(raw),
-    images: extractImageUrls(raw),
-    raw,
+    images,
+    variantCount: variants.length,
+    pricedVariantCount: variants.filter(hasVariantPrice).length,
+    imageCount: images.length,
   };
 }
 
@@ -275,7 +381,10 @@ export class MerchizeService {
     this.accessToken = getAccessToken();
   }
 
-  private buildUrl(path = '/product/catalog', query?: Record<string, string | number | undefined>): string {
+  private buildUrl(
+    path = '/product/catalog',
+    query?: Record<string, string | number | undefined>,
+  ): string {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     const url = new URL(`${this.baseUrl}${normalizedPath}`);
 
@@ -289,23 +398,37 @@ export class MerchizeService {
     return url.toString();
   }
 
-  private async request(path = '/product/catalog', query?: Record<string, string | number | undefined>): Promise<{ response: Response; body: unknown }> {
-    const response = await fetch(this.buildUrl(path, query), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'User-Agent': this.userAgent,
-      },
-      cache: 'no-store',
-    });
+  private async request(
+    path = '/product/catalog',
+    query?: Record<string, string | number | undefined>,
+  ): Promise<{ response: Response; body: unknown }> {
+    let response: Response;
+    try {
+      response = await fetch(this.buildUrl(path, query), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'User-Agent': this.userAgent,
+        },
+        cache: 'no-store',
+      });
+    } catch (error) {
+      throw new MerchizeServiceError(
+        'Merchize provider request failed',
+        error instanceof TypeError ? 'network' : 'provider',
+      );
+    }
 
     const body = await parseResponseBody(response);
 
     if (!response.ok) {
-      const detail = typeof body === 'string' ? body : JSON.stringify(body);
-      throw new Error(`Merchize API error (${response.status}): ${detail}`);
+      throw new MerchizeServiceError(
+        `Merchize provider returned HTTP ${response.status}`,
+        'provider',
+        response.status,
+      );
     }
 
     return { response, body };
@@ -318,21 +441,27 @@ export class MerchizeService {
 
       return {
         success: true,
-        endpoint: this.buildUrl('/product/catalog', { limit: 1, page: 1 }),
+        endpoint: '/product/catalog',
         status: response.status,
         productCount: products.length,
         sampleKeys: extractPayloadKeys(body),
       };
     } catch (error) {
+      const sanitized = sanitizeError(error);
       return {
         success: false,
-        endpoint: this.buildUrl('/product/catalog', { limit: 1, page: 1 }),
-        error: error instanceof Error ? error.message : String(error),
+        endpoint: '/product/catalog',
+        status: sanitized.status,
+        error: sanitized.message,
       };
     }
   }
 
-  async getProducts(options?: { limit?: number; page?: number; search?: string }): Promise<MerchizeProduct[]> {
+  async getProducts(options?: {
+    limit?: number;
+    page?: number;
+    search?: string;
+  }): Promise<MerchizeProduct[]> {
     const { body } = await this.request('/product/catalog', {
       limit: options?.limit ?? 50,
       page: options?.page ?? 1,
@@ -343,6 +472,113 @@ export class MerchizeService {
     return collection
       .map((item, index) => normalizeProduct(item, index))
       .filter((item): item is MerchizeProduct => Boolean(item));
+  }
+
+  async preflightCatalog(options?: {
+    limit?: number;
+    page?: number;
+  }): Promise<MerchizeCatalogPreflight> {
+    const query = {
+      limit: options?.limit ?? 50,
+      page: options?.page ?? 1,
+    };
+    const { response, body } = await this.request('/product/catalog', query);
+    const collection = extractCatalogProducts(body);
+    const products = collection
+      .map((item, index) => normalizeProduct(item, index))
+      .filter((item): item is MerchizeProduct => Boolean(item));
+    const issues: MerchizePreflightIssue[] = [];
+    const productIds = products.map((product) => product.id).filter(Boolean);
+    const skus = products.map((product) => product.sku ?? '').filter(Boolean);
+    const duplicateProductIdCount = countDuplicates(productIds);
+    const duplicateSkuCount = countDuplicates(skus);
+    const productsMissingImages = products.filter((product) => product.imageCount === 0).length;
+    const productsMissingPrice = products.filter((product) => product.price == null).length;
+    const variantCount = products.reduce((total, product) => total + product.variantCount, 0);
+    const pricedVariantCount = products.reduce(
+      (total, product) => total + product.pricedVariantCount,
+      0,
+    );
+    const imageCount = products.reduce((total, product) => total + product.imageCount, 0);
+
+    if (collection.length === 0) {
+      issues.push({
+        code: 'empty_provider_catalog',
+        message: 'Merchize returned no catalog products.',
+      });
+    }
+
+    if (products.length !== collection.length) {
+      issues.push({
+        code: 'unnormalized_products',
+        message: 'Some Merchize product payloads could not be normalized.',
+        count: collection.length - products.length,
+      });
+    }
+
+    if (duplicateProductIdCount > 0) {
+      issues.push({
+        code: 'duplicate_merchize_product_ids',
+        message: 'Merchize returned duplicate product identities.',
+        count: duplicateProductIdCount,
+      });
+    }
+
+    if (duplicateSkuCount > 0) {
+      issues.push({
+        code: 'duplicate_merchize_skus',
+        message: 'Merchize returned duplicate SKU values.',
+        count: duplicateSkuCount,
+      });
+    }
+
+    if (productsMissingImages > 0) {
+      issues.push({
+        code: 'products_missing_images',
+        message: 'Some Merchize products do not have usable images.',
+        count: productsMissingImages,
+      });
+    }
+
+    if (productsMissingPrice > 0) {
+      issues.push({
+        code: 'products_missing_price',
+        message: 'Some Merchize products do not have a usable price.',
+        count: productsMissingPrice,
+      });
+    }
+
+    return {
+      connection: {
+        success: true,
+        endpoint: '/product/catalog',
+        status: response.status,
+        productCount: products.length,
+        sampleKeys: extractPayloadKeys(body),
+      },
+      productCount: collection.length,
+      normalizedProductCount: products.length,
+      variantCount,
+      pricedVariantCount,
+      imageCount,
+      productsMissingImages,
+      productsMissingPrice,
+      duplicateProductIdCount,
+      duplicateSkuCount,
+      payloadShapeKeys: extractPayloadKeys(body) ?? [],
+      safeToImport: issues.length === 0 && products.length > 0,
+      issues,
+      products: products.slice(0, 24).map((product) => ({
+        id: product.id,
+        title: product.title,
+        sku: product.sku,
+        status: product.status,
+        price: product.price,
+        imageCount: product.imageCount,
+        variantCount: product.variantCount,
+        pricedVariantCount: product.pricedVariantCount,
+      })),
+    };
   }
 }
 

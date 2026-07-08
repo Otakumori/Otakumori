@@ -1,24 +1,46 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { createApiError, createApiSuccess, generateRequestId } from '@/app/lib/api-contracts';
+import { withAdminAuth } from '@/app/lib/auth/admin';
 import { getMerchizeService } from '@/app/lib/merchize/service';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
-  try {
-    const products = await getMerchizeService().getProducts();
+export const GET = withAdminAuth(async (_request: NextRequest) => {
+  const requestId = generateRequestId();
 
-    return NextResponse.json({
-      ok: true,
-      count: products.length,
-      products,
-    });
-  } catch (error) {
+  try {
+    const products = await getMerchizeService().getProducts({ limit: 50, page: 1 });
+
     return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
+      createApiSuccess(
+        {
+          count: products.length,
+          products: products.map((product) => ({
+            id: product.id,
+            title: product.title,
+            sku: product.sku,
+            status: product.status,
+            price: product.price,
+            imageCount: product.imageCount,
+            variantCount: product.variantCount,
+          })),
+        },
+        requestId,
+      ),
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
+  } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
+    logger.error(
+      'Merchize products admin API failed',
+      { requestId, route: '/api/merchize/products' },
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
+
+    return NextResponse.json(
+      createApiError('INTERNAL_ERROR', 'Failed to fetch Merchize products.', requestId),
+      { status: 502 },
     );
   }
-}
+});
