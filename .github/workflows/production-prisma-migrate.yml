@@ -1,0 +1,397 @@
+name: Production Prisma Migrate
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_pr_number:
+        description: 'Must be exactly 57'
+        required: true
+        type: string
+      confirm_migration:
+        description: 'Must be exactly 20260708233000_provider_neutral_variant_identity'
+        required: true
+        type: string
+      confirm_target:
+        description: 'Must be exactly production-main-neondb'
+        required: true
+        type: string
+      checkout_ref:
+        description: 'Branch or ref to check out for the migration code'
+        required: true
+        type: string
+        default: 'fix/provider-neutral-variant-identity-prep'
+      expected_head_sha:
+        description: 'Exact commit SHA expected after checkout'
+        required: true
+        type: string
+        default: 'c39417ca3dedcf5363ba868c9bf861a49e628065'
+      dry_run:
+        description: 'Run read-only preflight only'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-prisma-migrate
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.15.1'
+  SKIP_ENV_VALIDATION: '1'
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  DIRECT_URL: ${{ secrets.DIRECT_URL }}
+
+jobs:
+  production-prisma-migrate:
+    name: Production Prisma migration gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Fail closed unless confirmations match
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          if [ "${{ inputs.confirm_pr_number }}" != "57" ]; then
+            echo "confirm_pr_number mismatch"
+            exit 1
+          fi
+
+          if [ "${{ inputs.confirm_migration }}" != "20260708233000_provider_neutral_variant_identity" ]; then
+            echo "confirm_migration mismatch"
+            exit 1
+          fi
+
+          if [ "${{ inputs.confirm_target }}" != "production-main-neondb" ]; then
+            echo "confirm_target mismatch"
+            exit 1
+          fi
+
+          echo "Confirmations accepted"
+          echo "dry_run=${{ inputs.dry_run }}"
+
+      - name: Checkout requested migration ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout_ref }}
+
+      - name: Verify checked-out SHA
+        id: checkout
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          actual_sha="$(git rev-parse HEAD)"
+          expected_sha="${{ inputs.expected_head_sha }}"
+
+          echo "checked_out_sha=${actual_sha}" >> "$GITHUB_OUTPUT"
+          echo "checked-out SHA: ${actual_sha}"
+
+          {
+            echo "## Production Prisma Migrate"
+            echo ""
+            echo "- checked-out SHA: ${actual_sha}"
+            echo "- dry_run: ${{ inputs.dry_run }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${actual_sha}" != "${expected_sha}" ]; then
+            echo "Expected ${expected_sha}, got ${actual_sha}"
+            exit 1
+          fi
+
+      - name: Check secret presence
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          if [ -n "${DATABASE_URL:-}" ]; then
+            echo "DATABASE_URL present: true"
+          else
+            echo "DATABASE_URL present: false"
+          fi
+
+          if [ -n "${DIRECT_URL:-}" ]; then
+            echo "DIRECT_URL present: true"
+          else
+            echo "DIRECT_URL present: false"
+          fi
+
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "Required secret DATABASE_URL is missing"
+            exit 1
+          fi
+
+          if [ -z "${DIRECT_URL:-}" ]; then
+            echo "Required secret DIRECT_URL is missing"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Enable Corepack
+        shell: bash
+        run: |
+          set +x
+          corepack enable
+
+      - name: Install dependencies
+        run: corepack pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: corepack pnpm exec prisma generate --schema prisma/schema.prisma
+
+      - name: Read-only pre-migration verification
+        id: preflight
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          node <<'NODE'
+          const { appendFileSync } = require('node:fs');
+          const { PrismaClient } = require('@prisma/client');
+
+          const prisma = new PrismaClient({
+            datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
+          });
+
+          function sanitizeMessage(error) {
+            return String(error?.message || error)
+              .replace(/postgres(?:ql)?:\/\/[^\s'"`]+/gi, '[REDACTED_DATABASE_URL]')
+              .replace(/[A-Za-z0-9-]+(?:-pooler)?\.[A-Za-z0-9.-]*neon\.tech/gi, '[REDACTED_NEON_HOST]')
+              .split('\n')
+              .slice(0, 6)
+              .join('\n');
+          }
+
+          function appendSummary(row) {
+            appendFileSync(
+              process.env.GITHUB_STEP_SUMMARY,
+              [
+                '',
+                '### Read-only pre-migration verification',
+                '',
+                `- provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`,
+                `- printifyVariantId column exists: ${row.printify_variant_id_columns === 1}`,
+                `- printifyVariantId NOT NULL: ${row.printify_variant_nullable === 'NO'}`,
+                `- ProductVariant row count: ${row.product_variant_rows}`,
+                `- null printifyVariantId rows: ${row.null_printify_variant_rows}`,
+                `- duplicate productId + printifyVariantId pairs: ${row.duplicate_product_printify_pairs}`,
+                `- migration record present: ${row.target_migration_records === 1}`,
+                '',
+              ].join('\n'),
+            );
+          }
+
+          async function main() {
+            const [row] = await prisma.$queryRaw`
+              SELECT
+                (SELECT COUNT(*)::int FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'provider_variant_id') AS provider_variant_id_columns,
+                (SELECT COUNT(*)::int FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'printifyVariantId') AS printify_variant_id_columns,
+                (SELECT is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'printifyVariantId') AS printify_variant_nullable,
+                (SELECT COUNT(*)::int FROM "ProductVariant") AS product_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant" WHERE "printifyVariantId" IS NULL) AS null_printify_variant_rows,
+                (SELECT COUNT(*)::int FROM (
+                  SELECT "productId", "printifyVariantId"
+                  FROM "ProductVariant"
+                  GROUP BY "productId", "printifyVariantId"
+                  HAVING COUNT(*) > 1
+                ) dups) AS duplicate_product_printify_pairs,
+                (SELECT COUNT(*)::int FROM "_prisma_migrations" WHERE migration_name = '20260708233000_provider_neutral_variant_identity') AS target_migration_records
+            `;
+
+            console.log(`provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`);
+            console.log(`printifyVariantId column exists: ${row.printify_variant_id_columns === 1}`);
+            console.log(`printifyVariantId NOT NULL: ${row.printify_variant_nullable === 'NO'}`);
+            console.log(`ProductVariant row count: ${row.product_variant_rows}`);
+            console.log(`null printifyVariantId rows: ${row.null_printify_variant_rows}`);
+            console.log(`duplicate productId + printifyVariantId pairs: ${row.duplicate_product_printify_pairs}`);
+            console.log(`migration record present: ${row.target_migration_records === 1}`);
+
+            appendSummary(row);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_variant_rows=${row.product_variant_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `migration_record_present=${row.target_migration_records === 1}\n`);
+
+            if (row.provider_variant_id_columns !== 0) {
+              throw new Error('provider_variant_id column must be absent before this migration');
+            }
+            if (row.printify_variant_id_columns !== 1) {
+              throw new Error('printifyVariantId column must exist before this migration');
+            }
+            if (row.printify_variant_nullable !== 'NO') {
+              throw new Error('printifyVariantId must be NOT NULL before this migration');
+            }
+            if (row.null_printify_variant_rows !== 0) {
+              throw new Error('Existing Printify variants must not have null printifyVariantId before backfill');
+            }
+            if (row.duplicate_product_printify_pairs !== 0) {
+              throw new Error('Duplicate product-scoped Printify variant pairs would block migration safety');
+            }
+            if (row.target_migration_records !== 0) {
+              throw new Error('Target migration is already recorded as applied');
+            }
+          }
+
+          main()
+            .catch((error) => {
+              console.error(`Read-only preflight failed: ${sanitizeMessage(error)}`);
+              process.exitCode = 1;
+            })
+            .finally(async () => {
+              await prisma.$disconnect().catch(() => {});
+            });
+          NODE
+
+      - name: Stop after dry run
+        if: ${{ inputs.dry_run == true }}
+        shell: bash
+        run: |
+          set +x
+          echo "Dry run requested; migration deploy was not executed."
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Dry run requested; migration deploy was not executed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run Prisma migrate deploy
+        if: ${{ inputs.dry_run != true }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          log_file="$(mktemp)"
+          set +e
+          corepack pnpm exec prisma migrate deploy --schema prisma/schema.prisma >"${log_file}" 2>&1
+          status=$?
+          set -e
+
+          sed -E \
+            -e 's#postgres(ql)?://[^[:space:]'"'"'\"`]+#[REDACTED_DATABASE_URL]#g' \
+            -e 's#[A-Za-z0-9-]+(-pooler)?\.[A-Za-z0-9.-]*neon\.tech#[REDACTED_NEON_HOST]#g' \
+            -e 's#at "[^"]+"#at "[REDACTED_DATABASE_TARGET]"#g' \
+            "${log_file}"
+
+          rm -f "${log_file}"
+          exit "${status}"
+
+      - name: Read-only post-migration verification
+        if: ${{ inputs.dry_run != true }}
+        shell: bash
+        env:
+          PRODUCT_VARIANT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_variant_rows }}
+        run: |
+          set +x
+          set -euo pipefail
+
+          node <<'NODE'
+          const { appendFileSync } = require('node:fs');
+          const { PrismaClient } = require('@prisma/client');
+
+          const prisma = new PrismaClient({
+            datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
+          });
+
+          function sanitizeMessage(error) {
+            return String(error?.message || error)
+              .replace(/postgres(?:ql)?:\/\/[^\s'"`]+/gi, '[REDACTED_DATABASE_URL]')
+              .replace(/[A-Za-z0-9-]+(?:-pooler)?\.[A-Za-z0-9.-]*neon\.tech/gi, '[REDACTED_NEON_HOST]')
+              .split('\n')
+              .slice(0, 6)
+              .join('\n');
+          }
+
+          function appendSummary(row) {
+            appendFileSync(
+              process.env.GITHUB_STEP_SUMMARY,
+              [
+                '',
+                '### Read-only post-migration verification',
+                '',
+                `- provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`,
+                `- printifyVariantId nullable: ${row.printify_variant_nullable === 'YES'}`,
+                `- ProductVariant row count: ${row.product_variant_rows}`,
+                `- provider_variant_id null rows: ${row.null_provider_variant_rows}`,
+                `- provider_variant_id mismatch rows: ${row.printify_provider_mismatch_rows}`,
+                `- duplicate productId + provider_variant_id pairs: ${row.duplicate_product_provider_pairs}`,
+                `- migration record present: ${row.target_migration_applied === 1}`,
+                '',
+              ].join('\n'),
+            );
+          }
+
+          async function main() {
+            const [row] = await prisma.$queryRaw`
+              SELECT
+                (SELECT COUNT(*)::int FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'provider_variant_id') AS provider_variant_id_columns,
+                (SELECT is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'printifyVariantId') AS printify_variant_nullable,
+                (SELECT COUNT(*)::int FROM "ProductVariant") AS product_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant" WHERE "provider_variant_id" IS NULL) AS null_provider_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant" WHERE "printifyVariantId" IS NOT NULL AND "provider_variant_id" IS DISTINCT FROM "printifyVariantId"::text) AS printify_provider_mismatch_rows,
+                (SELECT COUNT(*)::int FROM (
+                  SELECT "productId", "provider_variant_id"
+                  FROM "ProductVariant"
+                  WHERE "provider_variant_id" IS NOT NULL
+                  GROUP BY "productId", "provider_variant_id"
+                  HAVING COUNT(*) > 1
+                ) dups) AS duplicate_product_provider_pairs,
+                (SELECT COUNT(*)::int FROM "_prisma_migrations" WHERE migration_name = '20260708233000_provider_neutral_variant_identity' AND finished_at IS NOT NULL AND rolled_back_at IS NULL) AS target_migration_applied
+            `;
+
+            console.log(`provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`);
+            console.log(`printifyVariantId nullable: ${row.printify_variant_nullable === 'YES'}`);
+            console.log(`ProductVariant row count: ${row.product_variant_rows}`);
+            console.log(`provider_variant_id null rows: ${row.null_provider_variant_rows}`);
+            console.log(`provider_variant_id mismatch rows: ${row.printify_provider_mismatch_rows}`);
+            console.log(`duplicate productId + provider_variant_id pairs: ${row.duplicate_product_provider_pairs}`);
+            console.log(`migration record present: ${row.target_migration_applied === 1}`);
+
+            appendSummary(row);
+
+            const before = Number(process.env.PRODUCT_VARIANT_ROWS_BEFORE);
+            if (row.provider_variant_id_columns !== 1) {
+              throw new Error('provider_variant_id column was not created');
+            }
+            if (row.printify_variant_nullable !== 'YES') {
+              throw new Error('printifyVariantId was not made nullable');
+            }
+            if (Number.isFinite(before) && row.product_variant_rows !== before) {
+              throw new Error('ProductVariant row count changed during migration');
+            }
+            if (row.null_provider_variant_rows !== 0) {
+              throw new Error('provider_variant_id backfill left null existing rows');
+            }
+            if (row.printify_provider_mismatch_rows !== 0) {
+              throw new Error('provider_variant_id does not match printifyVariantId text for existing Printify rows');
+            }
+            if (row.duplicate_product_provider_pairs !== 0) {
+              throw new Error('Duplicate product-scoped provider variant pairs found');
+            }
+            if (row.target_migration_applied !== 1) {
+              throw new Error('Target migration was not recorded as applied');
+            }
+          }
+
+          main()
+            .catch((error) => {
+              console.error(`Post-migration verification failed: ${sanitizeMessage(error)}`);
+              process.exitCode = 1;
+            })
+            .finally(async () => {
+              await prisma.$disconnect().catch(() => {});
+            });
+          NODE
