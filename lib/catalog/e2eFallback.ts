@@ -52,6 +52,8 @@ export function getE2EFallbackProducts(): CatalogProduct[] {
       variants: [
         {
           id: `${E2E_FALLBACK_PRODUCT_ID}-variant`,
+          provider: 'internal',
+          providerVariantId: `${E2E_FALLBACK_PRODUCT_ID}-variant`,
           title: 'Default',
           sku: 'E2E-SAKURA-TEE',
           price: 29,

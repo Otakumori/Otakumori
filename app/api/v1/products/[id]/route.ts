@@ -148,6 +148,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           variants:
             printifyProductData.variants?.map((v) => ({
               id: String(v.id),
+              provider: 'printify',
+              providerVariantId: String(v.id),
               title: v.title ?? null,
               sku: v.sku ?? null,
               price: v.price ? v.price / 100 : null,

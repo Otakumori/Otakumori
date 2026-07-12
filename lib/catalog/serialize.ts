@@ -1,5 +1,6 @@
 import type { Product, ProductVariant, ProductImage } from '@prisma/client';
 import { createProductSlug } from '@/lib/catalog/mapPrintify';
+import { resolveCatalogProvider, type CatalogProvider } from '@/lib/catalog/provider';
 
 type ProductWithRelations = Product & {
   ProductVariant: ProductVariant[];
@@ -29,16 +30,18 @@ export interface CatalogProduct {
   visible: boolean;
   active: boolean;
   isLocked?: boolean;
-  provider?: 'internal' | 'printify' | 'merchize';
+  provider?: CatalogProvider;
   variants: Array<{
     id: string;
+    provider: CatalogProvider;
+    providerVariantId: string | null;
     title: string | null;
     sku: string | null;
     price: number | null;
     priceCents: number | null;
     inStock: boolean;
     isEnabled: boolean;
-    printifyVariantId: number;
+    printifyVariantId: number | null;
     optionValues: OptionValue[];
     previewImageUrl: string | null;
   }>;
@@ -97,9 +100,7 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
   const slugSource = product.printifyProductId ?? product.id;
   const specs = (product.specs as any) ?? {};
   const isLocked = specs.is_locked ?? false;
-  const provider: CatalogProduct['provider'] = product.printifyProductId || product.integrationRef === 'printify'
-    ? 'printify'
-    : 'internal';
+  const provider = resolveCatalogProvider(product);
 
   return {
     id: product.id,
@@ -121,13 +122,17 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     provider,
     variants: product.ProductVariant.map((variant) => ({
       id: variant.id,
+      provider,
+      providerVariantId:
+        variant.providerVariantId ??
+        (variant.printifyVariantId != null ? String(variant.printifyVariantId) : null),
       title: variant.title ?? null,
       sku: variant.sku ?? null,
       price: centsToDollars(variant.priceCents ?? null),
       priceCents: variant.priceCents ?? null,
       inStock: variant.inStock,
       isEnabled: variant.isEnabled,
-      printifyVariantId: variant.printifyVariantId,
+      printifyVariantId: variant.printifyVariantId ?? null,
       optionValues: coerceOptionValues(variant.optionValues),
       previewImageUrl: variant.previewImageUrl,
     })),

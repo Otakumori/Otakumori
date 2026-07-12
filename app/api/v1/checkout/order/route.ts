@@ -13,10 +13,11 @@ const CheckoutOrderSchema = z.object({
   orderId: z.string(),
   lineItems: z.array(
     z.object({
+      provider: z.enum(['printify', 'merchize', 'internal']).optional(),
       productId: z.string(),
-      printifyProductId: z.string(),
+      printifyProductId: z.string().optional(),
       variantId: z.string(),
-      printifyVariantId: z.number(),
+      printifyVariantId: z.number().optional(),
       quantity: z.number().positive(),
     }),
   ),
@@ -63,6 +64,34 @@ export async function POST(req: NextRequest) {
 
     const { orderId, lineItems, shippingMethod, shippingAddress } = parsed.data;
 
+    const unsupportedItems = lineItems.filter(
+      (item) => (item.provider ?? 'printify') !== 'printify',
+    );
+    if (unsupportedItems.length > 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Unsupported fulfillment provider for Printify order route',
+          unsupportedProviderCount: unsupportedItems.length,
+        },
+        { status: 400 },
+      );
+    }
+
+    const printifyItemsMissingProviderIds = lineItems.filter(
+      (item) => !item.printifyProductId || item.printifyVariantId == null,
+    );
+    if (printifyItemsMissingProviderIds.length > 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Printify line items require Printify product and variant IDs',
+          invalidLineItemCount: printifyItemsMissingProviderIds.length,
+        },
+        { status: 400 },
+      );
+    }
+
     // Build Printify payload
     const addressTo: PrintifyOrderPayload['address_to'] = {
       first_name: shippingAddress.firstName,
@@ -80,8 +109,8 @@ export async function POST(req: NextRequest) {
     const printifyPayload: PrintifyOrderPayload = {
       external_id: orderId,
       line_items: lineItems.map((item) => ({
-        product_id: item.printifyProductId,
-        variant_id: item.printifyVariantId,
+        product_id: item.printifyProductId!,
+        variant_id: item.printifyVariantId!,
         quantity: item.quantity,
       })),
       shipping_method: shippingMethod,
@@ -117,7 +146,12 @@ export async function POST(req: NextRequest) {
       data: { printifyOrder },
     });
   } catch (error) {
-    logger.error('[Printify] Order submission failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[Printify] Order submission failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -137,7 +171,12 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (dbError) {
-      logger.error('[Printify] Failed to log error to database:', undefined, undefined, dbError instanceof Error ? dbError : new Error(String(dbError)));
+      logger.error(
+        '[Printify] Failed to log error to database:',
+        undefined,
+        undefined,
+        dbError instanceof Error ? dbError : new Error(String(dbError)),
+      );
     }
 
     return NextResponse.json({ ok: false, error: errorMessage }, { status: 500 });
@@ -175,7 +214,12 @@ export async function GET(req: NextRequest) {
       data: syncRecord,
     });
   } catch (error) {
-    logger.error('[Printify] Failed to get order sync status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[Printify] Failed to get order sync status:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

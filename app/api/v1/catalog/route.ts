@@ -8,27 +8,42 @@ import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/a
 export const runtime = 'nodejs';
 
 const QueryParamsSchema = z.object({
-  page: z.string().optional().transform((val) => {
-    const parsed = val ? parseInt(val, 10) : 1;
-    return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
-  }),
-  limit: z.string().optional().transform((val) => {
-    const parsed = val ? parseInt(val, 10) : 20;
-    return Number.isNaN(parsed) || parsed < 1 ? 20 : Math.min(parsed, 50);
-  }),
+  page: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const parsed = val ? parseInt(val, 10) : 1;
+      return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
+    }),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const parsed = val ? parseInt(val, 10) : 20;
+      return Number.isNaN(parsed) || parsed < 1 ? 20 : Math.min(parsed, 50);
+    }),
   category: z.string().optional(),
   q: z.string().optional(),
-  minPrice: z.string().optional().transform((val) => {
-    if (!val) return undefined;
-    const parsed = parseFloat(val);
-    return Number.isNaN(parsed) ? undefined : Math.max(0, parsed);
-  }),
-  maxPrice: z.string().optional().transform((val) => {
-    if (!val) return undefined;
-    const parsed = parseFloat(val);
-    return Number.isNaN(parsed) ? undefined : Math.max(0, parsed);
-  }),
-  inStock: z.enum(['true', 'false']).optional().transform((val) => val === 'true'),
+  minPrice: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      const parsed = parseFloat(val);
+      return Number.isNaN(parsed) ? undefined : Math.max(0, parsed);
+    }),
+  maxPrice: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      const parsed = parseFloat(val);
+      return Number.isNaN(parsed) ? undefined : Math.max(0, parsed);
+    }),
+  inStock: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((val) => val === 'true'),
   sortBy: z.enum(['createdAt', 'updatedAt', 'name', 'price', 'relevance', 'title']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });
@@ -48,17 +63,23 @@ function isRenderableListingImage(url: string | null | undefined): boolean {
 }
 
 function normalizeListingImages(images: string[]): string[] {
-  return images.filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index).slice(0, 2);
+  return images
+    .filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index)
+    .slice(0, 2);
 }
 
 function toListingProduct(product: CatalogProduct): CatalogProduct {
   const images = normalizeListingImages(product.images || []);
-  const primaryImage = isRenderableListingImage(product.image) ? product.image : images[0] ?? null;
+  const primaryImage = isRenderableListingImage(product.image)
+    ? product.image
+    : (images[0] ?? null);
   const trimmedVariants = (product.variants || [])
     .filter((variant) => variant.isEnabled && variant.inStock)
     .slice(0, 12)
     .map((variant) => ({
       id: variant.id,
+      provider: variant.provider,
+      providerVariantId: variant.providerVariantId,
       title: variant.title,
       sku: variant.sku,
       price: variant.price,
@@ -67,37 +88,62 @@ function toListingProduct(product: CatalogProduct): CatalogProduct {
       isEnabled: variant.isEnabled,
       printifyVariantId: variant.printifyVariantId,
       optionValues: (variant.optionValues || []).slice(0, 6),
-      previewImageUrl: isRenderableListingImage(variant.previewImageUrl) ? variant.previewImageUrl : null,
+      previewImageUrl: isRenderableListingImage(variant.previewImageUrl)
+        ? variant.previewImageUrl
+        : null,
     }));
 
   return {
     ...product,
     description: (product.description || '').slice(0, 400),
     image: primaryImage,
-    images: primaryImage ? [primaryImage, ...images.filter((image) => image !== primaryImage)].slice(0, 2) : images,
+    images: primaryImage
+      ? [primaryImage, ...images.filter((image) => image !== primaryImage)].slice(0, 2)
+      : images,
     available: trimmedVariants.length > 0,
     variants: trimmedVariants,
   };
 }
 
-function filterProducts(products: CatalogProduct[], params: z.infer<typeof QueryParamsSchema>): CatalogProduct[] {
+function filterProducts(
+  products: CatalogProduct[],
+  params: z.infer<typeof QueryParamsSchema>,
+): CatalogProduct[] {
   return products.filter((product) => {
-    if (params.category && product.categorySlug !== params.category && product.category !== params.category && !product.tags.includes(params.category)) {
+    if (
+      params.category &&
+      product.categorySlug !== params.category &&
+      product.category !== params.category &&
+      !product.tags.includes(params.category)
+    ) {
       return false;
     }
     if (params.q) {
       const q = params.q.trim().toLowerCase();
-      const haystack = [product.title, product.description, ...(product.tags || []), product.category || '', product.categorySlug || '', product.provider || ''].join(' ').toLowerCase();
+      const haystack = [
+        product.title,
+        product.description,
+        ...(product.tags || []),
+        product.category || '',
+        product.categorySlug || '',
+        product.provider || '',
+      ]
+        .join(' ')
+        .toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     if (params.inStock && !product.available) return false;
     if (params.minPrice != null && (product.price ?? -1) < params.minPrice) return false;
-    if (params.maxPrice != null && (product.price ?? Number.MAX_SAFE_INTEGER) > params.maxPrice) return false;
+    if (params.maxPrice != null && (product.price ?? Number.MAX_SAFE_INTEGER) > params.maxPrice)
+      return false;
     return true;
   });
 }
 
-function sortProducts(products: CatalogProduct[], params: z.infer<typeof QueryParamsSchema>): CatalogProduct[] {
+function sortProducts(
+  products: CatalogProduct[],
+  params: z.infer<typeof QueryParamsSchema>,
+): CatalogProduct[] {
   const sortBy = params.sortBy ?? 'relevance';
   const sortOrder = params.sortOrder ?? 'desc';
   const direction = sortOrder === 'asc' ? 1 : -1;
@@ -118,18 +164,70 @@ function sortProducts(products: CatalogProduct[], params: z.infer<typeof QueryPa
   });
 }
 
+function catalogFallbackResponse(
+  requestId: string,
+  params: z.infer<typeof QueryParamsSchema>,
+  page: number,
+  limit: number,
+) {
+  const products = getE2EFallbackProducts().map(toListingProduct);
+  const filtered = sortProducts(filterProducts(products, params), params);
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / limit);
+  const paginated = filtered.slice((page - 1) * limit, page * limit);
+
+  return NextResponse.json(
+    createApiSuccess(
+      {
+        products: paginated,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          total,
+          perPage: limit,
+        },
+        filters: {
+          availableCategories: ['apparel'],
+          priceRange: { min: 29, max: 29 },
+          availableColors: [],
+          availableSizes: [],
+        },
+      },
+      requestId,
+    ),
+    {
+      headers: {
+        'Cache-Control': 'no-store',
+        'X-OTM-Source': 'ci-fallback',
+      },
+    },
+  );
+}
+
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
   try {
     const { searchParams } = new URL(request.url);
     const parsed = QueryParamsSchema.safeParse(Object.fromEntries(searchParams));
     if (!parsed.success) {
-      return NextResponse.json(createApiError('VALIDATION_ERROR', 'Invalid query parameters', requestId, parsed.error.issues), { status: 400 });
+      return NextResponse.json(
+        createApiError(
+          'VALIDATION_ERROR',
+          'Invalid query parameters',
+          requestId,
+          parsed.error.issues,
+        ),
+        { status: 400 },
+      );
     }
 
     const params = parsed.data;
     const page = params.page ?? 1;
     const limit = params.limit ?? 20;
+
+    if (shouldUseCatalogFallback()) {
+      return catalogFallbackResponse(requestId, params, page, limit);
+    }
 
     const prismaProducts = await db.product.findMany({
       where: { active: true, visible: true },
@@ -141,7 +239,9 @@ export async function GET(request: NextRequest) {
     let checkoutSafeProducts = prismaProducts
       .map(serializeProduct)
       .map(toListingProduct)
-      .filter((product) => Boolean(product.image) && product.available && product.variants.length > 0);
+      .filter(
+        (product) => Boolean(product.image) && product.available && product.variants.length > 0,
+      );
 
     if (checkoutSafeProducts.length === 0 && shouldUseCatalogFallback()) {
       checkoutSafeProducts = getE2EFallbackProducts().map(toListingProduct);
@@ -152,55 +252,60 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.ceil(total / limit);
     const paginated = filtered.slice((page - 1) * limit, page * limit);
 
-    const pricedProducts = checkoutSafeProducts.filter((product) => typeof product.price === 'number');
-    const minPrice = pricedProducts.length > 0 ? Math.min(...pricedProducts.map((product) => product.price as number)) : 0;
-    const maxPrice = pricedProducts.length > 0 ? Math.max(...pricedProducts.map((product) => product.price as number)) : 0;
+    const pricedProducts = checkoutSafeProducts.filter(
+      (product) => typeof product.price === 'number',
+    );
+    const minPrice =
+      pricedProducts.length > 0
+        ? Math.min(...pricedProducts.map((product) => product.price as number))
+        : 0;
+    const maxPrice =
+      pricedProducts.length > 0
+        ? Math.max(...pricedProducts.map((product) => product.price as number))
+        : 0;
 
-    return NextResponse.json(createApiSuccess({
-      products: paginated,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        total,
-        perPage: limit,
+    return NextResponse.json(
+      createApiSuccess(
+        {
+          products: paginated,
+          pagination: {
+            currentPage: page,
+            totalPages,
+            total,
+            perPage: limit,
+          },
+          filters: {
+            availableCategories: Array.from(
+              new Set(
+                checkoutSafeProducts
+                  .map((product) => product.categorySlug || product.category)
+                  .filter(Boolean),
+              ),
+            ) as string[],
+            priceRange: { min: minPrice, max: maxPrice },
+            availableColors: [],
+            availableSizes: [],
+          },
+        },
+        requestId,
+      ),
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
       },
-      filters: {
-        availableCategories: Array.from(new Set(checkoutSafeProducts.map((product) => product.categorySlug || product.category).filter(Boolean))) as string[],
-        priceRange: { min: minPrice, max: maxPrice },
-        availableColors: [],
-        availableSizes: [],
-      },
-    }, requestId), {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-      },
-    });
+    );
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Catalog API error', { requestId, route: '/api/v1/catalog' }, undefined, error instanceof Error ? error : new Error(String(error)));
-    if (shouldUseCatalogFallback()) {
-      const products = getE2EFallbackProducts().map(toListingProduct);
-      return NextResponse.json(createApiSuccess({
-        products,
-        pagination: {
-          currentPage: 1,
-          totalPages: 1,
-          total: products.length,
-          perPage: products.length,
-        },
-        filters: {
-          availableCategories: ['apparel'],
-          priceRange: { min: 29, max: 29 },
-          availableColors: [],
-          availableSizes: [],
-        },
-      }, requestId), {
-        headers: {
-          'Cache-Control': 'no-store',
-          'X-OTM-Source': 'ci-fallback',
-        },
-      });
-    }
-    return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to fetch catalog', requestId), { status: 500 });
+    logger.error(
+      'Catalog API error',
+      { requestId, route: '/api/v1/catalog' },
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    return NextResponse.json(
+      createApiError('INTERNAL_ERROR', 'Failed to fetch catalog', requestId),
+      { status: 500 },
+    );
   }
 }
