@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getMerchizeService } from '@/app/lib/merchize/service';
+import { db } from '@/app/lib/db';
 import { limitApi } from '@/lib/ratelimit';
 
 vi.mock('@clerk/nextjs/server', () => ({
@@ -31,6 +32,14 @@ vi.mock('@/app/lib/db', () => ({
   db: {
     product: {
       findUnique: vi.fn(),
+    },
+    order: {
+      update: vi.fn(),
+    },
+    printifyOrderSync: {
+      create: vi.fn(),
+      update: vi.fn(),
+      upsert: vi.fn(),
     },
   },
 }));
@@ -75,13 +84,34 @@ function serviceMock(overrides: Record<string, unknown> = {}) {
     preflightCatalog: vi.fn().mockResolvedValue(preflightSummary()),
     getProducts: vi.fn().mockResolvedValue([
       {
+        provider: 'merchize',
+        providerProductId: 'merchize_1',
         id: 'merchize_1',
         title: 'Merchize Tee',
         sku: 'MT-1',
         status: 'active',
         price: 25,
+        priceRange: { min: 25, max: 29, currency: 'USD' },
+        images: [{ url: 'https://cdn.example/merchize-tee.png' }],
+        variants: [
+          {
+            provider: 'merchize',
+            providerVariantId: 'MZ-VARIANT-1',
+            sku: 'MT-1-S',
+            title: 'Small',
+            options: [{ option: 'Size', value: 'S' }],
+            price: 25,
+            currency: 'USD',
+            inStock: true,
+            availability: 'available',
+            printifyVariantId: null,
+          },
+        ],
         imageCount: 1,
         variantCount: 2,
+        pricedVariantCount: 2,
+        warnings: [],
+        importReadiness: { ready: true, issues: [] },
         raw: { should: 'not leak' },
       },
     ]),
@@ -112,14 +142,34 @@ function preflightSummary() {
     issues: [],
     products: [
       {
+        provider: 'merchize',
+        providerProductId: 'merchize_1',
         id: 'merchize_1',
         title: 'Merchize Tee',
         sku: 'MT-1',
         status: 'active',
         price: 25,
+        priceRange: { min: 25, max: 29, currency: 'USD' },
+        images: [{ url: 'https://cdn.example/merchize-tee.png' }],
+        variants: [
+          {
+            provider: 'merchize',
+            providerVariantId: 'MZ-VARIANT-1',
+            sku: 'MT-1-S',
+            title: 'Small',
+            options: [{ option: 'Size', value: 'S' }],
+            price: 25,
+            currency: 'USD',
+            inStock: true,
+            availability: 'available',
+            printifyVariantId: null,
+          },
+        ],
         imageCount: 1,
         variantCount: 2,
         pricedVariantCount: 2,
+        warnings: [],
+        importReadiness: { ready: true, issues: [] },
       },
     ],
   };
@@ -196,9 +246,23 @@ describe('Merchize read-only admin routes', () => {
       imageCount: 1,
       safeToImport: true,
     });
+    expect(json.data.products[0]).toMatchObject({
+      provider: 'merchize',
+      providerProductId: 'merchize_1',
+      priceRange: { min: 25, max: 29, currency: 'USD' },
+      importReadiness: { ready: true, issues: [] },
+      variants: [
+        expect.objectContaining({
+          provider: 'merchize',
+          providerVariantId: 'MZ-VARIANT-1',
+          printifyVariantId: null,
+        }),
+      ],
+    });
     expect(service.preflightCatalog).toHaveBeenCalledWith({ limit: 50, page: 1 });
     expect(JSON.stringify(json)).not.toContain('test-token');
     expect(JSON.stringify(json)).not.toContain('raw');
+    expect(JSON.stringify(json)).not.toContain('printify_product_');
   });
 
   it('rate limits read-only Merchize preflight', async () => {
@@ -240,9 +304,18 @@ describe('Merchize read-only admin routes', () => {
     expect(response.status).toBe(200);
     expect(json.data.count).toBe(1);
     expect(json.data.products[0]).toMatchObject({
+      provider: 'merchize',
+      providerProductId: 'merchize_1',
       id: 'merchize_1',
       title: 'Merchize Tee',
       variantCount: 2,
+      variants: [
+        expect.objectContaining({
+          provider: 'merchize',
+          providerVariantId: 'MZ-VARIANT-1',
+          printifyVariantId: null,
+        }),
+      ],
     });
     expect(json.data.products[0].raw).toBeUndefined();
   });
@@ -314,6 +387,10 @@ describe('Merchize webhook hardening', () => {
 
     expect(response.status).toBe(202);
     expect(json.status).toBe('accepted_noop');
+    expect(db.order.update).not.toHaveBeenCalled();
+    expect(db.printifyOrderSync.create).not.toHaveBeenCalled();
+    expect(db.printifyOrderSync.update).not.toHaveBeenCalled();
+    expect(db.printifyOrderSync.upsert).not.toHaveBeenCalled();
   });
 });
 
