@@ -164,6 +164,46 @@ function sortProducts(
   });
 }
 
+function catalogFallbackResponse(
+  requestId: string,
+  params: z.infer<typeof QueryParamsSchema>,
+  page: number,
+  limit: number,
+) {
+  const products = getE2EFallbackProducts().map(toListingProduct);
+  const filtered = sortProducts(filterProducts(products, params), params);
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / limit);
+  const paginated = filtered.slice((page - 1) * limit, page * limit);
+
+  return NextResponse.json(
+    createApiSuccess(
+      {
+        products: paginated,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          total,
+          perPage: limit,
+        },
+        filters: {
+          availableCategories: ['apparel'],
+          priceRange: { min: 29, max: 29 },
+          availableColors: [],
+          availableSizes: [],
+        },
+      },
+      requestId,
+    ),
+    {
+      headers: {
+        'Cache-Control': 'no-store',
+        'X-OTM-Source': 'ci-fallback',
+      },
+    },
+  );
+}
+
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
   try {
@@ -184,6 +224,10 @@ export async function GET(request: NextRequest) {
     const params = parsed.data;
     const page = params.page ?? 1;
     const limit = params.limit ?? 20;
+
+    if (shouldUseCatalogFallback()) {
+      return catalogFallbackResponse(requestId, params, page, limit);
+    }
 
     const prismaProducts = await db.product.findMany({
       where: { active: true, visible: true },
@@ -259,35 +303,6 @@ export async function GET(request: NextRequest) {
       undefined,
       error instanceof Error ? error : new Error(String(error)),
     );
-    if (shouldUseCatalogFallback()) {
-      const products = getE2EFallbackProducts().map(toListingProduct);
-      return NextResponse.json(
-        createApiSuccess(
-          {
-            products,
-            pagination: {
-              currentPage: 1,
-              totalPages: 1,
-              total: products.length,
-              perPage: products.length,
-            },
-            filters: {
-              availableCategories: ['apparel'],
-              priceRange: { min: 29, max: 29 },
-              availableColors: [],
-              availableSizes: [],
-            },
-          },
-          requestId,
-        ),
-        {
-          headers: {
-            'Cache-Control': 'no-store',
-            'X-OTM-Source': 'ci-fallback',
-          },
-        },
-      );
-    }
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch catalog', requestId),
       { status: 500 },
