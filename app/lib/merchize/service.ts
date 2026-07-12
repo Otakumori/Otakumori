@@ -7,7 +7,22 @@ export interface MerchizeProductImage {
   alt?: string | null;
 }
 
+export interface MerchizeProductVariant {
+  provider: 'merchize';
+  providerVariantId: string | null;
+  sku: string | null;
+  title: string | null;
+  options: Array<{ option: string; value: string }>;
+  price: number | null;
+  currency: string | null;
+  inStock: boolean | null;
+  availability: string | null;
+  printifyVariantId: null;
+}
+
 export interface MerchizeProduct {
+  provider: 'merchize';
+  providerProductId: string;
   id: string;
   title: string;
   description: string | null;
@@ -16,10 +31,17 @@ export interface MerchizeProduct {
   status: string | null;
   currency: string | null;
   price: number | null;
+  priceRange: { min: number | null; max: number | null; currency: string | null };
   images: MerchizeProductImage[];
+  variants: MerchizeProductVariant[];
   variantCount: number;
   pricedVariantCount: number;
   imageCount: number;
+  warnings: string[];
+  importReadiness: {
+    ready: boolean;
+    issues: string[];
+  };
 }
 
 export interface MerchizeConnectionResult {
@@ -52,14 +74,24 @@ export interface MerchizeCatalogPreflight {
   safeToImport: boolean;
   issues: MerchizePreflightIssue[];
   products: Array<{
+    provider: 'merchize';
+    providerProductId: string;
     id: string;
     title: string;
     sku: string | null;
     status: string | null;
     price: number | null;
+    priceRange: { min: number | null; max: number | null; currency: string | null };
+    images: MerchizeProductImage[];
+    variants: MerchizeProductVariant[];
     imageCount: number;
     variantCount: number;
     pricedVariantCount: number;
+    warnings: string[];
+    importReadiness: {
+      ready: boolean;
+      issues: string[];
+    };
   }>;
 }
 
@@ -153,6 +185,21 @@ function coerceNumber(value: unknown): number | null {
   return null;
 }
 
+function coerceBoolean(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1 ? true : value === 0 ? false : null;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', 'yes', 'y', '1', 'in_stock', 'available', 'active'].includes(normalized)) {
+      return true;
+    }
+    if (['false', 'no', 'n', '0', 'out_of_stock', 'unavailable', 'inactive'].includes(normalized)) {
+      return false;
+    }
+  }
+  return null;
+}
+
 function countDuplicates(values: string[]): number {
   const counts = new Map<string, number>();
   for (const value of values) {
@@ -161,6 +208,11 @@ function countDuplicates(values: string[]): number {
   }
 
   return [...counts.values()].filter((count) => count > 1).length;
+}
+
+function truncate(value: string | null, maxLength = 160): string | null {
+  if (!value) return null;
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
 }
 
 function extractImageUrls(raw: JsonRecord): MerchizeProductImage[] {
@@ -264,20 +316,104 @@ function extractDefaultPrice(raw: JsonRecord): number | null {
   return null;
 }
 
-function hasVariantPrice(variant: JsonRecord): boolean {
-  if (
-    coerceNumber(variant.price) != null ||
-    coerceNumber(variant.retailPrice) != null ||
-    coerceNumber(variant.retail_price) != null
-  ) {
-    return true;
+function extractVariantPrice(variant: JsonRecord): number | null {
+  const directPrice =
+    coerceNumber(variant.price) ||
+    coerceNumber(variant.retailPrice) ||
+    coerceNumber(variant.retail_price) ||
+    coerceNumber(variant.salePrice) ||
+    coerceNumber(variant.sale_price);
+
+  if (directPrice != null) {
+    return directPrice;
   }
 
   const tiers = Array.isArray(variant.tiers) ? variant.tiers : [];
-  return tiers.some((tier) => {
-    if (!tier || typeof tier !== 'object' || Array.isArray(tier)) return false;
-    return coerceNumber((tier as JsonRecord).price) != null;
-  });
+  for (const tier of tiers) {
+    if (!tier || typeof tier !== 'object' || Array.isArray(tier)) continue;
+    const tierPrice = coerceNumber((tier as JsonRecord).price);
+    if (tierPrice != null) {
+      return tierPrice;
+    }
+  }
+
+  return null;
+}
+
+function hasVariantPrice(variant: JsonRecord): boolean {
+  return extractVariantPrice(variant) != null;
+}
+
+function extractOptions(variant: JsonRecord): Array<{ option: string; value: string }> {
+  const options = variant.options;
+  if (!options || typeof options !== 'object' || Array.isArray(options)) {
+    return [];
+  }
+
+  return Object.entries(options as JsonRecord)
+    .map(([option, value]) => {
+      const optionValue = coerceString(value);
+      return optionValue ? { option, value: optionValue } : null;
+    })
+    .filter((option): option is { option: string; value: string } => Boolean(option))
+    .slice(0, 12);
+}
+
+function normalizeVariant(raw: JsonRecord): MerchizeProductVariant {
+  const providerVariantId =
+    coerceString(raw._id) ||
+    coerceString(raw.id) ||
+    coerceString(raw.variantId) ||
+    coerceString(raw.variant_id) ||
+    coerceString(raw.sku) ||
+    null;
+  const availability =
+    coerceString(raw.availability) ||
+    coerceString(raw.stock_status) ||
+    coerceString(raw.status) ||
+    null;
+
+  return {
+    provider: 'merchize',
+    providerVariantId,
+    sku: coerceString(raw.sku),
+    title: truncate(
+      coerceString(raw.title) ||
+        coerceString(raw.name) ||
+        coerceString(raw.option_title) ||
+        coerceString(raw.variant_title),
+      120,
+    ),
+    options: extractOptions(raw),
+    price: extractVariantPrice(raw),
+    currency: coerceString(raw.currency) || 'USD',
+    inStock:
+      coerceBoolean(raw.inStock) ??
+      coerceBoolean(raw.in_stock) ??
+      coerceBoolean(raw.available) ??
+      coerceBoolean(raw.is_available) ??
+      coerceBoolean(availability),
+    availability,
+    printifyVariantId: null,
+  };
+}
+
+function priceRangeFrom(productPrice: number | null, variants: MerchizeProductVariant[]) {
+  const variantPrices = variants
+    .map((variant) => variant.price)
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price));
+  const prices =
+    variantPrices.length > 0 ? variantPrices : productPrice != null ? [productPrice] : [];
+
+  if (prices.length === 0) {
+    return { min: null, max: null, currency: variants[0]?.currency ?? 'USD' };
+  }
+
+  return {
+    min: Math.min(...prices),
+    max: Math.max(...prices),
+    currency: variants[0]?.currency ?? 'USD',
+  };
 }
 
 function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | null {
@@ -323,9 +459,23 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
       : null,
   ].filter(Boolean) as string[];
   const variants = extractVariants(raw);
+  const normalizedVariants = variants.map(normalizeVariant);
   const images = extractImageUrls(raw);
+  const price = extractDefaultPrice(raw);
+  const warnings = [
+    normalizedVariants.some((variant) => !variant.providerVariantId)
+      ? 'variant_missing_provider_id'
+      : null,
+    normalizedVariants.length === 0 ? 'product_missing_variants' : null,
+    images.length === 0 ? 'product_missing_images' : null,
+    price == null && !normalizedVariants.some((variant) => variant.price != null)
+      ? 'product_missing_price'
+      : null,
+  ].filter(Boolean) as string[];
 
   return {
+    provider: 'merchize',
+    providerProductId: id,
     id,
     title,
     description: descriptionParts.length > 0 ? descriptionParts.join(' · ') : null,
@@ -333,11 +483,18 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
     handle: coerceString(raw.handle) || coerceString(raw.slug) || coerceString(raw.permalink),
     status: coerceString(raw.status) || coerceString(raw.state) || 'active',
     currency: 'USD',
-    price: extractDefaultPrice(raw),
-    images,
-    variantCount: variants.length,
+    price,
+    priceRange: priceRangeFrom(price, normalizedVariants),
+    images: images.slice(0, 12),
+    variants: normalizedVariants.slice(0, 40),
+    variantCount: normalizedVariants.length,
     pricedVariantCount: variants.filter(hasVariantPrice).length,
     imageCount: images.length,
+    warnings,
+    importReadiness: {
+      ready: warnings.length === 0,
+      issues: warnings,
+    },
   };
 }
 
@@ -492,8 +649,15 @@ export class MerchizeService {
     const skus = products.map((product) => product.sku ?? '').filter(Boolean);
     const duplicateProductIdCount = countDuplicates(productIds);
     const duplicateSkuCount = countDuplicates(skus);
+    const missingVariantIdCount = products.reduce(
+      (total, product) =>
+        total + product.variants.filter((variant) => !variant.providerVariantId).length,
+      0,
+    );
     const productsMissingImages = products.filter((product) => product.imageCount === 0).length;
-    const productsMissingPrice = products.filter((product) => product.price == null).length;
+    const productsMissingPrice = products.filter(
+      (product) => product.priceRange.min == null,
+    ).length;
     const variantCount = products.reduce((total, product) => total + product.variantCount, 0);
     const pricedVariantCount = products.reduce(
       (total, product) => total + product.pricedVariantCount,
@@ -529,6 +693,14 @@ export class MerchizeService {
         code: 'duplicate_merchize_skus',
         message: 'Merchize returned duplicate SKU values.',
         count: duplicateSkuCount,
+      });
+    }
+
+    if (missingVariantIdCount > 0) {
+      issues.push({
+        code: 'variants_missing_provider_ids',
+        message: 'Some Merchize variants do not expose stable provider variant identities.',
+        count: missingVariantIdCount,
       });
     }
 
@@ -569,14 +741,21 @@ export class MerchizeService {
       safeToImport: issues.length === 0 && products.length > 0,
       issues,
       products: products.slice(0, 24).map((product) => ({
+        provider: product.provider,
+        providerProductId: product.providerProductId,
         id: product.id,
         title: product.title,
         sku: product.sku,
         status: product.status,
         price: product.price,
+        priceRange: product.priceRange,
+        images: product.images.slice(0, 4),
+        variants: product.variants.slice(0, 8),
         imageCount: product.imageCount,
         variantCount: product.variantCount,
         pricedVariantCount: product.pricedVariantCount,
+        warnings: product.warnings,
+        importReadiness: product.importReadiness,
       })),
     };
   }

@@ -27,6 +27,23 @@ function StatCard({ label, value }: { label: string; value: string | number | bo
   );
 }
 
+function truncate(value: string, maxLength = 28) {
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+}
+
+function formatPriceRange(priceRange: {
+  min: number | null;
+  max: number | null;
+  currency: string | null;
+}) {
+  if (priceRange.min == null && priceRange.max == null) return 'n/a';
+  const currency = priceRange.currency ?? 'USD';
+  if (priceRange.min === priceRange.max || priceRange.max == null) {
+    return `${currency} ${priceRange.min}`;
+  }
+  return `${currency} ${priceRange.min} - ${priceRange.max}`;
+}
+
 export default function MerchizeAdminClient() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PreflightResponse | null>(null);
@@ -69,6 +86,9 @@ export default function MerchizeAdminClient() {
             Runs Merchize GET-only diagnostics, normalizes product shape, and reports import
             readiness. This page does not write to Merchize or the Otakumori database.
           </p>
+          <p className="mt-3 rounded-xl border border-pink-300/20 bg-pink-400/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-pink-100">
+            Read-only diagnostics. No import has run. No provider write has run.
+          </p>
         </div>
         <button
           type="button"
@@ -99,10 +119,12 @@ export default function MerchizeAdminClient() {
             <StatCard label="Products returned" value={summary.productCount} />
             <StatCard label="Normalized products" value={summary.normalizedProductCount} />
             <StatCard label="Variants detected" value={summary.variantCount} />
+            <StatCard label="Priced variants" value={summary.pricedVariantCount} />
             <StatCard label="Images detected" value={summary.imageCount} />
             <StatCard label="Products missing images" value={summary.productsMissingImages} />
             <StatCard label="Products missing price" value={summary.productsMissingPrice} />
             <StatCard label="Duplicate product IDs" value={summary.duplicateProductIdCount} />
+            <StatCard label="Duplicate SKUs" value={summary.duplicateSkuCount} />
             <StatCard label="Safe to import" value={summary.safeToImport} />
           </div>
 
@@ -132,15 +154,39 @@ export default function MerchizeAdminClient() {
                   key={product.id}
                   className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
                 >
-                  <p className="text-xs uppercase tracking-wide text-white/45">{product.id}</p>
+                  <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-white/45">
+                    <span>{product.provider}</span>
+                    <span aria-label="provider product id">
+                      {truncate(product.providerProductId)}
+                    </span>
+                  </div>
                   <h4 className="mt-2 font-semibold text-white">{product.title}</h4>
                   <p className="mt-2 text-xs text-white/55">
                     SKU: {product.sku ?? 'n/a'} | Status: {product.status ?? 'n/a'}
                   </p>
                   <p className="mt-2 text-xs text-white/55">
-                    Variants: {product.variantCount} | Images: {product.imageCount} | Price:{' '}
-                    {product.price ?? 'n/a'}
+                    Variants: {product.variantCount} | Images: {product.imageCount} | Priced:{' '}
+                    {product.pricedVariantCount}
                   </p>
+                  <p className="mt-2 text-xs text-white/55">
+                    Price range: {formatPriceRange(product.priceRange)}
+                  </p>
+                  {product.warnings.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {product.warnings.map((warning) => (
+                        <span
+                          key={warning}
+                          className="rounded-full border border-amber-300/20 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-100"
+                        >
+                          {warning}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3 rounded-full border border-emerald-300/20 bg-emerald-500/10 px-2 py-1 text-[11px] text-emerald-100">
+                      Readiness: clean
+                    </p>
+                  )}
                 </article>
               ))}
             </div>
