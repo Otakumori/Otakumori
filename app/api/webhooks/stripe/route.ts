@@ -57,7 +57,12 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
   } catch (err) {
-    logger.error('Invalid Stripe signature', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+    logger.error(
+      'Invalid Stripe signature',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -77,7 +82,8 @@ export async function POST(req: Request) {
 
       const total = fullSession.amount_total ?? 0;
       const currency = fullSession.currency ?? 'usd';
-      const paymentIntentId = typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
+      const paymentIntentId =
+        typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
 
       const updateData: any = {
         status: 'pending_fulfillment',
@@ -108,11 +114,37 @@ export async function POST(req: Request) {
         create: createData,
       });
 
+      const orderItems = await prisma.orderItem.findMany({
+        where: { orderId: order.id },
+        select: { printifyProductId: true, printifyVariantId: true },
+      });
+      const hasUnsupportedProviderItems = orderItems.some(
+        (item) => !item.printifyProductId || item.printifyVariantId == null,
+      );
+      if (hasUnsupportedProviderItems) {
+        logger.warn('Skipping Printify fulfillment for unsupported provider order', {
+          extra: {
+            orderId: order.id,
+            itemCount: orderItems.length,
+          },
+        });
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: 'pending_mapping' },
+        });
+        return NextResponse.json({ ok: true, note: 'unsupported-provider-fulfillment-skipped' });
+      }
+
       try {
         const result = await createPrintifyOrder(order.id, fullSession);
 
         if (!result.ok) {
-          logger.error('Printify fulfillment failed', undefined, undefined, new Error(result.error || 'unknown'));
+          logger.error(
+            'Printify fulfillment failed',
+            undefined,
+            undefined,
+            new Error(result.error || 'unknown'),
+          );
         } else {
           logger.info('Printify fulfillment success', undefined, {
             orderId: order.id,
@@ -120,7 +152,12 @@ export async function POST(req: Request) {
           });
         }
       } catch (err) {
-        logger.error('Printify fulfillment exception', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+        logger.error(
+          'Printify fulfillment exception',
+          undefined,
+          undefined,
+          err instanceof Error ? err : new Error(String(err)),
+        );
       }
 
       return NextResponse.json({ ok: true });
