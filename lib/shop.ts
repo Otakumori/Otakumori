@@ -14,6 +14,7 @@ export const getProducts = async (params?: {
 
   const where = {
     active: true,
+    visible: true,
     ...(params?.category && { category: params.category }),
   };
 
@@ -50,11 +51,11 @@ export const getProducts = async (params?: {
 };
 
 export const getProduct = async (id: string) => {
-  const product = await prisma.product.findUnique({
-    where: { id },
+  const product = await prisma.product.findFirst({
+    where: { id, active: true, visible: true },
     include: {
       ProductVariant: {
-        where: { isEnabled: true },
+        where: { isEnabled: true, inStock: true },
       },
     },
   });

@@ -198,7 +198,7 @@ export class DatabaseAccess {
    */
   static async getActiveProducts() {
     return await db.product.findMany({
-      where: { active: true },
+      where: { active: true, visible: true },
       include: {
         ProductVariant: {
           where: { isEnabled: true, inStock: true },
@@ -216,6 +216,7 @@ export class DatabaseAccess {
     return await db.product.findMany({
       where: {
         active: true,
+        visible: true,
         OR: [
           { name: { contains: searchTerm, mode: 'insensitive' } },
           { description: { contains: searchTerm, mode: 'insensitive' } },

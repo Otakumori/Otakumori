@@ -85,13 +85,24 @@ describe('Cart API', () => {
       vi.mocked(db.product.findUnique).mockResolvedValue({
         id: 'prod_1',
         name: 'Test Product',
+        description: null,
+        primaryImageUrl: null,
+        active: true,
+        visible: true,
+        printifyProductId: 'printify_prod_1',
+        integrationRef: 'printify:printify_prod_1',
         ProductVariant: [
           {
             id: 'var_1',
+            productId: 'prod_1',
             title: 'Small',
+            sku: 'SKU-1',
             priceCents: 2500,
+            currency: 'USD',
             isEnabled: true,
             inStock: true,
+            printifyVariantId: 101,
+            providerVariantId: '101',
           },
         ],
       } as any);
@@ -131,6 +142,75 @@ describe('Cart API', () => {
       expect(data.ok).toBe(true);
       expect(data.data.productId).toBe('prod_1');
       expect(data.data.quantity).toBe(2);
+    });
+
+    it('rejects hidden products before cart persistence', async () => {
+      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
+      vi.mocked(db.product.findUnique).mockResolvedValue({
+        id: 'prod_1',
+        name: 'Hidden Product',
+        active: true,
+        visible: false,
+        printifyProductId: 'printify_prod_1',
+        integrationRef: 'printify:printify_prod_1',
+        ProductVariant: [
+          {
+            id: 'var_1',
+            productId: 'prod_1',
+            isEnabled: true,
+            inStock: true,
+            priceCents: 2500,
+            currency: 'USD',
+            printifyVariantId: 101,
+          },
+        ],
+      } as any);
+
+      const req = new NextRequest('http://localhost/api/v1/cart', {
+        method: 'POST',
+        body: JSON.stringify({ productId: 'prod_1', variantId: 'var_1', quantity: 1 }),
+      });
+      const response = await updateCart(req);
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.code).toBe('PRODUCT_NOT_PUBLIC');
+      expect(db.cartItem.upsert).not.toHaveBeenCalled();
+    });
+
+    it('rejects non-Printify products before cart persistence', async () => {
+      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
+      vi.mocked(db.product.findUnique).mockResolvedValue({
+        id: 'prod_1',
+        name: 'Merchize Product',
+        active: true,
+        visible: true,
+        printifyProductId: null,
+        integrationRef: 'merchize:mz_1',
+        ProductVariant: [
+          {
+            id: 'var_1',
+            productId: 'prod_1',
+            isEnabled: true,
+            inStock: true,
+            priceCents: 2500,
+            currency: 'USD',
+            printifyVariantId: null,
+            providerVariantId: 'MZ-1',
+          },
+        ],
+      } as any);
+
+      const req = new NextRequest('http://localhost/api/v1/cart', {
+        method: 'POST',
+        body: JSON.stringify({ productId: 'prod_1', variantId: 'var_1', quantity: 1 }),
+      });
+      const response = await updateCart(req);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.code).toBe('UNSUPPORTED_PROVIDER');
+      expect(db.cartItem.upsert).not.toHaveBeenCalled();
     });
 
     it('should return 404 for non-existent product', async () => {

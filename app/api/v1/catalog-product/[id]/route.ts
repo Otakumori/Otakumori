@@ -72,6 +72,12 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
       });
     }
 
+    if (!product.active || !product.visible) {
+      return NextResponse.json(createApiError('NOT_FOUND', 'Product not found', requestId), {
+        status: 404,
+      });
+    }
+
     const serialized = serializeProduct(product);
     const images = cleanImages(serialized.images || []);
     const normalized = {

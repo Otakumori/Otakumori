@@ -12,6 +12,7 @@ import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 import { getDiscountConfig } from '@/app/config/petalTuning';
 import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
+import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 function getStripeClient() {
   return new Stripe(env.STRIPE_SECRET_KEY, {
@@ -35,7 +36,12 @@ export async function POST(req: NextRequest) {
         const { logger } = await import('@/app/lib/logger');
         logger.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
         return NextResponse.json(
-          { ok: false, error: 'Checkout temporarily unavailable. Please contact support.', requestId, stage },
+          {
+            ok: false,
+            error: 'Checkout temporarily unavailable. Please contact support.',
+            requestId,
+            stage,
+          },
           { status: 503 },
         );
       }
@@ -76,7 +82,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } = parsed.data as any;
+      const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } =
+        parsed.data as any;
 
       stage = 'load_user';
       let user = await prisma.user.findFirst({ where: { clerkId: userId } });
@@ -92,35 +99,45 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'validate_items';
-      const productIds = items.map((i: any) => i.productId).filter(Boolean);
-      const variantIds = items.map((i: any) => i.variantId).filter(Boolean);
-
-      const [dbProducts, dbVariants] = await Promise.all([
-        prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true } }),
-        prisma.productVariant.findMany({
-          where: { id: { in: variantIds } },
-          select: { id: true, productId: true, isEnabled: true, inStock: true },
-        }),
-      ]);
-
-      const validProductIds = new Set(dbProducts.map((p) => p.id));
-      const variantById = new Map(dbVariants.map((v) => [v.id, v]));
-
-      const invalidItems = items.filter((item: any) => {
-        if (!item.productId || !item.variantId) return true;
-        if (!validProductIds.has(item.productId)) return true;
-        const variant = variantById.get(item.variantId);
-        if (!variant) return true;
-        if (variant.productId !== item.productId) return true;
-        if (!variant.isEnabled || !variant.inStock) return true;
-        return false;
-      });
+      const safeItems = [];
+      const invalidItems = [];
+      for (const item of items) {
+        if (!item.productId || !item.variantId) {
+          invalidItems.push(item);
+          continue;
+        }
+        const validation = await validatePrintifyPurchasableLineItem(
+          {
+            productId: item.productId,
+            variantId: item.variantId,
+          },
+          prisma,
+        );
+        if (!validation.ok) {
+          invalidItems.push({ ...item, reason: validation.code });
+          continue;
+        }
+        safeItems.push({
+          ...item,
+          name: validation.item.productName,
+          description: validation.item.productDescription ?? undefined,
+          images: validation.item.primaryImageUrl ? [validation.item.primaryImageUrl] : [],
+          sku: validation.item.sku ?? undefined,
+          priceCents: validation.item.priceCents,
+          currency: validation.item.currency,
+          printifyProductId: validation.item.printifyProductId,
+          printifyVariantId: validation.item.printifyVariantId,
+          variantId: validation.item.variantId,
+          productId: validation.item.productId,
+        });
+      }
 
       if (invalidItems.length > 0) {
         return NextResponse.json(
           {
             ok: false,
-            error: 'One or more cart items are no longer available. Please refresh your cart and try again.',
+            error:
+              'One or more cart items are no longer available. Please refresh your cart and try again.',
             requestId,
             stage,
             invalidItems: invalidItems.map((item: any) => ({
@@ -134,7 +151,10 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'calculate_totals';
-      const subtotalCents = items.reduce((sum: number, i: any) => sum + i.priceCents * i.quantity, 0);
+      const subtotalCents = safeItems.reduce(
+        (sum: number, i: any) => sum + i.priceCents * i.quantity,
+        0,
+      );
 
       let appliedCodes: string[] = [];
       let discountTotalCents = 0;
@@ -198,14 +218,16 @@ export async function POST(req: NextRequest) {
         const metas: CouponMeta[] = [...couponMetas, ...grantMetas];
         const breakdown = await getApplicableCoupons({
           now: new Date(),
-          items: items.map((i: any) => ({
+          items: safeItems.map((i: any) => ({
             id: i.productId ?? i.sku ?? i.variantId ?? i.name,
             productId: i.productId,
             collectionIds: [],
             quantity: i.quantity,
             unitPrice: i.priceCents / 100,
           })),
-          shipping: shipping ? { provider: shipping.provider ?? 'stripe', fee: shipping.fee ?? 0 } : { provider: 'stripe', fee: 0 },
+          shipping: shipping
+            ? { provider: shipping.provider ?? 'stripe', fee: shipping.fee ?? 0 }
+            : { provider: 'stripe', fee: 0 },
           coupons: metas,
           codesOrder: codes,
         });
@@ -230,7 +252,10 @@ export async function POST(req: NextRequest) {
             acc += d;
           });
         }
-        discountedLineItems = itemTotals.map((it: any) => ({ id: it.key, totalDiscountCents: discountsPerItem[it.key] ?? 0 }));
+        discountedLineItems = itemTotals.map((it: any) => ({
+          id: it.key,
+          totalDiscountCents: discountsPerItem[it.key] ?? 0,
+        }));
       }
 
       stage = 'create_order';
@@ -242,14 +267,14 @@ export async function POST(req: NextRequest) {
           subtotalCents,
           currency: 'USD',
           status: 'pending',
-          primaryItemName: items[0]?.name ?? 'Order',
+          primaryItemName: safeItems[0]?.name ?? 'Order',
           label: `Order for ${shippingInfo?.firstName ?? user.displayName ?? user.username}`,
           appliedCouponCodes: appliedCodes,
         },
       });
 
       stage = 'create_order_items';
-      for (const item of items) {
+      for (const item of safeItems) {
         await prisma.orderItem.create({
           data: {
             Order: { connect: { id: order.id } },
@@ -260,15 +285,17 @@ export async function POST(req: NextRequest) {
             quantity: item.quantity,
             unitAmount: item.priceCents,
             printifyProductId: item.printifyProductId,
-            printifyVariantId: typeof item.printifyVariantId === 'number' ? item.printifyVariantId : null,
+            printifyVariantId:
+              typeof item.printifyVariantId === 'number' ? item.printifyVariantId : null,
           },
         });
       }
 
       stage = 'build_line_items';
-      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((i: any) => {
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = safeItems.map((i: any) => {
         const key = i.productId ?? i.sku ?? i.variantId ?? i.name;
-        const totalDiscount = discountedLineItems.find((d) => d.id === key)?.totalDiscountCents ?? 0;
+        const totalDiscount =
+          discountedLineItems.find((d) => d.id === key)?.totalDiscountCents ?? 0;
         const qty = i.quantity;
         const perItemBase = i.priceCents;
         const perItemDiscount = Math.floor(totalDiscount / qty);
@@ -293,7 +320,11 @@ export async function POST(req: NextRequest) {
       });
 
       const original = subtotalCents;
-      const discountedSum = lineItems.reduce((s: number, li: any) => s + (li.price_data?.unit_amount as number) * (li.quantity as number), 0);
+      const discountedSum = lineItems.reduce(
+        (s: number, li: any) =>
+          s + (li.price_data?.unit_amount as number) * (li.quantity as number),
+        0,
+      );
       const nonShipDiscountCents = discountTotalCents - shippingDiscountCents;
       const target = original - Math.max(0, nonShipDiscountCents);
       let delta = discountedSum - target;
@@ -309,20 +340,33 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const shippingOptions = shippingDiscountCents > 0
-        ? [{ shipping_rate_data: { type: 'fixed_amount', fixed_amount: { amount: 0, currency: 'usd' }, display_name: 'Free shipping' } }]
-        : undefined;
+      const shippingOptions =
+        shippingDiscountCents > 0
+          ? [
+              {
+                shipping_rate_data: {
+                  type: 'fixed_amount',
+                  fixed_amount: { amount: 0, currency: 'usd' },
+                  display_name: 'Free shipping',
+                },
+              },
+            ]
+          : undefined;
 
       stage = 'create_stripe_session';
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
-        success_url: successUrl ?? `${getRuntimeOrigin()}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url:
+          successUrl ??
+          `${getRuntimeOrigin()}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancelUrl ?? `${getRuntimeOrigin()}/shop/cart`,
         client_reference_id: userId,
         customer_email: shippingInfo?.email ?? user.email,
-        shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'] },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'],
+        },
         metadata: {
           coupon_codes: appliedCodes.join(','),
           discount_total_cents: String(discountTotalCents),
@@ -351,7 +395,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(responseBody);
     } catch (error) {
       const { logger } = await import('@/app/lib/logger');
-      logger.error('[checkout/session] unhandled server error', undefined, { requestId, stage }, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        '[checkout/session] unhandled server error',
+        undefined,
+        { requestId, stage },
+        error instanceof Error ? error : new Error(String(error)),
+      );
       return NextResponse.json(
         {
           ok: false,

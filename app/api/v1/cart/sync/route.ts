@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db as prisma } from '@/lib/db';
+import { validateLoadedPrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 interface SyncCartItem {
   productId: string;
@@ -47,12 +48,16 @@ export async function POST(req: Request) {
       }));
 
     const productIds = [...new Set(normalizedItems.map((item) => item.productId))];
-    const variantIds = [...new Set(normalizedItems.map((item) => item.variantId).filter((id): id is string => Boolean(id)))];
+    const variantIds = [
+      ...new Set(
+        normalizedItems.map((item) => item.variantId).filter((id): id is string => Boolean(id)),
+      ),
+    ];
 
     const [products, variants] = await Promise.all([
       prisma.product.findMany({
         where: { id: { in: productIds } },
-        select: { id: true, ProductVariant: { select: { id: true, isEnabled: true, inStock: true } } },
+        include: { ProductVariant: true },
       }),
       prisma.productVariant.findMany({
         where: { id: { in: variantIds } },
@@ -67,14 +72,19 @@ export async function POST(req: Request) {
       const product = productById.get(item.productId);
       if (!product) return true;
 
-      const chosenVariantId = item.variantId ?? product.ProductVariant.find((variant) => variant.isEnabled && variant.inStock)?.id ?? null;
+      const chosenVariantId =
+        item.variantId ??
+        product.ProductVariant.find((variant) => variant.isEnabled && variant.inStock)?.id ??
+        null;
       if (!chosenVariantId) return true;
 
-      const variant = variantById.get(chosenVariantId) ?? product.ProductVariant.find((candidate) => candidate.id === chosenVariantId);
+      const variant =
+        variantById.get(chosenVariantId) ??
+        product.ProductVariant.find((candidate) => candidate.id === chosenVariantId);
       if (!variant) return true;
       if ('productId' in variant && variant.productId !== item.productId) return true;
-      if (!variant.isEnabled || !variant.inStock) return true;
-      return false;
+      const validation = validateLoadedPrintifyPurchasableLineItem(product as any, variant.id);
+      return !validation.ok;
     });
 
     if (invalidItems.length > 0) {
@@ -104,20 +114,27 @@ export async function POST(req: Request) {
 
       for (const item of normalizedItems) {
         const product = productById.get(item.productId)!;
-        const resolvedVariantId = item.variantId ?? product.ProductVariant.find((variant) => variant.isEnabled && variant.inStock)!.id;
+        const resolvedVariantId =
+          item.variantId ??
+          product.ProductVariant.find((variant) => variant.isEnabled && variant.inStock)!.id;
+        const validation = validateLoadedPrintifyPurchasableLineItem(
+          product as any,
+          resolvedVariantId,
+        );
+        if (!validation.ok) throw new Error(validation.code);
 
         await tx.cartItem.create({
           data: {
             cartId: cart.id,
             productId: item.productId,
-            productVariantId: resolvedVariantId,
+            productVariantId: validation.item.variantId,
             quantity: item.quantity,
           },
         });
 
         syncedItems.push({
           productId: item.productId,
-          variantId: resolvedVariantId,
+          variantId: validation.item.variantId,
           quantity: item.quantity,
         });
       }
@@ -129,7 +146,12 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Cart sync failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Cart sync failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Failed to sync cart' }, { status: 500 });
   }
 }

@@ -1,4 +1,3 @@
-
 import { type NextRequest, NextResponse } from 'next/server';
 import {
   verifyWebhookSignature,
@@ -15,6 +14,7 @@ import {
 } from '@/app/lib/printify';
 import { env } from '@/env';
 import { petalService } from '@/app/lib/petals';
+import { resolveCatalogProvider } from '@/lib/catalog/provider';
 
 export const runtime = 'nodejs';
 
@@ -150,13 +150,18 @@ async function handleCheckoutCompleted(session: any) {
           },
         });
       } else {
-        logger.error('Failed to award purchase bonus', undefined, {
-          extra: {
-            orderId: order.id,
-            userId: order.userId,
-            error: petalResult.error,
+        logger.error(
+          'Failed to award purchase bonus',
+          undefined,
+          {
+            extra: {
+              orderId: order.id,
+              userId: order.userId,
+              error: petalResult.error,
+            },
           },
-        }, undefined);
+          undefined,
+        );
       }
     }
 
@@ -212,15 +217,55 @@ async function createPrintifyOrder(order: any) {
     const printifyOrderData: PrintifyOrderData = {
       external_id: order.id,
       label: `Order #${order.displayNumber}`,
-      line_items: order.OrderItem.map((item: any) => ({
-        printify_product_id: item.printifyProductId,
-        printify_variant_id: item.printifyVariantId,
-        quantity: item.quantity,
-      })),
+      line_items: [],
       shipping_method: 1, // Standard shipping
       send_shipping_notification: true,
       address_to: shippingAddress,
     };
+
+    const invalidItems = order.OrderItem.filter((item: any) => {
+      const provider = resolveCatalogProvider(item.Product);
+      return (
+        !item.Product?.active ||
+        !item.Product?.visible ||
+        provider !== 'printify' ||
+        !item.Product?.printifyProductId ||
+        !item.ProductVariant?.isEnabled ||
+        !item.ProductVariant?.inStock ||
+        item.ProductVariant?.printifyVariantId == null ||
+        !item.printifyProductId ||
+        item.printifyVariantId == null
+      );
+    });
+
+    if (invalidItems.length > 0) {
+      await db.order.update({
+        where: { id: order.id },
+        data: {
+          status: 'pending_mapping',
+          updatedAt: new Date(),
+        },
+      });
+
+      logger.error(
+        'Printify fulfillment blocked for unmapped or unsupported order items',
+        undefined,
+        {
+          extra: {
+            orderId: order.id,
+            invalidItemCount: invalidItems.length,
+          },
+        },
+      );
+
+      return null;
+    }
+
+    printifyOrderData.line_items = order.OrderItem.map((item: any) => ({
+      printify_product_id: item.Product.printifyProductId,
+      printify_variant_id: item.ProductVariant.printifyVariantId,
+      quantity: item.quantity,
+    }));
 
     // Create the order in Printify
     const printifyOrder = await printifyService.createOrder(printifyOrderData);

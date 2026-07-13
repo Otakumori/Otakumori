@@ -15,6 +15,9 @@ vi.mock('@/env', () => ({
 
 vi.mock('@/lib/db', () => ({
   db: {
+    product: {
+      findUnique: vi.fn(),
+    },
     printifyOrderSync: {
       create: vi.fn(),
       findUnique: vi.fn(),
@@ -32,6 +35,8 @@ vi.mock('@/app/lib/logger', () => ({
     error: vi.fn(),
   },
 }));
+
+import { db } from '@/lib/db';
 
 function request(body: unknown) {
   return new NextRequest('http://localhost/api/v1/checkout/order', {
@@ -74,6 +79,28 @@ describe('Printify checkout provider gating', () => {
     vi.clearAllMocks();
     vi.mocked(auth).mockResolvedValue({ userId: 'user_1' } as never);
     vi.mocked(createPrintifyOrder).mockResolvedValue({ id: 'printify_order_1' } as never);
+    vi.mocked(db.product.findUnique).mockResolvedValue({
+      id: 'product_1',
+      name: 'Printify Product',
+      description: null,
+      primaryImageUrl: null,
+      active: true,
+      visible: true,
+      printifyProductId: 'printify_product_1',
+      integrationRef: 'printify:printify_product_1',
+      ProductVariant: [
+        {
+          id: 'variant_1',
+          productId: 'product_1',
+          isEnabled: true,
+          inStock: true,
+          priceCents: 2500,
+          currency: 'USD',
+          printifyVariantId: 101,
+          providerVariantId: '101',
+        },
+      ],
+    } as never);
   });
 
   it('accepts valid Printify line items', async () => {
@@ -122,6 +149,25 @@ describe('Printify checkout provider gating', () => {
   });
 
   it('continues to require Printify product and variant IDs for Printify items', async () => {
+    vi.mocked(db.product.findUnique).mockResolvedValue({
+      id: 'product_1',
+      name: 'Printify Product',
+      active: true,
+      visible: true,
+      printifyProductId: 'printify_product_1',
+      integrationRef: 'printify:printify_product_1',
+      ProductVariant: [
+        {
+          id: 'variant_1',
+          productId: 'product_1',
+          isEnabled: true,
+          inStock: true,
+          priceCents: 2500,
+          currency: 'USD',
+          printifyVariantId: null,
+        },
+      ],
+    } as never);
     const mod = await import('../../app/api/v1/checkout/order/route');
 
     const response = await mod.POST(
@@ -141,7 +187,38 @@ describe('Printify checkout provider gating', () => {
     const json = await response.json();
 
     expect(response.status).toBe(400);
-    expect(json.error).toMatch(/require Printify product and variant IDs/i);
+    expect(json.error).toMatch(/not eligible for Printify fulfillment/i);
+    expect(createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('rejects DB-resolved non-Printify products even when the browser claims Printify', async () => {
+    vi.mocked(db.product.findUnique).mockResolvedValue({
+      id: 'product_1',
+      name: 'Merchize Product',
+      active: true,
+      visible: true,
+      printifyProductId: null,
+      integrationRef: 'merchize:mz_1',
+      ProductVariant: [
+        {
+          id: 'variant_1',
+          productId: 'product_1',
+          isEnabled: true,
+          inStock: true,
+          priceCents: 2500,
+          currency: 'USD',
+          printifyVariantId: null,
+          providerVariantId: 'MZ-1',
+        },
+      ],
+    } as never);
+    const mod = await import('../../app/api/v1/checkout/order/route');
+
+    const response = await mod.POST(request(validBody()));
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.error).toMatch(/not eligible for Printify fulfillment/i);
     expect(createPrintifyOrder).not.toHaveBeenCalled();
   });
 });

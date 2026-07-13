@@ -395,6 +395,10 @@ describe('Merchize webhook hardening', () => {
 });
 
 describe('public catalog safety for Merchize', () => {
+  beforeEach(() => {
+    vi.mocked(db.product.findUnique).mockReset();
+  });
+
   it('does not perform live public Merchize provider reads before local import', async () => {
     const mod = await catalogProductRoute();
 
@@ -409,5 +413,55 @@ describe('public catalog safety for Merchize', () => {
     expect(response.status).toBe(404);
     expect(json.error.code).toBe('NOT_FOUND');
     expect(getMerchizeService).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 for hidden DB products by internal ID', async () => {
+    vi.mocked(db.product.findUnique).mockResolvedValue({
+      id: 'product_hidden',
+      name: 'Hidden Product',
+      active: true,
+      visible: false,
+      printifyProductId: 'printify_hidden',
+      integrationRef: 'printify:printify_hidden',
+      ProductVariant: [],
+      ProductImage: [],
+    } as never);
+    const mod = await catalogProductRoute();
+
+    const response = await mod.GET(
+      new NextRequest('http://localhost/api/v1/catalog-product/product_hidden'),
+      {
+        params: Promise.resolve({ id: 'product_hidden' }),
+      },
+    );
+    const json = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(json.error.code).toBe('NOT_FOUND');
+  });
+
+  it('returns 404 for inactive DB products by internal ID', async () => {
+    vi.mocked(db.product.findUnique).mockResolvedValue({
+      id: 'product_archived',
+      name: 'Archived Product',
+      active: false,
+      visible: true,
+      printifyProductId: 'printify_archived',
+      integrationRef: 'printify:printify_archived',
+      ProductVariant: [],
+      ProductImage: [],
+    } as never);
+    const mod = await catalogProductRoute();
+
+    const response = await mod.GET(
+      new NextRequest('http://localhost/api/v1/catalog-product/product_archived'),
+      {
+        params: Promise.resolve({ id: 'product_archived' }),
+      },
+    );
+    const json = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(json.error.code).toBe('NOT_FOUND');
   });
 });
