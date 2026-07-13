@@ -422,20 +422,20 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
   }
 
   const raw = rawValue as JsonRecord;
-  const id =
+  const providerProductId =
     coerceString(raw._id) ||
     coerceString(raw.id) ||
     coerceString(raw.productId) ||
     coerceString(raw.product_id) ||
-    coerceString(raw.sku) ||
-    `merchize-${index + 1}`;
+    coerceString(raw.sku);
+  const id = providerProductId || `merchize-${index + 1}`;
 
-  const title =
+  const providerTitle =
     coerceString(raw.title) ||
     coerceString(raw.name) ||
     coerceString(raw.productName) ||
-    coerceString(raw.product_name) ||
-    `Merchize Product ${index + 1}`;
+    coerceString(raw.product_name);
+  const title = providerTitle || `Merchize Product ${index + 1}`;
 
   const fulfillmentLocation =
     raw.fulfillment_location &&
@@ -463,6 +463,8 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
   const images = extractImageUrls(raw);
   const price = extractDefaultPrice(raw);
   const warnings = [
+    !providerProductId ? 'product_missing_provider_id' : null,
+    !providerTitle ? 'product_missing_title' : null,
     normalizedVariants.some((variant) => !variant.providerVariantId)
       ? 'variant_missing_provider_id'
       : null,
@@ -485,8 +487,8 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
     currency: 'USD',
     price,
     priceRange: priceRangeFrom(price, normalizedVariants),
-    images: images.slice(0, 12),
-    variants: normalizedVariants.slice(0, 40),
+    images,
+    variants: normalizedVariants,
     variantCount: normalizedVariants.length,
     pricedVariantCount: variants.filter(hasVariantPrice).length,
     imageCount: images.length,
