@@ -133,7 +133,7 @@ async function callGET(mod: Record<string, unknown>) {
   return { response, json: await response.json() };
 }
 
-describe('Merchize hidden import preflight route', () => {
+describe('Merchize import preflight route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     adminSession();
@@ -174,7 +174,7 @@ describe('Merchize hidden import preflight route', () => {
     expect(response.status).toBe(200);
     expect(json.data).toMatchObject({
       provider: 'merchize',
-      mode: 'hidden_local_import_preflight',
+      mode: 'import_preflight',
       productCount: 1,
       wouldInsert: 1,
       wouldUpdate: 0,
@@ -190,6 +190,11 @@ describe('Merchize hidden import preflight route', () => {
       public: false,
       purchasable: false,
     });
+    expect(json.data.products[0].variants[0]).toMatchObject({
+      provider: 'merchize',
+      providerVariantId: 'MZ-VARIANT-1',
+      printifyVariantId: null,
+    });
     expect(service.getProducts).toHaveBeenCalledWith({ limit: 50, page: 1 });
     expect(db.product.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -197,8 +202,11 @@ describe('Merchize hidden import preflight route', () => {
       }),
     );
     expect(db.product.upsert).not.toHaveBeenCalled();
+    expect(db.productVariant.upsert).not.toHaveBeenCalled();
+    expect(db.productImage.upsert).not.toHaveBeenCalled();
     expect(db.$transaction).not.toHaveBeenCalled();
     expect(JSON.stringify(json)).not.toContain('raw');
+    expect(JSON.stringify(json)).not.toContain('printifyProductId');
   });
 
   it('calculates wouldUpdate for existing merchize integration references', async () => {

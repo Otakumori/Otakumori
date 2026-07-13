@@ -28,7 +28,7 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
     const preflight = await buildMerchizeImportPreflight();
 
     const { logger } = await import('@/app/lib/logger');
-    logger.info('Merchize hidden import preflight completed', {
+    logger.info('Merchize import preflight completed', {
       requestId,
       route: '/api/admin/merchize/import/preflight',
       extra: {
@@ -46,7 +46,7 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
     logger.error(
-      'Merchize hidden import preflight failed',
+      'Merchize import preflight failed',
       { requestId, route: '/api/admin/merchize/import/preflight' },
       undefined,
       error instanceof Error ? error : new Error(String(error)),

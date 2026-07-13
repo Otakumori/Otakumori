@@ -9,6 +9,17 @@ export type MerchizeImportIssue = {
   providerProductId?: string;
 };
 
+export type MerchizeImportVariantPlan = {
+  provider: 'merchize';
+  providerVariantId: string | null;
+  printifyVariantId: null;
+  sku: string | null;
+  title: string | null;
+  price: number | null;
+  currency: string | null;
+  inStock: boolean | null;
+};
+
 export type MerchizeImportProductPlan = {
   provider: 'merchize';
   providerProductId: string;
@@ -20,13 +31,14 @@ export type MerchizeImportProductPlan = {
   variantCount: number;
   imageCount: number;
   pricedVariantCount: number;
+  variants: MerchizeImportVariantPlan[];
   warnings: string[];
   issues: string[];
 };
 
 export type MerchizeImportPreflight = {
   provider: 'merchize';
-  mode: 'hidden_local_import_preflight';
+  mode: 'import_preflight';
   productCount: number;
   normalizedProductCount: number;
   wouldInsert: number;
@@ -35,17 +47,6 @@ export type MerchizeImportPreflight = {
   wouldBlock: number;
   safeToImport: boolean;
   issues: MerchizeImportIssue[];
-  products: MerchizeImportProductPlan[];
-};
-
-export type MerchizeImportApplyResult = {
-  provider: 'merchize';
-  mode: 'hidden_local_import';
-  productCount: number;
-  inserted: number;
-  updated: number;
-  skipped: number;
-  blocked: number;
   products: MerchizeImportProductPlan[];
 };
 
@@ -161,7 +162,7 @@ function merchizeIssueMessage(code: string): string {
     case 'product_missing_price':
       return 'A Merchize product has no positively priced variant.';
     default:
-      return 'A Merchize product is not ready for hidden local import.';
+      return 'A Merchize product is not ready for import planning.';
   }
 }
 
@@ -203,6 +204,16 @@ async function buildMerchizeImportPreflightForProducts(
       variantCount: product.variantCount,
       imageCount: product.imageCount,
       pricedVariantCount: product.pricedVariantCount,
+      variants: product.variants.slice(0, 20).map((variant) => ({
+        provider: 'merchize',
+        providerVariantId: variant.providerVariantId,
+        printifyVariantId: null,
+        sku: variant.sku,
+        title: variant.title,
+        price: variant.price,
+        currency: variant.currency,
+        inStock: variant.inStock,
+      })),
       warnings: product.warnings,
       issues,
     };
@@ -224,7 +235,7 @@ async function buildMerchizeImportPreflightForProducts(
 
   return {
     provider: 'merchize',
-    mode: 'hidden_local_import_preflight',
+    mode: 'import_preflight',
     productCount: products.length,
     normalizedProductCount: products.length,
     wouldInsert,
@@ -250,188 +261,4 @@ export async function loadMerchizeImportPlan(): Promise<{
 
 export async function buildMerchizeImportPreflight(): Promise<MerchizeImportPreflight> {
   return (await loadMerchizeImportPlan()).preflight;
-}
-
-function toCents(price: number | null): number | null {
-  if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return null;
-  return Math.round(price * 100);
-}
-
-export async function applyMerchizeHiddenLocalImport(
-  preflight: MerchizeImportPreflight,
-  products: MerchizeProduct[],
-): Promise<MerchizeImportApplyResult> {
-  if (!preflight.safeToImport) {
-    return {
-      provider: 'merchize',
-      mode: 'hidden_local_import',
-      productCount: preflight.productCount,
-      inserted: 0,
-      updated: 0,
-      skipped: preflight.wouldSkip,
-      blocked: preflight.wouldBlock,
-      products: preflight.products,
-    };
-  }
-
-  const planByRef = new Map(preflight.products.map((product) => [product.integrationRef, product]));
-  const results: MerchizeImportProductPlan[] = [];
-  const now = new Date();
-
-  for (const product of products) {
-    const integrationRef = providerProductRef('merchize', product.providerProductId);
-    const plan = planByRef.get(integrationRef);
-    if (!plan || plan.action === 'blocked') {
-      if (plan) results.push({ ...plan, action: 'skipped' });
-      continue;
-    }
-
-    const safeImages = product.images.filter((image) => isSafeImageUrl(image.url)).slice(0, 12);
-    const primaryImageUrl = safeImages[0]?.url ?? null;
-    const incomingVariantIds = product.variants
-      .map((variant) => variant.providerVariantId?.trim() ?? '')
-      .filter(Boolean);
-
-    await db.$transaction(async (tx) => {
-      const localProduct = await tx.product.upsert({
-        where: { integrationRef },
-        create: {
-          name: product.title,
-          description: product.description,
-          primaryImageUrl,
-          printifyProductId: null,
-          integrationRef,
-          active: false,
-          visible: false,
-          category: 'Merchize',
-          categorySlug: 'merchize',
-          tags: ['merchize'],
-          specs: {
-            provider: 'merchize',
-            providerProductId: product.providerProductId,
-            status: product.status,
-            sku: product.sku,
-            importMode: 'hidden_local_import',
-            public: false,
-            purchasable: false,
-          },
-          lastSyncedAt: now,
-        },
-        update: {
-          name: product.title,
-          description: product.description,
-          primaryImageUrl,
-          printifyProductId: null,
-          active: false,
-          visible: false,
-          category: 'Merchize',
-          categorySlug: 'merchize',
-          tags: ['merchize'],
-          specs: {
-            provider: 'merchize',
-            providerProductId: product.providerProductId,
-            status: product.status,
-            sku: product.sku,
-            importMode: 'hidden_local_import',
-            public: false,
-            purchasable: false,
-          },
-          lastSyncedAt: now,
-        },
-      });
-
-      for (const variant of product.variants) {
-        const providerVariantId = variant.providerVariantId?.trim();
-        if (!providerVariantId) continue;
-
-        await tx.productVariant.upsert({
-          where: {
-            productId_providerVariantId: {
-              productId: localProduct.id,
-              providerVariantId,
-            },
-          },
-          create: {
-            productId: localProduct.id,
-            providerVariantId,
-            printifyVariantId: null,
-            printProviderName: 'merchize',
-            title: variant.title,
-            sku: variant.sku,
-            priceCents: toCents(variant.price),
-            currency: variant.currency ?? product.currency ?? 'USD',
-            isEnabled: false,
-            inStock: false,
-            isDefaultVariant: false,
-            optionValues: variant.options,
-            previewImageUrl: primaryImageUrl,
-            lastSyncedAt: now,
-          },
-          update: {
-            printifyVariantId: null,
-            printProviderName: 'merchize',
-            title: variant.title,
-            sku: variant.sku,
-            priceCents: toCents(variant.price),
-            currency: variant.currency ?? product.currency ?? 'USD',
-            isEnabled: false,
-            inStock: false,
-            optionValues: variant.options,
-            previewImageUrl: primaryImageUrl,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      if (incomingVariantIds.length > 0) {
-        await tx.productVariant.updateMany({
-          where: {
-            productId: localProduct.id,
-            providerVariantId: { notIn: incomingVariantIds },
-          },
-          data: {
-            isEnabled: false,
-            inStock: false,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const [index, image] of safeImages.entries()) {
-        await tx.productImage.upsert({
-          where: {
-            productId_url: {
-              productId: localProduct.id,
-              url: image.url,
-            },
-          },
-          create: {
-            productId: localProduct.id,
-            url: image.url,
-            position: index,
-            variantIds: [],
-            isDefault: index === 0,
-          },
-          update: {
-            position: index,
-            variantIds: [],
-            isDefault: index === 0,
-          },
-        });
-      }
-    });
-
-    results.push(plan);
-  }
-
-  return {
-    provider: 'merchize',
-    mode: 'hidden_local_import',
-    productCount: preflight.productCount,
-    inserted: results.filter((product) => product.action === 'inserted').length,
-    updated: results.filter((product) => product.action === 'updated').length,
-    skipped: results.filter((product) => product.action === 'skipped').length,
-    blocked: preflight.wouldBlock,
-    products: results,
-  };
 }

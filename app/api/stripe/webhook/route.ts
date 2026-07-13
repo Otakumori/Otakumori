@@ -1,3 +1,4 @@
+
 import { type NextRequest, NextResponse } from 'next/server';
 import {
   verifyWebhookSignature,
@@ -149,18 +150,13 @@ async function handleCheckoutCompleted(session: any) {
           },
         });
       } else {
-        logger.error(
-          'Failed to award purchase bonus',
-          undefined,
-          {
-            extra: {
-              orderId: order.id,
-              userId: order.userId,
-              error: petalResult.error,
-            },
+        logger.error('Failed to award purchase bonus', undefined, {
+          extra: {
+            orderId: order.id,
+            userId: order.userId,
+            error: petalResult.error,
           },
-          undefined,
-        );
+        }, undefined);
       }
     }
 
@@ -225,26 +221,6 @@ async function createPrintifyOrder(order: any) {
       send_shipping_notification: true,
       address_to: shippingAddress,
     };
-
-    const hasUnsupportedProviderItems = order.OrderItem.some(
-      (item: any) => !item.printifyProductId || item.printifyVariantId == null,
-    );
-    if (hasUnsupportedProviderItems) {
-      logger.warn('Skipping Printify order creation for unsupported provider order', {
-        extra: {
-          orderId: order.id,
-          itemCount: order.OrderItem.length,
-        },
-      });
-      await db.order.update({
-        where: { id: order.id },
-        data: {
-          status: 'pending_mapping',
-          updatedAt: new Date(),
-        },
-      });
-      return null;
-    }
 
     // Create the order in Printify
     const printifyOrder = await printifyService.createOrder(printifyOrderData);

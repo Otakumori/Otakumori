@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import type { MerchizeCatalogPreflight } from '@/app/lib/merchize/service';
-import type {
-  MerchizeImportApplyResult,
-  MerchizeImportPreflight,
-} from '@/app/lib/merchize/importPreflight';
+import type { MerchizeImportPreflight } from '@/app/lib/merchize/importPreflight';
 
 type PreflightResponse =
   | {
@@ -33,22 +30,6 @@ type ImportPreflightResponse =
       error: {
         code?: string;
         message?: string;
-      };
-      requestId: string;
-    };
-
-type ImportApplyResponse =
-  | {
-      ok: true;
-      data: MerchizeImportApplyResult;
-      requestId: string;
-    }
-  | {
-      ok: false;
-      error: {
-        code?: string;
-        message?: string;
-        details?: unknown;
       };
       requestId: string;
     };
@@ -83,10 +64,8 @@ export default function MerchizeAdminClient() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PreflightResponse | null>(null);
   const [importPreflightLoading, setImportPreflightLoading] = useState(false);
-  const [importApplyLoading, setImportApplyLoading] = useState(false);
   const [importPreflightResult, setImportPreflightResult] =
     useState<ImportPreflightResponse | null>(null);
-  const [importApplyResult, setImportApplyResult] = useState<ImportApplyResponse | null>(null);
 
   async function runPreflight() {
     if (loading) return;
@@ -116,9 +95,8 @@ export default function MerchizeAdminClient() {
   }
 
   async function runImportPreflight() {
-    if (importPreflightLoading || importApplyLoading) return;
+    if (importPreflightLoading) return;
     setImportPreflightLoading(true);
-    setImportApplyResult(null);
 
     try {
       const response = await fetch('/api/admin/merchize/import/preflight', {
@@ -142,42 +120,8 @@ export default function MerchizeAdminClient() {
     }
   }
 
-  async function applyHiddenImport() {
-    if (
-      importApplyLoading ||
-      !importPreflightResult?.ok ||
-      !importPreflightResult.data.safeToImport
-    )
-      return;
-    setImportApplyLoading(true);
-
-    try {
-      const response = await fetch('/api/admin/merchize/import/apply', {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ apply: true }),
-      });
-      const json = (await response.json()) as ImportApplyResponse;
-      setImportApplyResult(json);
-    } catch {
-      setImportApplyResult({
-        ok: false,
-        requestId: `client_${Date.now()}`,
-        error: {
-          code: 'NETWORK_ERROR',
-          message: 'Unable to import Merchize products.',
-        },
-      });
-    } finally {
-      setImportApplyLoading(false);
-    }
-  }
-
   const summary = result?.ok ? result.data : null;
   const importSummary = importPreflightResult?.ok ? importPreflightResult.data : null;
-  const canApplyHiddenImport =
-    Boolean(importSummary?.safeToImport) && !importApplyLoading && !importPreflightLoading;
 
   return (
     <section className="space-y-6">
@@ -301,34 +245,24 @@ export default function MerchizeAdminClient() {
       <div className="rounded-2xl border border-pink-300/20 bg-black/30 p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-xl font-medium">Hidden local import</h2>
+            <h2 className="text-xl font-medium">Import readiness preflight</h2>
             <p className="mt-2 max-w-3xl text-sm text-white/65">
-              Import Preflight is a dry run only. Import Hidden Products writes local catalog rows
-              with public visibility disabled. Imported products will not appear in the public shop
-              and cannot be purchased until provider-aware checkout and fulfillment are implemented.
+              Read-only preflight. No import has run. No provider write has run. Merchize products
+              are not purchasable. A later Phase 4D PR will add a separate hidden local import plan
+              with its own confirmation flow.
             </p>
             <p className="mt-3 rounded-xl border border-amber-300/20 bg-amber-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">
-              Hidden local records only. No provider write. No checkout or fulfillment enablement.
+              Dry run only. No database write. No checkout or fulfillment enablement.
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:items-end">
-            <button
-              type="button"
-              onClick={runImportPreflight}
-              disabled={importPreflightLoading || importApplyLoading}
-              className="rounded-full border border-pink-300/40 bg-pink-400/15 px-5 py-2 text-sm font-semibold text-pink-100 transition hover:bg-pink-400/25 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {importPreflightLoading ? 'Running...' : 'Run Import Preflight'}
-            </button>
-            <button
-              type="button"
-              onClick={applyHiddenImport}
-              disabled={!canApplyHiddenImport}
-              className="rounded-full border border-amber-300/40 bg-amber-400/15 px-5 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/25 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {importApplyLoading ? 'Importing...' : 'Import Hidden Products'}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={runImportPreflight}
+            disabled={importPreflightLoading}
+            className="rounded-full border border-pink-300/40 bg-pink-400/15 px-5 py-2 text-sm font-semibold text-pink-100 transition hover:bg-pink-400/25 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {importPreflightLoading ? 'Running...' : 'Run Import Preflight'}
+          </button>
         </div>
 
         {importPreflightResult ? (
@@ -370,8 +304,8 @@ export default function MerchizeAdminClient() {
               </div>
             ) : (
               <div className="rounded-2xl border border-emerald-300/20 bg-emerald-500/10 p-4 text-emerald-100">
-                Hidden import preflight is clean. Products will remain public=false and
-                purchasable=false after import.
+                Import preflight is clean. This PR still does not import products or make them
+                purchasable.
               </div>
             )}
 
@@ -411,27 +345,6 @@ export default function MerchizeAdminClient() {
                 ))}
               </div>
             </div>
-          </div>
-        ) : null}
-
-        {importApplyResult ? (
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm text-white/75">
-            <p>
-              <span className="font-medium text-white">Apply request ID:</span>{' '}
-              {importApplyResult.requestId}
-            </p>
-            {importApplyResult.ok ? (
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard label="Inserted" value={importApplyResult.data.inserted} />
-                <StatCard label="Updated" value={importApplyResult.data.updated} />
-                <StatCard label="Skipped" value={importApplyResult.data.skipped} />
-                <StatCard label="Blocked" value={importApplyResult.data.blocked} />
-              </div>
-            ) : (
-              <p className="mt-2 text-rose-300">
-                {importApplyResult.error.message ?? 'Merchize hidden import failed.'}
-              </p>
-            )}
           </div>
         ) : null}
       </div>

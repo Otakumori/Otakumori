@@ -1,3 +1,4 @@
+
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -6,7 +7,6 @@ import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
-import { resolveCatalogProvider } from '@/lib/catalog/provider';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -36,56 +36,6 @@ export async function POST(req: NextRequest) {
 
       if (!user) {
         return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
-      }
-
-      const productIds = items.map((item: any) => item.productId).filter(Boolean);
-      const variantIds = items.map((item: any) => item.variantId).filter(Boolean);
-      const [dbProducts, dbVariants] = await Promise.all([
-        db.product.findMany({
-          where: { id: { in: productIds } },
-          select: {
-            id: true,
-            active: true,
-            visible: true,
-            printifyProductId: true,
-            integrationRef: true,
-          },
-        }),
-        db.productVariant.findMany({
-          where: { id: { in: variantIds } },
-          select: {
-            id: true,
-            productId: true,
-            isEnabled: true,
-            inStock: true,
-            printifyVariantId: true,
-            providerVariantId: true,
-          },
-        }),
-      ]);
-      const productById = new Map(dbProducts.map((product) => [product.id, product]));
-      const variantById = new Map(dbVariants.map((variant) => [variant.id, variant]));
-      const invalidItems = items.filter((item: any) => {
-        const product = productById.get(item.productId);
-        const variant = variantById.get(item.variantId);
-        if (!product || !variant) return true;
-        if (!product.active || !product.visible) return true;
-        if (resolveCatalogProvider(product) !== 'printify') return true;
-        if (!product.printifyProductId || variant.printifyVariantId == null) return true;
-        if (variant.productId !== product.id) return true;
-        if (!variant.isEnabled || !variant.inStock) return true;
-        return false;
-      });
-
-      if (invalidItems.length > 0) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: 'One or more cart items are not available for Printify checkout.',
-            invalidItemCount: invalidItems.length,
-          },
-          { status: 400 },
-        );
       }
 
       // Calculate totals
