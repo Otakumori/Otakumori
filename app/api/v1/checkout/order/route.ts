@@ -6,6 +6,7 @@ import { env } from '@/env';
 import { createPrintifyOrder } from '@/app/lib/printify/printifyClient';
 import type { PrintifyOrderPayload } from '@/app/lib/printify/types';
 import { z } from 'zod';
+import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 export const runtime = 'nodejs';
 
@@ -78,15 +79,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const printifyItemsMissingProviderIds = lineItems.filter(
-      (item) => !item.printifyProductId || item.printifyVariantId == null,
-    );
-    if (printifyItemsMissingProviderIds.length > 0) {
+    const validatedItems = [];
+    const invalidItems = [];
+    for (const item of lineItems) {
+      const validation = await validatePrintifyPurchasableLineItem({
+        productId: item.productId,
+        variantId: item.variantId,
+      });
+      if (!validation.ok) {
+        invalidItems.push({ item, reason: validation.code });
+        continue;
+      }
+      validatedItems.push({ ...item, ...validation.item });
+    }
+
+    if (invalidItems.length > 0) {
       return NextResponse.json(
         {
           ok: false,
-          error: 'Printify line items require Printify product and variant IDs',
-          invalidLineItemCount: printifyItemsMissingProviderIds.length,
+          error: 'Line items are not eligible for Printify fulfillment',
+          invalidLineItemCount: invalidItems.length,
         },
         { status: 400 },
       );
@@ -108,9 +120,9 @@ export async function POST(req: NextRequest) {
 
     const printifyPayload: PrintifyOrderPayload = {
       external_id: orderId,
-      line_items: lineItems.map((item) => ({
-        product_id: item.printifyProductId!,
-        variant_id: item.printifyVariantId!,
+      line_items: validatedItems.map((item) => ({
+        product_id: item.printifyProductId,
+        variant_id: item.printifyVariantId,
         quantity: item.quantity,
       })),
       shipping_method: shippingMethod,

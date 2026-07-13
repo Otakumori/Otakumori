@@ -1,5 +1,6 @@
 import { env } from '@/env';
 import { db as prisma } from '@/lib/db';
+import { resolveCatalogProvider } from '@/lib/catalog/provider';
 
 export interface PrintifyAddress {
   first_name: string;
@@ -71,20 +72,36 @@ export async function loadPrintifyOrderItems(localOrderId: string) {
   const orderItems = await prisma.orderItem.findMany({
     where: { orderId: localOrderId },
     orderBy: { createdAt: 'asc' },
+    include: {
+      Product: true,
+      ProductVariant: true,
+    },
   });
 
   const lineItems: PrintifyLineItem[] = [];
   const missingMappings: string[] = [];
 
   for (const item of orderItems) {
-    if (!item.printifyProductId || !item.printifyVariantId) {
+    const provider = resolveCatalogProvider(item.Product);
+    const variant = item.ProductVariant;
+    if (
+      !item.Product.active ||
+      !item.Product.visible ||
+      provider !== 'printify' ||
+      !item.Product.printifyProductId ||
+      !variant.isEnabled ||
+      !variant.inStock ||
+      variant.printifyVariantId == null ||
+      !item.printifyProductId ||
+      !item.printifyVariantId
+    ) {
       missingMappings.push(item.id);
       continue;
     }
 
     lineItems.push({
-      product_id: item.printifyProductId,
-      variant_id: item.printifyVariantId,
+      product_id: item.Product.printifyProductId,
+      variant_id: variant.printifyVariantId,
       quantity: item.quantity,
     });
   }
@@ -92,7 +109,10 @@ export async function loadPrintifyOrderItems(localOrderId: string) {
   return { orderItems, lineItems, missingMappings };
 }
 
-export async function createPrintifyOrder(localOrderId: string, session: any): Promise<PrintifyOrderResult> {
+export async function createPrintifyOrder(
+  localOrderId: string,
+  session: any,
+): Promise<PrintifyOrderResult> {
   const { lineItems, missingMappings } = await loadPrintifyOrderItems(localOrderId);
 
   if (missingMappings.length > 0) {
@@ -100,7 +120,13 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'mapping_failed', error, lastSyncAt: new Date() },
-      create: { localOrderId, printifyOrderId: `pending_${localOrderId}`, status: 'mapping_failed', error, lastSyncAt: new Date() },
+      create: {
+        localOrderId,
+        printifyOrderId: `pending_${localOrderId}`,
+        status: 'mapping_failed',
+        error,
+        lastSyncAt: new Date(),
+      },
     });
     return { ok: false, error };
   }
@@ -110,7 +136,13 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'no_items', error, lastSyncAt: new Date() },
-      create: { localOrderId, printifyOrderId: `pending_${localOrderId}`, status: 'no_items', error, lastSyncAt: new Date() },
+      create: {
+        localOrderId,
+        printifyOrderId: `pending_${localOrderId}`,
+        status: 'no_items',
+        error,
+        lastSyncAt: new Date(),
+      },
     });
     return { ok: false, error };
   }
@@ -143,11 +175,20 @@ export async function createPrintifyOrder(localOrderId: string, session: any): P
   }
 
   if (!response.ok) {
-    const error = typeof parsed?.message === 'string' ? parsed.message : `Printify order creation failed with ${response.status}`;
+    const error =
+      typeof parsed?.message === 'string'
+        ? parsed.message
+        : `Printify order creation failed with ${response.status}`;
     await prisma.printifyOrderSync.upsert({
       where: { localOrderId },
       update: { status: 'failed', error, lastSyncAt: new Date() },
-      create: { localOrderId, printifyOrderId: `failed_${localOrderId}`, status: 'failed', error, lastSyncAt: new Date() },
+      create: {
+        localOrderId,
+        printifyOrderId: `failed_${localOrderId}`,
+        status: 'failed',
+        error,
+        lastSyncAt: new Date(),
+      },
     });
     return { ok: false, error, payload, response: parsed };
   }

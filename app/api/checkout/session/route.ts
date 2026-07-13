@@ -1,4 +1,3 @@
-
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -7,6 +6,7 @@ import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
+import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -31,6 +31,38 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: false, error: 'Invalid items' }, { status: 400 });
       }
 
+      const safeItems = [];
+      for (const item of items) {
+        if (!item.productId || !item.variantId) {
+          return NextResponse.json(
+            { ok: false, error: 'One or more cart items are no longer available.' },
+            { status: 400 },
+          );
+        }
+        const validation = await validatePrintifyPurchasableLineItem(
+          { productId: item.productId, variantId: item.variantId },
+          db,
+        );
+        if (!validation.ok) {
+          return NextResponse.json(
+            { ok: false, error: validation.message, code: validation.code },
+            { status: validation.status },
+          );
+        }
+        safeItems.push({
+          ...item,
+          name: validation.item.productName,
+          description: validation.item.productDescription ?? undefined,
+          images: validation.item.primaryImageUrl ? [validation.item.primaryImageUrl] : [],
+          sku: validation.item.sku ?? undefined,
+          priceCents: validation.item.priceCents,
+          printifyProductId: validation.item.printifyProductId,
+          printifyVariantId: validation.item.printifyVariantId,
+          productId: validation.item.productId,
+          variantId: validation.item.variantId,
+        });
+      }
+
       // Get user from database
       const user = await DatabaseAccess.getCurrentUser();
 
@@ -39,11 +71,11 @@ export async function POST(req: NextRequest) {
       }
 
       // Calculate totals
-      const subtotalCents = items.reduce(
+      const safeSubtotalCents = safeItems.reduce(
         (sum: number, item: any) => sum + item.priceCents * item.quantity,
         0,
       );
-      const totalAmount = subtotalCents;
+      const totalAmount = safeSubtotalCents;
 
       // Create order in database first
       const order = await db.order.create({
@@ -51,16 +83,16 @@ export async function POST(req: NextRequest) {
           User: { connect: { id: user.id } },
           stripeId: `temp_${Date.now()}`, // Temporary ID, will be updated
           totalAmount,
-          subtotalCents,
+          subtotalCents: safeSubtotalCents,
           currency: 'USD',
           status: 'pending',
-          primaryItemName: items[0]?.name || 'Order',
+          primaryItemName: safeItems[0]?.name || 'Order',
           label: `Order for ${shippingInfo?.firstName || user.displayName || user.username}`,
         },
       });
 
       // Create order items
-      for (const item of items) {
+      for (const item of safeItems) {
         await db.orderItem.create({
           data: {
             Order: { connect: { id: order.id } },
@@ -79,7 +111,7 @@ export async function POST(req: NextRequest) {
       // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
-        line_items: items.map((item: any) => ({
+        line_items: safeItems.map((item: any) => ({
           price_data: {
             currency: 'usd',
             product_data: {

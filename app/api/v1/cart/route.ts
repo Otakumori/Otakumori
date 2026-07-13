@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db as prisma } from '@/lib/db';
 import { CartUpdateSchema } from '@/app/lib/contracts';
+import { validateLoadedPrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 function serializeCartItem(item: {
   id: string;
@@ -33,7 +34,9 @@ function serializeCartItem(item: {
 export async function GET(req: NextRequest) {
   try {
     const { logger } = await import('@/app/lib/logger');
-    logger.warn('Cart GET requested from:', undefined, { userAgent: req.headers.get('user-agent') });
+    logger.warn('Cart GET requested from:', undefined, {
+      userAgent: req.headers.get('user-agent'),
+    });
 
     const { userId } = await auth();
     if (!userId) {
@@ -93,7 +96,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, data: cart.CartItem.map(serializeCartItem) });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Error fetching cart:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error fetching cart:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -130,8 +138,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Variant not found' }, { status: 404 });
     }
 
-    if (!resolvedVariant.isEnabled || !resolvedVariant.inStock) {
-      return NextResponse.json({ ok: false, error: 'Variant is no longer available' }, { status: 400 });
+    const validation = validateLoadedPrintifyPurchasableLineItem(product, resolvedVariant.id);
+    if (!validation.ok) {
+      return NextResponse.json(
+        { ok: false, error: validation.message, code: validation.code },
+        { status: validation.status },
+      );
     }
 
     let cart = await prisma.cart.findUnique({
@@ -149,14 +161,14 @@ export async function POST(req: NextRequest) {
         cartId_productId_productVariantId: {
           cartId: cart.id,
           productId,
-          productVariantId: resolvedVariant.id,
+          productVariantId: validation.item.variantId,
         },
       },
       update: { quantity },
       create: {
         cartId: cart.id,
         productId,
-        productVariantId: resolvedVariant.id,
+        productVariantId: validation.item.variantId,
         quantity,
       },
       include: {
@@ -180,7 +192,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, data: serializeCartItem(cartItem) });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Error updating cart:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error updating cart:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
