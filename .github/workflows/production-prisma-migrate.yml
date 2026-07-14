@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       confirm_pr_number:
-        description: 'Must be exactly 57'
+        description: 'Must be an approved PR number: 57 or 62'
         required: true
         type: string
       confirm_migration:
-        description: 'Must be exactly 20260708233000_provider_neutral_variant_identity'
+        description: 'Must match the approved migration for the confirmed PR'
         required: true
         type: string
       confirm_target:
@@ -19,12 +19,12 @@ on:
         description: 'Branch or ref to check out for the migration code'
         required: true
         type: string
-        default: 'fix/provider-neutral-variant-identity-prep'
+        default: 'main'
       expected_head_sha:
         description: 'Exact commit SHA expected after checkout'
         required: true
         type: string
-        default: 'c39417ca3dedcf5363ba868c9bf861a49e628065'
+        default: 'af62dc1576258079d2d43163acc5e2d798f0f551'
       dry_run:
         description: 'Run read-only preflight only'
         required: true
@@ -58,13 +58,18 @@ jobs:
           set +x
           set -euo pipefail
 
-          if [ "${{ inputs.confirm_pr_number }}" != "57" ]; then
-            echo "confirm_pr_number mismatch"
-            exit 1
-          fi
+          approved_pair="false"
+          case "${{ inputs.confirm_pr_number }}:${{ inputs.confirm_migration }}" in
+            "57:20260708233000_provider_neutral_variant_identity")
+              approved_pair="true"
+              ;;
+            "62:20260714121500_provider_import_audit_trail")
+              approved_pair="true"
+              ;;
+          esac
 
-          if [ "${{ inputs.confirm_migration }}" != "20260708233000_provider_neutral_variant_identity" ]; then
-            echo "confirm_migration mismatch"
+          if [ "${approved_pair}" != "true" ]; then
+            echo "confirm_pr_number and confirm_migration are not an approved pair"
             exit 1
           fi
 
@@ -74,6 +79,7 @@ jobs:
           fi
 
           echo "Confirmations accepted"
+          echo "approved PR/migration pair: ${{ inputs.confirm_pr_number }} / ${{ inputs.confirm_migration }}"
           echo "dry_run=${{ inputs.dry_run }}"
 
       - name: Checkout requested migration ref
@@ -98,6 +104,8 @@ jobs:
             echo "## Production Prisma Migrate"
             echo ""
             echo "- checked-out SHA: ${actual_sha}"
+            echo "- confirmed PR: ${{ inputs.confirm_pr_number }}"
+            echo "- confirmed migration: ${{ inputs.confirm_migration }}"
             echo "- dry_run: ${{ inputs.dry_run }}"
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -159,6 +167,8 @@ jobs:
       - name: Read-only pre-migration verification
         id: preflight
         shell: bash
+        env:
+          CONFIRMED_MIGRATION: ${{ inputs.confirm_migration }}
         run: |
           set +x
           set -euo pipefail
@@ -167,6 +177,7 @@ jobs:
           const { appendFileSync } = require('node:fs');
           const { PrismaClient } = require('@prisma/client');
 
+          const migration = process.env.CONFIRMED_MIGRATION;
           const prisma = new PrismaClient({
             datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
           });
@@ -180,26 +191,20 @@ jobs:
               .join('\n');
           }
 
-          function appendSummary(row) {
+          function appendSummary(title, rows) {
             appendFileSync(
               process.env.GITHUB_STEP_SUMMARY,
               [
                 '',
-                '### Read-only pre-migration verification',
+                `### ${title}`,
                 '',
-                `- provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`,
-                `- printifyVariantId column exists: ${row.printify_variant_id_columns === 1}`,
-                `- printifyVariantId NOT NULL: ${row.printify_variant_nullable === 'NO'}`,
-                `- ProductVariant row count: ${row.product_variant_rows}`,
-                `- null printifyVariantId rows: ${row.null_printify_variant_rows}`,
-                `- duplicate productId + printifyVariantId pairs: ${row.duplicate_product_printify_pairs}`,
-                `- migration record present: ${row.target_migration_records === 1}`,
+                ...rows.map(([label, value]) => `- ${label}: ${value}`),
                 '',
               ].join('\n'),
             );
           }
 
-          async function main() {
+          async function verifyProviderNeutralVariantIdentityPreflight() {
             const [row] = await prisma.$queryRaw`
               SELECT
                 (SELECT COUNT(*)::int FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'provider_variant_id') AS provider_variant_id_columns,
@@ -224,7 +229,15 @@ jobs:
             console.log(`duplicate productId + printifyVariantId pairs: ${row.duplicate_product_printify_pairs}`);
             console.log(`migration record present: ${row.target_migration_records === 1}`);
 
-            appendSummary(row);
+            appendSummary('Read-only pre-migration verification', [
+              ['provider_variant_id column exists', row.provider_variant_id_columns === 1],
+              ['printifyVariantId column exists', row.printify_variant_id_columns === 1],
+              ['printifyVariantId NOT NULL', row.printify_variant_nullable === 'NO'],
+              ['ProductVariant row count', row.product_variant_rows],
+              ['null printifyVariantId rows', row.null_printify_variant_rows],
+              ['duplicate productId + printifyVariantId pairs', row.duplicate_product_printify_pairs],
+              ['migration record present', row.target_migration_records === 1],
+            ]);
             appendFileSync(process.env.GITHUB_OUTPUT, `product_variant_rows=${row.product_variant_rows}\n`);
             appendFileSync(process.env.GITHUB_OUTPUT, `migration_record_present=${row.target_migration_records === 1}\n`);
 
@@ -246,6 +259,60 @@ jobs:
             if (row.target_migration_records !== 0) {
               throw new Error('Target migration is already recorded as applied');
             }
+          }
+
+          async function verifyProviderImportAuditTrailPreflight() {
+            const [row] = await prisma.$queryRaw`
+              SELECT
+                (SELECT COUNT(*)::int FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'provider_import_operations') AS provider_import_operations_tables,
+                (SELECT COUNT(*)::int FROM "_prisma_migrations" WHERE migration_name = '20260714121500_provider_import_audit_trail') AS target_migration_records,
+                (SELECT COUNT(*)::int FROM "Product") AS product_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant") AS product_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductImage") AS product_image_rows,
+                (SELECT COUNT(*)::int FROM "Order") AS order_rows
+            `;
+
+            console.log(`provider_import_operations table exists: ${row.provider_import_operations_tables === 1}`);
+            console.log(`migration record present: ${row.target_migration_records === 1}`);
+            console.log(`Product row count: ${row.product_rows}`);
+            console.log(`ProductVariant row count: ${row.product_variant_rows}`);
+            console.log(`ProductImage row count: ${row.product_image_rows}`);
+            console.log(`Order row count: ${row.order_rows}`);
+
+            appendSummary('Read-only pre-migration verification', [
+              ['provider_import_operations table exists', row.provider_import_operations_tables === 1],
+              ['migration record present', row.target_migration_records === 1],
+              ['Product row count', row.product_rows],
+              ['ProductVariant row count', row.product_variant_rows],
+              ['ProductImage row count', row.product_image_rows],
+              ['Order row count', row.order_rows],
+            ]);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_rows=${row.product_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_variant_rows=${row.product_variant_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_image_rows=${row.product_image_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `order_rows=${row.order_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `migration_record_present=${row.target_migration_records === 1}\n`);
+
+            if (row.provider_import_operations_tables !== 0) {
+              throw new Error('provider_import_operations table must be absent before this migration');
+            }
+            if (row.target_migration_records !== 0) {
+              throw new Error('Target migration is already recorded as applied');
+            }
+          }
+
+          async function main() {
+            if (migration === '20260708233000_provider_neutral_variant_identity') {
+              await verifyProviderNeutralVariantIdentityPreflight();
+              return;
+            }
+
+            if (migration === '20260714121500_provider_import_audit_trail') {
+              await verifyProviderImportAuditTrailPreflight();
+              return;
+            }
+
+            throw new Error('Unsupported migration reached preflight');
           }
 
           main()
@@ -293,7 +360,11 @@ jobs:
         if: ${{ inputs.dry_run != true }}
         shell: bash
         env:
+          CONFIRMED_MIGRATION: ${{ inputs.confirm_migration }}
+          PRODUCT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_rows }}
           PRODUCT_VARIANT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_variant_rows }}
+          PRODUCT_IMAGE_ROWS_BEFORE: ${{ steps.preflight.outputs.product_image_rows }}
+          ORDER_ROWS_BEFORE: ${{ steps.preflight.outputs.order_rows }}
         run: |
           set +x
           set -euo pipefail
@@ -302,6 +373,7 @@ jobs:
           const { appendFileSync } = require('node:fs');
           const { PrismaClient } = require('@prisma/client');
 
+          const migration = process.env.CONFIRMED_MIGRATION;
           const prisma = new PrismaClient({
             datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
           });
@@ -315,26 +387,27 @@ jobs:
               .join('\n');
           }
 
-          function appendSummary(row) {
+          function appendSummary(title, rows) {
             appendFileSync(
               process.env.GITHUB_STEP_SUMMARY,
               [
                 '',
-                '### Read-only post-migration verification',
+                `### ${title}`,
                 '',
-                `- provider_variant_id column exists: ${row.provider_variant_id_columns === 1}`,
-                `- printifyVariantId nullable: ${row.printify_variant_nullable === 'YES'}`,
-                `- ProductVariant row count: ${row.product_variant_rows}`,
-                `- provider_variant_id null rows: ${row.null_provider_variant_rows}`,
-                `- provider_variant_id mismatch rows: ${row.printify_provider_mismatch_rows}`,
-                `- duplicate productId + provider_variant_id pairs: ${row.duplicate_product_provider_pairs}`,
-                `- migration record present: ${row.target_migration_applied === 1}`,
+                ...rows.map(([label, value]) => `- ${label}: ${value}`),
                 '',
               ].join('\n'),
             );
           }
 
-          async function main() {
+          function assertUnchanged(label, beforeValue, afterValue) {
+            const before = Number(beforeValue);
+            if (Number.isFinite(before) && afterValue !== before) {
+              throw new Error(`${label} row count changed during migration`);
+            }
+          }
+
+          async function verifyProviderNeutralVariantIdentityPostflight() {
             const [row] = await prisma.$queryRaw`
               SELECT
                 (SELECT COUNT(*)::int FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'ProductVariant' AND column_name = 'provider_variant_id') AS provider_variant_id_columns,
@@ -360,18 +433,23 @@ jobs:
             console.log(`duplicate productId + provider_variant_id pairs: ${row.duplicate_product_provider_pairs}`);
             console.log(`migration record present: ${row.target_migration_applied === 1}`);
 
-            appendSummary(row);
+            appendSummary('Read-only post-migration verification', [
+              ['provider_variant_id column exists', row.provider_variant_id_columns === 1],
+              ['printifyVariantId nullable', row.printify_variant_nullable === 'YES'],
+              ['ProductVariant row count', row.product_variant_rows],
+              ['provider_variant_id null rows', row.null_provider_variant_rows],
+              ['provider_variant_id mismatch rows', row.printify_provider_mismatch_rows],
+              ['duplicate productId + provider_variant_id pairs', row.duplicate_product_provider_pairs],
+              ['migration record present', row.target_migration_applied === 1],
+            ]);
 
-            const before = Number(process.env.PRODUCT_VARIANT_ROWS_BEFORE);
             if (row.provider_variant_id_columns !== 1) {
               throw new Error('provider_variant_id column was not created');
             }
             if (row.printify_variant_nullable !== 'YES') {
               throw new Error('printifyVariantId was not made nullable');
             }
-            if (Number.isFinite(before) && row.product_variant_rows !== before) {
-              throw new Error('ProductVariant row count changed during migration');
-            }
+            assertUnchanged('ProductVariant', process.env.PRODUCT_VARIANT_ROWS_BEFORE, row.product_variant_rows);
             if (row.null_provider_variant_rows !== 0) {
               throw new Error('provider_variant_id backfill left null existing rows');
             }
@@ -384,6 +462,128 @@ jobs:
             if (row.target_migration_applied !== 1) {
               throw new Error('Target migration was not recorded as applied');
             }
+          }
+
+          async function verifyProviderImportAuditTrailPostflight() {
+            const expectedColumns = [
+              'id',
+              'request_id',
+              'admin_user_id',
+              'provider',
+              'action',
+              'status',
+              'preflight_fingerprint',
+              'fingerprint_expires_at',
+              'idempotency_key_hash',
+              'expected_product_count',
+              'expected_insert_count',
+              'expected_update_count',
+              'expected_skip_count',
+              'expected_block_count',
+              'inserted_count',
+              'updated_count',
+              'skipped_count',
+              'blocked_count',
+              'failure_category',
+              'failure_message',
+              'started_at',
+              'completed_at',
+              'created_at',
+              'updated_at',
+            ];
+            const expectedIndexes = [
+              'provider_import_operations_request_id_key',
+              'provider_import_operations_provider_action_idempotency_key_hash_key',
+              'provider_import_operations_provider_action_status_idx',
+              'provider_import_operations_preflight_fingerprint_idx',
+              'provider_import_operations_started_at_idx',
+              'provider_import_operations_created_at_idx',
+            ];
+
+            const [row] = await prisma.$queryRaw`
+              SELECT
+                (SELECT COUNT(*)::int FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'provider_import_operations') AS provider_import_operations_tables,
+                (SELECT COUNT(*)::int FROM "_prisma_migrations" WHERE migration_name = '20260714121500_provider_import_audit_trail' AND finished_at IS NOT NULL AND rolled_back_at IS NULL) AS target_migration_applied,
+                (SELECT COUNT(*)::int FROM "provider_import_operations") AS provider_import_operation_rows,
+                (SELECT COUNT(*)::int FROM "Product") AS product_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant") AS product_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductImage") AS product_image_rows,
+                (SELECT COUNT(*)::int FROM "Order") AS order_rows
+            `;
+
+            const columns = await prisma.$queryRaw`
+              SELECT column_name
+              FROM information_schema.columns
+              WHERE table_schema = 'public'
+                AND table_name = 'provider_import_operations'
+            `;
+            const indexes = await prisma.$queryRaw`
+              SELECT indexname
+              FROM pg_indexes
+              WHERE schemaname = 'public'
+                AND tablename = 'provider_import_operations'
+            `;
+
+            const presentColumns = new Set(columns.map((column) => column.column_name));
+            const presentIndexes = new Set(indexes.map((index) => index.indexname));
+            const missingColumns = expectedColumns.filter((column) => !presentColumns.has(column));
+            const missingIndexes = expectedIndexes.filter((index) => !presentIndexes.has(index));
+
+            console.log(`provider_import_operations table exists: ${row.provider_import_operations_tables === 1}`);
+            console.log(`migration record present: ${row.target_migration_applied === 1}`);
+            console.log(`expected columns present: ${missingColumns.length === 0}`);
+            console.log(`indexes/constraints present: ${missingIndexes.length === 0}`);
+            console.log(`provider_import_operations row count: ${row.provider_import_operation_rows}`);
+            console.log(`Product row count: ${row.product_rows}`);
+            console.log(`ProductVariant row count: ${row.product_variant_rows}`);
+            console.log(`ProductImage row count: ${row.product_image_rows}`);
+            console.log(`Order row count: ${row.order_rows}`);
+
+            appendSummary('Read-only post-migration verification', [
+              ['provider_import_operations table exists', row.provider_import_operations_tables === 1],
+              ['migration record present', row.target_migration_applied === 1],
+              ['expected columns present', missingColumns.length === 0],
+              ['indexes/constraints present', missingIndexes.length === 0],
+              ['provider_import_operations row count', row.provider_import_operation_rows],
+              ['Product row count', row.product_rows],
+              ['ProductVariant row count', row.product_variant_rows],
+              ['ProductImage row count', row.product_image_rows],
+              ['Order row count', row.order_rows],
+            ]);
+
+            if (row.provider_import_operations_tables !== 1) {
+              throw new Error('provider_import_operations table was not created');
+            }
+            if (row.target_migration_applied !== 1) {
+              throw new Error('Target migration was not recorded as applied');
+            }
+            if (missingColumns.length > 0) {
+              throw new Error(`provider_import_operations missing expected columns: ${missingColumns.join(', ')}`);
+            }
+            if (missingIndexes.length > 0) {
+              throw new Error(`provider_import_operations missing expected indexes or constraints: ${missingIndexes.join(', ')}`);
+            }
+            if (row.provider_import_operation_rows !== 0) {
+              throw new Error('provider_import_operations should be empty immediately after schema migration');
+            }
+            assertUnchanged('Product', process.env.PRODUCT_ROWS_BEFORE, row.product_rows);
+            assertUnchanged('ProductVariant', process.env.PRODUCT_VARIANT_ROWS_BEFORE, row.product_variant_rows);
+            assertUnchanged('ProductImage', process.env.PRODUCT_IMAGE_ROWS_BEFORE, row.product_image_rows);
+            assertUnchanged('Order', process.env.ORDER_ROWS_BEFORE, row.order_rows);
+          }
+
+          async function main() {
+            if (migration === '20260708233000_provider_neutral_variant_identity') {
+              await verifyProviderNeutralVariantIdentityPostflight();
+              return;
+            }
+
+            if (migration === '20260714121500_provider_import_audit_trail') {
+              await verifyProviderImportAuditTrailPostflight();
+              return;
+            }
+
+            throw new Error('Unsupported migration reached postflight');
           }
 
           main()
