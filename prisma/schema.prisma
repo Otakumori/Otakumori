@@ -1333,6 +1333,40 @@ model ProductImage {
   @@index([productId, position])
 }
 
+model ProviderImportOperation {
+  id                   String    @id @default(cuid())
+  requestId            String    @unique @map("request_id") @db.VarChar(100)
+  adminUserId          String    @map("admin_user_id") @db.VarChar(255)
+  provider             String    @db.VarChar(64)
+  action               String    @db.VarChar(80)
+  status               String    @default("pending") @db.VarChar(64)
+  preflightFingerprint String    @map("preflight_fingerprint") @db.VarChar(128)
+  fingerprintExpiresAt DateTime  @map("fingerprint_expires_at")
+  idempotencyKeyHash   String    @map("idempotency_key_hash") @db.VarChar(128)
+  expectedProductCount Int       @default(0) @map("expected_product_count")
+  expectedInsertCount  Int       @default(0) @map("expected_insert_count")
+  expectedUpdateCount  Int       @default(0) @map("expected_update_count")
+  expectedSkipCount    Int       @default(0) @map("expected_skip_count")
+  expectedBlockCount   Int       @default(0) @map("expected_block_count")
+  insertedCount        Int       @default(0) @map("inserted_count")
+  updatedCount         Int       @default(0) @map("updated_count")
+  skippedCount         Int       @default(0) @map("skipped_count")
+  blockedCount         Int       @default(0) @map("blocked_count")
+  failureCategory      String?   @map("failure_category") @db.VarChar(100)
+  failureMessage       String?   @map("failure_message") @db.VarChar(500)
+  startedAt            DateTime  @default(now()) @map("started_at")
+  completedAt          DateTime? @map("completed_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@unique([provider, action, idempotencyKeyHash])
+  @@index([provider, action, status])
+  @@index([preflightFingerprint])
+  @@index([startedAt])
+  @@index([createdAt])
+  @@map("provider_import_operations")
+}
+
 model ProductView {
   id        String   @id @default(cuid())
   productId String
