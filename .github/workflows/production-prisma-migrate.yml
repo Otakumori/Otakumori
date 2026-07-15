@@ -30,6 +30,11 @@ on:
         required: true
         type: boolean
         default: true
+      verify_only:
+        description: 'Run read-only postflight verification only; skips preflight and migrate deploy'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -81,6 +86,7 @@ jobs:
           echo "Confirmations accepted"
           echo "approved PR/migration pair: ${{ inputs.confirm_pr_number }} / ${{ inputs.confirm_migration }}"
           echo "dry_run=${{ inputs.dry_run }}"
+          echo "verify_only=${{ inputs.verify_only }}"
 
       - name: Checkout requested migration ref
         uses: actions/checkout@v4
@@ -107,6 +113,7 @@ jobs:
             echo "- confirmed PR: ${{ inputs.confirm_pr_number }}"
             echo "- confirmed migration: ${{ inputs.confirm_migration }}"
             echo "- dry_run: ${{ inputs.dry_run }}"
+            echo "- verify_only: ${{ inputs.verify_only }}"
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${actual_sha}" != "${expected_sha}" ]; then
@@ -165,6 +172,7 @@ jobs:
         run: corepack pnpm exec prisma generate --schema prisma/schema.prisma
 
       - name: Read-only pre-migration verification
+        if: ${{ inputs.verify_only != true }}
         id: preflight
         shell: bash
         env:
@@ -326,7 +334,7 @@ jobs:
           NODE
 
       - name: Stop after dry run
-        if: ${{ inputs.dry_run == true }}
+        if: ${{ inputs.dry_run == true && inputs.verify_only != true }}
         shell: bash
         run: |
           set +x
@@ -335,7 +343,7 @@ jobs:
           echo "Dry run requested; migration deploy was not executed." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run Prisma migrate deploy
-        if: ${{ inputs.dry_run != true }}
+        if: ${{ inputs.dry_run != true && inputs.verify_only != true }}
         shell: bash
         run: |
           set +x
@@ -357,7 +365,7 @@ jobs:
           exit "${status}"
 
       - name: Read-only post-migration verification
-        if: ${{ inputs.dry_run != true }}
+        if: ${{ inputs.dry_run != true || inputs.verify_only == true }}
         shell: bash
         env:
           CONFIRMED_MIGRATION: ${{ inputs.confirm_migration }}
@@ -491,15 +499,6 @@ jobs:
               'created_at',
               'updated_at',
             ];
-            const expectedIndexes = [
-              'provider_import_operations_request_id_key',
-              'provider_import_operations_provider_action_idempotency_key_hash_key',
-              'provider_import_operations_provider_action_status_idx',
-              'provider_import_operations_preflight_fingerprint_idx',
-              'provider_import_operations_started_at_idx',
-              'provider_import_operations_created_at_idx',
-            ];
-
             const [row] = await prisma.$queryRaw`
               SELECT
                 (SELECT COUNT(*)::int FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'provider_import_operations') AS provider_import_operations_tables,
@@ -517,22 +516,63 @@ jobs:
               WHERE table_schema = 'public'
                 AND table_name = 'provider_import_operations'
             `;
-            const indexes = await prisma.$queryRaw`
-              SELECT indexname
-              FROM pg_indexes
-              WHERE schemaname = 'public'
-                AND tablename = 'provider_import_operations'
+            const indexSemantics = await prisma.$queryRaw`
+              WITH table_indexes AS (
+                SELECT
+                  i.indisunique,
+                  i.indkey::int[] AS key_numbers,
+                  ARRAY(
+                    SELECT a.attname
+                    FROM unnest(i.indkey) WITH ORDINALITY AS keys(attnum, ord)
+                    JOIN pg_attribute a
+                      ON a.attrelid = t.oid
+                     AND a.attnum = keys.attnum
+                    ORDER BY keys.ord
+                  ) AS key_columns
+                FROM pg_index i
+                JOIN pg_class idx
+                  ON idx.oid = i.indexrelid
+                JOIN pg_class t
+                  ON t.oid = i.indrelid
+                JOIN pg_namespace n
+                  ON n.oid = t.relnamespace
+                WHERE n.nspname = 'public'
+                  AND t.relname = 'provider_import_operations'
+                  AND i.indpred IS NULL
+                  AND i.indexprs IS NULL
+              )
+              SELECT
+                (COUNT(*) FILTER (WHERE indisunique AND key_columns = ARRAY['request_id']::name[]))::int AS unique_request_id_indexes,
+                (COUNT(*) FILTER (WHERE indisunique AND key_columns = ARRAY['provider', 'action', 'idempotency_key_hash']::name[]))::int AS unique_idempotency_indexes,
+                (COUNT(*) FILTER (WHERE NOT indisunique AND key_columns = ARRAY['provider', 'action', 'status']::name[]))::int AS provider_action_status_indexes,
+                (COUNT(*) FILTER (WHERE key_columns = ARRAY['preflight_fingerprint']::name[]))::int AS preflight_fingerprint_indexes,
+                (COUNT(*) FILTER (WHERE key_columns = ARRAY['started_at']::name[]))::int AS started_at_indexes,
+                (COUNT(*) FILTER (WHERE key_columns = ARRAY['created_at']::name[]))::int AS created_at_indexes
+              FROM table_indexes
             `;
 
             const presentColumns = new Set(columns.map((column) => column.column_name));
-            const presentIndexes = new Set(indexes.map((index) => index.indexname));
             const missingColumns = expectedColumns.filter((column) => !presentColumns.has(column));
-            const missingIndexes = expectedIndexes.filter((index) => !presentIndexes.has(index));
+            const [indexRow] = indexSemantics;
+            const missingIndexSemantics = [
+              ['unique request_id', indexRow.unique_request_id_indexes],
+              ['unique provider/action/idempotency_key_hash', indexRow.unique_idempotency_indexes],
+              ['provider/action/status', indexRow.provider_action_status_indexes],
+              ['preflight_fingerprint', indexRow.preflight_fingerprint_indexes],
+              ['started_at', indexRow.started_at_indexes],
+              ['created_at', indexRow.created_at_indexes],
+            ].filter(([, count]) => count < 1);
 
             console.log(`provider_import_operations table exists: ${row.provider_import_operations_tables === 1}`);
             console.log(`migration record present: ${row.target_migration_applied === 1}`);
             console.log(`expected columns present: ${missingColumns.length === 0}`);
-            console.log(`indexes/constraints present: ${missingIndexes.length === 0}`);
+            console.log(`index/constraint semantics present: ${missingIndexSemantics.length === 0}`);
+            console.log(`unique request_id index present: ${indexRow.unique_request_id_indexes > 0}`);
+            console.log(`unique provider/action/idempotency_key_hash index present: ${indexRow.unique_idempotency_indexes > 0}`);
+            console.log(`provider/action/status index present: ${indexRow.provider_action_status_indexes > 0}`);
+            console.log(`preflight_fingerprint index present: ${indexRow.preflight_fingerprint_indexes > 0}`);
+            console.log(`started_at index present: ${indexRow.started_at_indexes > 0}`);
+            console.log(`created_at index present: ${indexRow.created_at_indexes > 0}`);
             console.log(`provider_import_operations row count: ${row.provider_import_operation_rows}`);
             console.log(`Product row count: ${row.product_rows}`);
             console.log(`ProductVariant row count: ${row.product_variant_rows}`);
@@ -543,7 +583,13 @@ jobs:
               ['provider_import_operations table exists', row.provider_import_operations_tables === 1],
               ['migration record present', row.target_migration_applied === 1],
               ['expected columns present', missingColumns.length === 0],
-              ['indexes/constraints present', missingIndexes.length === 0],
+              ['index/constraint semantics present', missingIndexSemantics.length === 0],
+              ['unique request_id index present', indexRow.unique_request_id_indexes > 0],
+              ['unique provider/action/idempotency_key_hash index present', indexRow.unique_idempotency_indexes > 0],
+              ['provider/action/status index present', indexRow.provider_action_status_indexes > 0],
+              ['preflight_fingerprint index present', indexRow.preflight_fingerprint_indexes > 0],
+              ['started_at index present', indexRow.started_at_indexes > 0],
+              ['created_at index present', indexRow.created_at_indexes > 0],
               ['provider_import_operations row count', row.provider_import_operation_rows],
               ['Product row count', row.product_rows],
               ['ProductVariant row count', row.product_variant_rows],
@@ -560,8 +606,12 @@ jobs:
             if (missingColumns.length > 0) {
               throw new Error(`provider_import_operations missing expected columns: ${missingColumns.join(', ')}`);
             }
-            if (missingIndexes.length > 0) {
-              throw new Error(`provider_import_operations missing expected indexes or constraints: ${missingIndexes.join(', ')}`);
+            if (missingIndexSemantics.length > 0) {
+              throw new Error(
+                `provider_import_operations missing expected index or constraint semantics: ${missingIndexSemantics
+                  .map(([label]) => label)
+                  .join(', ')}`,
+              );
             }
             if (row.provider_import_operation_rows !== 0) {
               throw new Error('provider_import_operations should be empty immediately after schema migration');
