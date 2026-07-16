@@ -7,7 +7,7 @@ test.describe('Homepage', () => {
 
   test('should load homepage with hero section', async ({ page }) => {
     // Check that the hero section is visible
-    await expect(page.locator('h1')).toContainText('Rest beneath the sakura tree');
+    await expectHeroHeading(page);
 
     // Check that the cherry tree is present
     await expect(page.getByRole('img', { name: /Otakumori sakura tree scene/i })).toBeVisible();
@@ -126,8 +126,7 @@ test.describe('Homepage', () => {
 
   test('should have proper accessibility attributes', async ({ page }) => {
     // Check for proper heading structure
-    const h1 = page.locator('h1');
-    await expect(h1).toBeVisible();
+    await expectHeroHeading(page);
 
     // Check for proper alt text on images
     const images = page.locator('img');
@@ -160,7 +159,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
 
     // Wait for hero section to be visible
-    await expect(page.locator('h1')).toBeVisible();
+    await expectHeroHeading(page);
 
     const loadTime = Date.now() - startTime;
 
@@ -184,6 +183,16 @@ test.describe('Homepage', () => {
     await expect(focusedElement).toBeVisible();
   });
 });
+
+async function expectHeroHeading(page: import('@playwright/test').Page) {
+  const heroHeading = page.getByRole('heading', {
+    level: 1,
+    name: /Rest beneath the sakura tree/i,
+  });
+
+  await expect(heroHeading).toHaveCount(1);
+  await expect(heroHeading).toBeVisible();
+}
 
 function maxCssDurationMs(value: string) {
   return Math.max(
