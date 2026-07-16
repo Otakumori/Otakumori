@@ -171,6 +171,81 @@ jobs:
       - name: Generate Prisma client
         run: corepack pnpm exec prisma generate --schema prisma/schema.prisma
 
+      - name: Read-only verify-only baseline counts
+        if: ${{ inputs.verify_only == true }}
+        id: verify_only_baseline
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+
+          node <<'NODE'
+          const { appendFileSync } = require('node:fs');
+          const { PrismaClient } = require('@prisma/client');
+
+          const prisma = new PrismaClient({
+            datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
+          });
+
+          function sanitizeMessage(error) {
+            return String(error?.message || error)
+              .replace(/postgres(?:ql)?:\/\/[^\s'"`]+/gi, '[REDACTED_DATABASE_URL]')
+              .replace(/[A-Za-z0-9-]+(?:-pooler)?\.[A-Za-z0-9.-]*neon\.tech/gi, '[REDACTED_NEON_HOST]')
+              .split('\n')
+              .slice(0, 6)
+              .join('\n');
+          }
+
+          function appendSummary(title, rows) {
+            appendFileSync(
+              process.env.GITHUB_STEP_SUMMARY,
+              [
+                '',
+                `### ${title}`,
+                '',
+                ...rows.map(([label, value]) => `- ${label}: ${value}`),
+                '',
+              ].join('\n'),
+            );
+          }
+
+          async function main() {
+            const [row] = await prisma.$queryRaw`
+              SELECT
+                (SELECT COUNT(*)::int FROM "Product") AS product_rows,
+                (SELECT COUNT(*)::int FROM "ProductVariant") AS product_variant_rows,
+                (SELECT COUNT(*)::int FROM "ProductImage") AS product_image_rows,
+                (SELECT COUNT(*)::int FROM "Order") AS order_rows
+            `;
+
+            console.log(`Product row count baseline: ${row.product_rows}`);
+            console.log(`ProductVariant row count baseline: ${row.product_variant_rows}`);
+            console.log(`ProductImage row count baseline: ${row.product_image_rows}`);
+            console.log(`Order row count baseline: ${row.order_rows}`);
+
+            appendSummary('Read-only verify-only baseline counts', [
+              ['Product row count baseline', row.product_rows],
+              ['ProductVariant row count baseline', row.product_variant_rows],
+              ['ProductImage row count baseline', row.product_image_rows],
+              ['Order row count baseline', row.order_rows],
+            ]);
+
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_rows=${row.product_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_variant_rows=${row.product_variant_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `product_image_rows=${row.product_image_rows}\n`);
+            appendFileSync(process.env.GITHUB_OUTPUT, `order_rows=${row.order_rows}\n`);
+          }
+
+          main()
+            .catch((error) => {
+              console.error(`Read-only verify-only baseline capture failed: ${sanitizeMessage(error)}`);
+              process.exitCode = 1;
+            })
+            .finally(async () => {
+              await prisma.$disconnect().catch(() => {});
+            });
+          NODE
+
       - name: Read-only pre-migration verification
         if: ${{ inputs.verify_only != true }}
         id: preflight
@@ -369,10 +444,10 @@ jobs:
         shell: bash
         env:
           CONFIRMED_MIGRATION: ${{ inputs.confirm_migration }}
-          PRODUCT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_rows }}
-          PRODUCT_VARIANT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_variant_rows }}
-          PRODUCT_IMAGE_ROWS_BEFORE: ${{ steps.preflight.outputs.product_image_rows }}
-          ORDER_ROWS_BEFORE: ${{ steps.preflight.outputs.order_rows }}
+          PRODUCT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_rows || steps.verify_only_baseline.outputs.product_rows }}
+          PRODUCT_VARIANT_ROWS_BEFORE: ${{ steps.preflight.outputs.product_variant_rows || steps.verify_only_baseline.outputs.product_variant_rows }}
+          PRODUCT_IMAGE_ROWS_BEFORE: ${{ steps.preflight.outputs.product_image_rows || steps.verify_only_baseline.outputs.product_image_rows }}
+          ORDER_ROWS_BEFORE: ${{ steps.preflight.outputs.order_rows || steps.verify_only_baseline.outputs.order_rows }}
         run: |
           set +x
           set -euo pipefail
@@ -409,8 +484,14 @@ jobs:
           }
 
           function assertUnchanged(label, beforeValue, afterValue) {
+            if (beforeValue == null || String(beforeValue).trim() === '') {
+              throw new Error(`Missing row-count baseline for ${label} during postflight`);
+            }
             const before = Number(beforeValue);
-            if (Number.isFinite(before) && afterValue !== before) {
+            if (!Number.isFinite(before)) {
+              throw new Error(`Missing row-count baseline for ${label} during postflight`);
+            }
+            if (afterValue !== before) {
               throw new Error(`${label} row count changed during migration`);
             }
           }
