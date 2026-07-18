@@ -382,6 +382,15 @@ describe('Merchize hidden local import apply route', () => {
         url: { notIn: ['https://cdn.example.com/merchize-tee.png'] },
       },
     });
+    expect(tx.productVariant.updateMany).toHaveBeenCalledWith({
+      where: {
+        productId: 'product_1',
+        providerVariantId: { notIn: ['MZ-VARIANT-1'] },
+        printProviderName: 'merchize',
+        printifyVariantId: null,
+      },
+      data: { isEnabled: false, inStock: false },
+    });
     expect(db.providerImportOperation.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -455,6 +464,29 @@ describe('Merchize hidden local import apply route', () => {
     });
   });
 
+  it('disables only stale Merchize-owned variants and leaves Printify or other-provider variants outside the predicate', async () => {
+    const tx = transactionClient();
+    vi.mocked(db.$transaction).mockImplementationOnce(
+      async (callback: (transaction: typeof tx) => Promise<void>) => callback(tx),
+    );
+    const body = await signedPreflightBody();
+
+    const { response } = await callPOST(body, {
+      'x-idempotency-key': 'stale-merchize-variant-idempotency-key',
+    });
+
+    expect(response.status).toBe(200);
+    expect(tx.productVariant.updateMany).toHaveBeenCalledWith({
+      where: {
+        productId: 'product_1',
+        providerVariantId: { notIn: ['MZ-VARIANT-1'] },
+        printProviderName: 'merchize',
+        printifyVariantId: null,
+      },
+      data: { isEnabled: false, inStock: false },
+    });
+  });
+
   it('blocks unsafe image URLs before any image or catalog mutation', async () => {
     const products = [
       merchizeProduct({
@@ -496,6 +528,34 @@ describe('Merchize hidden local import apply route', () => {
           status: 'blocked',
           failureCategory: 'confirmation_mismatch',
         }),
+      }),
+    );
+  });
+
+  it('blocks existing Merchize integration refs with Printify ownership before transaction mutation', async () => {
+    const body = await signedPreflightBody();
+    vi.mocked(db.product.findMany)
+      .mockResolvedValueOnce([
+        {
+          id: 'conflicting_product',
+          integrationRef: 'merchize:mz-product-1',
+          printifyProductId: 'printify-product-1',
+        },
+      ] as never)
+      .mockResolvedValueOnce([] as never);
+    vi.mocked(db.productVariant.findMany).mockResolvedValue([] as never);
+
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'ownership-conflict-idempotency-key',
+    });
+
+    expect(response.status).toBe(422);
+    expect(json.data.status).toBe('blocked');
+    expect(json.data.error).toBe('Merchize import preflight fingerprint did not match.');
+    expect(db.$transaction).not.toHaveBeenCalled();
+    expect(db.providerImportOperation.update).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'completed' }),
       }),
     );
   });

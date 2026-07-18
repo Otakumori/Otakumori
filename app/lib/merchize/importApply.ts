@@ -490,6 +490,7 @@ async function applyHiddenProduct(tx: Prisma.TransactionClient, product: Canonic
       where: {
         productId: productRecord.id,
         providerVariantId: { notIn: product.incomingProviderVariantIdSet },
+        printProviderName: 'merchize',
         printifyVariantId: null,
       },
       data: { isEnabled: false, inStock: false },

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '@/app/lib/db';
 import {
   buildMerchizeImportPreflightForProducts,
+  buildMerchizeHiddenImportManifestForProducts,
   MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
   verifyMerchizeImportPreflightSignature,
 } from '@/app/lib/merchize/importPreflight';
@@ -371,6 +372,163 @@ describe('Merchize import preflight route', () => {
     expect(JSON.stringify(json.data.issues)).toContain(
       'provider_variant_id_conflicts_with_printify',
     );
+  });
+
+  it('blocks overlong mutation-relevant product and variant fields without truncating identities', async () => {
+    const overlongProductId = `${'p'.repeat(200)}A`;
+    const overlongVariantId = `${'v'.repeat(200)}A`;
+    const preflight = await buildMerchizeImportPreflightForProducts([
+      merchizeProduct({
+        providerProductId: overlongProductId,
+        id: overlongProductId,
+        title: 'T'.repeat(241),
+        description: 'D'.repeat(4001),
+        sku: 'S'.repeat(121),
+        handle: 'h'.repeat(201),
+        status: 's'.repeat(81),
+        currency: 'C'.repeat(9),
+        priceRange: { min: 25, max: 25, currency: 'R'.repeat(9) },
+        variants: [
+          {
+            ...merchizeProduct().variants[0],
+            providerVariantId: overlongVariantId,
+            title: 'V'.repeat(241),
+            sku: 'K'.repeat(121),
+            currency: 'Z'.repeat(9),
+            options: [{ option: 'O'.repeat(81), value: 'Value' }],
+          },
+        ],
+      }),
+    ] as never);
+
+    expect(preflight.safeToImport).toBe(false);
+    expect(preflight.wouldBlock).toBe(1);
+    expect(JSON.stringify(preflight.issues)).toContain('field_length_exceeded');
+    expect(preflight.products[0].providerProductId).toBe(overlongProductId);
+    expect(preflight.products[0].integrationRef).toBe('');
+    expect(preflight.products[0].variants).toHaveLength(0);
+
+    const manifest = await buildMerchizeHiddenImportManifestForProducts([
+      merchizeProduct({
+        providerProductId: 'mz-product-1',
+        variants: [
+          {
+            ...merchizeProduct().variants[0],
+            providerVariantId: `${'x'.repeat(200)}A`,
+          },
+          {
+            ...merchizeProduct().variants[0],
+            providerVariantId: `${'x'.repeat(200)}B`,
+            sku: 'MZ-TEE-M',
+          },
+        ],
+        variantCount: 2,
+        pricedVariantCount: 2,
+      }),
+    ] as never);
+
+    expect(manifest.safeToImport).toBe(false);
+    expect(manifest.products[0].variants).toHaveLength(0);
+    expect(manifest.products[0].issues).toContain('field_length_exceeded');
+    expect(JSON.stringify(manifest)).not.toContain(`${'x'.repeat(200)}A`.slice(0, 200));
+  });
+
+  it('blocks option overflow instead of silently truncating provider options', async () => {
+    const thirteenOptions = Array.from({ length: 13 }, (_, index) => ({
+      option: `Option ${index + 1}`,
+      value: `Value ${index + 1}`,
+    }));
+    const tooManyVariantOptions = await buildMerchizeImportPreflightForProducts([
+      merchizeProduct({
+        variants: [
+          {
+            ...merchizeProduct().variants[0],
+            options: thirteenOptions,
+          },
+        ],
+      }),
+    ] as never);
+
+    expect(tooManyVariantOptions.safeToImport).toBe(false);
+    expect(JSON.stringify(tooManyVariantOptions.issues)).toContain(
+      'unsupported_option_combination',
+    );
+
+    const variants = Array.from({ length: 11 }, (_, variantIndex) => ({
+      ...merchizeProduct().variants[0],
+      providerVariantId: `MZ-VARIANT-${variantIndex + 1}`,
+      sku: `MZ-TEE-${variantIndex + 1}`,
+      options: Array.from({ length: 12 }, (_, optionIndex) => ({
+        option: `Option ${variantIndex + 1}-${optionIndex + 1}`,
+        value: `Value ${variantIndex + 1}-${optionIndex + 1}`,
+      })),
+    }));
+    const tooManyProductOptions = await buildMerchizeImportPreflightForProducts([
+      merchizeProduct({
+        variants,
+        variantCount: variants.length,
+        pricedVariantCount: variants.length,
+      }),
+    ] as never);
+
+    expect(tooManyProductOptions.safeToImport).toBe(false);
+    expect(JSON.stringify(tooManyProductOptions.issues)).toContain('product_too_many_options');
+  });
+
+  it('allows boundary-length mutation fields at the exact configured limits', async () => {
+    const options = Array.from({ length: 12 }, (_, index) => ({
+      option: `O${String(index + 1).padStart(2, '0')}${'N'.repeat(77)}`,
+      value: `V${String(index + 1).padStart(2, '0')}${'A'.repeat(77)}`,
+    }));
+    const preflight = await buildMerchizeImportPreflightForProducts([
+      merchizeProduct({
+        providerProductId: 'P'.repeat(200),
+        id: 'P'.repeat(200),
+        title: 'T'.repeat(240),
+        description: 'D'.repeat(4000),
+        sku: 'S'.repeat(120),
+        handle: 'h'.repeat(200),
+        status: 's'.repeat(80),
+        currency: 'USDTEST1',
+        priceRange: { min: 25, max: 25, currency: 'USDTEST1' },
+        images: [{ url: `https://cdn.example.com/${'i'.repeat(1972)}` }],
+        variants: [
+          {
+            ...merchizeProduct().variants[0],
+            providerVariantId: 'V'.repeat(200),
+            title: 'R'.repeat(240),
+            sku: 'K'.repeat(120),
+            currency: 'USDTEST1',
+            options,
+          },
+        ],
+      }),
+    ] as never);
+
+    expect(preflight.safeToImport).toBe(true);
+    expect(JSON.stringify(preflight.issues)).not.toContain('field_length_exceeded');
+    expect(preflight.products[0].integrationRef).toBe(`merchize:${'P'.repeat(200)}`);
+  });
+
+  it('blocks existing Merchize refs with Printify ownership instead of updating or clearing ownership', async () => {
+    vi.mocked(db.product.findMany)
+      .mockResolvedValueOnce([
+        {
+          id: 'conflicting_product',
+          integrationRef: 'merchize:mz-product-1',
+          printifyProductId: 'printify-product-1',
+        },
+      ] as never)
+      .mockResolvedValueOnce([] as never);
+    vi.mocked(db.productVariant.findMany).mockResolvedValue([] as never);
+
+    const preflight = await buildMerchizeImportPreflightForProducts([merchizeProduct() as never]);
+
+    expect(preflight.safeToImport).toBe(false);
+    expect(preflight.wouldUpdate).toBe(0);
+    expect(preflight.wouldBlock).toBe(1);
+    expect(preflight.products[0].action).toBe('blocked');
+    expect(JSON.stringify(preflight.issues)).toContain('provider_product_ownership_conflict');
   });
 
   it('sanitizes provider errors', async () => {

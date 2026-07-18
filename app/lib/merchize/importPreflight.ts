@@ -144,6 +144,7 @@ export type CanonicalMerchizeProduct = {
   staleVariantOwnership: {
     productIdMatchesImportedProduct: true;
     providerVariantIdNotInIncomingSet: true;
+    printProviderNameMerchize: true;
     printifyVariantIdNull: true;
   };
   variantCount: number;
@@ -199,15 +200,15 @@ export class MerchizeImportPreflightSigningError extends Error {
   }
 }
 
-function coerceText(value: string | null | undefined, maxLength: number): string | null {
+function coerceText(value: string | null | undefined): string | null {
   if (value == null) return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
-  return trimmed.length > maxLength ? trimmed.slice(0, maxLength) : trimmed;
+  return trimmed;
 }
 
-function coerceRequiredText(value: string | null | undefined, maxLength: number): string {
-  return coerceText(value, maxLength) ?? '';
+function coerceRequiredText(value: string | null | undefined): string {
+  return coerceText(value) ?? '';
 }
 
 function duplicateValues(values: string[]): Set<string> {
@@ -319,19 +320,24 @@ function isValidSku(value: string | null | undefined): boolean {
 function canonicalizeOptions(options: Array<{ option: string; value: string }>): {
   options: CanonicalMerchizeOption[];
   invalid: boolean;
+  tooMany: boolean;
+  fieldLengthExceeded: boolean;
 } {
   if (options.length > MAX_OPTIONS_PER_VARIANT) {
-    return { options: [], invalid: true };
+    return { options: [], invalid: true, tooMany: true, fieldLengthExceeded: false };
   }
 
   const seen = new Set<string>();
   const normalized: CanonicalMerchizeOption[] = [];
   for (const option of options) {
-    const name = coerceRequiredText(option.option, MAX_OPTION_FIELD_LENGTH);
-    const value = coerceRequiredText(option.value, MAX_OPTION_FIELD_LENGTH);
+    const name = coerceRequiredText(option.option);
+    const value = coerceRequiredText(option.value);
+    const fieldLengthExceeded =
+      hasInvalidLength(name, MAX_OPTION_FIELD_LENGTH) ||
+      hasInvalidLength(value, MAX_OPTION_FIELD_LENGTH);
     const key = name.toLowerCase();
-    if (!name || !value || seen.has(key)) {
-      return { options: [], invalid: true };
+    if (!name || !value || fieldLengthExceeded || seen.has(key)) {
+      return { options: [], invalid: true, tooMany: false, fieldLengthExceeded };
     }
     seen.add(key);
     normalized.push({ option: name, value });
@@ -343,6 +349,8 @@ function canonicalizeOptions(options: Array<{ option: string; value: string }>):
       return optionCompare === 0 ? a.value.localeCompare(b.value) : optionCompare;
     }),
     invalid: false,
+    tooMany: false,
+    fieldLengthExceeded: false,
   };
 }
 
@@ -398,8 +406,9 @@ export function canonicalizeMerchizeImageUrls(
   };
 }
 
-function hasInvalidLength(value: string | null, maxLength: number): boolean {
-  return Boolean(value && value.length > maxLength);
+function hasInvalidLength(value: string | null | undefined, maxLength: number): boolean {
+  const normalized = coerceText(value);
+  return Boolean(normalized && normalized.length > maxLength);
 }
 
 function variantIdentitySource(variant: Record<string, unknown>): string | null {
@@ -442,8 +451,12 @@ function merchizeIssueMessage(code: string): string {
       return 'A Merchize product or variant has an invalid SKU.';
     case 'unsupported_option_combination':
       return 'A Merchize product has unsupported or ambiguous variant options.';
+    case 'product_too_many_options':
+      return 'A Merchize product has more option values than the hidden import limit.';
     case 'provider_product_id_conflicts_with_printify':
       return 'A Merchize provider product ID conflicts with an existing Printify-owned product.';
+    case 'provider_product_ownership_conflict':
+      return 'An existing product with this Merchize integration reference has conflicting provider ownership.';
     case 'provider_variant_id_conflicts_with_printify':
       return 'A Merchize provider variant ID conflicts with an existing Printify-owned variant.';
     case 'provider_catalog_too_large':
@@ -488,15 +501,22 @@ function buildCanonicalVariant(
   printifyVariantConflicts: Set<string>,
 ): { variant: CanonicalMerchizeVariant | null; issues: string[] } {
   const issues = new Set<string>();
-  const providerVariantId = coerceText(variant.providerVariantId, MAX_PROVIDER_ID_LENGTH);
-  const sku = coerceText(variant.sku, MAX_SKU_LENGTH);
-  const title = coerceText(variant.title, MAX_TITLE_LENGTH);
-  const currency = coerceText(variant.currency, MAX_CURRENCY_LENGTH) ?? 'USD';
+  const providerVariantId = coerceText(variant.providerVariantId);
+  const sku = coerceText(variant.sku);
+  const title = coerceText(variant.title);
+  const currency = coerceText(variant.currency) ?? 'USD';
   const priceCents = priceToCents(variant.price);
   const optionResult = canonicalizeOptions(variant.options);
   const source = variantIdentitySource(variant as unknown as Record<string, unknown>);
+  const fieldLengthExceeded =
+    hasInvalidLength(providerVariantId, MAX_PROVIDER_ID_LENGTH) ||
+    hasInvalidLength(sku, MAX_SKU_LENGTH) ||
+    hasInvalidLength(title, MAX_TITLE_LENGTH) ||
+    hasInvalidLength(currency, MAX_CURRENCY_LENGTH) ||
+    optionResult.fieldLengthExceeded;
 
   addIssue(issues, !providerVariantId, 'variants_missing_provider_ids');
+  addIssue(issues, fieldLengthExceeded, 'field_length_exceeded');
   addIssue(issues, source === 'sku_fallback' || source === 'missing', 'variant_id_not_stable');
   addIssue(
     issues,
@@ -512,7 +532,7 @@ function buildCanonicalVariant(
   addIssue(issues, !isValidSku(sku), 'invalid_sku');
   addIssue(issues, optionResult.invalid, 'unsupported_option_combination');
 
-  if (!providerVariantId || priceCents == null || optionResult.invalid) {
+  if (!providerVariantId || fieldLengthExceeded || priceCents == null || optionResult.invalid) {
     return { variant: null, issues: [...issues] };
   }
 
@@ -537,7 +557,10 @@ function buildCanonicalVariant(
   };
 }
 
-function canonicalProductOptions(variants: CanonicalMerchizeVariant[]): CanonicalMerchizeOption[] {
+function canonicalProductOptions(variants: CanonicalMerchizeVariant[]): {
+  options: CanonicalMerchizeOption[];
+  tooMany: boolean;
+} {
   const seen = new Set<string>();
   const options: CanonicalMerchizeOption[] = [];
 
@@ -550,12 +573,15 @@ function canonicalProductOptions(variants: CanonicalMerchizeVariant[]): Canonica
     }
   }
 
-  return options
-    .sort((a, b) => {
-      const optionCompare = a.option.localeCompare(b.option);
-      return optionCompare === 0 ? a.value.localeCompare(b.value) : optionCompare;
-    })
-    .slice(0, MAX_PRODUCT_OPTIONS);
+  const sorted = options.sort((a, b) => {
+    const optionCompare = a.option.localeCompare(b.option);
+    return optionCompare === 0 ? a.value.localeCompare(b.value) : optionCompare;
+  });
+
+  return {
+    options: sorted.length > MAX_PRODUCT_OPTIONS ? [] : sorted,
+    tooMany: sorted.length > MAX_PRODUCT_OPTIONS,
+  };
 }
 
 function canonicalizeProduct(input: {
@@ -563,31 +589,36 @@ function canonicalizeProduct(input: {
   duplicateProductIds: Set<string>;
   printifyProductConflicts: Set<string>;
   printifyVariantConflicts: Set<string>;
-  existingRefs: Set<string>;
+  existingProductsByRef: Map<string, ExistingProduct>;
 }): CanonicalMerchizeProduct {
   const {
     product,
     duplicateProductIds,
     printifyProductConflicts,
     printifyVariantConflicts,
-    existingRefs,
+    existingProductsByRef,
   } = input;
   const issues = new Set<string>(product.importReadiness.issues);
-  const providerProductId = coerceRequiredText(product.providerProductId, MAX_PROVIDER_ID_LENGTH);
-  const integrationRef = providerProductRef('merchize', providerProductId);
+  const providerProductId = coerceRequiredText(product.providerProductId);
+  const providerProductIdTooLong = hasInvalidLength(providerProductId, MAX_PROVIDER_ID_LENGTH);
+  const integrationRef =
+    providerProductId && !providerProductIdTooLong && !providerProductId.startsWith('merchize-')
+      ? providerProductRef('merchize', providerProductId)
+      : '';
   const imageResult = canonicalizeMerchizeImageUrls(product.images);
   const primaryImageUrl = imageResult.images[0]?.url ?? null;
   const duplicateVariantIds = duplicateValues(
     product.variants.map((variant) => variant.providerVariantId ?? '').filter(Boolean),
   );
-  const title = coerceRequiredText(product.title, MAX_TITLE_LENGTH);
-  const description = coerceText(product.description, MAX_DESCRIPTION_LENGTH);
-  const sku = coerceText(product.sku, MAX_SKU_LENGTH);
-  const handle = coerceText(product.handle, MAX_HANDLE_LENGTH);
-  const status = coerceText(product.status, MAX_STATUS_LENGTH);
-  const currency =
-    coerceText(product.currency, MAX_CURRENCY_LENGTH) ?? product.priceRange.currency ?? 'USD';
+  const title = coerceRequiredText(product.title);
+  const description = coerceText(product.description);
+  const sku = coerceText(product.sku);
+  const handle = coerceText(product.handle);
+  const status = coerceText(product.status);
+  const currency = coerceText(product.currency) ?? coerceText(product.priceRange.currency) ?? 'USD';
   const productSource = productIdentitySource(product as unknown as Record<string, unknown>);
+  const existingProduct = integrationRef ? existingProductsByRef.get(integrationRef) : null;
+  const existingProductOwnershipConflict = Boolean(existingProduct?.printifyProductId);
 
   addIssue(
     issues,
@@ -610,6 +641,7 @@ function canonicalizeProduct(input: {
     printifyProductConflicts.has(providerProductId),
     'provider_product_id_conflicts_with_printify',
   );
+  addIssue(issues, existingProductOwnershipConflict, 'provider_product_ownership_conflict');
   addIssue(issues, product.variants.length === 0, 'product_missing_variants');
   addIssue(issues, product.variants.length > MAX_VARIANTS_PER_PRODUCT, 'product_too_many_variants');
   addIssue(issues, product.images.length > MAX_IMAGES_PER_PRODUCT, 'product_too_many_images');
@@ -621,8 +653,11 @@ function canonicalizeProduct(input: {
     hasInvalidLength(product.providerProductId, MAX_PROVIDER_ID_LENGTH) ||
       hasInvalidLength(product.title, MAX_TITLE_LENGTH) ||
       hasInvalidLength(product.description, MAX_DESCRIPTION_LENGTH) ||
+      hasInvalidLength(product.sku, MAX_SKU_LENGTH) ||
       hasInvalidLength(product.handle, MAX_HANDLE_LENGTH) ||
-      hasInvalidLength(product.status, MAX_STATUS_LENGTH),
+      hasInvalidLength(product.status, MAX_STATUS_LENGTH) ||
+      hasInvalidLength(product.currency, MAX_CURRENCY_LENGTH) ||
+      hasInvalidLength(product.priceRange.currency, MAX_CURRENCY_LENGTH),
     'field_length_exceeded',
   );
 
@@ -645,9 +680,11 @@ function canonicalizeProduct(input: {
     variants.every((variant) => variant.priceCents <= 0),
     'product_missing_price',
   );
+  const productOptionResult = canonicalProductOptions(variants);
+  addIssue(issues, productOptionResult.tooMany, 'product_too_many_options');
 
   const blocked = issues.size > 0;
-  const exists = existingRefs.has(integrationRef);
+  const exists = Boolean(existingProduct && !existingProductOwnershipConflict);
   const action: CanonicalMerchizeProduct['action'] = blocked
     ? 'blocked'
     : exists
@@ -669,7 +706,7 @@ function canonicalizeProduct(input: {
     imageUrls: imageResult.images.map((image) => image.url),
     incomingImageUrlSet: imageResult.images.map((image) => image.url),
     primaryImageUrl,
-    options: canonicalProductOptions(variants),
+    options: productOptionResult.options,
     specs: {
       provider: 'merchize',
       providerProductId,
@@ -682,6 +719,7 @@ function canonicalizeProduct(input: {
     staleVariantOwnership: {
       productIdMatchesImportedProduct: true,
       providerVariantIdNotInIncomingSet: true,
+      printProviderNameMerchize: true,
       printifyVariantIdNull: true,
     },
     variantCount: variants.length,
@@ -793,11 +831,14 @@ export async function buildMerchizeHiddenImportManifestForProducts(
   products: MerchizeProduct[],
 ): Promise<MerchizeHiddenImportManifest> {
   const candidateProducts = products.slice(0, MAX_PROVIDER_PRODUCTS);
-  const providerProductIds = candidateProducts.map((product) => product.providerProductId);
+  const providerProductIds = candidateProducts.map((product) =>
+    coerceRequiredText(product.providerProductId),
+  );
   const duplicateProductIds = duplicateValues(providerProductIds);
-  const integrationRefs = providerProductIds
-    .filter((id) => id && !id.startsWith('merchize-'))
-    .map((id) => providerProductRef('merchize', id));
+  const lookupProviderProductIds = providerProductIds.filter(
+    (id) => id && id.length <= MAX_PROVIDER_ID_LENGTH && !id.startsWith('merchize-'),
+  );
+  const integrationRefs = lookupProviderProductIds.map((id) => providerProductRef('merchize', id));
 
   const existingProducts = integrationRefs.length
     ? await db.product.findMany({
@@ -805,16 +846,16 @@ export async function buildMerchizeHiddenImportManifestForProducts(
         select: { id: true, integrationRef: true, printifyProductId: true },
       })
     : [];
-  const existingRefs = new Set(
+  const existingProductsByRef = new Map(
     (existingProducts as ExistingProduct[])
-      .map((product) => product.integrationRef)
-      .filter((value): value is string => Boolean(value)),
+      .filter((product) => Boolean(product.integrationRef))
+      .map((product) => [product.integrationRef as string, product]),
   );
   const printifyProductConflicts = new Set(
     (
       await db.product.findMany({
         where: {
-          printifyProductId: { in: providerProductIds.filter(Boolean) },
+          printifyProductId: { in: lookupProviderProductIds },
         },
         select: { printifyProductId: true },
       })
@@ -825,7 +866,9 @@ export async function buildMerchizeHiddenImportManifestForProducts(
   const incomingVariantIds = [
     ...new Set(
       candidateProducts.flatMap((product) =>
-        product.variants.map((variant) => variant.providerVariantId ?? '').filter(Boolean),
+        product.variants
+          .map((variant) => coerceText(variant.providerVariantId) ?? '')
+          .filter((id) => id && id.length <= MAX_PROVIDER_ID_LENGTH),
       ),
     ),
   ];
@@ -855,7 +898,7 @@ export async function buildMerchizeHiddenImportManifestForProducts(
       duplicateProductIds,
       printifyProductConflicts,
       printifyVariantConflicts,
-      existingRefs,
+      existingProductsByRef,
     }),
   );
   let issues = summarizeIssues(manifestProducts);

@@ -212,11 +212,6 @@ function countDuplicates(values: string[]): number {
   return [...counts.values()].filter((count) => count > 1).length;
 }
 
-function truncate(value: string | null, maxLength = 160): string | null {
-  if (!value) return null;
-  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
-}
-
 function extractImageUrls(raw: JsonRecord): MerchizeProductImage[] {
   const candidates = [
     raw.images,
@@ -357,8 +352,7 @@ function extractOptions(variant: JsonRecord): Array<{ option: string; value: str
       const optionValue = coerceString(value);
       return optionValue ? { option, value: optionValue } : null;
     })
-    .filter((option): option is { option: string; value: string } => Boolean(option))
-    .slice(0, 12);
+    .filter((option): option is { option: string; value: string } => Boolean(option));
 }
 
 function normalizeVariant(raw: JsonRecord): MerchizeProductVariant {
@@ -384,13 +378,11 @@ function normalizeVariant(raw: JsonRecord): MerchizeProductVariant {
         ? 'sku_fallback'
         : 'missing',
     sku,
-    title: truncate(
+    title:
       coerceString(raw.title) ||
-        coerceString(raw.name) ||
-        coerceString(raw.option_title) ||
-        coerceString(raw.variant_title),
-      120,
-    ),
+      coerceString(raw.name) ||
+      coerceString(raw.option_title) ||
+      coerceString(raw.variant_title),
     options: extractOptions(raw),
     price: extractVariantPrice(raw),
     currency: coerceString(raw.currency) || 'USD',
