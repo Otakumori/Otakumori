@@ -3,7 +3,10 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { db } from '@/app/lib/db';
-import { buildMerchizeImportPreflightForProducts } from '@/app/lib/merchize/importPreflight';
+import {
+  buildMerchizeImportPreflightForProducts,
+  MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
+} from '@/app/lib/merchize/importPreflight';
 import { getMerchizeService } from '@/app/lib/merchize/service';
 import { limitApi } from '@/lib/ratelimit';
 
@@ -58,7 +61,7 @@ vi.mock('@/env/server', () => ({
       return process.env.AUTH_SECRET;
     },
     get CLERK_SECRET_KEY() {
-      return process.env.CLERK_SECRET_KEY || 'vitest-clerk-secret';
+      return process.env.CLERK_SECRET_KEY;
     },
     get MERCHIZE_LOCAL_IMPORT_ENABLED() {
       return process.env.MERCHIZE_LOCAL_IMPORT_ENABLED;
@@ -209,6 +212,7 @@ async function signedPreflightBody(products = [merchizeProduct()]) {
 
   return {
     confirmation: 'APPLY HIDDEN MERCHIZE IMPORT',
+    manifestVersion: preflight.manifestVersion,
     preflightFingerprint: preflight.preflightFingerprint,
     fingerprintExpiresAt: preflight.fingerprintExpiresAt,
     preflightSignature: preflight.preflightSignature,
@@ -220,10 +224,38 @@ async function signedPreflightBody(products = [merchizeProduct()]) {
   };
 }
 
+function merchizeProducts(count: number) {
+  return Array.from({ length: count }, (_, index) =>
+    merchizeProduct({
+      providerProductId: `mz-product-${index + 1}`,
+      id: `mz-product-${index + 1}`,
+      title: `Merchize Tee ${index + 1}`,
+      variants: [
+        {
+          ...merchizeProduct().variants[0],
+          providerVariantId: `MZ-VARIANT-${index + 1}`,
+          sku: `MZ-TEE-${index + 1}`,
+        },
+      ],
+    }),
+  );
+}
+
+function manyVariants(count: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    ...merchizeProduct().variants[0],
+    providerVariantId: `MZ-VARIANT-${index + 1}`,
+    sku: `MZ-TEE-${index + 1}`,
+    title: `Variant ${index + 1}`,
+    price: 25 + index,
+  }));
+}
+
 describe('Merchize hidden local import apply route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.AUTH_SECRET = 'vitest-merchize-import-signing-secret';
+    delete process.env.CLERK_SECRET_KEY;
     process.env.MERCHIZE_LOCAL_IMPORT_ENABLED = 'true';
     adminSession();
     vi.mocked(limitApi).mockResolvedValue({
@@ -275,6 +307,19 @@ describe('Merchize hidden local import apply route', () => {
     expect(db.$transaction).not.toHaveBeenCalled();
   });
 
+  it('rejects invalid idempotency key formats before provider fetch or audit creation', async () => {
+    const body = await signedPreflightBody();
+
+    for (const key of ['short', 'bad key with spaces']) {
+      const { response, json } = await callPOST(body, { 'x-idempotency-key': key });
+      expect(response.status).toBe(400);
+      expect(json.error.code).toBe('VALIDATION_ERROR');
+      expect(getMerchizeService).not.toHaveBeenCalled();
+      expect(db.providerImportOperation.create).not.toHaveBeenCalled();
+      expect(db.$transaction).not.toHaveBeenCalled();
+    }
+  });
+
   it('inserts hidden, inactive, non-purchasable Merchize records with provider-neutral identities', async () => {
     const tx = transactionClient();
     vi.mocked(db.$transaction).mockImplementationOnce(
@@ -282,7 +327,9 @@ describe('Merchize hidden local import apply route', () => {
     );
     const body = await signedPreflightBody();
 
-    const { response, json } = await callPOST(body, { 'x-idempotency-key': 'secret-replay-key' });
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'secret-replay-key',
+    });
 
     expect(response.status).toBe(200);
     expect(json.data).toMatchObject({
@@ -329,6 +376,12 @@ describe('Merchize hidden local import apply route', () => {
         }),
       }),
     );
+    expect(tx.productImage.deleteMany).toHaveBeenCalledWith({
+      where: {
+        productId: 'product_1',
+        url: { notIn: ['https://cdn.example.com/merchize-tee.png'] },
+      },
+    });
     expect(db.providerImportOperation.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -348,12 +401,89 @@ describe('Merchize hidden local import apply route', () => {
     expect(JSON.stringify(json)).not.toContain('secret-replay-key');
   });
 
+  it('uses canonical image lists for persistence and stale image deletion', async () => {
+    const tx = transactionClient();
+    vi.mocked(db.$transaction).mockImplementationOnce(
+      async (callback: (transaction: typeof tx) => Promise<void>) => callback(tx),
+    );
+    const products = [
+      merchizeProduct({
+        images: [
+          { url: 'https://cdn.example.com/primary.png?width=100' },
+          { url: 'https://cdn.example.com/secondary.png?width=200' },
+          { url: 'https://cdn.example.com/primary.png?width=100' },
+        ],
+        imageCount: 3,
+      }),
+    ];
+    vi.mocked(getMerchizeService).mockReturnValue(serviceMock(products) as never);
+    const body = await signedPreflightBody(products);
+
+    const { response } = await callPOST(body, {
+      'x-idempotency-key': 'canonical-image-idempotency-key',
+    });
+
+    expect(response.status).toBe(200);
+    expect(tx.product.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          primaryImageUrl: 'https://cdn.example.com/primary.png?width=100',
+        }),
+      }),
+    );
+    expect(tx.productImage.upsert).toHaveBeenCalledTimes(2);
+    expect(tx.productImage.upsert).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        create: expect.objectContaining({
+          url: 'https://cdn.example.com/primary.png?width=100',
+          position: 0,
+          isDefault: true,
+        }),
+      }),
+    );
+    expect(tx.productImage.deleteMany).toHaveBeenCalledWith({
+      where: {
+        productId: 'product_1',
+        url: {
+          notIn: [
+            'https://cdn.example.com/primary.png?width=100',
+            'https://cdn.example.com/secondary.png?width=200',
+          ],
+        },
+      },
+    });
+  });
+
+  it('blocks unsafe image URLs before any image or catalog mutation', async () => {
+    const products = [
+      merchizeProduct({
+        images: [
+          { url: 'https://cdn.example.com/valid.png' },
+          { url: 'ftp://cdn.example.com/unsafe.png' },
+        ],
+        imageCount: 2,
+      }),
+    ];
+    vi.mocked(getMerchizeService).mockReturnValue(serviceMock(products) as never);
+    const body = await signedPreflightBody(products);
+
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'unsafe-image-idempotency-key',
+    });
+
+    expect(response.status).toBe(422);
+    expect(json.data.status).toBe('blocked');
+    expect(JSON.stringify(json.data)).toContain('blocked');
+    expect(db.$transaction).not.toHaveBeenCalled();
+  });
+
   it('blocks confirmation mismatch without catalog mutation', async () => {
     const body = await signedPreflightBody();
 
     const { response, json } = await callPOST(
       { ...body, confirmation: 'wrong confirmation' },
-      { 'x-idempotency-key': 'blocked-key' },
+      { 'x-idempotency-key': 'blocked-idempotency-key' },
     );
 
     expect(response.status).toBe(422);
@@ -377,6 +507,7 @@ describe('Merchize hidden local import apply route', () => {
       { fingerprintExpiresAt: '2020-01-01T00:00:00.000Z' },
       { preflightSignature: 'bad-signature' },
       { preflightFingerprint: 'bad-fingerprint' },
+      { manifestVersion: 'wrong-version' },
       { expectedInsertCount: 2 },
     ]) {
       vi.clearAllMocks();
@@ -405,6 +536,112 @@ describe('Merchize hidden local import apply route', () => {
     }
   });
 
+  it('rejects provider drift after signing without catalog mutation or completed audit state', async () => {
+    const driftCases = [
+      {
+        label: 'product-26',
+        before: merchizeProducts(30),
+        after: merchizeProducts(30).map((product, index) =>
+          index === 25 ? { ...product, description: 'Changed product 26' } : product,
+        ),
+      },
+      {
+        label: 'variant-21',
+        before: [
+          merchizeProduct({
+            variants: manyVariants(25),
+            variantCount: 25,
+            pricedVariantCount: 25,
+          }),
+        ],
+        after: [
+          merchizeProduct({
+            variants: manyVariants(25).map((variant, index) =>
+              index === 20 ? { ...variant, title: 'Changed variant 21' } : variant,
+            ),
+            variantCount: 25,
+            pricedVariantCount: 25,
+          }),
+        ],
+      },
+      {
+        label: 'secondary-image',
+        before: [
+          merchizeProduct({
+            images: [
+              { url: 'https://cdn.example.com/primary.png' },
+              { url: 'https://cdn.example.com/secondary.png' },
+            ],
+            imageCount: 2,
+          }),
+        ],
+        after: [
+          merchizeProduct({
+            images: [
+              { url: 'https://cdn.example.com/primary.png' },
+              { url: 'https://cdn.example.com/changed-secondary.png' },
+            ],
+            imageCount: 2,
+          }),
+        ],
+      },
+      {
+        label: 'description',
+        before: [merchizeProduct({ description: 'Before' })],
+        after: [merchizeProduct({ description: 'After' })],
+      },
+    ];
+
+    for (const driftCase of driftCases) {
+      vi.clearAllMocks();
+      process.env.AUTH_SECRET = 'vitest-merchize-import-signing-secret';
+      process.env.MERCHIZE_LOCAL_IMPORT_ENABLED = 'true';
+      adminSession();
+      vi.mocked(limitApi).mockResolvedValue({
+        success: true,
+        limit: 20,
+        remaining: 19,
+        reset: Date.now() + 60_000,
+      } as never);
+      vi.mocked(db.product.findMany).mockResolvedValue([]);
+      vi.mocked(db.productVariant.findMany).mockResolvedValue([]);
+      vi.mocked(db.providerImportOperation.findUnique).mockResolvedValue(null);
+      vi.mocked(db.providerImportOperation.create).mockResolvedValue(auditRecord() as never);
+      vi.mocked(db.providerImportOperation.update).mockResolvedValue({} as never);
+      vi.mocked(getMerchizeService).mockReturnValue(serviceMock(driftCase.after) as never);
+      const body = await signedPreflightBody(driftCase.before);
+
+      const { response, json } = await callPOST(body, {
+        'x-idempotency-key': `drift-${driftCase.label}-idempotency-key`,
+      });
+
+      expect(response.status).toBe(422);
+      expect(json.data.status).toBe('blocked');
+      expect(json.data.error).toBe('Merchize import preflight fingerprint did not match.');
+      expect(db.$transaction).not.toHaveBeenCalled();
+      expect(db.providerImportOperation.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'completed' }),
+        }),
+      );
+    }
+  });
+
+  it('blocks oversized provider catalogs and does not import the first page as a partial catalog', async () => {
+    const products = merchizeProducts(51);
+    vi.mocked(getMerchizeService).mockReturnValue(serviceMock(products) as never);
+    const body = await signedPreflightBody(products);
+
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'oversized-provider-catalog-idempotency-key',
+    });
+
+    expect(response.status).toBe(422);
+    expect(json.data.status).toBe('blocked');
+    expect(json.data.blocked).toBe(51);
+    expect(db.$transaction).not.toHaveBeenCalled();
+  });
+
   it('does not mutate twice when the idempotency key is replayed', async () => {
     const existing = auditRecord({
       status: 'completed',
@@ -416,7 +653,9 @@ describe('Merchize hidden local import apply route', () => {
     vi.mocked(db.providerImportOperation.findUnique).mockResolvedValue(existing as never);
     const body = await signedPreflightBody();
 
-    const { response, json } = await callPOST(body, { 'x-idempotency-key': 'already-used' });
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'already-used-idempotency-key',
+    });
 
     expect(response.status).toBe(200);
     expect(json.data.replayed).toBe(true);
@@ -438,7 +677,9 @@ describe('Merchize hidden local import apply route', () => {
     vi.mocked(db.providerImportOperation.create).mockRejectedValueOnce({ code: 'P2002' });
     const body = await signedPreflightBody();
 
-    const { response, json } = await callPOST(body, { 'x-idempotency-key': 'racing-key' });
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'racing-idempotency-key',
+    });
 
     expect(response.status).toBe(409);
     expect(json.data.replayed).toBe(true);
@@ -458,7 +699,9 @@ describe('Merchize hidden local import apply route', () => {
     );
     const body = await signedPreflightBody();
 
-    const { response, json } = await callPOST(body, { 'x-idempotency-key': 'rollback-key' });
+    const { response, json } = await callPOST(body, {
+      'x-idempotency-key': 'rollback-idempotency-key',
+    });
 
     expect(response.status).toBe(500);
     expect(json.data.status).toBe('failed');

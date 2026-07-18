@@ -15,6 +15,7 @@ export const runtime = 'nodejs';
 
 type ApplyBody = {
   confirmation?: unknown;
+  manifestVersion?: unknown;
   preflightFingerprint?: unknown;
   fingerprintExpiresAt?: unknown;
   preflightSignature?: unknown;
@@ -25,6 +26,9 @@ type ApplyBody = {
   expectedSkipCount?: unknown;
   expectedBlockCount?: unknown;
 };
+
+const MIN_IDEMPOTENCY_KEY_LENGTH = 16;
+const MAX_IDEMPOTENCY_KEY_LENGTH = 200;
 
 async function readApplyBody(request: NextRequest): Promise<ApplyBody> {
   const text = await request.text();
@@ -40,10 +44,23 @@ function stringField(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function rawStringField(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
 function numberField(value: unknown): number | null {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) return value;
   if (typeof value === 'string' && /^\d+$/.test(value.trim())) return Number(value.trim());
   return null;
+}
+
+function isValidIdempotencyKey(value: string): boolean {
+  return (
+    value.length >= MIN_IDEMPOTENCY_KEY_LENGTH &&
+    value.length <= MAX_IDEMPOTENCY_KEY_LENGTH &&
+    value.trim() === value &&
+    /^[A-Za-z0-9._~:/#@+=-]+$/.test(value)
+  );
 }
 
 function applyInputFromBody(
@@ -51,8 +68,9 @@ function applyInputFromBody(
   request: NextRequest,
 ): Omit<MerchizeImportApplyInput, 'requestId' | 'adminUserId'> | null {
   const idempotencyKey =
-    request.headers.get('x-idempotency-key')?.trim() || stringField(body.idempotencyKey);
+    request.headers.get('x-idempotency-key') || rawStringField(body.idempotencyKey);
   const confirmation = stringField(body.confirmation);
+  const manifestVersion = stringField(body.manifestVersion);
   const preflightFingerprint = stringField(body.preflightFingerprint);
   const fingerprintExpiresAt = stringField(body.fingerprintExpiresAt);
   const preflightSignature = stringField(body.preflightSignature);
@@ -64,7 +82,9 @@ function applyInputFromBody(
 
   if (
     !idempotencyKey ||
+    !isValidIdempotencyKey(idempotencyKey) ||
     !confirmation ||
+    !manifestVersion ||
     !preflightFingerprint ||
     !fingerprintExpiresAt ||
     !preflightSignature ||
@@ -80,6 +100,7 @@ function applyInputFromBody(
   return {
     idempotencyKey,
     confirmation,
+    manifestVersion,
     preflightFingerprint,
     fingerprintExpiresAt,
     preflightSignature,
@@ -143,7 +164,7 @@ export const POST = withAdminAuth(async (request: NextRequest) => {
     return NextResponse.json(
       createApiError(
         'VALIDATION_ERROR',
-        `Merchize hidden import requires idempotencyKey, confirmation "${MERCHIZE_IMPORT_CONFIRMATION}", preflight fingerprint, expiry, signature, and expected counts.`,
+        `Merchize hidden import requires idempotencyKey, confirmation "${MERCHIZE_IMPORT_CONFIRMATION}", manifest version, preflight fingerprint, expiry, signature, and expected counts.`,
         requestId,
       ),
       { status: 400, headers: { 'Cache-Control': 'no-store' } },

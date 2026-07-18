@@ -3,22 +3,22 @@ import { Prisma } from '@prisma/client';
 
 import { db } from '@/app/lib/db';
 import {
-  buildMerchizeImportPreflightForProducts,
   countsMatch,
-  fingerprintMerchizeImportPreflight,
+  MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
   loadMerchizeImportPlan,
   preflightCounts,
   verifyMerchizeImportPreflightSignature,
+  type CanonicalMerchizeProduct,
   type MerchizeImportPreflight,
   type MerchizeImportPreflightCounts,
 } from '@/app/lib/merchize/importPreflight';
-import type { MerchizeProduct, MerchizeProductImage } from '@/app/lib/merchize/service';
 import { env } from '@/env/server';
-import { providerProductRef } from '@/lib/catalog/provider';
 
 export const MERCHIZE_IMPORT_PROVIDER = 'merchize';
 export const MERCHIZE_IMPORT_ACTION = 'hidden_local_import';
 export const MERCHIZE_IMPORT_CONFIRMATION = 'APPLY HIDDEN MERCHIZE IMPORT';
+const MIN_IDEMPOTENCY_KEY_LENGTH = 16;
+const MAX_IDEMPOTENCY_KEY_LENGTH = 200;
 
 type ImportStatus = 'completed' | 'blocked' | 'failed' | 'running' | 'pending';
 
@@ -35,6 +35,7 @@ export type MerchizeImportApplyInput = {
   adminUserId: string;
   idempotencyKey: string;
   confirmation: string;
+  manifestVersion: string;
   preflightFingerprint: string;
   fingerprintExpiresAt: string;
   preflightSignature: string;
@@ -96,24 +97,31 @@ async function logImportError(message: string, payload: ImportLogPayload) {
   logger.error(message, payload);
 }
 
-function assertNonEmpty(value: string, category: string, message: string) {
-  if (!value.trim()) {
-    throw new MerchizeImportApplyError(message, category);
+function assertValidIdempotencyKey(value: string) {
+  const normalized = value.trim();
+  if (!normalized) {
+    throw new MerchizeImportApplyError(
+      'An idempotency key is required.',
+      'idempotency_key_missing',
+    );
+  }
+
+  if (
+    normalized.length < MIN_IDEMPOTENCY_KEY_LENGTH ||
+    normalized.length > MAX_IDEMPOTENCY_KEY_LENGTH ||
+    normalized !== value ||
+    !/^[A-Za-z0-9._~:/#@+=-]+$/.test(normalized)
+  ) {
+    throw new MerchizeImportApplyError(
+      'The idempotency key format is invalid.',
+      'idempotency_key_invalid',
+    );
   }
 }
 
 function parseExpiry(value: string): Date | null {
   const parsed = new Date(value);
   return Number.isFinite(parsed.getTime()) ? parsed : null;
-}
-
-function priceToCents(price: number | null): number | null {
-  if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return null;
-  return Math.round(price * 100);
-}
-
-function firstSafeImage(images: MerchizeProductImage[]): string | null {
-  return images.find((image) => image.url.trim())?.url.trim() ?? null;
 }
 
 function hiddenImportEnabled(): boolean {
@@ -132,7 +140,7 @@ export function assertMerchizeLocalImportEnabled() {
 }
 
 export function hashMerchizeImportIdempotencyKey(key: string): string {
-  assertNonEmpty(key, 'idempotency_key_missing', 'An idempotency key is required.');
+  assertValidIdempotencyKey(key);
   return createHash('sha256')
     .update(`${MERCHIZE_IMPORT_PROVIDER}:${MERCHIZE_IMPORT_ACTION}:${key}`)
     .digest('hex');
@@ -232,6 +240,13 @@ function validateExpectedPreflight(
     );
   }
 
+  if (input.manifestVersion !== MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION) {
+    throw new MerchizeImportApplyError(
+      'Merchize import manifest version did not match.',
+      'manifest_version_mismatch',
+    );
+  }
+
   if (!expiresAt || expiresAt.getTime() <= now.getTime()) {
     throw new MerchizeImportApplyError(
       'Merchize import preflight fingerprint has expired.',
@@ -241,6 +256,9 @@ function validateExpectedPreflight(
 
   if (
     !verifyMerchizeImportPreflightSignature({
+      manifestVersion: input.manifestVersion,
+      provider: MERCHIZE_IMPORT_PROVIDER,
+      mode: MERCHIZE_IMPORT_ACTION,
       preflightFingerprint: input.preflightFingerprint,
       fingerprintExpiresAt: input.fingerprintExpiresAt,
       preflightSignature: input.preflightSignature,
@@ -252,8 +270,7 @@ function validateExpectedPreflight(
     );
   }
 
-  const expectedFingerprint = fingerprintMerchizeImportPreflight(preflight);
-  if (input.preflightFingerprint !== expectedFingerprint) {
+  if (input.preflightFingerprint !== preflight.preflightFingerprint) {
     throw new MerchizeImportApplyError(
       'Merchize import preflight fingerprint did not match.',
       'fingerprint_mismatch',
@@ -335,17 +352,14 @@ async function markBlocked(
   };
 }
 
-function applyProductSummary(product: MerchizeProduct, preflight: MerchizeImportPreflight) {
-  const plan = preflight.products.find(
-    (candidate) => candidate.providerProductId === product.providerProductId,
-  );
+function applyProductSummary(product: CanonicalMerchizeProduct) {
   const action: 'inserted' | 'updated' | 'skipped' =
-    plan?.action === 'updated' || plan?.action === 'skipped' ? plan.action : 'inserted';
+    product.action === 'updated' || product.action === 'skipped' ? product.action : 'inserted';
 
   return {
     provider: 'merchize' as const,
     providerProductId: product.providerProductId,
-    integrationRef: providerProductRef('merchize', product.providerProductId),
+    integrationRef: product.integrationRef,
     title: product.title,
     action,
     public: false as const,
@@ -355,95 +369,74 @@ function applyProductSummary(product: MerchizeProduct, preflight: MerchizeImport
   };
 }
 
-async function applyHiddenProduct(tx: Prisma.TransactionClient, product: MerchizeProduct) {
-  const primaryImageUrl = firstSafeImage(product.images);
-  const integrationRef = providerProductRef('merchize', product.providerProductId);
+async function applyHiddenProduct(tx: Prisma.TransactionClient, product: CanonicalMerchizeProduct) {
   const now = new Date();
   const productRecord = await tx.product.upsert({
-    where: { integrationRef },
+    where: { integrationRef: product.integrationRef },
     update: {
       name: product.title,
-      description: product.description ?? null,
-      primaryImageUrl,
+      description: product.description,
+      primaryImageUrl: product.primaryImageUrl,
       category: 'Merchize Import',
       categorySlug: 'merchize-import',
       active: false,
       visible: false,
       printifyProductId: null,
       tags: [],
-      options: product.variants.flatMap((variant) => variant.options).slice(0, 40),
-      specs: {
-        provider: 'merchize',
-        providerProductId: product.providerProductId,
-        status: product.status,
-        handle: product.handle,
-        importMode: 'hidden_local_import',
-      },
+      options: product.options,
+      specs: product.specs,
       lastSyncedAt: now,
     },
     create: {
       name: product.title,
-      description: product.description ?? null,
-      primaryImageUrl,
+      description: product.description,
+      primaryImageUrl: product.primaryImageUrl,
       category: 'Merchize Import',
       categorySlug: 'merchize-import',
       active: false,
       visible: false,
       tags: [],
-      options: product.variants.flatMap((variant) => variant.options).slice(0, 40),
-      specs: {
-        provider: 'merchize',
-        providerProductId: product.providerProductId,
-        status: product.status,
-        handle: product.handle,
-        importMode: 'hidden_local_import',
-      },
-      integrationRef,
+      options: product.options,
+      specs: product.specs,
+      integrationRef: product.integrationRef,
       printifyProductId: null,
       lastSyncedAt: now,
     },
   });
 
-  const incomingImageUrls = new Set<string>();
-  for (const [position, image] of product.images.entries()) {
-    const url = image.url.trim();
-    if (!url || incomingImageUrls.has(url)) continue;
-    incomingImageUrls.add(url);
+  for (const image of product.images) {
     await tx.productImage.upsert({
       where: {
         productId_url: {
           productId: productRecord.id,
-          url,
+          url: image.url,
         },
       },
       update: {
-        position,
+        position: image.position,
         variantIds: [],
-        isDefault: position === 0,
+        isDefault: image.isDefault,
       },
       create: {
         productId: productRecord.id,
-        url,
-        position,
+        url: image.url,
+        position: image.position,
         variantIds: [],
-        isDefault: position === 0,
+        isDefault: image.isDefault,
       },
     });
   }
 
-  if (incomingImageUrls.size > 0) {
+  if (product.incomingImageUrlSet.length > 0) {
     await tx.productImage.deleteMany({
       where: {
         productId: productRecord.id,
-        url: { notIn: [...incomingImageUrls] },
+        url: { notIn: product.incomingImageUrlSet },
       },
     });
   }
 
-  const incomingVariantIds = new Set<string>();
   for (const variant of product.variants) {
-    if (!variant.providerVariantId) continue;
-    incomingVariantIds.add(variant.providerVariantId);
     await tx.productVariant.upsert({
       where: {
         productId_providerVariantId: {
@@ -452,51 +445,51 @@ async function applyHiddenProduct(tx: Prisma.TransactionClient, product: Merchiz
         },
       },
       update: {
-        previewImageUrl: primaryImageUrl,
+        previewImageUrl: variant.previewImageUrl,
         printifyVariantId: null,
-        printProviderName: 'merchize',
+        printProviderName: variant.printProviderName,
         title: variant.title,
         sku: variant.sku,
         grams: null,
         leadMinDays: null,
         leadMaxDays: null,
         isEnabled: false,
-        inStock: variant.inStock === true,
-        priceCents: priceToCents(variant.price),
-        currency: variant.currency ?? 'USD',
-        isDefaultVariant: incomingVariantIds.size === 1,
-        optionValues: variant.options,
+        inStock: variant.inStock,
+        priceCents: variant.priceCents,
+        currency: variant.currency,
+        isDefaultVariant: variant.isDefaultVariant,
+        optionValues: variant.optionValues,
         costCents: null,
         lastSyncedAt: now,
       },
       create: {
         productId: productRecord.id,
-        previewImageUrl: primaryImageUrl,
+        previewImageUrl: variant.previewImageUrl,
         printifyVariantId: null,
         providerVariantId: variant.providerVariantId,
-        printProviderName: 'merchize',
+        printProviderName: variant.printProviderName,
         title: variant.title,
         sku: variant.sku,
         grams: null,
         leadMinDays: null,
         leadMaxDays: null,
         isEnabled: false,
-        inStock: variant.inStock === true,
-        priceCents: priceToCents(variant.price),
-        currency: variant.currency ?? 'USD',
-        isDefaultVariant: incomingVariantIds.size === 1,
-        optionValues: variant.options,
+        inStock: variant.inStock,
+        priceCents: variant.priceCents,
+        currency: variant.currency,
+        isDefaultVariant: variant.isDefaultVariant,
+        optionValues: variant.optionValues,
         costCents: null,
         lastSyncedAt: now,
       },
     });
   }
 
-  if (incomingVariantIds.size > 0) {
+  if (product.incomingProviderVariantIdSet.length > 0) {
     await tx.productVariant.updateMany({
       where: {
         productId: productRecord.id,
-        providerVariantId: { notIn: [...incomingVariantIds] },
+        providerVariantId: { notIn: product.incomingProviderVariantIdSet },
         printifyVariantId: null,
       },
       data: { isEnabled: false, inStock: false },
@@ -513,8 +506,7 @@ export async function applyMerchizeHiddenLocalImport(
   const existingReplay = await replayExistingOperation(idempotencyKeyHash);
   if (existingReplay) return existingReplay;
 
-  const { products } = await (input.loadPlan ?? loadMerchizeImportPlan)();
-  const preflight = await buildMerchizeImportPreflightForProducts(products, { now });
+  const { preflight, manifest } = await (input.loadPlan ?? loadMerchizeImportPlan)();
   let auditRecord: AuditRecord;
 
   try {
@@ -543,7 +535,7 @@ export async function applyMerchizeHiddenLocalImport(
     });
 
     await db.$transaction(async (tx) => {
-      for (const product of products) {
+      for (const product of manifest.products) {
         await applyHiddenProduct(tx, product);
       }
 
@@ -586,7 +578,7 @@ export async function applyMerchizeHiddenLocalImport(
       blocked: preflight.wouldBlock,
       public: false,
       purchasable: false,
-      products: products.map((product) => applyProductSummary(product, preflight)).slice(0, 25),
+      products: manifest.products.map(applyProductSummary).slice(0, 25),
     };
   } catch (error) {
     const sanitized = sanitizeMerchizeImportError(error);
