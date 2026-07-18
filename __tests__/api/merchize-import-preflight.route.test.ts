@@ -18,6 +18,7 @@ vi.mock('@/app/lib/db', () => ({
       upsert: vi.fn(),
     },
     productVariant: {
+      findMany: vi.fn(),
       upsert: vi.fn(),
       updateMany: vi.fn(),
     },
@@ -48,6 +49,17 @@ vi.mock('@/env.mjs', () => ({
   env: {
     UPSTASH_REDIS_REST_URL: '',
     UPSTASH_REDIS_REST_TOKEN: '',
+  },
+}));
+
+vi.mock('@/env/server', () => ({
+  env: {
+    get AUTH_SECRET() {
+      return process.env.AUTH_SECRET;
+    },
+    get CLERK_SECRET_KEY() {
+      return process.env.CLERK_SECRET_KEY || 'vitest-clerk-secret';
+    },
   },
 }));
 
@@ -144,7 +156,9 @@ describe('Merchize import preflight route', () => {
       reset: Date.now() + 60_000,
     } as never);
     vi.mocked(db.product.findMany).mockResolvedValue([]);
+    vi.mocked(db.productVariant.findMany).mockResolvedValue([]);
     vi.mocked(getMerchizeService).mockReturnValue(serviceMock() as never);
+    process.env.AUTH_SECRET = 'vitest-preflight-signing-secret';
   });
 
   it('requires authentication', async () => {
@@ -182,6 +196,9 @@ describe('Merchize import preflight route', () => {
       wouldBlock: 0,
       safeToImport: true,
     });
+    expect(json.data.preflightFingerprint).toMatch(/^[a-f0-9]{64}$/);
+    expect(Date.parse(json.data.fingerprintExpiresAt)).toBeGreaterThan(Date.now());
+    expect(json.data.preflightSignature).toMatch(/^[a-f0-9]{64}$/);
     expect(json.data.products[0]).toMatchObject({
       provider: 'merchize',
       providerProductId: 'mz-product-1',
@@ -199,6 +216,11 @@ describe('Merchize import preflight route', () => {
     expect(db.product.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { integrationRef: { in: ['merchize:mz-product-1'] } },
+      }),
+    );
+    expect(db.productVariant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { providerVariantId: { in: ['MZ-VARIANT-1'] } },
       }),
     );
     expect(db.product.upsert).not.toHaveBeenCalled();
@@ -280,6 +302,68 @@ describe('Merchize import preflight route', () => {
     expect(response.status).toBe(200);
     expect(json.data.safeToImport).toBe(false);
     expect(JSON.stringify(json.data.issues)).toContain('duplicate_merchize_variant_ids');
+  });
+
+  it('generates deterministic fingerprints for the same normalized source data', async () => {
+    const first = await callGET(await preflightRoute());
+    const second = await callGET(await preflightRoute());
+
+    expect(first.response.status).toBe(200);
+    expect(second.response.status).toBe(200);
+    expect(first.json.data.preflightFingerprint).toBe(second.json.data.preflightFingerprint);
+  });
+
+  it('blocks invalid prices, SKUs, unsupported options, and Printify-owned identity conflicts', async () => {
+    vi.mocked(db.product.findMany)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ printifyProductId: 'printify-product-1' }] as never);
+    vi.mocked(db.productVariant.findMany).mockResolvedValue([
+      {
+        providerVariantId: '101',
+        Product: {
+          integrationRef: 'printify:printify-product-1',
+          printifyProductId: 'printify-product-1',
+        },
+      },
+    ] as never);
+    vi.mocked(getMerchizeService).mockReturnValue(
+      serviceMock([
+        merchizeProduct({
+          providerProductId: 'printify-product-1',
+          variants: [
+            {
+              provider: 'merchize',
+              providerVariantId: '101',
+              sku: 'bad<>sku',
+              title: 'Conflicting Variant',
+              options: [
+                { option: 'Size', value: 'S' },
+                { option: 'size', value: 'Small' },
+              ],
+              price: 0,
+              currency: 'USD',
+              inStock: true,
+              availability: 'available',
+              printifyVariantId: null,
+            },
+          ],
+        }),
+      ]) as never,
+    );
+
+    const { response, json } = await callGET(await preflightRoute());
+
+    expect(response.status).toBe(200);
+    expect(json.data.safeToImport).toBe(false);
+    expect(JSON.stringify(json.data.issues)).toContain('variant_invalid_price');
+    expect(JSON.stringify(json.data.issues)).toContain('invalid_sku');
+    expect(JSON.stringify(json.data.issues)).toContain('unsupported_option_combination');
+    expect(JSON.stringify(json.data.issues)).toContain(
+      'provider_product_id_conflicts_with_printify',
+    );
+    expect(JSON.stringify(json.data.issues)).toContain(
+      'provider_variant_id_conflicts_with_printify',
+    );
   });
 
   it('sanitizes provider errors', async () => {

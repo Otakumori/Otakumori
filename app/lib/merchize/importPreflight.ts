@@ -1,6 +1,13 @@
+import { createHmac, createHash } from 'node:crypto';
 import { db } from '@/app/lib/db';
 import { getMerchizeService, type MerchizeProduct } from '@/app/lib/merchize/service';
+import { env } from '@/env/server';
 import { providerProductRef } from '@/lib/catalog/provider';
+
+const PREFLIGHT_TTL_MS = 15 * 60 * 1000;
+const MAX_PREFLIGHT_PRODUCTS = 50;
+const MAX_PREFLIGHT_PRODUCT_DETAILS = 25;
+const MAX_PREFLIGHT_VARIANTS_PER_PRODUCT = 20;
 
 export type MerchizeImportIssue = {
   code: string;
@@ -46,6 +53,9 @@ export type MerchizeImportPreflight = {
   wouldSkip: number;
   wouldBlock: number;
   safeToImport: boolean;
+  preflightFingerprint: string;
+  fingerprintExpiresAt: string;
+  preflightSignature: string;
   issues: MerchizeImportIssue[];
   products: MerchizeImportProductPlan[];
 };
@@ -53,17 +63,28 @@ export type MerchizeImportPreflight = {
 type ExistingProduct = {
   id: string;
   integrationRef: string | null;
+  printifyProductId: string | null;
 };
 
-function countDuplicates(values: string[]): number {
-  const counts = new Map<string, number>();
-  for (const value of values) {
-    const normalized = value.trim();
-    if (!normalized) continue;
-    counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
-  }
-  return [...counts.values()].filter((count) => count > 1).length;
-}
+type ExistingProviderVariant = {
+  providerVariantId: string | null;
+  Product: {
+    integrationRef: string | null;
+    printifyProductId: string | null;
+  } | null;
+};
+
+export type MerchizeImportPreflightCounts = {
+  productCount: number;
+  wouldInsert: number;
+  wouldUpdate: number;
+  wouldSkip: number;
+  wouldBlock: number;
+};
+
+type MerchizeImportPreflightOptions = {
+  now?: Date;
+};
 
 function duplicateValues(values: string[]): Set<string> {
   const counts = new Map<string, number>();
@@ -85,7 +106,87 @@ function isSafeImageUrl(value: string | null | undefined): value is string {
   return /^https?:\/\//i.test(value) && /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(normalized);
 }
 
-function productIssues(product: MerchizeProduct, duplicateProductIds: Set<string>): string[] {
+function stableStringify(value: unknown): string {
+  if (value == null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map((item) => stableStringify(item)).join(',')}]`;
+
+  const record = value as Record<string, unknown>;
+  return `{${Object.keys(record)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${stableStringify(record[key])}`)
+    .join(',')}}`;
+}
+
+function preflightSigningSecret(): string | null {
+  return env.AUTH_SECRET || env.CLERK_SECRET_KEY || null;
+}
+
+export function signMerchizeImportPreflight(
+  preflightFingerprint: string,
+  fingerprintExpiresAt: string,
+): string {
+  const secret = preflightSigningSecret();
+  if (!secret) return '';
+
+  return createHmac('sha256', secret)
+    .update(`merchize:hidden_local_import:${preflightFingerprint}:${fingerprintExpiresAt}`)
+    .digest('hex')
+    .slice(0, 64);
+}
+
+export function verifyMerchizeImportPreflightSignature(input: {
+  preflightFingerprint: string;
+  fingerprintExpiresAt: string;
+  preflightSignature: string;
+}): boolean {
+  const expected = signMerchizeImportPreflight(
+    input.preflightFingerprint,
+    input.fingerprintExpiresAt,
+  );
+
+  return Boolean(expected) && input.preflightSignature === expected;
+}
+
+function isValidSku(value: string | null | undefined): boolean {
+  if (value == null || value === '') return true;
+  const normalized = value.trim();
+  return (
+    normalized.length > 0 &&
+    normalized.length <= 120 &&
+    /^[A-Za-z0-9][A-Za-z0-9._:/#@+\-\s]*$/.test(normalized)
+  );
+}
+
+function hasUnsupportedOptions(product: MerchizeProduct): boolean {
+  return product.variants.some((variant) => {
+    if (variant.options.length > 12) return true;
+
+    const optionNames = new Set<string>();
+    for (const option of variant.options) {
+      const name = option.option.trim().toLowerCase();
+      const value = option.value.trim();
+      if (!name || !value || optionNames.has(name)) return true;
+      optionNames.add(name);
+    }
+
+    return false;
+  });
+}
+
+function hasInvalidVariantPrice(product: MerchizeProduct): boolean {
+  return product.variants.some(
+    (variant) =>
+      typeof variant.price !== 'number' || !Number.isFinite(variant.price) || variant.price <= 0,
+  );
+}
+
+function productIssues(
+  product: MerchizeProduct,
+  duplicateProductIds: Set<string>,
+  duplicateVariantIds: Set<string>,
+  printifyProductConflicts: Set<string>,
+  printifyVariantConflicts: Set<string>,
+): string[] {
   const issues = new Set<string>(product.importReadiness.issues);
   const providerProductId = product.providerProductId?.trim();
 
@@ -101,12 +202,19 @@ function productIssues(product: MerchizeProduct, duplicateProductIds: Set<string
     issues.add('duplicate_merchize_product_ids');
   }
 
+  if (providerProductId && printifyProductConflicts.has(providerProductId)) {
+    issues.add('provider_product_id_conflicts_with_printify');
+  }
+
   const variantIds = product.variants
     .map((variant) => variant.providerVariantId?.trim() ?? '')
     .filter(Boolean);
-  const duplicateVariantCount = countDuplicates(variantIds);
-  if (duplicateVariantCount > 0) {
+  if (variantIds.some((id) => duplicateVariantIds.has(id))) {
     issues.add('duplicate_merchize_variant_ids');
+  }
+
+  if (variantIds.some((id) => printifyVariantConflicts.has(id))) {
+    issues.add('provider_variant_id_conflicts_with_printify');
   }
 
   if (product.variants.length === 0) {
@@ -123,6 +231,18 @@ function productIssues(product: MerchizeProduct, duplicateProductIds: Set<string
 
   if (!product.variants.some((variant) => typeof variant.price === 'number' && variant.price > 0)) {
     issues.add('product_missing_price');
+  }
+
+  if (product.variants.length > 0 && hasInvalidVariantPrice(product)) {
+    issues.add('variant_invalid_price');
+  }
+
+  if (!isValidSku(product.sku) || product.variants.some((variant) => !isValidSku(variant.sku))) {
+    issues.add('invalid_sku');
+  }
+
+  if (hasUnsupportedOptions(product)) {
+    issues.add('unsupported_option_combination');
   }
 
   return [...issues];
@@ -161,16 +281,105 @@ function merchizeIssueMessage(code: string): string {
       return 'A Merchize product has no usable product image.';
     case 'product_missing_price':
       return 'A Merchize product has no positively priced variant.';
+    case 'variant_invalid_price':
+      return 'A Merchize variant has a missing, zero, negative, or malformed price.';
+    case 'invalid_sku':
+      return 'A Merchize product or variant has an invalid SKU.';
+    case 'unsupported_option_combination':
+      return 'A Merchize product has unsupported or ambiguous variant options.';
+    case 'provider_product_id_conflicts_with_printify':
+      return 'A Merchize provider product ID conflicts with an existing Printify-owned product.';
+    case 'provider_variant_id_conflicts_with_printify':
+      return 'A Merchize provider variant ID conflicts with an existing Printify-owned variant.';
+    case 'provider_catalog_too_large':
+      return 'Merchize import preflight is bounded to the first 50 products.';
     default:
       return 'A Merchize product is not ready for import planning.';
   }
 }
 
-async function buildMerchizeImportPreflightForProducts(
+export function fingerprintMerchizeImportPreflight(
+  preflight: Omit<
+    MerchizeImportPreflight,
+    'preflightFingerprint' | 'fingerprintExpiresAt' | 'preflightSignature'
+  >,
+): string {
+  const boundedProducts = preflight.products.map((product) => ({
+    provider: product.provider,
+    providerProductId: product.providerProductId,
+    integrationRef: product.integrationRef,
+    action: product.action,
+    variantCount: product.variantCount,
+    imageCount: product.imageCount,
+    pricedVariantCount: product.pricedVariantCount,
+    variants: product.variants.map((variant) => ({
+      providerVariantId: variant.providerVariantId,
+      sku: variant.sku,
+      title: variant.title,
+      price: variant.price,
+      currency: variant.currency,
+      inStock: variant.inStock,
+      printifyVariantId: variant.printifyVariantId,
+    })),
+    issues: product.issues,
+  }));
+
+  return createHash('sha256')
+    .update(
+      stableStringify({
+        provider: preflight.provider,
+        mode: preflight.mode,
+        productCount: preflight.productCount,
+        normalizedProductCount: preflight.normalizedProductCount,
+        wouldInsert: preflight.wouldInsert,
+        wouldUpdate: preflight.wouldUpdate,
+        wouldSkip: preflight.wouldSkip,
+        wouldBlock: preflight.wouldBlock,
+        safeToImport: preflight.safeToImport,
+        issues: preflight.issues,
+        products: boundedProducts,
+      }),
+    )
+    .digest('hex')
+    .slice(0, 64);
+}
+
+export function preflightCounts(preflight: MerchizeImportPreflight): MerchizeImportPreflightCounts {
+  return {
+    productCount: preflight.productCount,
+    wouldInsert: preflight.wouldInsert,
+    wouldUpdate: preflight.wouldUpdate,
+    wouldSkip: preflight.wouldSkip,
+    wouldBlock: preflight.wouldBlock,
+  };
+}
+
+export function countsMatch(
+  preflight: MerchizeImportPreflight,
+  expected: MerchizeImportPreflightCounts,
+): boolean {
+  const actual = preflightCounts(preflight);
+  return (
+    actual.productCount === expected.productCount &&
+    actual.wouldInsert === expected.wouldInsert &&
+    actual.wouldUpdate === expected.wouldUpdate &&
+    actual.wouldSkip === expected.wouldSkip &&
+    actual.wouldBlock === expected.wouldBlock
+  );
+}
+
+export async function buildMerchizeImportPreflightForProducts(
   products: MerchizeProduct[],
+  options: MerchizeImportPreflightOptions = {},
 ): Promise<MerchizeImportPreflight> {
-  const providerProductIds = products.map((product) => product.providerProductId);
+  const boundedProducts = products.slice(0, MAX_PREFLIGHT_PRODUCTS);
+  const providerProductIds = boundedProducts.map((product) => product.providerProductId);
   const duplicateProductIds = duplicateValues(providerProductIds);
+  const duplicateVariantIds = duplicateValues(
+    boundedProducts.flatMap((product) =>
+      product.variants.map((variant) => variant.providerVariantId ?? '').filter(Boolean),
+    ),
+  );
   const integrationRefs = providerProductIds
     .filter((id) => id && !id.startsWith('merchize-'))
     .map((id) => providerProductRef('merchize', id));
@@ -178,7 +387,7 @@ async function buildMerchizeImportPreflightForProducts(
   const existingProducts = integrationRefs.length
     ? await db.product.findMany({
         where: { integrationRef: { in: integrationRefs } },
-        select: { id: true, integrationRef: true },
+        select: { id: true, integrationRef: true, printifyProductId: true },
       })
     : [];
   const existingRefs = new Set(
@@ -186,10 +395,54 @@ async function buildMerchizeImportPreflightForProducts(
       .map((product) => product.integrationRef)
       .filter((value): value is string => Boolean(value)),
   );
+  const printifyProductConflicts = new Set(
+    (
+      await db.product.findMany({
+        where: {
+          printifyProductId: { in: providerProductIds.filter(Boolean) },
+        },
+        select: { printifyProductId: true },
+      })
+    )
+      .map((product) => product.printifyProductId)
+      .filter((value): value is string => Boolean(value)),
+  );
+  const incomingVariantIds = [
+    ...new Set(
+      boundedProducts.flatMap((product) =>
+        product.variants.map((variant) => variant.providerVariantId ?? '').filter(Boolean),
+      ),
+    ),
+  ];
+  const existingProviderVariants = incomingVariantIds.length
+    ? ((await db.productVariant.findMany({
+        where: { providerVariantId: { in: incomingVariantIds } },
+        select: {
+          providerVariantId: true,
+          Product: { select: { integrationRef: true, printifyProductId: true } },
+        },
+      })) as ExistingProviderVariant[])
+    : [];
+  const printifyVariantConflicts = new Set(
+    existingProviderVariants
+      .filter(
+        (variant) =>
+          variant.Product?.printifyProductId ||
+          variant.Product?.integrationRef?.startsWith('printify:'),
+      )
+      .map((variant) => variant.providerVariantId)
+      .filter((value): value is string => Boolean(value)),
+  );
 
-  const productPlans = products.map((product): MerchizeImportProductPlan => {
+  const productPlans = boundedProducts.map((product): MerchizeImportProductPlan => {
     const integrationRef = providerProductRef('merchize', product.providerProductId);
-    const issues = productIssues(product, duplicateProductIds);
+    const issues = productIssues(
+      product,
+      duplicateProductIds,
+      duplicateVariantIds,
+      printifyProductConflicts,
+      printifyVariantConflicts,
+    );
     const blocked = issues.length > 0;
     const exists = existingRefs.has(integrationRef);
 
@@ -204,7 +457,7 @@ async function buildMerchizeImportPreflightForProducts(
       variantCount: product.variantCount,
       imageCount: product.imageCount,
       pricedVariantCount: product.pricedVariantCount,
-      variants: product.variants.slice(0, 20).map((variant) => ({
+      variants: product.variants.slice(0, MAX_PREFLIGHT_VARIANTS_PER_PRODUCT).map((variant) => ({
         provider: 'merchize',
         providerVariantId: variant.providerVariantId,
         printifyVariantId: null,
@@ -225,7 +478,7 @@ async function buildMerchizeImportPreflightForProducts(
   const wouldSkip = productPlans.filter((product) => product.action === 'skipped').length;
   const issues = summarizeIssues(productPlans);
 
-  if (products.length === 0) {
+  if (boundedProducts.length === 0) {
     issues.push({
       code: 'empty_provider_catalog',
       message: 'Merchize returned no catalog products.',
@@ -233,18 +486,40 @@ async function buildMerchizeImportPreflightForProducts(
     });
   }
 
-  return {
+  if (products.length > MAX_PREFLIGHT_PRODUCTS) {
+    issues.push({
+      code: 'provider_catalog_too_large',
+      message: merchizeIssueMessage('provider_catalog_too_large'),
+      count: products.length - MAX_PREFLIGHT_PRODUCTS,
+    });
+  }
+
+  const withoutFingerprint: Omit<
+    MerchizeImportPreflight,
+    'preflightFingerprint' | 'fingerprintExpiresAt' | 'preflightSignature'
+  > = {
     provider: 'merchize',
     mode: 'import_preflight',
-    productCount: products.length,
-    normalizedProductCount: products.length,
+    productCount: boundedProducts.length,
+    normalizedProductCount: boundedProducts.length,
     wouldInsert,
     wouldUpdate,
     wouldSkip,
     wouldBlock,
-    safeToImport: products.length > 0 && wouldBlock === 0 && issues.length === 0,
+    safeToImport: boundedProducts.length > 0 && wouldBlock === 0 && issues.length === 0,
     issues,
-    products: productPlans,
+    products: productPlans.slice(0, MAX_PREFLIGHT_PRODUCT_DETAILS),
+  };
+  const preflightFingerprint = fingerprintMerchizeImportPreflight(withoutFingerprint);
+  const fingerprintExpiresAt = new Date(
+    (options.now ?? new Date()).getTime() + PREFLIGHT_TTL_MS,
+  ).toISOString();
+
+  return {
+    ...withoutFingerprint,
+    preflightFingerprint,
+    fingerprintExpiresAt,
+    preflightSignature: signMerchizeImportPreflight(preflightFingerprint, fingerprintExpiresAt),
   };
 }
 
