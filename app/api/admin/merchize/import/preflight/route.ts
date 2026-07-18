@@ -45,12 +45,13 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
     });
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
-    logger.error(
-      'Merchize import preflight failed',
-      { requestId, route: '/api/admin/merchize/import/preflight' },
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
-    );
+    logger.error('Merchize import preflight failed', {
+      requestId,
+      route: '/api/admin/merchize/import/preflight',
+      extra: {
+        failureCategory: error instanceof SyntaxError ? 'invalid_provider_payload' : 'provider',
+      },
+    });
 
     return NextResponse.json(
       createApiError(

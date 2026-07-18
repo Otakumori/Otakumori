@@ -10,6 +10,7 @@ export interface MerchizeProductImage {
 export interface MerchizeProductVariant {
   provider: 'merchize';
   providerVariantId: string | null;
+  providerVariantIdSource?: 'provider_id' | 'sku_fallback' | 'missing';
   sku: string | null;
   title: string | null;
   options: Array<{ option: string; value: string }>;
@@ -23,6 +24,7 @@ export interface MerchizeProductVariant {
 export interface MerchizeProduct {
   provider: 'merchize';
   providerProductId: string;
+  providerProductIdSource?: 'provider_id' | 'sku_fallback' | 'generated';
   id: string;
   title: string;
   description: string | null;
@@ -210,11 +212,6 @@ function countDuplicates(values: string[]): number {
   return [...counts.values()].filter((count) => count > 1).length;
 }
 
-function truncate(value: string | null, maxLength = 160): string | null {
-  if (!value) return null;
-  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
-}
-
 function extractImageUrls(raw: JsonRecord): MerchizeProductImage[] {
   const candidates = [
     raw.images,
@@ -355,18 +352,17 @@ function extractOptions(variant: JsonRecord): Array<{ option: string; value: str
       const optionValue = coerceString(value);
       return optionValue ? { option, value: optionValue } : null;
     })
-    .filter((option): option is { option: string; value: string } => Boolean(option))
-    .slice(0, 12);
+    .filter((option): option is { option: string; value: string } => Boolean(option));
 }
 
 function normalizeVariant(raw: JsonRecord): MerchizeProductVariant {
-  const providerVariantId =
+  const providerVariantIdFromProvider =
     coerceString(raw._id) ||
     coerceString(raw.id) ||
     coerceString(raw.variantId) ||
-    coerceString(raw.variant_id) ||
-    coerceString(raw.sku) ||
-    null;
+    coerceString(raw.variant_id);
+  const sku = coerceString(raw.sku);
+  const providerVariantId = providerVariantIdFromProvider || sku || null;
   const availability =
     coerceString(raw.availability) ||
     coerceString(raw.stock_status) ||
@@ -376,14 +372,17 @@ function normalizeVariant(raw: JsonRecord): MerchizeProductVariant {
   return {
     provider: 'merchize',
     providerVariantId,
-    sku: coerceString(raw.sku),
-    title: truncate(
+    providerVariantIdSource: providerVariantIdFromProvider
+      ? 'provider_id'
+      : sku
+        ? 'sku_fallback'
+        : 'missing',
+    sku,
+    title:
       coerceString(raw.title) ||
-        coerceString(raw.name) ||
-        coerceString(raw.option_title) ||
-        coerceString(raw.variant_title),
-      120,
-    ),
+      coerceString(raw.name) ||
+      coerceString(raw.option_title) ||
+      coerceString(raw.variant_title),
     options: extractOptions(raw),
     price: extractVariantPrice(raw),
     currency: coerceString(raw.currency) || 'USD',
@@ -422,12 +421,13 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
   }
 
   const raw = rawValue as JsonRecord;
-  const providerProductId =
+  const providerProductIdFromProvider =
     coerceString(raw._id) ||
     coerceString(raw.id) ||
     coerceString(raw.productId) ||
-    coerceString(raw.product_id) ||
-    coerceString(raw.sku);
+    coerceString(raw.product_id);
+  const productSku = coerceString(raw.sku);
+  const providerProductId = providerProductIdFromProvider || productSku;
   const id = providerProductId || `merchize-${index + 1}`;
 
   const providerTitle =
@@ -478,10 +478,15 @@ function normalizeProduct(rawValue: unknown, index: number): MerchizeProduct | n
   return {
     provider: 'merchize',
     providerProductId: id,
+    providerProductIdSource: providerProductIdFromProvider
+      ? 'provider_id'
+      : productSku
+        ? 'sku_fallback'
+        : 'generated',
     id,
     title,
     description: descriptionParts.length > 0 ? descriptionParts.join(' · ') : null,
-    sku: coerceString(raw.sku),
+    sku: productSku,
     handle: coerceString(raw.handle) || coerceString(raw.slug) || coerceString(raw.permalink),
     status: coerceString(raw.status) || coerceString(raw.state) || 'active',
     currency: 'USD',
