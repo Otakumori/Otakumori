@@ -129,9 +129,76 @@ function merchizeProduct(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function sellerSourceContext(products: Array<ReturnType<typeof merchizeProduct>>) {
+  return {
+    catalogScope: 'seller_products' as const,
+    completeness: 'complete' as const,
+    pagination: {
+      total: products.length,
+      limit: Math.max(products.length, 1),
+      page: 1,
+      loadedCount: products.length,
+      completeness: 'complete' as const,
+    },
+  };
+}
+
+function blankCatalogSourceContext(
+  products: Array<ReturnType<typeof merchizeProduct>>,
+  overrides: Record<string, unknown> = {},
+) {
+  const pagination = {
+    total: products.length,
+    limit: Math.max(products.length, 1),
+    page: 1,
+    loadedCount: products.length,
+    completeness: 'complete' as const,
+    ...overrides,
+  };
+
+  return {
+    catalogScope: 'fulfillment_blank_catalog' as const,
+    completeness: pagination.completeness,
+    pagination,
+  };
+}
+
+function productCollection(
+  products: Array<ReturnType<typeof merchizeProduct>>,
+  sourceContext = sellerSourceContext(products),
+) {
+  return {
+    products,
+    rawProductCount: products.length,
+    payloadShapeKeys: ['success', 'data'],
+    catalogScope: sourceContext.catalogScope,
+    pagination: sourceContext.pagination,
+  };
+}
+
+async function buildSellerImportPreflightForProducts(
+  products: Array<ReturnType<typeof merchizeProduct>>,
+  options: Record<string, unknown> = {},
+) {
+  return buildMerchizeImportPreflightForProducts(products as never, {
+    ...options,
+    sourceContext: sellerSourceContext(products),
+  });
+}
+
+async function buildSellerHiddenImportManifestForProducts(
+  products: Array<ReturnType<typeof merchizeProduct>>,
+) {
+  return buildMerchizeHiddenImportManifestForProducts(
+    products as never,
+    sellerSourceContext(products),
+  );
+}
+
 function serviceMock(products = [merchizeProduct()], overrides: Record<string, unknown> = {}) {
   return {
     getProducts: vi.fn().mockResolvedValue(products),
+    getProductCollection: vi.fn().mockResolvedValue(productCollection(products)),
     createProduct: vi.fn(),
     updateProduct: vi.fn(),
     deleteProduct: vi.fn(),
@@ -186,8 +253,13 @@ describe('Merchize import preflight route', () => {
     expect(json.error).toBe('FORBIDDEN');
   });
 
-  it('returns dry-run counts for new Merchize products without DB writes', async () => {
-    const service = serviceMock();
+  it('fails closed for the fulfillment blank catalog while preserving dry-run safety', async () => {
+    const products = [merchizeProduct()];
+    const service = serviceMock(products, {
+      getProductCollection: vi
+        .fn()
+        .mockResolvedValue(productCollection(products, blankCatalogSourceContext(products))),
+    });
     vi.mocked(getMerchizeService).mockReturnValue(service as never);
 
     const { response, json } = await callGET(await preflightRoute());
@@ -197,12 +269,14 @@ describe('Merchize import preflight route', () => {
       provider: 'merchize',
       mode: 'import_preflight',
       manifestVersion: MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
+      catalogScope: 'fulfillment_blank_catalog',
+      completeness: 'complete',
       productCount: 1,
-      wouldInsert: 1,
+      wouldInsert: 0,
       wouldUpdate: 0,
       wouldSkip: 0,
-      wouldBlock: 0,
-      safeToImport: true,
+      wouldBlock: 1,
+      safeToImport: false,
     });
     expect(json.data.preflightFingerprint).toMatch(/^[a-f0-9]{64}$/);
     expect(Date.parse(json.data.fingerprintExpiresAt)).toBeGreaterThan(Date.now());
@@ -211,16 +285,21 @@ describe('Merchize import preflight route', () => {
       provider: 'merchize',
       providerProductId: 'mz-product-1',
       integrationRef: 'merchize:mz-product-1',
-      action: 'inserted',
+      action: 'blocked',
       public: false,
       purchasable: false,
     });
+    expect(json.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'unsupported_provider_catalog_scope', count: 1 }),
+      ]),
+    );
     expect(json.data.products[0].variants[0]).toMatchObject({
       provider: 'merchize',
       providerVariantId: 'MZ-VARIANT-1',
       printifyVariantId: null,
     });
-    expect(service.getProducts).toHaveBeenCalledWith({ limit: 51, page: 1 });
+    expect(service.getProductCollection).toHaveBeenCalledWith({ limit: 51, page: 1 });
     expect(db.product.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { integrationRef: { in: ['merchize:mz-product-1'] } },
@@ -237,6 +316,81 @@ describe('Merchize import preflight route', () => {
     expect(db.$transaction).not.toHaveBeenCalled();
     expect(JSON.stringify(json)).not.toContain('raw');
     expect(JSON.stringify(json)).not.toContain('printifyProductId');
+  });
+
+  it('treats a valid 50-product blank catalog as normalization-ready but import-blocked', async () => {
+    const products = Array.from({ length: 50 }, (_, index) =>
+      merchizeProduct({
+        providerProductId: `blank-product-${index + 1}`,
+        id: `blank-product-${index + 1}`,
+        variants: [
+          {
+            ...merchizeProduct().variants[0],
+            providerVariantId: `BLANK-VARIANT-${index + 1}`,
+            sku: `BLANK-SKU-${index + 1}`,
+          },
+        ],
+      }),
+    );
+
+    const preflight = await buildMerchizeImportPreflightForProducts(products as never, {
+      sourceContext: blankCatalogSourceContext(products, {
+        total: 50,
+        limit: 50,
+        page: 1,
+        loadedCount: 50,
+        completeness: 'complete',
+      }),
+    });
+
+    expect(preflight.catalogScope).toBe('fulfillment_blank_catalog');
+    expect(preflight.completeness).toBe('complete');
+    expect(preflight.productCount).toBe(50);
+    expect(preflight.wouldInsert).toBe(0);
+    expect(preflight.wouldUpdate).toBe(0);
+    expect(preflight.wouldBlock).toBe(50);
+    expect(preflight.safeToImport).toBe(false);
+    expect(JSON.stringify(preflight.issues)).toContain('unsupported_provider_catalog_scope');
+  });
+
+  it('blocks incomplete, unknown, and malformed pagination contracts', async () => {
+    const products = [merchizeProduct()];
+    const contexts = [
+      blankCatalogSourceContext(products, {
+        total: 2,
+        limit: 1,
+        page: 1,
+        loadedCount: 1,
+        completeness: 'incomplete',
+      }),
+      blankCatalogSourceContext(products, {
+        total: null,
+        limit: null,
+        page: null,
+        loadedCount: 1,
+        completeness: 'unknown',
+      }),
+      blankCatalogSourceContext(products, {
+        total: -1,
+        limit: 0,
+        page: 0,
+        loadedCount: 1,
+        completeness: 'unknown',
+      }),
+    ];
+
+    for (const sourceContext of contexts) {
+      const preflight = await buildMerchizeImportPreflightForProducts(products as never, {
+        sourceContext,
+      });
+
+      expect(preflight.safeToImport).toBe(false);
+      expect(preflight.wouldInsert).toBe(0);
+      expect(preflight.wouldUpdate).toBe(0);
+      expect(JSON.stringify(preflight.issues)).toContain(
+        'provider_catalog_completeness_unverified',
+      );
+    }
   });
 
   it('calculates wouldUpdate for existing merchize integration references', async () => {
@@ -377,7 +531,7 @@ describe('Merchize import preflight route', () => {
   it('blocks overlong mutation-relevant product and variant fields without truncating identities', async () => {
     const overlongProductId = `${'p'.repeat(200)}A`;
     const overlongVariantId = `${'v'.repeat(200)}A`;
-    const preflight = await buildMerchizeImportPreflightForProducts([
+    const preflight = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         providerProductId: overlongProductId,
         id: overlongProductId,
@@ -408,7 +562,7 @@ describe('Merchize import preflight route', () => {
     expect(preflight.products[0].integrationRef).toBe('');
     expect(preflight.products[0].variants).toHaveLength(0);
 
-    const manifest = await buildMerchizeHiddenImportManifestForProducts([
+    const manifest = await buildSellerHiddenImportManifestForProducts([
       merchizeProduct({
         providerProductId: 'mz-product-1',
         variants: [
@@ -438,7 +592,7 @@ describe('Merchize import preflight route', () => {
       option: `Option ${index + 1}`,
       value: `Value ${index + 1}`,
     }));
-    const tooManyVariantOptions = await buildMerchizeImportPreflightForProducts([
+    const tooManyVariantOptions = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         variants: [
           {
@@ -463,7 +617,7 @@ describe('Merchize import preflight route', () => {
         value: `Value ${variantIndex + 1}-${optionIndex + 1}`,
       })),
     }));
-    const tooManyProductOptions = await buildMerchizeImportPreflightForProducts([
+    const tooManyProductOptions = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         variants,
         variantCount: variants.length,
@@ -480,7 +634,7 @@ describe('Merchize import preflight route', () => {
       option: `O${String(index + 1).padStart(2, '0')}${'N'.repeat(77)}`,
       value: `V${String(index + 1).padStart(2, '0')}${'A'.repeat(77)}`,
     }));
-    const preflight = await buildMerchizeImportPreflightForProducts([
+    const preflight = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         providerProductId: 'P'.repeat(200),
         id: 'P'.repeat(200),
@@ -522,7 +676,7 @@ describe('Merchize import preflight route', () => {
       .mockResolvedValueOnce([] as never);
     vi.mocked(db.productVariant.findMany).mockResolvedValue([] as never);
 
-    const preflight = await buildMerchizeImportPreflightForProducts([merchizeProduct() as never]);
+    const preflight = await buildSellerImportPreflightForProducts([merchizeProduct() as never]);
 
     expect(preflight.safeToImport).toBe(false);
     expect(preflight.wouldUpdate).toBe(0);
@@ -534,7 +688,7 @@ describe('Merchize import preflight route', () => {
   it('sanitizes provider errors', async () => {
     vi.mocked(getMerchizeService).mockReturnValue(
       serviceMock([], {
-        getProducts: vi.fn().mockRejectedValue(new Error('token=secret provider payload')),
+        getProductCollection: vi.fn().mockRejectedValue(new Error('token=secret provider payload')),
       }) as never,
     );
 
@@ -555,7 +709,7 @@ describe('Merchize import preflight route', () => {
       ],
       imageCount: 2,
     });
-    const baseline = await buildMerchizeImportPreflightForProducts([base as never]);
+    const baseline = await buildSellerImportPreflightForProducts([base as never]);
     const changedProducts = [
       merchizeProduct({ description: 'Changed description' }),
       merchizeProduct({ handle: 'changed-handle' }),
@@ -598,13 +752,13 @@ describe('Merchize import preflight route', () => {
     ];
 
     for (const changed of changedProducts) {
-      const changedPreflight = await buildMerchizeImportPreflightForProducts([changed as never]);
+      const changedPreflight = await buildSellerImportPreflightForProducts([changed as never]);
       expect(changedPreflight.preflightFingerprint).not.toBe(baseline.preflightFingerprint);
     }
   });
 
   it('changes the fingerprint when planned action changes from insert to update', async () => {
-    const insert = await buildMerchizeImportPreflightForProducts([merchizeProduct() as never]);
+    const insert = await buildSellerImportPreflightForProducts([merchizeProduct() as never]);
     vi.mocked(db.product.findMany)
       .mockResolvedValueOnce([
         {
@@ -615,7 +769,7 @@ describe('Merchize import preflight route', () => {
       ] as never)
       .mockResolvedValueOnce([]);
 
-    const update = await buildMerchizeImportPreflightForProducts([merchizeProduct() as never]);
+    const update = await buildSellerImportPreflightForProducts([merchizeProduct() as never]);
 
     expect(update.wouldUpdate).toBe(1);
     expect(update.preflightFingerprint).not.toBe(insert.preflightFingerprint);
@@ -636,12 +790,12 @@ describe('Merchize import preflight route', () => {
         ],
       }),
     );
-    const baseline = await buildMerchizeImportPreflightForProducts(products as never);
+    const baseline = await buildSellerImportPreflightForProducts(products as never);
     const changed = products.map((product, index) =>
       index === 25 ? { ...product, description: 'Changed product 26' } : product,
     );
 
-    const changedPreflight = await buildMerchizeImportPreflightForProducts(changed as never);
+    const changedPreflight = await buildSellerImportPreflightForProducts(changed as never);
 
     expect(baseline.products).toHaveLength(25);
     expect(changedPreflight.preflightFingerprint).not.toBe(baseline.preflightFingerprint);
@@ -655,7 +809,7 @@ describe('Merchize import preflight route', () => {
       title: `Variant ${index + 1}`,
       price: 25 + index,
     }));
-    const baseline = await buildMerchizeImportPreflightForProducts([
+    const baseline = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         variants,
         variantCount: variants.length,
@@ -666,7 +820,7 @@ describe('Merchize import preflight route', () => {
       index === 20 ? { ...variant, title: 'Changed variant 21' } : variant,
     );
 
-    const changedPreflight = await buildMerchizeImportPreflightForProducts([
+    const changedPreflight = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         variants: changedVariants,
         variantCount: changedVariants.length,
@@ -679,7 +833,7 @@ describe('Merchize import preflight route', () => {
   });
 
   it('blocks unsafe image URLs and canonicalizes duplicate safe image URLs deterministically', async () => {
-    const unsafe = await buildMerchizeImportPreflightForProducts([
+    const unsafe = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         images: [
           { url: 'https://cdn.example.com/valid.png?token=not-a-secret' },
@@ -691,7 +845,7 @@ describe('Merchize import preflight route', () => {
     expect(unsafe.safeToImport).toBe(false);
     expect(JSON.stringify(unsafe.issues)).toContain('product_unsafe_image_url');
 
-    const deduped = await buildMerchizeImportPreflightForProducts([
+    const deduped = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         images: [
           { url: 'https://cdn.example.com/valid.png?width=100' },
@@ -720,7 +874,7 @@ describe('Merchize import preflight route', () => {
       }),
     );
 
-    const preflight = await buildMerchizeImportPreflightForProducts(products as never);
+    const preflight = await buildSellerImportPreflightForProducts(products as never);
 
     expect(preflight.safeToImport).toBe(false);
     expect(preflight.productCount).toBe(51);
@@ -730,7 +884,7 @@ describe('Merchize import preflight route', () => {
   });
 
   it('fails closed for malformed signatures, altered signed state, and missing signing secrets', async () => {
-    const preflight = await buildMerchizeImportPreflightForProducts([merchizeProduct() as never]);
+    const preflight = await buildSellerImportPreflightForProducts([merchizeProduct() as never]);
 
     for (const input of [
       {
@@ -756,12 +910,12 @@ describe('Merchize import preflight route', () => {
 
     delete process.env.AUTH_SECRET;
     await expect(
-      buildMerchizeImportPreflightForProducts([merchizeProduct() as never]),
+      buildSellerImportPreflightForProducts([merchizeProduct() as never]),
     ).rejects.toThrow('signing secret');
   });
 
   it('blocks fallback identities and does not match by title, slug, handle, or SKU similarity', async () => {
-    const synthesized = await buildMerchizeImportPreflightForProducts([
+    const synthesized = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         providerProductId: 'merchize-1',
         providerProductIdSource: 'generated',
@@ -769,7 +923,7 @@ describe('Merchize import preflight route', () => {
     ] as never);
     expect(JSON.stringify(synthesized.issues)).toContain('product_provider_id_not_stable');
 
-    const skuVariant = await buildMerchizeImportPreflightForProducts([
+    const skuVariant = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         variants: [
           {
@@ -783,7 +937,7 @@ describe('Merchize import preflight route', () => {
     ] as never);
     expect(JSON.stringify(skuVariant.issues)).toContain('variant_id_not_stable');
 
-    const sameDisplayDifferentProviderId = await buildMerchizeImportPreflightForProducts([
+    const sameDisplayDifferentProviderId = await buildSellerImportPreflightForProducts([
       merchizeProduct({
         providerProductId: 'different-provider-id',
         title: 'Minimal Cleavage Code Tee',
