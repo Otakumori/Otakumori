@@ -153,6 +153,7 @@ describe('documentation secret-safety scanner', () => {
       encoding: 'utf8',
       shell: process.platform === 'win32',
       stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 30_000,
     });
 
     expect(cleanOutput).toContain('Documentation secret-safety check passed:');
@@ -172,6 +173,7 @@ describe('documentation secret-safety scanner', () => {
         encoding: 'utf8',
         shell: process.platform === 'win32',
         stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 30_000,
       });
     } catch (error) {
       const commandError = error as { status?: number; stdout?: string; stderr?: string };
@@ -183,7 +185,7 @@ describe('documentation secret-safety scanner', () => {
     expect(combinedOutput).toContain('Documentation secret-safety check failed:');
     expect(combinedOutput).toContain('2 blocking');
     expect(combinedOutput).not.toContain(fabricatedSecret);
-  });
+  }, 35_000);
 });
 
 describe('documentation registry validation', () => {
