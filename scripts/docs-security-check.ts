@@ -112,8 +112,16 @@ const KNOWN_SECRET_VALUE_RE =
   /(?:\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}\b|\bwhsec_[A-Za-z0-9]{16,}\b|\bpostgres(?:ql)?:\/\/[^\s'"`)<>]+)/i;
 const GENERIC_DATABASE_COMPONENT_RE =
   /^(?:user|username|postgres|pass|password|db|database|dbname|neondb|app)$/i;
-const PLACEHOLDER_TOKEN_RE = /(?:your|placeholder|sample|dummy|project)/i;
-const PLACEHOLDER_COMPONENT_RE = /^(?:your|placeholder|sample|dummy|project|host)$/i;
+const RESERVED_POSTGRES_HOSTS = new Set([
+  'localhost',
+  '127.0.0.1',
+  '::1',
+  '[::1]',
+  'example.com',
+  'example.net',
+  'example.org',
+]);
+const EXPLICIT_PLACEHOLDER_TOKEN_RE = /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i;
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
@@ -128,23 +136,19 @@ function isApprovedPlaceholderValue(value: string): boolean {
 }
 
 function isApprovedPlaceholderPostgresUrl(value: string): boolean {
+  const urlText = value.trim();
+  if (EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText)) {
+    return true;
+  }
+
   try {
     const parsed = new URL(value);
     const hostname = parsed.hostname.toLowerCase();
-    const urlText = value.trim();
     const username = decodeURIComponent(parsed.username);
     const password = decodeURIComponent(parsed.password);
     const databaseName = decodeURIComponent(
       parsed.pathname.replace(/^\/+/, '').split(/[/?#]/)[0] ?? '',
     );
-    const hasExplicitPlaceholderSyntax =
-      /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i.test(urlText);
-    const hasPlaceholderToken = PLACEHOLDER_TOKEN_RE.test(
-      [username, password, hostname, databaseName].join(' '),
-    );
-    const hasPlaceholderComponent = [username, password, hostname, databaseName]
-      .flatMap((component) => component.split(/[.\-_:/]+/))
-      .some((component) => PLACEHOLDER_COMPONENT_RE.test(component));
     const hasEllipsisPlaceholder = urlText.includes('...') || hostname.includes('...');
     const isSingleLabelLocalHost = !hostname.includes('.') && /^[a-z][a-z0-9_-]*$/i.test(hostname);
     const hasGenericCredentials =
@@ -152,24 +156,14 @@ function isApprovedPlaceholderPostgresUrl(value: string): boolean {
     const hasOnlyGenericConnectionComponents =
       hasGenericCredentials && GENERIC_DATABASE_COMPONENT_RE.test(databaseName);
     return (
-      hasExplicitPlaceholderSyntax ||
-      hasPlaceholderToken ||
-      hasPlaceholderComponent ||
       hasEllipsisPlaceholder ||
-      ['localhost', '127.0.0.1'].includes(hostname) ||
-      ['example.com', 'example.net', 'example.org'].includes(hostname) ||
+      RESERVED_POSTGRES_HOSTS.has(hostname) ||
       hostname.endsWith('.example') ||
       hostname.endsWith('.invalid') ||
-      (isSingleLabelLocalHost && hasGenericCredentials) ||
-      (hostname.includes('neon') && hasOnlyGenericConnectionComponents)
+      (isSingleLabelLocalHost && hasOnlyGenericConnectionComponents)
     );
   } catch {
-    return (
-      /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i.test(value) ||
-      PLACEHOLDER_TOKEN_RE.test(value) ||
-      /(?:^|[.\-_/@:])host(?:$|[.\-_/@:])/i.test(value) ||
-      value.includes('...')
-    );
+    return EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText) || urlText.includes('...');
   }
 }
 

@@ -108,7 +108,7 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/otakumori_dev
+      - DATABASE_URL=<DATABASE_URL>
       - NEXTAUTH_SECRET=dev-secret
       - NEXTAUTH_URL=http://localhost:3000
     volumes:

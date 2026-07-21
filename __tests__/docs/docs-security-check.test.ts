@@ -28,6 +28,28 @@ function makeTempDir() {
   return dir;
 }
 
+function runScannerCheckForText(text: string) {
+  const dir = makeTempDir();
+  const fixturePath = path.join(dir, 'fixture.md');
+  writeFileSync(fixturePath, text);
+
+  try {
+    const stdout = execFileSync(CLI_COMMAND, [...CLI_ARGS, '--check', '--file', fixturePath], {
+      encoding: 'utf8',
+      shell: process.platform === 'win32',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 30_000,
+    });
+    return { exitCode: 0, output: stdout };
+  } catch (error) {
+    const commandError = error as { status?: number; stdout?: string; stderr?: string };
+    return {
+      exitCode: commandError.status ?? 1,
+      output: `${commandError.stdout ?? ''}${commandError.stderr ?? ''}`,
+    };
+  }
+}
+
 describe('documentation secret-safety scanner', () => {
   it('detects high-confidence fake token, database URL, and webhook-secret patterns without returning raw values', () => {
     const text = [
@@ -157,11 +179,55 @@ describe('documentation secret-safety scanner', () => {
     }
   });
 
+  it('blocks routable PostgreSQL URLs with placeholder-looking substrings or provider-brand text', () => {
+    const cases = [
+      'DATABASE_URL=postgresql://postgres:password@project-alpha.db-provider.com/neondb',
+      'DATABASE_URL=postgresql://user:password@sample-production.database.com/app',
+      'DATABASE_URL=postgresql://postgres:password@ep-example.aws.neon.tech/neondb',
+      'DATABASE_URL=postgresql://user:password@yourcompany.database.com/app',
+      'DATABASE_URL=postgresql://postgres:password@hosted-db.company.com/app',
+      'DATABASE_URL=postgresql://postgres:password@dummycorp.database.com/app',
+    ];
+
+    for (const text of cases) {
+      const rawUrl = text.split('=')[1];
+      const completeCredentials = rawUrl.split('@')[0].replace(/^postgres(?:ql)?:\/\//i, '');
+      const findings = scanDocumentationText(text, 'docs/postgres-adversarial.md');
+      expect(findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            classification: 'confirmed-or-probable-credential',
+            ruleId: 'postgres_connection_url',
+          }),
+        ]),
+      );
+      expect(hasBlockingFindings(findings)).toBe(true);
+
+      const serialized = JSON.stringify(findings);
+      expect(serialized).not.toContain(rawUrl);
+      expect(serialized).not.toContain('password');
+      expect(serialized).not.toContain(completeCredentials);
+    }
+
+    const cliResult = runScannerCheckForText(cases.join('\n'));
+    expect(cliResult.exitCode).not.toBe(0);
+    for (const text of cases) {
+      const rawUrl = text.split('=')[1];
+      expect(cliResult.output).not.toContain(rawUrl);
+      expect(cliResult.output).not.toContain('postgres:password');
+      expect(cliResult.output).not.toContain('user:password');
+    }
+  });
+
   it('accepts structurally reserved PostgreSQL placeholder URLs', () => {
     const findings = scanDocumentationText(
       [
+        'DATABASE_URL=postgresql://user:password@localhost/app',
+        'DATABASE_URL=postgresql://user:password@127.0.0.1/app',
         'DATABASE_URL=postgresql://user:password@example.invalid/app',
-        'DATABASE_URL=postgresql://postgres:password@localhost/app',
+        'DATABASE_URL=postgresql://user:password@db.example/app',
+        'DATABASE_URL=postgresql://<USERNAME>:<PASSWORD>@<DATABASE_HOST>/<DATABASE_NAME>',
+        'DATABASE_URL=postgresql://postgres:password@postgres/app',
       ].join('\n'),
       'docs/postgres-placeholders.md',
     );
