@@ -227,7 +227,7 @@ describe('documentation secret-safety scanner', () => {
         'DATABASE_URL=postgresql://user:password@example.invalid/app',
         'DATABASE_URL=postgresql://user:password@db.example/app',
         'DATABASE_URL=postgresql://<USERNAME>:<PASSWORD>@<DATABASE_HOST>/<DATABASE_NAME>',
-        'DATABASE_URL=postgresql://postgres:password@postgres/app',
+        'DATABASE_URL=postgresql://postgres:password@postgres:5432/otakumori_dev',
       ].join('\n'),
       'docs/postgres-placeholders.md',
     );
@@ -241,6 +241,76 @@ describe('documentation secret-safety scanner', () => {
         }),
       ]),
     );
+  });
+
+  it('accepts the Docker Compose local PostgreSQL service URL without emitting the raw URL', () => {
+    const text = 'DATABASE_URL=postgresql://postgres:password@postgres:5432/otakumori_dev';
+    const rawUrl = text.split('=')[1];
+    const findings = scanDocumentationText(text, 'docker-compose.yml');
+
+    expect(findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          classification: 'example-placeholder',
+          ruleId: 'postgres_connection_url',
+        }),
+      ]),
+    );
+    expect(findings.filter((finding) => finding.ruleId === 'secret_env_assignment')).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          classification: 'confirmed-or-probable-credential',
+        }),
+      ]),
+    );
+    expect(hasBlockingFindings(findings)).toBe(false);
+    expect(JSON.stringify(findings)).not.toContain(rawUrl);
+
+    const cliResult = runScannerCheckForText(text);
+    expect(cliResult.exitCode).toBe(0);
+    expect(cliResult.output).not.toContain(rawUrl);
+  });
+
+  it('blocks PostgreSQL URLs that only resemble the Docker Compose local service shape', () => {
+    const cases = [
+      'DATABASE_URL=postgresql://postgres:password@postgres.company.com/otakumori_dev',
+      'DATABASE_URL=postgresql://postgres:realLookingPassword123@postgres:5432/otakumori_dev',
+      'DATABASE_URL=postgresql://realUser:password@postgres:5432/otakumori_dev',
+      'DATABASE_URL=postgresql://postgres:password@ep-example.aws.neon.tech/neondb',
+    ];
+
+    for (const text of cases) {
+      const rawUrl = text.split('=')[1];
+      const completeCredentials = rawUrl.split('@')[0].replace(/^postgres(?:ql)?:\/\//i, '');
+      const password = completeCredentials.split(':')[1];
+      const findings = scanDocumentationText(text, 'docs/postgres-local-adversarial.md');
+
+      expect(findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            classification: 'confirmed-or-probable-credential',
+            ruleId: 'postgres_connection_url',
+          }),
+        ]),
+      );
+      expect(hasBlockingFindings(findings)).toBe(true);
+
+      const serialized = JSON.stringify(findings);
+      expect(serialized).not.toContain(rawUrl);
+      expect(serialized).not.toContain(completeCredentials);
+      expect(serialized).not.toContain(password);
+    }
+
+    const cliResult = runScannerCheckForText(cases.join('\n'));
+    expect(cliResult.exitCode).not.toBe(0);
+    for (const text of cases) {
+      const rawUrl = text.split('=')[1];
+      const completeCredentials = rawUrl.split('@')[0].replace(/^postgres(?:ql)?:\/\//i, '');
+      const password = completeCredentials.split(':')[1];
+      expect(cliResult.output).not.toContain(rawUrl);
+      expect(cliResult.output).not.toContain(completeCredentials);
+      expect(cliResult.output).not.toContain(password);
+    }
   });
 
   it('does not let a same-location finding id authorize a changed credential', () => {

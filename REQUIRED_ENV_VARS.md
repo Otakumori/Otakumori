@@ -13,7 +13,7 @@ These MUST be set in production (Vercel environment variables):
 |----------|-------------|---------|--------|
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (client-exposed) | `pk_live_...` | Clerk Dashboard |
 | `CLERK_SECRET_KEY` | Clerk secret key for server-side auth | `sk_live_...` | Clerk Dashboard |
-| `DATABASE_URL` | Neon PostgreSQL connection string | `postgresql://user:pass@host:5432/db` | Neon Dashboard |
+| `DATABASE_URL` | Neon PostgreSQL connection string | `<DATABASE_URL>` | Neon Dashboard |
 | `STRIPE_SECRET_KEY` | Stripe secret API key | `sk_live_...` | Stripe Dashboard |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `whsec_...` | Stripe Webhooks |
 | `PRINTIFY_API_KEY` | Printify JWT token | `Bearer ...` | Printify Dashboard |

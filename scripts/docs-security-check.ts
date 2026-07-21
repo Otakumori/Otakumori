@@ -110,8 +110,6 @@ const PLACEHOLDER_RE =
 const SAFE_PUBLIC_VALUE_RE = /^(?:true|false|0|1|localhost|127\.0\.0\.1|null|undefined)$/i;
 const KNOWN_SECRET_VALUE_RE =
   /(?:\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}\b|\bwhsec_[A-Za-z0-9]{16,}\b|\bpostgres(?:ql)?:\/\/[^\s'"`)<>]+)/i;
-const GENERIC_DATABASE_COMPONENT_RE =
-  /^(?:user|username|postgres|pass|password|db|database|dbname|neondb|app)$/i;
 const RESERVED_POSTGRES_HOSTS = new Set([
   'localhost',
   '127.0.0.1',
@@ -121,7 +119,11 @@ const RESERVED_POSTGRES_HOSTS = new Set([
   'example.net',
   'example.org',
 ]);
+const LOCAL_POSTGRES_SERVICE_HOSTS = new Set(['postgres']);
+const GENERIC_LOCAL_DATABASE_USERS = new Set(['postgres', 'user']);
+const GENERIC_LOCAL_DATABASE_PASSWORDS = new Set(['password', 'pass']);
 const EXPLICIT_PLACEHOLDER_TOKEN_RE = /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i;
+const POSTGRES_ELLIPSIS_PLACEHOLDER_RE = /^postgres(?:ql)?:\/\/\.{3}$/i;
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
@@ -137,7 +139,10 @@ function isApprovedPlaceholderValue(value: string): boolean {
 
 function isApprovedPlaceholderPostgresUrl(value: string): boolean {
   const urlText = value.trim();
-  if (EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText)) {
+  if (
+    EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText) ||
+    POSTGRES_ELLIPSIS_PLACEHOLDER_RE.test(urlText)
+  ) {
     return true;
   }
 
@@ -146,24 +151,24 @@ function isApprovedPlaceholderPostgresUrl(value: string): boolean {
     const hostname = parsed.hostname.toLowerCase();
     const username = decodeURIComponent(parsed.username);
     const password = decodeURIComponent(parsed.password);
-    const databaseName = decodeURIComponent(
-      parsed.pathname.replace(/^\/+/, '').split(/[/?#]/)[0] ?? '',
-    );
-    const hasEllipsisPlaceholder = urlText.includes('...') || hostname.includes('...');
-    const isSingleLabelLocalHost = !hostname.includes('.') && /^[a-z][a-z0-9_-]*$/i.test(hostname);
-    const hasGenericCredentials =
-      GENERIC_DATABASE_COMPONENT_RE.test(username) && GENERIC_DATABASE_COMPONENT_RE.test(password);
-    const hasOnlyGenericConnectionComponents =
-      hasGenericCredentials && GENERIC_DATABASE_COMPONENT_RE.test(databaseName);
+    const port = parsed.port;
+    const hasGenericLocalCredentials =
+      GENERIC_LOCAL_DATABASE_USERS.has(username.toLowerCase()) &&
+      GENERIC_LOCAL_DATABASE_PASSWORDS.has(password.toLowerCase());
+    const isApprovedLocalService =
+      LOCAL_POSTGRES_SERVICE_HOSTS.has(hostname) &&
+      hasGenericLocalCredentials &&
+      (!port || port === '5432');
     return (
-      hasEllipsisPlaceholder ||
       RESERVED_POSTGRES_HOSTS.has(hostname) ||
       hostname.endsWith('.example') ||
       hostname.endsWith('.invalid') ||
-      (isSingleLabelLocalHost && hasOnlyGenericConnectionComponents)
+      isApprovedLocalService
     );
   } catch {
-    return EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText) || urlText.includes('...');
+    return (
+      EXPLICIT_PLACEHOLDER_TOKEN_RE.test(urlText) || POSTGRES_ELLIPSIS_PLACEHOLDER_RE.test(urlText)
+    );
   }
 }
 

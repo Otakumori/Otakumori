@@ -28,8 +28,8 @@ PRINTIFY_API_URL=https://api.printify.com/v1
 PRINTIFY_WEBHOOK_SECRET=your_printify_webhook_secret_here
 
 # === Database (REQUIRED) ===
-DATABASE_URL=postgresql://user:password@host/database
-DIRECT_URL=postgresql://user:password@host/database
+DATABASE_URL=<DATABASE_URL>
+DIRECT_URL=<DATABASE_URL>
 
 # === Clerk (REQUIRED) ===
 CLERK_SECRET_KEY=sk_test_your_key
