@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -124,6 +124,87 @@ describe('documentation secret-safety scanner', () => {
     expect(serialized).not.toContain('superSecretValue123');
   });
 
+  it('does not accept production-looking PostgreSQL URLs because one credential component is generic', () => {
+    const cases = [
+      {
+        password: 'realLookingPassword12345',
+        text: 'DATABASE_URL=postgresql://postgres:realLookingPassword12345@db.provider.example.net/app',
+      },
+      {
+        password: 'anotherRealLookingPassword12345',
+        text: 'DATABASE_URL=postgresql://user:anotherRealLookingPassword12345@db.provider.example.net/app',
+      },
+      {
+        password: 'companyPassword12345',
+        text: 'DATABASE_URL=postgresql://username:companyPassword12345@database.company.test/app',
+      },
+    ];
+
+    for (const { password, text } of cases) {
+      const findings = scanDocumentationText(text, 'docs/postgres.md');
+      expect(hasBlockingFindings(findings)).toBe(true);
+      expect(findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            classification: 'confirmed-or-probable-credential',
+            ruleId: 'postgres_connection_url',
+          }),
+        ]),
+      );
+      const serialized = JSON.stringify(findings);
+      expect(serialized).not.toContain(password);
+      expect(serialized).not.toContain(text.split('=')[1]);
+    }
+  });
+
+  it('accepts structurally reserved PostgreSQL placeholder URLs', () => {
+    const findings = scanDocumentationText(
+      [
+        'DATABASE_URL=postgresql://user:password@example.invalid/app',
+        'DATABASE_URL=postgresql://postgres:password@localhost/app',
+      ].join('\n'),
+      'docs/postgres-placeholders.md',
+    );
+
+    expect(hasBlockingFindings(findings)).toBe(false);
+    expect(findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          classification: 'example-placeholder',
+          ruleId: 'postgres_connection_url',
+        }),
+      ]),
+    );
+  });
+
+  it('does not let a same-location finding id authorize a changed credential', () => {
+    const placeholder = scanDocumentationText(
+      'DATABASE_URL=postgresql://user:password@example.invalid/app',
+      'docs/same-location.md',
+    );
+    const changedCredential = scanDocumentationText(
+      'DATABASE_URL=postgresql://user:realLookingPassword12345@db.provider.example.net/app',
+      'docs/same-location.md',
+    );
+
+    expect(placeholder.map((finding) => finding.findingId)).toEqual(
+      changedCredential.map((finding) => finding.findingId),
+    );
+    expect(hasBlockingFindings(placeholder)).toBe(false);
+    expect(hasBlockingFindings(changedCredential)).toBe(true);
+    expect(changedCredential).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          classification: 'confirmed-or-probable-credential',
+          ruleId: 'postgres_connection_url',
+        }),
+      ]),
+    );
+    const serialized = JSON.stringify(changedCredential);
+    expect(serialized).not.toContain('realLookingPassword12345');
+    expect(serialized).not.toContain('db.provider.example.net');
+  });
+
   it('uses non-secret-derived finding ids', () => {
     const first = scanDocumentationText(
       'STRIPE_SECRET_KEY=sk_test_1234567890abcdef1234567890abcdef',
@@ -198,7 +279,7 @@ describe('documentation registry validation', () => {
       JSON.stringify({
         version: 1,
         lastReviewedDate: '2026-07-21',
-        lastReviewedCommit: 'abc',
+        sourceBaselineCommit: 'abc',
         documents: [
           {
             path: path.join(dir, 'doc.md'),
@@ -232,7 +313,7 @@ describe('documentation registry validation', () => {
       JSON.stringify({
         version: 1,
         lastReviewedDate: '2026-07-21',
-        lastReviewedCommit: 'abc',
+        sourceBaselineCommit: 'abc',
         documents: [
           {
             path: path.join(dir, 'doc.md'),
@@ -253,5 +334,21 @@ describe('documentation registry validation', () => {
 
   it('passes the checked-in registry', () => {
     expect(validateDocumentationRegistry()).toEqual([]);
+
+    const registry = JSON.parse(readFileSync('docs/documentation-registry.json', 'utf8')) as {
+      lastReviewedCommit?: string;
+      sourceBaselineCommit?: string;
+      documents: Array<{ path: string; lastVerifiedCommit?: string }>;
+    };
+    expect(registry.sourceBaselineCommit).toBe('4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d');
+    expect(registry.lastReviewedCommit).toBeUndefined();
+    expect(
+      registry.documents.find((doc) => doc.path === 'docs/repository-documentation.md')
+        ?.lastVerifiedCommit,
+    ).toBeUndefined();
+    expect(
+      registry.documents.find((doc) => doc.path === 'docs/documentation-registry.json')
+        ?.lastVerifiedCommit,
+    ).toBeUndefined();
   });
 });

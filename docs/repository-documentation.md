@@ -31,7 +31,8 @@ This is the current entry point for documentation trust. It does not replace sou
 - A document marked `unverified` requires source-code verification before use.
 - A document marked `historical`, `stale`, `unsafe`, or `duplicate` must not be used as current instruction.
 - Secret-like matches in documentation must be reported by path, line, rule, severity, confidence, classification, and a non-secret-derived finding ID only. Values, authorization headers, database URLs, and value-derived hashes must not be printed in terminal output, PRs, Linear, or chat.
-- Existing high-confidence historical/setup findings may be listed as `requires-review` by finding ID only. That is not a credential rotation or cleanup claim; moved or newly introduced high-confidence values must fail check mode.
+- High-confidence credential-like findings must be blocked unless the exact candidate is structurally recognized as a placeholder, redacted value, public identifier, or environment-variable reference. Finding IDs are location identifiers only and must not authorize downgrading a changed candidate at the same path and line.
+- The documentation registry uses `sourceBaselineCommit` to record the audited repository baseline. Newly introduced canonical B1 files intentionally omit `lastVerifiedCommit` until a stable merged commit exists.
 
 ## Known Deferred Work
 

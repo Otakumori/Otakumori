@@ -36,7 +36,7 @@ type RegistryDocument = {
 type DocumentationRegistry = {
   version: number;
   lastReviewedDate: string;
-  lastReviewedCommit: string;
+  sourceBaselineCommit: string;
   documents: RegistryDocument[];
 };
 
@@ -110,35 +110,10 @@ const PLACEHOLDER_RE =
 const SAFE_PUBLIC_VALUE_RE = /^(?:true|false|0|1|localhost|127\.0\.0\.1|null|undefined)$/i;
 const KNOWN_SECRET_VALUE_RE =
   /(?:\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}\b|\bwhsec_[A-Za-z0-9]{16,}\b|\bpostgres(?:ql)?:\/\/[^\s'"`)<>]+)/i;
-
-const REVIEW_REQUIRED_FINDING_IDS = new Set([
-  'DATABASE_SETUP.md:29:postgres_connection_url:0',
-  'DATABASE_SETUP.md:32:postgres_connection_url:0',
-  'DEPLOYMENT.md:54:postgres_connection_url:0',
-  'DEPLOYMENT.md:54:secret_env_assignment:0',
-  'docker-compose.yml:111:secret_env_assignment:0',
-  'LOCAL_SETUP_GUIDE.md:26:postgres_connection_url:0',
-  'LOCAL_SETUP_GUIDE.md:26:secret_env_assignment:0',
-  'LOCAL_SETUP_GUIDE.md:29:postgres_connection_url:0',
-  'LOCAL_SETUP_GUIDE.md:29:secret_env_assignment:0',
-  'LOCAL_SETUP_GUIDE.md:32:secret_env_assignment:0',
-  'LOCAL_SETUP_GUIDE.md:35:postgres_connection_url:0',
-  'LOCAL_SETUP_GUIDE.md:35:secret_env_assignment:0',
-  'LOCAL_SETUP_GUIDE.md:74:postgres_connection_url:0',
-  'PRINTIFY_WEBHOOK_DEBUG.md:112:postgres_connection_url:0',
-  'PRINTIFY_WEBHOOK_DEBUG.md:112:secret_env_assignment:0',
-  'PRODUCTION_DEPLOYMENT.md:11:postgres_connection_url:0',
-  'PRODUCTION_READY_CHECKLIST.md:78:postgres_connection_url:0',
-  'PRODUCTION_READY_CHECKLIST.md:78:secret_env_assignment:0',
-  'RUNE_SYSTEM_SETUP.md:36:postgres_connection_url:0',
-  'SESSION_COMPLETE_PHASES_1-4.md:320:postgres_connection_url:0',
-  'SESSION_COMPLETE_PHASES_1-4.md:320:secret_env_assignment:0',
-  'SESSION_PROGRESS_PHASE_1-3_COMPLETE.md:472:postgres_connection_url:0',
-  'SESSION_PROGRESS_PHASE_1-3_COMPLETE.md:472:secret_env_assignment:0',
-  'setup-local-env.sh:31:secret_env_assignment:0',
-  'setup-local-env.sh:32:secret_env_assignment:0',
-  'upgrade_config.env.example:13:secret_env_assignment:0',
-]);
+const GENERIC_DATABASE_COMPONENT_RE =
+  /^(?:user|username|postgres|pass|password|db|database|dbname|neondb|app)$/i;
+const PLACEHOLDER_TOKEN_RE = /(?:your|placeholder|sample|dummy|project)/i;
+const PLACEHOLDER_COMPONENT_RE = /^(?:your|placeholder|sample|dummy|project|host)$/i;
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
@@ -156,18 +131,45 @@ function isApprovedPlaceholderPostgresUrl(value: string): boolean {
   try {
     const parsed = new URL(value);
     const hostname = parsed.hostname.toLowerCase();
+    const urlText = value.trim();
     const username = decodeURIComponent(parsed.username);
     const password = decodeURIComponent(parsed.password);
+    const databaseName = decodeURIComponent(
+      parsed.pathname.replace(/^\/+/, '').split(/[/?#]/)[0] ?? '',
+    );
+    const hasExplicitPlaceholderSyntax =
+      /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i.test(urlText);
+    const hasPlaceholderToken = PLACEHOLDER_TOKEN_RE.test(
+      [username, password, hostname, databaseName].join(' '),
+    );
+    const hasPlaceholderComponent = [username, password, hostname, databaseName]
+      .flatMap((component) => component.split(/[.\-_:/]+/))
+      .some((component) => PLACEHOLDER_COMPONENT_RE.test(component));
+    const hasEllipsisPlaceholder = urlText.includes('...') || hostname.includes('...');
+    const isSingleLabelLocalHost = !hostname.includes('.') && /^[a-z][a-z0-9_-]*$/i.test(hostname);
+    const hasGenericCredentials =
+      GENERIC_DATABASE_COMPONENT_RE.test(username) && GENERIC_DATABASE_COMPONENT_RE.test(password);
+    const hasOnlyGenericConnectionComponents =
+      hasGenericCredentials && GENERIC_DATABASE_COMPONENT_RE.test(databaseName);
     return (
-      ['localhost', '127.0.0.1', 'example.com'].includes(hostname) ||
+      hasExplicitPlaceholderSyntax ||
+      hasPlaceholderToken ||
+      hasPlaceholderComponent ||
+      hasEllipsisPlaceholder ||
+      ['localhost', '127.0.0.1'].includes(hostname) ||
+      ['example.com', 'example.net', 'example.org'].includes(hostname) ||
+      hostname.endsWith('.example') ||
       hostname.endsWith('.invalid') ||
-      isApprovedPlaceholderValue(username) ||
-      isApprovedPlaceholderValue(password) ||
-      ['user', 'username', 'postgres'].includes(username.toLowerCase()) ||
-      ['pass', 'password'].includes(password.toLowerCase())
+      (isSingleLabelLocalHost && hasGenericCredentials) ||
+      (hostname.includes('neon') && hasOnlyGenericConnectionComponents)
     );
   } catch {
-    return false;
+    return (
+      /(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|%[A-Z0-9_]+%)/i.test(value) ||
+      PLACEHOLDER_TOKEN_RE.test(value) ||
+      /(?:^|[.\-_/@:])host(?:$|[.\-_/@:])/i.test(value) ||
+      value.includes('...')
+    );
   }
 }
 
@@ -187,6 +189,12 @@ function classifyCandidate(ruleId: string, value: string): SecretFinding['classi
     if (/^\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}$/i.test(candidateValue))
       return 'environment-variable-name';
     if (/^[A-Z0-9_]+$/.test(candidateValue)) return 'environment-variable-name';
+    if (
+      /^postgres(?:ql)?:\/\//i.test(candidateValue) &&
+      isApprovedPlaceholderPostgresUrl(candidateValue)
+    ) {
+      return 'example-placeholder';
+    }
     if (KNOWN_SECRET_VALUE_RE.test(candidateValue)) return 'confirmed-or-probable-credential';
   }
   if (ruleId === 'postgres_connection_url') {
@@ -217,18 +225,13 @@ export function scanDocumentationText(text: string, filePath = 'input.txt'): Sec
         const value = match[0];
         const classification = classifyCandidate(rule.id, value);
         const findingId = `${normalizedPath}:${index + 1}:${rule.id}:${matchIndex}`;
-        const reviewedClassification =
-          classification === 'confirmed-or-probable-credential' &&
-          REVIEW_REQUIRED_FINDING_IDS.has(findingId)
-            ? 'requires-review'
-            : classification;
         findings.push({
           path: normalizedPath,
           line: index + 1,
           ruleId: rule.id,
           severity: rule.severity,
           confidence: rule.confidence,
-          classification: reviewedClassification,
+          classification,
           findingId,
         });
         matchIndex += 1;
@@ -297,7 +300,16 @@ export function validateDocumentationRegistry(registryPath = DOC_REGISTRY_PATH):
     return [`Missing documentation registry: ${registryPath}`];
   }
 
-  const registry = JSON.parse(readFileSync(registryPath, 'utf8')) as DocumentationRegistry;
+  const rawRegistry = JSON.parse(readFileSync(registryPath, 'utf8')) as DocumentationRegistry & {
+    lastReviewedCommit?: unknown;
+  };
+  const registry = rawRegistry as DocumentationRegistry;
+  if (!registry.sourceBaselineCommit) {
+    errors.push('registry: missing sourceBaselineCommit');
+  }
+  if ('lastReviewedCommit' in rawRegistry) {
+    errors.push('registry: lastReviewedCommit is inaccurate; use sourceBaselineCommit');
+  }
   const seen = new Set<string>();
   const statusSet = new Set<string>(DOCUMENT_STATUSES);
 

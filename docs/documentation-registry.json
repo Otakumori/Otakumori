@@ -1,7 +1,6 @@
 {
   "version": 1,
   "lastReviewedDate": "2026-07-21",
-  "lastReviewedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
   "documents": [
     {
       "path": "docs/repository-documentation.md",
@@ -9,7 +8,6 @@
       "status": "canonical",
       "owner": "repository-operations",
       "lastVerifiedDate": "2026-07-21",
-      "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
       "maintenance": "manual",
       "verification": "corepack pnpm docs:security:check"
     },
@@ -19,7 +17,6 @@
       "status": "canonical",
       "owner": "repository-operations",
       "lastVerifiedDate": "2026-07-21",
-      "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
       "maintenance": "manual",
       "verification": "corepack pnpm docs:security:check"
     },
@@ -333,5 +330,6 @@
       "warning": "Has contents:write behavior; review before changing schedule or dependency update behavior.",
       "entryPoint": "docs/repository-documentation.md"
     }
-  ]
+  ],
+  "sourceBaselineCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d"
 }
