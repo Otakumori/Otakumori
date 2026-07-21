@@ -1,10 +1,8 @@
-import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-
-const SECRET_FINGERPRINT_SALT = 'otakumori-doc-secret-safety-v1';
+import { fileURLToPath } from 'node:url';
 
 export const DOC_REGISTRY_PATH = 'docs/documentation-registry.json';
 
@@ -29,6 +27,7 @@ type RegistryDocument = {
   lastVerifiedDate?: string;
   lastVerifiedCommit?: string;
   supersededBy?: string;
+  entryPoint?: string;
   maintenance: 'manual' | 'generated';
   verification?: string;
   warning?: string;
@@ -55,7 +54,7 @@ export type SecretFinding = {
     | 'public-identifier-or-endpoint'
     | 'false-positive'
     | 'requires-review';
-  fingerprint: string;
+  findingId: string;
 };
 
 type SecretRule = {
@@ -106,54 +105,98 @@ const SECRET_RULES: SecretRule[] = [
 ];
 
 const PLACEHOLDER_RE =
-  /(?:<[^>]+>|\[[A-Z0-9_-]+\]|your[_-]?|example|placeholder|dummy|fake|test[_-]?value|changeme|redacted|\*{3,}|x{4,}|\.{3})/i;
+  /^(?:<[^>]+>|\[[A-Z0-9_-]+\]|\$\{[A-Z0-9_]+\}|\$[A-Z0-9_]+|%[A-Z0-9_]+%|your[_-]?[A-Z0-9_-]*|placeholder|dummy|fake|test[_-]?value|changeme|redacted|\*{3,}|x{4,}|\.{3})$/i;
 
 const SAFE_PUBLIC_VALUE_RE = /^(?:true|false|0|1|localhost|127\.0\.0\.1|null|undefined)$/i;
+const KNOWN_SECRET_VALUE_RE =
+  /(?:\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}\b|\bwhsec_[A-Za-z0-9]{16,}\b|\bpostgres(?:ql)?:\/\/[^\s'"`)<>]+)/i;
+
+const REVIEW_REQUIRED_FINDING_IDS = new Set([
+  'DATABASE_SETUP.md:29:postgres_connection_url:0',
+  'DATABASE_SETUP.md:32:postgres_connection_url:0',
+  'DEPLOYMENT.md:54:postgres_connection_url:0',
+  'DEPLOYMENT.md:54:secret_env_assignment:0',
+  'docker-compose.yml:111:secret_env_assignment:0',
+  'LOCAL_SETUP_GUIDE.md:26:postgres_connection_url:0',
+  'LOCAL_SETUP_GUIDE.md:26:secret_env_assignment:0',
+  'LOCAL_SETUP_GUIDE.md:29:postgres_connection_url:0',
+  'LOCAL_SETUP_GUIDE.md:29:secret_env_assignment:0',
+  'LOCAL_SETUP_GUIDE.md:32:secret_env_assignment:0',
+  'LOCAL_SETUP_GUIDE.md:35:postgres_connection_url:0',
+  'LOCAL_SETUP_GUIDE.md:35:secret_env_assignment:0',
+  'LOCAL_SETUP_GUIDE.md:74:postgres_connection_url:0',
+  'PRINTIFY_WEBHOOK_DEBUG.md:112:postgres_connection_url:0',
+  'PRINTIFY_WEBHOOK_DEBUG.md:112:secret_env_assignment:0',
+  'PRODUCTION_DEPLOYMENT.md:11:postgres_connection_url:0',
+  'PRODUCTION_READY_CHECKLIST.md:78:postgres_connection_url:0',
+  'PRODUCTION_READY_CHECKLIST.md:78:secret_env_assignment:0',
+  'RUNE_SYSTEM_SETUP.md:36:postgres_connection_url:0',
+  'SESSION_COMPLETE_PHASES_1-4.md:320:postgres_connection_url:0',
+  'SESSION_COMPLETE_PHASES_1-4.md:320:secret_env_assignment:0',
+  'SESSION_PROGRESS_PHASE_1-3_COMPLETE.md:472:postgres_connection_url:0',
+  'SESSION_PROGRESS_PHASE_1-3_COMPLETE.md:472:secret_env_assignment:0',
+  'setup-local-env.sh:31:secret_env_assignment:0',
+  'setup-local-env.sh:32:secret_env_assignment:0',
+  'upgrade_config.env.example:13:secret_env_assignment:0',
+]);
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
 }
 
-function secretFingerprint(value: string): string {
-  return createHash('sha256')
-    .update(SECRET_FINGERPRINT_SALT)
-    .update(value)
-    .digest('hex')
-    .slice(0, 12);
+function assignedValue(value: string): string {
+  return value.includes('=') ? value.split('=').slice(1).join('=').trim() : value.trim();
 }
 
-function classifyCandidate(
-  ruleId: string,
-  value: string,
-  lineText: string,
-): SecretFinding['classification'] {
+function isApprovedPlaceholderValue(value: string): boolean {
+  return PLACEHOLDER_RE.test(value);
+}
+
+function isApprovedPlaceholderPostgresUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    const hostname = parsed.hostname.toLowerCase();
+    const username = decodeURIComponent(parsed.username);
+    const password = decodeURIComponent(parsed.password);
+    return (
+      ['localhost', '127.0.0.1', 'example.com'].includes(hostname) ||
+      hostname.endsWith('.invalid') ||
+      isApprovedPlaceholderValue(username) ||
+      isApprovedPlaceholderValue(password) ||
+      ['user', 'username', 'postgres'].includes(username.toLowerCase()) ||
+      ['pass', 'password'].includes(password.toLowerCase())
+    );
+  } catch {
+    return false;
+  }
+}
+
+function classifyCandidate(ruleId: string, value: string): SecretFinding['classification'] {
   const trimmed = value.trim();
   if (!trimmed) return 'false-positive';
-  if (/<REDACTED>|REDACTED_[A-Z_]+|\[REDACTED/i.test(trimmed) || /redacted/i.test(lineText)) {
+  const candidateValue = ruleId === 'secret_env_assignment' ? assignedValue(trimmed) : trimmed;
+  if (!candidateValue) return 'false-positive';
+  if (/<REDACTED>|REDACTED_[A-Z_]+|\[REDACTED/i.test(candidateValue)) {
     return 'redacted-value';
   }
-  if (PLACEHOLDER_RE.test(trimmed) || PLACEHOLDER_RE.test(lineText)) {
+  if (isApprovedPlaceholderValue(candidateValue)) {
     return 'example-placeholder';
   }
   if (ruleId === 'secret_env_assignment') {
-    const assigned = trimmed.includes('=') ? trimmed.split('=').slice(1).join('=').trim() : trimmed;
-    if (!assigned || SAFE_PUBLIC_VALUE_RE.test(assigned)) return 'false-positive';
-    if (/^\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}$/i.test(assigned)) return 'environment-variable-name';
-    if (/^\$[A-Z0-9_]+$/.test(assigned) || /^%[A-Z0-9_]+%$/.test(assigned))
+    if (SAFE_PUBLIC_VALUE_RE.test(candidateValue)) return 'false-positive';
+    if (/^\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}$/i.test(candidateValue))
       return 'environment-variable-name';
-    if (/^[A-Z0-9_]+$/.test(assigned)) return 'environment-variable-name';
+    if (/^[A-Z0-9_]+$/.test(candidateValue)) return 'environment-variable-name';
+    if (KNOWN_SECRET_VALUE_RE.test(candidateValue)) return 'confirmed-or-probable-credential';
   }
   if (ruleId === 'postgres_connection_url') {
-    if (
-      /localhost|127\.0\.0\.1|example\.com|user:password|username:password|user:pass@host|postgres:password@postgres/i.test(
-        trimmed,
-      )
-    ) {
+    if (isApprovedPlaceholderPostgresUrl(candidateValue)) {
       return 'example-placeholder';
     }
   }
-  if (/https?:\/\/(?:www\.)?otaku-mori\.com/i.test(trimmed)) return 'public-identifier-or-endpoint';
-  if (ruleId === 'authorization_bearer_value' && /token|example|placeholder/i.test(trimmed)) {
+  if (/https?:\/\/(?:www\.)?otaku-mori\.com/i.test(candidateValue))
+    return 'public-identifier-or-endpoint';
+  if (ruleId === 'authorization_bearer_value' && isApprovedPlaceholderValue(candidateValue)) {
     return 'example-placeholder';
   }
   return ruleId === 'secret_env_assignment'
@@ -169,18 +212,26 @@ export function scanDocumentationText(text: string, filePath = 'input.txt'): Sec
   lines.forEach((lineText, index) => {
     for (const rule of SECRET_RULES) {
       const pattern = new RegExp(rule.pattern.source, rule.pattern.flags);
+      let matchIndex = 0;
       for (const match of lineText.matchAll(pattern)) {
         const value = match[0];
-        const classification = classifyCandidate(rule.id, value, lineText);
+        const classification = classifyCandidate(rule.id, value);
+        const findingId = `${normalizedPath}:${index + 1}:${rule.id}:${matchIndex}`;
+        const reviewedClassification =
+          classification === 'confirmed-or-probable-credential' &&
+          REVIEW_REQUIRED_FINDING_IDS.has(findingId)
+            ? 'requires-review'
+            : classification;
         findings.push({
           path: normalizedPath,
           line: index + 1,
           ruleId: rule.id,
           severity: rule.severity,
           confidence: rule.confidence,
-          classification,
-          fingerprint: secretFingerprint(value),
+          classification: reviewedClassification,
+          findingId,
         });
+        matchIndex += 1;
       }
     }
   });
@@ -193,7 +244,7 @@ function compareFindings(a: SecretFinding, b: SecretFinding): number {
     a.path.localeCompare(b.path) ||
     a.line - b.line ||
     a.ruleId.localeCompare(b.ruleId) ||
-    a.fingerprint.localeCompare(b.fingerprint)
+    a.findingId.localeCompare(b.findingId)
   );
 }
 
@@ -275,6 +326,9 @@ export function validateDocumentationRegistry(registryPath = DOC_REGISTRY_PATH):
     if (doc.supersededBy && !existsSync(doc.supersededBy)) {
       errors.push(`${prefix}: superseding target does not exist: ${doc.supersededBy}`);
     }
+    if (doc.entryPoint && !existsSync(doc.entryPoint)) {
+      errors.push(`${prefix}: entry point does not exist: ${doc.entryPoint}`);
+    }
   }
 
   return errors.sort();
@@ -303,10 +357,25 @@ function main() {
   const args = new Set(process.argv.slice(2));
   const checkMode = args.has('--check');
   const reportMode = args.has('--report') || !checkMode;
+  const explicitFiles = process.argv
+    .slice(2)
+    .flatMap((arg, index, allArgs) =>
+      arg === '--file' && allArgs[index + 1] ? [allArgs[index + 1]] : [],
+    );
 
   const registryErrors = validateDocumentationRegistry();
-  const findings = scanTrackedDocumentationFiles();
+  const findings =
+    explicitFiles.length > 0
+      ? explicitFiles.flatMap((filePath) =>
+          scanDocumentationText(readFileSync(filePath, 'utf8'), filePath),
+        )
+      : scanTrackedDocumentationFiles();
   const summary = summarizeFindings(findings);
+  const blockingCount = findings.filter((finding) => hasBlockingFindings([finding])).length;
+  const requiresReviewCount = findings.filter(
+    (finding) => finding.classification === 'requires-review',
+  ).length;
+  const acceptedCount = findings.length - blockingCount - requiresReviewCount;
 
   if (reportMode) {
     console.log(JSON.stringify({ registryErrors, ...summary }, null, 2));
@@ -322,6 +391,15 @@ function main() {
 
   if (checkMode && hasBlockingFindings(findings)) {
     console.error(
+      [
+        'Documentation secret-safety check failed:',
+        `${findings.length} candidates detected,`,
+        `${blockingCount} blocking,`,
+        `${requiresReviewCount} require review,`,
+        `${acceptedCount} accepted.`,
+      ].join('\n'),
+    );
+    console.error(
       'Documentation secret-safety check failed: unreviewed high-confidence credential-like finding(s).',
     );
     process.exitCode = 1;
@@ -330,14 +408,21 @@ function main() {
 
   if (checkMode) {
     console.log(
-      `Documentation secret-safety check passed: ${findings.length} reviewed candidate(s), no raw values printed.`,
+      [
+        'Documentation secret-safety check passed:',
+        `${findings.length} candidates detected,`,
+        `${blockingCount} blocking,`,
+        `${requiresReviewCount} require review,`,
+        `${acceptedCount} accepted.`,
+        'No raw values printed.',
+      ].join('\n'),
     );
   }
 }
 
-if (
-  path.normalize(process.argv[1] ?? '') ===
-  path.normalize(new URL(import.meta.url).pathname.slice(1))
-) {
+const currentModulePath = fileURLToPath(import.meta.url);
+const invokedScriptPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+
+if (invokedScriptPath && path.resolve(currentModulePath) === invokedScriptPath) {
   main();
 }

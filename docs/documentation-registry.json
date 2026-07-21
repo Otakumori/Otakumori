@@ -30,10 +30,10 @@
       "owner": "brand",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
       "verification": "manual review",
-      "warning": "Use for brand and product context only; do not treat as the current operational runbook."
+      "warning": "Use for brand and product context only; do not treat as the current operational runbook.",
+      "entryPoint": "docs/repository-documentation.md"
     },
     {
       "path": "docs/APIS.md",
@@ -66,10 +66,10 @@
       "owner": "database",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
       "verification": "manual review",
-      "warning": "Prisma connection guidance only; migrations require the guarded Production workflow."
+      "warning": "Prisma connection guidance only; migrations require the guarded Production workflow.",
+      "entryPoint": "docs/repository-documentation.md"
     },
     {
       "path": "docs/AUDIT.md",
@@ -294,9 +294,9 @@
       "owner": "ci",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
-      "verification": "manual workflow audit"
+      "verification": "manual workflow audit",
+      "entryPoint": "docs/repository-documentation.md"
     },
     {
       "path": ".github/workflows/api-health-check.yml",
@@ -305,9 +305,9 @@
       "owner": "ci",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
-      "verification": "manual workflow audit"
+      "verification": "manual workflow audit",
+      "entryPoint": "docs/repository-documentation.md"
     },
     {
       "path": ".github/workflows/production-prisma-migrate.yml",
@@ -316,10 +316,10 @@
       "owner": "database",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
       "verification": "manual workflow audit",
-      "warning": "Only approved controlled Production Prisma workflow; never replace with manual SQL."
+      "warning": "Only approved controlled Production Prisma workflow; never replace with manual SQL.",
+      "entryPoint": "docs/repository-documentation.md"
     },
     {
       "path": ".github/workflows/update-browser-data.yml",
@@ -328,10 +328,10 @@
       "owner": "ci",
       "lastVerifiedDate": "2026-07-21",
       "lastVerifiedCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d",
-      "supersededBy": "docs/repository-documentation.md",
       "maintenance": "manual",
       "verification": "manual workflow audit",
-      "warning": "Has contents:write behavior; review before changing schedule or dependency update behavior."
+      "warning": "Has contents:write behavior; review before changing schedule or dependency update behavior.",
+      "entryPoint": "docs/repository-documentation.md"
     }
   ]
 }

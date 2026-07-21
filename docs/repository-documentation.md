@@ -30,7 +30,8 @@ This is the current entry point for documentation trust. It does not replace sou
 - A document marked `current-reference` can support implementation but must be checked against code and tests.
 - A document marked `unverified` requires source-code verification before use.
 - A document marked `historical`, `stale`, `unsafe`, or `duplicate` must not be used as current instruction.
-- Secret-like matches in documentation must be reported by path, line, rule, severity, confidence, classification, and redacted fingerprint only. Values must not be printed in terminal output, PRs, Linear, or chat.
+- Secret-like matches in documentation must be reported by path, line, rule, severity, confidence, classification, and a non-secret-derived finding ID only. Values, authorization headers, database URLs, and value-derived hashes must not be printed in terminal output, PRs, Linear, or chat.
+- Existing high-confidence historical/setup findings may be listed as `requires-review` by finding ID only. That is not a credential rotation or cleanup claim; moved or newly introduced high-confidence values must fail check mode.
 
 ## Known Deferred Work
 
