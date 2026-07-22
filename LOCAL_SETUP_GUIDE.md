@@ -32,7 +32,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # DATABASE_URL=postgresql://postgres:password@localhost:5432/otakumori_dev
 
 # Placeholder - replace with your actual database URL
-DATABASE_URL=postgresql://username:password@host:port/database
+DATABASE_URL=<DATABASE_URL>
 
 # Clerk Authentication (REQUIRED)
 # Get these from https://dashboard.clerk.com/

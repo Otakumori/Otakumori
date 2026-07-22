@@ -8,7 +8,7 @@ Ensure these are set in your Vercel project:
 
 ```bash
 # Database
-DATABASE_URL="postgresql://username:password@host:port/database"
+DATABASE_URL="<DATABASE_URL>"
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...

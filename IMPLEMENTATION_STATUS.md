@@ -134,7 +134,7 @@ The build fails on Prisma validation (unrelated to avatar code). To fix:
 1. **Option A**: Update `.env` with valid DATABASE_URL
 
    ```env
-   DATABASE_URL="postgresql://user:password@host:5432/db"
+   DATABASE_URL="<DATABASE_URL>"
    ```
 
 2. **Option B**: Skip Prisma validation temporarily

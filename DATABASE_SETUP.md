@@ -26,10 +26,10 @@ Open `.env` and add:
 ```env
 # Neon PostgreSQL Connection
 # Get this from: https://console.neon.tech/ → Your Project → Connection Details
-DATABASE_URL="postgresql://otakumori_owner:npg_xxxxxxxxxxxxx@ep-project-name.us-east-2.aws.neon.tech/otakumori?sslmode=require"
+DATABASE_URL="<DATABASE_URL>"
 
 # Same URL for DIRECT_URL (used for migrations)
-DIRECT_URL="postgresql://otakumori_owner:npg_xxxxxxxxxxxxx@ep-project-name.us-east-2.aws.neon.tech/otakumori?sslmode=require"
+DIRECT_URL="<DATABASE_URL>"
 ```
 
 ### Step 3: Find Your Actual Neon Connection String
@@ -41,7 +41,7 @@ DIRECT_URL="postgresql://otakumori_owner:npg_xxxxxxxxxxxxx@ep-project-name.us-ea
 3. Click **"Connection Details"** or **"Quickstart"**
 4. Copy the connection string that looks like:
    ```
-   postgresql://username:password@ep-xxx.region.aws.neon.tech/dbname
+   <DATABASE_URL>
    ```
 
 **Option B: From Vercel Environment Variables**

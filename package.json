@@ -189,6 +189,7 @@
     "gen:pack": "tsx scripts/gen-pack.ts",
     "api:health": "tsx scripts/api-health-check.ts",
     "api:test": "npm run api:health",
+    "docs:security:check": "tsx scripts/docs-security-check.ts --check",
     "db:test": "tsx scripts/test-database.ts",
     "stress-test:db": "tsx scripts/stress-test-db.ts",
     "performance:audit": "tsx scripts/performance-audit.ts",
