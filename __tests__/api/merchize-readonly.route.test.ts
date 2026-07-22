@@ -128,6 +128,15 @@ function preflightSummary() {
       productCount: 1,
       sampleKeys: ['data'],
     },
+    catalogScope: 'fulfillment_blank_catalog',
+    completeness: 'complete',
+    pagination: {
+      total: 1,
+      limit: 1,
+      page: 1,
+      loadedCount: 1,
+      completeness: 'complete',
+    },
     productCount: 1,
     normalizedProductCount: 1,
     variantCount: 2,
@@ -138,8 +147,16 @@ function preflightSummary() {
     duplicateProductIdCount: 0,
     duplicateSkuCount: 0,
     payloadShapeKeys: ['data'],
-    safeToImport: true,
-    issues: [],
+    safeToNormalize: true,
+    safeToImport: false,
+    issues: [
+      {
+        code: 'unsupported_provider_catalog_scope',
+        message:
+          'The connected Merchize endpoint is the fulfillment blank catalog, not a verified seller-created product source.',
+        count: 1,
+      },
+    ],
     products: [
       {
         provider: 'merchize',
@@ -244,7 +261,10 @@ describe('Merchize read-only admin routes', () => {
       normalizedProductCount: 1,
       variantCount: 2,
       imageCount: 1,
-      safeToImport: true,
+      catalogScope: 'fulfillment_blank_catalog',
+      completeness: 'complete',
+      safeToNormalize: true,
+      safeToImport: false,
     });
     expect(json.data.products[0]).toMatchObject({
       provider: 'merchize',

@@ -1,10 +1,17 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { db } from '@/app/lib/db';
-import { getMerchizeService, type MerchizeProduct } from '@/app/lib/merchize/service';
+import {
+  getMerchizeService,
+  type MerchizeCatalogCompleteness,
+  type MerchizeCatalogPagination,
+  type MerchizeCatalogScope,
+  type MerchizeProduct,
+  type MerchizeProductCollection,
+} from '@/app/lib/merchize/service';
 import { env } from '@/env/server';
 import { providerProductRef } from '@/lib/catalog/provider';
 
-export const MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION = 'merchize-hidden-local-import-v1';
+export const MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION = 'merchize-hidden-local-import-v2';
 export const MERCHIZE_HIDDEN_IMPORT_PROVIDER = 'merchize';
 export const MERCHIZE_HIDDEN_IMPORT_MODE = 'hidden_local_import';
 
@@ -66,6 +73,9 @@ export type MerchizeImportPreflight = {
   provider: 'merchize';
   mode: 'import_preflight';
   manifestVersion: typeof MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION;
+  catalogScope: MerchizeCatalogScope;
+  completeness: MerchizeCatalogCompleteness;
+  pagination: MerchizeCatalogPagination;
   productCount: number;
   normalizedProductCount: number;
   wouldInsert: number;
@@ -158,6 +168,9 @@ export type MerchizeHiddenImportManifest = {
   version: typeof MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION;
   provider: 'merchize';
   mode: 'hidden_local_import';
+  catalogScope: MerchizeCatalogScope;
+  completeness: MerchizeCatalogCompleteness;
+  pagination: MerchizeCatalogPagination;
   productCount: number;
   normalizedProductCount: number;
   wouldInsert: number;
@@ -185,6 +198,13 @@ type ExistingProviderVariant = {
 
 type MerchizeImportPreflightOptions = {
   now?: Date;
+  sourceContext?: MerchizeImportSourceContext;
+};
+
+export type MerchizeImportSourceContext = {
+  catalogScope: MerchizeCatalogScope;
+  completeness: MerchizeCatalogCompleteness;
+  pagination: MerchizeCatalogPagination;
 };
 
 type ImageValidationResult = {
@@ -192,6 +212,62 @@ type ImageValidationResult = {
   unsafeCount: number;
   duplicateCount: number;
 };
+
+function sourceContextFromProducts(
+  products: MerchizeProduct[],
+  overrides: Partial<MerchizeImportSourceContext> = {},
+): MerchizeImportSourceContext {
+  const loadedCount = products.length;
+  const pagination = overrides.pagination ?? {
+    total: null,
+    limit: null,
+    page: null,
+    loadedCount,
+    completeness: overrides.completeness ?? 'unknown',
+  };
+
+  return {
+    catalogScope: overrides.catalogScope ?? 'unknown',
+    completeness: overrides.completeness ?? pagination.completeness,
+    pagination: {
+      total: pagination.total,
+      limit: pagination.limit,
+      page: pagination.page,
+      loadedCount: pagination.loadedCount,
+      completeness: overrides.completeness ?? pagination.completeness,
+    },
+  };
+}
+
+function sourceContextFromCollection(
+  collection: MerchizeProductCollection,
+): MerchizeImportSourceContext {
+  return {
+    catalogScope: collection.catalogScope,
+    completeness: collection.pagination.completeness,
+    pagination: collection.pagination,
+  };
+}
+
+function sourceIssueCodes(sourceContext: MerchizeImportSourceContext): string[] {
+  const issues: string[] = [];
+
+  if (sourceContext.catalogScope !== 'seller_products') {
+    issues.push('unsupported_provider_catalog_scope');
+  }
+
+  if (sourceContext.completeness !== 'complete') {
+    issues.push('provider_catalog_completeness_unverified');
+  }
+
+  return issues;
+}
+
+export function merchizeImportSourceIsVerified(
+  manifest: Pick<MerchizeHiddenImportManifest, 'catalogScope' | 'completeness'>,
+): boolean {
+  return manifest.catalogScope === 'seller_products' && manifest.completeness === 'complete';
+}
 
 export class MerchizeImportPreflightSigningError extends Error {
   constructor(message = 'Merchize import preflight signing secret is not configured.') {
@@ -467,6 +543,10 @@ function merchizeIssueMessage(code: string): string {
       return 'A Merchize product has more images than the hidden import limit.';
     case 'field_length_exceeded':
       return 'A Merchize product contains a field longer than the hidden import limit.';
+    case 'unsupported_provider_catalog_scope':
+      return 'The connected Merchize endpoint is the fulfillment blank catalog, not a verified seller-created product source.';
+    case 'provider_catalog_completeness_unverified':
+      return 'Merchize pagination metadata does not prove a complete seller-product catalog.';
     default:
       return 'A Merchize product is not ready for import planning.';
   }
@@ -812,6 +892,9 @@ function preflightFromManifest(
     provider: 'merchize',
     mode: 'import_preflight',
     manifestVersion: manifest.version,
+    catalogScope: manifest.catalogScope,
+    completeness: manifest.completeness,
+    pagination: manifest.pagination,
     productCount: manifest.productCount,
     normalizedProductCount: manifest.normalizedProductCount,
     wouldInsert: manifest.wouldInsert,
@@ -829,8 +912,10 @@ function preflightFromManifest(
 
 export async function buildMerchizeHiddenImportManifestForProducts(
   products: MerchizeProduct[],
+  sourceContext = sourceContextFromProducts(products),
 ): Promise<MerchizeHiddenImportManifest> {
   const candidateProducts = products.slice(0, MAX_PROVIDER_PRODUCTS);
+  const catalogTooLarge = products.length > MAX_PROVIDER_PRODUCTS;
   const providerProductIds = candidateProducts.map((product) =>
     coerceRequiredText(product.providerProductId),
   );
@@ -892,15 +977,31 @@ export async function buildMerchizeHiddenImportManifestForProducts(
       .filter((value): value is string => Boolean(value)),
   );
 
-  const manifestProducts = candidateProducts.map((product) =>
-    canonicalizeProduct({
-      product,
-      duplicateProductIds,
-      printifyProductConflicts,
-      printifyVariantConflicts,
-      existingProductsByRef,
-    }),
-  );
+  const importSourceIssues = sourceIssueCodes(sourceContext);
+  const operationBlockingIssues = [
+    ...importSourceIssues,
+    ...(catalogTooLarge ? ['provider_catalog_too_large'] : []),
+  ];
+  const operationBlocked = operationBlockingIssues.length > 0;
+  const manifestProducts = candidateProducts
+    .map((product) =>
+      canonicalizeProduct({
+        product,
+        duplicateProductIds,
+        printifyProductConflicts,
+        printifyVariantConflicts,
+        existingProductsByRef,
+      }),
+    )
+    .map((product) =>
+      operationBlocked
+        ? {
+            ...product,
+            action: 'blocked' as const,
+            issues: [...new Set([...product.issues, ...operationBlockingIssues])].sort(),
+          }
+        : product,
+    );
   let issues = summarizeIssues(manifestProducts);
 
   if (products.length === 0) {
@@ -919,8 +1020,10 @@ export async function buildMerchizeHiddenImportManifestForProducts(
     });
   }
 
-  issues = issues.sort((a, b) => a.code.localeCompare(b.code));
-  const catalogTooLarge = products.length > MAX_PROVIDER_PRODUCTS;
+  issues = [...new Map(issues.map((issue) => [issue.code, issue])).values()].sort((a, b) =>
+    a.code.localeCompare(b.code),
+  );
+  const sourceNotVerified = !merchizeImportSourceIsVerified(sourceContext);
   const wouldBlock = catalogTooLarge
     ? products.length
     : manifestProducts.filter((product) => product.action === 'blocked').length;
@@ -938,6 +1041,9 @@ export async function buildMerchizeHiddenImportManifestForProducts(
     version: MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
     provider: 'merchize',
     mode: 'hidden_local_import',
+    catalogScope: sourceContext.catalogScope,
+    completeness: sourceContext.completeness,
+    pagination: sourceContext.pagination,
     productCount: products.length,
     normalizedProductCount: products.length,
     wouldInsert,
@@ -945,7 +1051,11 @@ export async function buildMerchizeHiddenImportManifestForProducts(
     wouldSkip,
     wouldBlock,
     safeToImport:
-      products.length > 0 && !catalogTooLarge && wouldBlock === 0 && issues.length === 0,
+      products.length > 0 &&
+      !catalogTooLarge &&
+      !sourceNotVerified &&
+      wouldBlock === 0 &&
+      issues.length === 0,
     issues,
     products: manifestProducts,
   };
@@ -955,7 +1065,10 @@ export async function buildMerchizeImportPreflightForProducts(
   products: MerchizeProduct[],
   options: MerchizeImportPreflightOptions = {},
 ): Promise<MerchizeImportPreflight> {
-  const manifest = await buildMerchizeHiddenImportManifestForProducts(products);
+  const manifest = await buildMerchizeHiddenImportManifestForProducts(
+    products,
+    options.sourceContext,
+  );
   return preflightFromManifest(manifest, options);
 }
 
@@ -963,11 +1076,14 @@ export async function loadMerchizeImportPlan(): Promise<{
   preflight: MerchizeImportPreflight;
   manifest: MerchizeHiddenImportManifest;
 }> {
-  const products = await getMerchizeService().getProducts({
+  const collection = await getMerchizeService().getProductCollection({
     limit: MAX_PROVIDER_PRODUCTS + 1,
     page: 1,
   });
-  const manifest = await buildMerchizeHiddenImportManifestForProducts(products);
+  const manifest = await buildMerchizeHiddenImportManifestForProducts(
+    collection.products,
+    sourceContextFromCollection(collection),
+  );
   return {
     preflight: preflightFromManifest(manifest, {}),
     manifest,

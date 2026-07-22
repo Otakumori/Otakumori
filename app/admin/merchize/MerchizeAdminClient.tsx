@@ -130,11 +130,13 @@ export default function MerchizeAdminClient() {
           <div>
             <h2 className="text-xl font-medium">Read-only catalog preflight</h2>
             <p className="mt-2 max-w-3xl text-sm text-white/65">
-              Runs Merchize GET-only diagnostics, normalizes product shape, and reports import
-              readiness. This page does not write to Merchize or the Otakumori database.
+              Runs Merchize GET-only diagnostics, normalizes product shape, and reports source
+              scope. The current catalog endpoint is useful for connectivity diagnostics, but it is
+              not treated as a verified seller-product import source.
             </p>
             <p className="mt-3 rounded-xl border border-pink-300/20 bg-pink-400/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-pink-100">
-              Read-only diagnostics. No import has run. No provider write has run.
+              Read-only diagnostics. No import has run. No provider write has run. Seller-product
+              source verification is required before import.
             </p>
           </div>
           <button
@@ -172,8 +174,18 @@ export default function MerchizeAdminClient() {
               <StatCard label="Products missing price" value={summary.productsMissingPrice} />
               <StatCard label="Duplicate product IDs" value={summary.duplicateProductIdCount} />
               <StatCard label="Duplicate SKUs" value={summary.duplicateSkuCount} />
+              <StatCard label="Catalog scope" value={summary.catalogScope} />
+              <StatCard label="Completeness" value={summary.completeness} />
+              <StatCard label="Safe to normalize" value={summary.safeToNormalize} />
               <StatCard label="Safe to import" value={summary.safeToImport} />
             </div>
+
+            {summary.catalogScope !== 'seller_products' ? (
+              <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 p-4 text-amber-100">
+                Provider connection succeeded and the fulfillment catalog normalized, but the
+                seller-created product source is not verified. Import remains blocked.
+              </div>
+            ) : null}
 
             {summary.issues.length > 0 ? (
               <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 p-4">
@@ -248,8 +260,8 @@ export default function MerchizeAdminClient() {
             <h2 className="text-xl font-medium">Import readiness preflight</h2>
             <p className="mt-2 max-w-3xl text-sm text-white/65">
               Read-only preflight. No import has run. No provider write has run. Merchize products
-              are not purchasable. A later Phase 4D PR will add a separate hidden local import plan
-              with its own confirmation flow.
+              are not purchasable. This preflight blocks unless the source is a verified
+              seller-product catalog with complete pagination.
             </p>
             <p className="mt-3 rounded-xl border border-amber-300/20 bg-amber-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">
               Dry run only. No database write. No checkout or fulfillment enablement.
@@ -287,6 +299,8 @@ export default function MerchizeAdminClient() {
               <StatCard label="Would update" value={importSummary.wouldUpdate} />
               <StatCard label="Would skip" value={importSummary.wouldSkip} />
               <StatCard label="Would block" value={importSummary.wouldBlock} />
+              <StatCard label="Catalog scope" value={importSummary.catalogScope} />
+              <StatCard label="Completeness" value={importSummary.completeness} />
               <StatCard label="Safe to import hidden" value={importSummary.safeToImport} />
             </div>
 
