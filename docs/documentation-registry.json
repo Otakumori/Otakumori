@@ -21,6 +21,24 @@
       "verification": "corepack pnpm docs:security:check"
     },
     {
+      "path": "AGENTS.md",
+      "domain": "repository-operations",
+      "status": "canonical",
+      "owner": "repository-operations",
+      "lastVerifiedDate": "2026-07-22",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
+    },
+    {
+      "path": "docs/repository-validation.md",
+      "domain": "repository-validation",
+      "status": "canonical",
+      "owner": "repository-operations",
+      "lastVerifiedDate": "2026-07-22",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
+    },
+    {
       "path": "README.md",
       "domain": "product-brand",
       "status": "current-reference",
