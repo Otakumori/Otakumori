@@ -42,8 +42,9 @@ from the task assumptions.
 
 Use a clean worktree and a dedicated branch. Keep changed files minimal. Do not perform
 opportunistic refactors, unrelated formatting sweeps, or stale-branch reuse. Do not modify
-PR #68 or PR #41 unless the owner explicitly authorizes that exact work. Harness B2 does not
-authorize OTA-25 identity implementation.
+unrelated open pull requests or begin a later program phase unless the current task explicitly
+places that work in scope. Any merge, provider, database, environment, deployment, credential,
+or other mutation still requires the applicable owner approval.
 
 ## Secret Handling
 
@@ -147,7 +148,7 @@ Every completion report must include:
   occurred.
 - Neon state when relevant.
 - Supabase state when relevant.
-- PR #68 and PR #41 status when relevant.
+- Related open pull request status when relevant.
 - Remaining owner actions.
 - Full safety confirmation.
 

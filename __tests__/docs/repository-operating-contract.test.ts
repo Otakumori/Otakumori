@@ -47,7 +47,7 @@ describe('repository operating contract', () => {
     expect(validateDocumentationRegistry()).toEqual([]);
 
     const registry = readRegistry();
-    expect(registry.sourceBaselineCommit).toBe('4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d');
+    expect(registry.sourceBaselineCommit).toBe('4dd488f5a681d169615e637366872057ee2e7429');
     expect(registry.documents).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -99,9 +99,10 @@ describe('repository operating contract', () => {
       expect(approvalSection).toContain(requiredPhrase);
     }
 
-    expect(agents).toContain('PR #68');
-    expect(agents).toContain('PR #41');
-    expect(agents).toMatch(/Harness B2 does not\s+authorize OTA-25 identity implementation/);
+    expect(agents).toContain('unrelated open pull requests');
+    expect(agents).toContain('begin a later program phase');
+    expect(agents).toContain('unless the current task explicitly');
+    expect(agents).toContain('other mutation still requires the applicable owner approval');
   });
 
   it('keeps validation tiers focused on safe command groups', () => {
@@ -120,6 +121,10 @@ describe('repository operating contract', () => {
     ]) {
       expect(validation).toContain(tier);
     }
+
+    expect(validation).toMatch(
+      /A validation tier does not authorize implementation or dashboard changes\s+outside the current task's approved scope\./,
+    );
 
     for (const command of [
       'corepack pnpm docs:security:check',

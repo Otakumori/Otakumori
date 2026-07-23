@@ -65,7 +65,8 @@ Require:
 - Owner-side browser verification when dashboard or session behavior is material.
 
 Do not change Clerk dashboard settings without separate owner approval. Do not run authenticated
-destructive smoke tests. Harness B2 does not authorize auth implementation changes.
+destructive smoke tests. A validation tier does not authorize implementation or dashboard changes
+outside the current task's approved scope.
 
 ## Tier 5 - Provider, Checkout, Order, Or Fulfillment Change
 
