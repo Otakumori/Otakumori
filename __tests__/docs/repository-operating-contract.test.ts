@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { validateDocumentationRegistry } from '@/scripts/docs-security-check';
 
 type Registry = {
+  lastReviewedDate: string;
   sourceBaselineCommit: string;
   documents: Array<{
     path: string;
@@ -18,6 +19,7 @@ type Registry = {
 const AGENTS_PATH = 'AGENTS.md';
 const VALIDATION_PATH = 'docs/repository-validation.md';
 const REGISTRY_PATH = 'docs/documentation-registry.json';
+const TRUTH_INDEX_PATH = 'docs/repository-documentation.md';
 
 function readText(path: string) {
   return readFileSync(path, 'utf8');
@@ -47,7 +49,16 @@ describe('repository operating contract', () => {
     expect(validateDocumentationRegistry()).toEqual([]);
 
     const registry = readRegistry();
+    const truthIndex = readText(TRUTH_INDEX_PATH);
+    const reviewedDate = truthIndex.match(/^Last reviewed: (\d{4}-\d{2}-\d{2}) /m)?.[1];
+
+    expect(reviewedDate).toBeDefined();
+    expect(registry.lastReviewedDate).toBe(reviewedDate);
     expect(registry.sourceBaselineCommit).toBe('4dd488f5a681d169615e637366872057ee2e7429');
+    expect(truthIndex).not.toContain('canonical B1 files');
+    expect(truthIndex).toContain(
+      'Newly introduced canonical documents omit `lastVerifiedCommit` until they exist at a stable merged commit that has been verified.',
+    );
     expect(registry.documents).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

@@ -38,7 +38,7 @@ This is the current entry point for documentation trust. It does not replace sou
 - A document marked `historical`, `stale`, `unsafe`, or `duplicate` must not be used as current instruction.
 - Secret-like matches in documentation must be reported by path, line, rule, severity, confidence, classification, and a non-secret-derived finding ID only. Values, authorization headers, database URLs, and value-derived hashes must not be printed in terminal output, PRs, Linear, or chat.
 - High-confidence credential-like findings must be blocked unless the exact candidate is structurally recognized as a placeholder, redacted value, public identifier, or environment-variable reference. Finding IDs are location identifiers only and must not authorize downgrading a changed candidate at the same path and line.
-- The documentation registry uses `sourceBaselineCommit` to record the audited repository baseline. Newly introduced canonical B1 files intentionally omit `lastVerifiedCommit` until a stable merged commit exists.
+- The documentation registry uses `sourceBaselineCommit` to record the audited repository baseline. Newly introduced canonical documents omit `lastVerifiedCommit` until they exist at a stable merged commit that has been verified.
 
 ## Known Deferred Work
 
