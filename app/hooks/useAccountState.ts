@@ -60,22 +60,24 @@ export function useAccountState() {
   const [clientTimedOut, setClientTimedOut] = useState(false);
 
   useEffect(() => {
-    if (auth.isLoaded) {
+    if (auth.status !== 'loading') {
       setClientTimedOut(false);
       return undefined;
     }
 
     const timer = window.setTimeout(() => setClientTimedOut(true), CLERK_CLIENT_RECOVERY_MS);
     return () => window.clearTimeout(timer);
-  }, [auth.isLoaded]);
+  }, [auth.status]);
 
   return useMemo(() => {
     const user = auth.user as ClerkLikeUser | null;
     const email = accountEmail(user);
     const username = publicUsername(user);
-    const isUnavailable = !auth.isLoaded && clientTimedOut;
+    const isUnavailable = auth.status === 'unavailable' || clientTimedOut;
+    const status = isUnavailable ? 'unavailable' : auth.status;
 
     return {
+      status,
       isLoaded: auth.isLoaded,
       isSignedIn: auth.isSignedIn,
       isUnavailable,

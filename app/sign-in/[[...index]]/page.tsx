@@ -1,22 +1,18 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { SignIn } from '@clerk/nextjs';
-import { useSearchParams } from 'next/navigation';
+import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
-export default function SignInPage() {
-  const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect_url') || '/';
+type AuthRedirectPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-md p-6">
-        <SignIn
-          routing="path"
-          path="/sign-in"
-          signUpUrl="/sign-up"
-          fallbackRedirectUrl={redirectUrl}
-        />
-      </div>
-    </div>
-  );
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function SignInPage({ searchParams }: AuthRedirectPageProps) {
+  const params = (await searchParams) ?? {};
+  const returnUrl = firstParam(params.redirect_url) ?? firstParam(params.redirect) ?? '/';
+
+  redirect(buildCanonicalSignInUrl(returnUrl, FALLBACK_APP_ORIGIN));
 }

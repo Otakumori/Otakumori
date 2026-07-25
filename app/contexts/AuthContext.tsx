@@ -6,6 +6,8 @@ import { type User } from '@clerk/nextjs/server';
 import { OnboardingModal } from '@/app/components/onboarding/OnboardingModal';
 import { buildCanonicalSignInUrl, buildCanonicalSignUpUrl } from '@/app/lib/auth/accountUrls';
 
+export type AuthSessionStatus = 'loading' | 'signed-out' | 'signed-in' | 'unavailable';
+
 interface AuthModalState {
   isOpen: boolean;
   action: 'sign-in' | 'sign-up' | 'profile' | null;
@@ -15,11 +17,13 @@ interface AuthModalState {
 
 interface AuthContextType {
   user: User | null;
+  status: AuthSessionStatus;
+  authError: string | null;
   isLoaded: boolean;
   isSignedIn: boolean;
   isAdmin: boolean;
   isLoading: boolean;
-  signOut: () => Promise<void>;
+  signOut: (options?: { redirectUrl?: string }) => Promise<void>;
   redirectToSignIn: (redirectUrl?: string) => void;
   redirectToSignUp: (redirectUrl?: string) => void;
 
@@ -50,19 +54,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Safely use Clerk hooks with error handling
   let user: User | null = null;
   let isLoaded = false;
-  let signOut: (() => Promise<void>) | undefined;
+  let signOut: AuthContextType['signOut'] | undefined;
+  let authError: string | null = null;
 
   try {
     const clerkUser = useUser();
     const clerkAuth = useAuth();
     user = clerkUser.user as User | null;
     isLoaded = clerkUser.isLoaded;
-    signOut = clerkAuth.signOut;
-  } catch {
-    // Clerk is not available, use mock state
-    isLoaded = true;
+    signOut = clerkAuth.signOut as AuthContextType['signOut'];
+  } catch (error) {
+    authError = error instanceof Error ? error.name : 'ClerkClientUnavailable';
+    console.warn('Clerk client session state unavailable', { errorName: authError });
   }
 
+  const status: AuthSessionStatus = authError
+    ? 'unavailable'
+    : !isLoaded
+      ? 'loading'
+      : user
+        ? 'signed-in'
+        : 'signed-out';
   const [isLoading, setIsLoading] = useState(true);
   const [authModal, setAuthModal] = useState<AuthModalState>({
     isOpen: false,
@@ -77,21 +89,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAdmin = user?.publicMetadata?.role === 'admin' || user?.unsafeMetadata?.role === 'admin';
 
   useEffect(() => {
-    if (isLoaded) {
+    if (status !== 'loading') {
       setIsLoading(false);
     }
-  }, [isLoaded]);
+  }, [status]);
 
   // Reset session deduplication when user auth state changes
   useEffect(() => {
-    if (isLoaded) {
+    if (status === 'signed-in' || status === 'signed-out') {
       setShownThisSession(new Set()); // Clear session deduplication on auth change
     }
-  }, [user?.id, isLoaded]); // Reset when user ID changes
+  }, [user?.id, status]); // Reset when user ID changes
 
   // Check if user should see onboarding on first sign-in
   useEffect(() => {
-    if (isLoaded && user && !isLoading) {
+    if (status === 'signed-in' && user && !isLoading) {
       // Check if this is a new user (created in last 5 minutes) or hasn't seen onboarding
       const hasSeenOnboarding =
         typeof window !== 'undefined' &&
@@ -107,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     }
-  }, [isLoaded, user, isLoading]);
+  }, [status, user, isLoading]);
 
   const openAuthModal = useCallback(
     (action: 'sign-in' | 'sign-up', redirectUrl?: string, message?: string) => {
@@ -141,13 +153,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const requireAuth = useCallback(
     (action: () => void, fallbackMessage = 'Please sign in to continue') => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, fallbackMessage);
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const requireRole = useCallback(
@@ -156,6 +176,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       action: () => void,
       fallbackMessage = `This action requires ${role} permissions`,
     ) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Please sign in to continue');
         return;
@@ -169,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const redirectToSignIn = (redirectUrl?: string) => {
@@ -183,65 +211,107 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Specific gated action implementations
   const requireAuthForSoapstone = useCallback(
     (action: () => void) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Sign in to leave a sign for fellow travelers');
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const requireAuthForPraise = useCallback(
     (action: () => void) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Sign in to send praise to other travelers');
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const requireAuthForWishlist = useCallback(
     (action: () => void) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Sign in to add items to your wishlist');
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const requireAuthForTrade = useCallback(
     (action: () => void) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Sign in to present offers in the Scarlet Bazaar');
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const requireAuthForCommunity = useCallback(
     (action: () => void) => {
+      if (status === 'unavailable') {
+        openAuthModal(
+          'sign-in',
+          undefined,
+          'Account service is unavailable. Reload the page and try again.',
+        );
+        return;
+      }
       if (!user) {
         openAuthModal('sign-in', undefined, 'Sign in to participate in community discussions');
         return;
       }
       action();
     },
-    [user, openAuthModal],
+    [status, user, openAuthModal],
   );
 
   const value: AuthContextType = {
     user: user as User | null,
+    status,
+    authError,
     isLoaded,
-    isSignedIn: !!user,
+    isSignedIn: status === 'signed-in',
     isAdmin,
-    isLoading,
+    isLoading: status === 'loading',
     signOut: signOut || (() => Promise.resolve()),
     redirectToSignIn,
     redirectToSignUp,

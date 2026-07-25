@@ -37,6 +37,7 @@ vi.mock('@/app/components/search/GlobalSearch', () => ({
 
 function setAuthState(overrides: Record<string, any>) {
   authState = {
+    status: 'signed-out',
     isLoaded: true,
     isSignedIn: false,
     user: null,
@@ -72,7 +73,7 @@ describe('Navbar Clerk session states', () => {
   });
 
   it('renders a compact loading account placeholder instead of Sign In while Clerk resolves', () => {
-    setAuthState({ isLoaded: false, isSignedIn: false, user: null });
+    setAuthState({ status: 'loading', isLoaded: false, isSignedIn: false, user: null });
 
     render(<Navbar />);
 
@@ -94,10 +95,23 @@ describe('Navbar Clerk session states', () => {
     expect(parsed.searchParams.get('redirect_url')).toContain('/admin/printify');
   });
 
+  it('renders hosted Sign Up with the same safe return URL when signed out', () => {
+    render(<Navbar />);
+
+    const signUp = screen.getAllByRole('link', { name: /^sign up$/i })[0];
+    const href = signUp.getAttribute('href') ?? '';
+    const parsed = new URL(href);
+
+    expect(parsed.origin).toBe('https://accounts.otaku-mori.com');
+    expect(parsed.pathname).toBe('/sign-up');
+    expect(parsed.searchParams.get('redirect_url')).toContain('/admin/printify');
+  });
+
   it('renders signed-in username publicly and private email only inside the account menu', () => {
     setAuthState({
       isLoaded: true,
       isSignedIn: true,
+      status: 'signed-in',
       user: signedInUser(),
     });
 
@@ -113,7 +127,7 @@ describe('Navbar Clerk session states', () => {
     expect(screen.getAllByText('sakura_admin').length).toBeGreaterThan(0);
     expect(screen.getByText('admin@example.com')).toBeInTheDocument();
     expect(screen.getByText('Profile')).toBeInTheDocument();
-    expect(screen.getByText('Account Settings')).toBeInTheDocument();
+    expect(screen.getByText('Account & Security')).toBeInTheDocument();
     expect(screen.getByText('Achievements')).toBeInTheDocument();
     expect(screen.getByText('Wishlist')).toBeInTheDocument();
   });
@@ -122,6 +136,7 @@ describe('Navbar Clerk session states', () => {
     setAuthState({
       isLoaded: true,
       isSignedIn: true,
+      status: 'signed-in',
       user: signedInUser({ username: 'neon_sakura', imageUrl: '' }),
     });
 
@@ -138,6 +153,7 @@ describe('Navbar Clerk session states', () => {
     setAuthState({
       isLoaded: true,
       isSignedIn: true,
+      status: 'signed-in',
       user: signedInUser(),
     });
 
@@ -146,13 +162,13 @@ describe('Navbar Clerk session states', () => {
     fireEvent.click(screen.getByRole('button', { name: /user menu/i }));
     fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
 
-    await waitFor(() => expect(signOut).toHaveBeenCalledOnce());
+    await waitFor(() => expect(signOut).toHaveBeenCalledWith({ redirectUrl: '/' }));
     expect(push).not.toHaveBeenCalled();
   });
 
   it('shows explicit account recovery when Clerk client state does not resolve', async () => {
     vi.useFakeTimers();
-    setAuthState({ isLoaded: false, isSignedIn: false, user: null });
+    setAuthState({ status: 'loading', isLoaded: false, isSignedIn: false, user: null });
 
     render(<Navbar />);
 
@@ -162,7 +178,20 @@ describe('Navbar Clerk session states', () => {
       vi.advanceTimersByTime(8000);
     });
 
-    expect(screen.getByRole('button', { name: /account unavailable/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /account service unavailable/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders explicit account service unavailable state without Sign In', () => {
+    setAuthState({ status: 'unavailable', isLoaded: false, isSignedIn: false, user: null });
+
+    render(<Navbar />);
+
+    expect(
+      screen.getByRole('button', { name: /account service unavailable/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^sign in$/i })).not.toBeInTheDocument();
   });
 
   it('keeps Mini-Games on one desktop line and shifts desktop layout to large viewports', () => {

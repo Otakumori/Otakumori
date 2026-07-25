@@ -12,6 +12,7 @@ import ProfileStatsCard from '../components/profile/ProfileStatsCard';
 import MiniGameStats from '../components/profile/MiniGameStats';
 import RecentActivity from '../components/profile/RecentActivity';
 import CosmeticsTab from '../components/profile/CosmeticsTab';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,7 +49,7 @@ export default async function ProfilePage() {
             progress and unlock rewards!
           </p>
           <a
-            href="/sign-in"
+            href={buildCanonicalSignInUrl('/profile')}
             className="inline-block px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-colors"
           >
             Sign In

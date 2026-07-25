@@ -11,7 +11,7 @@ import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
-import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { buildCanonicalSignInUrl, buildCanonicalSignUpUrl } from '@/app/lib/auth/accountUrls';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -105,6 +105,7 @@ export default function Navbar() {
     signOut,
   } = account;
   const signInHref = useMemo(() => buildCanonicalSignInUrl(pathname || '/'), [pathname]);
+  const signUpHref = useMemo(() => buildCanonicalSignUpUrl(pathname || '/'), [pathname]);
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -389,8 +390,9 @@ export default function Navbar() {
                 type="button"
                 onClick={reloadAccountState}
                 className="inline-flex min-h-[44px] max-w-44 items-center rounded-lg border border-amber-300/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-100 transition-colors hover:bg-amber-400/20"
+                aria-label="Account service unavailable. Reload account state"
               >
-                Account unavailable - reload
+                Account service unavailable
               </button>
             ) : !isLoaded ? (
               <div
@@ -455,7 +457,7 @@ export default function Navbar() {
                         className="block min-h-[44px] px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
-                        Account Settings
+                        Account & Security
                       </Link>
                       <Link
                         href={paths.achievements()}
@@ -474,7 +476,7 @@ export default function Navbar() {
                       <button
                         onClick={async () => {
                           setShowUserMenu(false);
-                          await signOut();
+                          await signOut({ redirectUrl: paths.home() });
                         }}
                         className="w-full text-left min-h-[44px] px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors mt-2 border-t border-white/10 pt-2"
                       >
@@ -485,12 +487,20 @@ export default function Navbar() {
                 )}
               </>
             ) : (
-              <a
-                href={signInHref}
-                className="inline-flex min-h-[44px] items-center rounded-lg border border-current bg-transparent px-4 py-2 text-text-link transition-all duration-300 hover:border-primary hover:text-text-link-hover"
-              >
-                Sign In
-              </a>
+              <div className="flex items-center gap-2">
+                <a
+                  href={signInHref}
+                  className="inline-flex min-h-[44px] items-center rounded-lg border border-current bg-transparent px-4 py-2 text-text-link transition-all duration-300 hover:border-primary hover:text-text-link-hover"
+                >
+                  Sign In
+                </a>
+                <a
+                  href={signUpHref}
+                  className="inline-flex min-h-[44px] items-center rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-text-link transition-all duration-300 hover:border-primary hover:text-text-link-hover"
+                >
+                  Sign Up
+                </a>
+              </div>
             )}
           </div>
         </div>
@@ -683,8 +693,9 @@ export default function Navbar() {
                     type="button"
                     onClick={reloadAccountState}
                     className="flex w-full min-h-[44px] items-center justify-center rounded-lg border border-amber-300/40 bg-amber-400/10 px-4 py-3 text-amber-100 transition-colors hover:bg-amber-400/20"
+                    aria-label="Account service unavailable. Reload account state"
                   >
-                    Account unavailable - reload
+                    Account service unavailable
                   </button>
                 ) : !isLoaded ? (
                   <div
@@ -731,7 +742,7 @@ export default function Navbar() {
                       onClick={() => setIsMenuOpen(false)}
                       className="block min-h-[44px] px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                      Account Settings
+                      Account & Security
                     </Link>
                     <Link
                       href={paths.achievements()}
@@ -750,7 +761,7 @@ export default function Navbar() {
                     <button
                       onClick={async () => {
                         setIsMenuOpen(false);
-                        await signOut();
+                        await signOut({ redirectUrl: paths.home() });
                       }}
                       className="w-full text-left min-h-[44px] px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                     >
@@ -758,12 +769,20 @@ export default function Navbar() {
                     </button>
                   </div>
                 ) : (
-                  <a
-                    href={signInHref}
-                    className="flex w-full min-h-[44px] items-center justify-center rounded-lg border border-current bg-transparent px-4 py-3 text-white transition-colors hover:bg-white/10"
-                  >
-                    Sign In
-                  </a>
+                  <div className="grid gap-2">
+                    <a
+                      href={signInHref}
+                      className="flex w-full min-h-[44px] items-center justify-center rounded-lg border border-current bg-transparent px-4 py-3 text-white transition-colors hover:bg-white/10"
+                    >
+                      Sign In
+                    </a>
+                    <a
+                      href={signUpHref}
+                      className="flex w-full min-h-[44px] items-center justify-center rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-white transition-colors hover:bg-white/10"
+                    >
+                      Sign Up
+                    </a>
+                  </div>
                 )}
               </div>
             </div>

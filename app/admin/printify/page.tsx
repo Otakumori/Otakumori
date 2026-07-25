@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../../../components/ui/card';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 const CONFIRMATION_PHRASE = 'APPLY PRINTIFY CATALOG';
 
@@ -139,10 +140,8 @@ function authAwareError(response: Response, body: CatalogSyncResponse) {
 }
 
 function signInHref() {
-  if (typeof window === 'undefined') return '/sign-in';
-  const url = new URL('/sign-in', window.location.origin);
-  url.searchParams.set('redirect_url', window.location.href);
-  return `${url.pathname}${url.search}`;
+  if (typeof window === 'undefined') return buildCanonicalSignInUrl('/admin/printify');
+  return buildCanonicalSignInUrl(window.location.href);
 }
 
 export default function PrintifyAdminPage() {

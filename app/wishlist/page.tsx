@@ -10,6 +10,7 @@ import FooterDark from '@/app/components/FooterDark';
 import { EmptyWishlist } from '@/app/components/empty-states';
 import { ShopGridSkeleton } from '@/app/components/ui/Skeleton';
 import GlassPanel from '@/app/components/GlassPanel';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -38,7 +39,7 @@ export default function WishlistPage() {
 
   useEffect(() => {
     if (!isSignedIn) {
-      router.push('/sign-in?redirect_url=/wishlist');
+      router.push(buildCanonicalSignInUrl('/wishlist'));
       return;
     }
     if (userId) {

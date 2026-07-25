@@ -3,8 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import FooterDark from '../components/FooterDark';
 import CheckoutContent from '../components/shop/CheckoutContent';
+import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { t } from '@/lib/microcopy';
-
 
 export function generateMetadata() {
   return generateSEO({
@@ -17,7 +17,7 @@ export default async function CheckoutPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in?redirect_url=/checkout');
+    redirect(buildCanonicalSignInUrl('/checkout', FALLBACK_APP_ORIGIN));
   }
 
   return (

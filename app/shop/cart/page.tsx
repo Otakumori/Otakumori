@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react';
 import { paths } from '../../../lib/paths';
 import { EmptyCart } from '@/app/components/empty-states';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 interface CartItem {
   id: string;
@@ -32,7 +33,7 @@ export default function CartPage() {
   const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();
   const checkoutHref = isSignedIn
     ? paths.checkout()
-    : `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
+    : buildCanonicalSignInUrl(paths.checkout());
 
   if (cart.length === 0) {
     return (

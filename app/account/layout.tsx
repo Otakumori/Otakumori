@@ -1,15 +1,13 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-export default async function AccountLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+
+export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    redirect(buildCanonicalSignInUrl('/account', FALLBACK_APP_ORIGIN));
   }
 
   return (
@@ -18,4 +16,3 @@ export default async function AccountLayout({
     </div>
   );
 }
-
