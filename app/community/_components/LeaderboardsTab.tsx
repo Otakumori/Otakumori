@@ -3,6 +3,7 @@
 import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { MoriPanel, MoriUnavailableState } from '@/app/components/mori';
 
 interface LeaderboardEntry {
   rank: number;
@@ -30,6 +31,7 @@ export function LeaderboardsTab() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [globalPetalsUnavailable, setGlobalPetalsUnavailable] = useState(false);
 
   useEffect(() => {
     async function fetchLeaderboards() {
@@ -42,7 +44,12 @@ export function LeaderboardsTab() {
           const globalData = await globalResponse.json();
           if (globalData.ok && globalData.data) {
             setGlobalLeaderboard(globalData.data.leaderboard || []);
+            setGlobalPetalsUnavailable(false);
+          } else {
+            setGlobalPetalsUnavailable(true);
           }
+        } else {
+          setGlobalPetalsUnavailable(true);
         }
 
         // Fetch game-specific leaderboards (for all 9 mini-games)
@@ -114,11 +121,16 @@ export function LeaderboardsTab() {
   return (
     <div className="space-y-8">
       {/* Global Petal Leaderboard */}
-      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+      <MoriPanel className="p-6">
         <h2 className="text-2xl font-semibold text-white mb-4">Global Petal Leaderboard</h2>
         <p className="text-sm text-zinc-300 mb-6">Top players by lifetime petals earned</p>
 
-        {globalLeaderboard.length === 0 ? (
+        {globalPetalsUnavailable ? (
+          <MoriUnavailableState
+            title="Global petal rankings are temporarily unavailable"
+            description="Petal leaderboard data is paused until the wallet backing table is restored. Game leaderboards continue to load independently."
+          />
+        ) : globalLeaderboard.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-zinc-400">Leaderboards are warming up...</p>
             <p className="text-xs text-zinc-500 mt-2">
@@ -173,10 +185,10 @@ export function LeaderboardsTab() {
             })}
           </div>
         )}
-      </div>
+      </MoriPanel>
 
       {/* Game Leaderboards */}
-      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+      <MoriPanel className="p-6">
         <h2 className="text-2xl font-semibold text-white mb-4">Game Leaderboards</h2>
         <p className="text-sm text-zinc-300 mb-6">Top scores by game</p>
 
@@ -223,7 +235,7 @@ export function LeaderboardsTab() {
             })}
           </div>
         )}
-      </div>
+      </MoriPanel>
     </div>
   );
 }

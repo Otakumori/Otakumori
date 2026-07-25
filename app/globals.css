@@ -3,6 +3,316 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --mori-ink: #080706;
+    --mori-charcoal: #11100f;
+    --mori-soot: #181514;
+    --mori-paper: #221d1a;
+    --mori-ivory: #f5ead8;
+    --mori-parchment: #e7d6bd;
+    --mori-parchment-muted: rgba(231, 214, 189, 0.74);
+    --mori-taupe: #a99785;
+    --mori-bronze: #87725f;
+    --mori-sakura: #c98592;
+    --mori-sakura-light: #e4b0b8;
+    --mori-rose: #8e4658;
+    --mori-plum: #4a2633;
+    --mori-border: rgba(231, 214, 189, 0.34);
+    --mori-border-muted: rgba(231, 214, 189, 0.18);
+    --mori-shadow: rgba(0, 0, 0, 0.5);
+    --mori-focus: #f2c4cc;
+  }
+}
+
+@layer components {
+  .mori-page {
+    color: var(--mori-ivory);
+    background:
+      radial-gradient(circle at 16% 0%, rgba(201, 133, 146, 0.16), transparent 30%),
+      radial-gradient(circle at 86% 16%, rgba(142, 70, 88, 0.12), transparent 28%),
+      linear-gradient(180deg, var(--mori-charcoal), var(--mori-ink));
+  }
+
+  .mori-paper-texture {
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      radial-gradient(circle at 32% 18%, rgba(231, 214, 189, 0.045), transparent 28%),
+      radial-gradient(circle at 70% 70%, rgba(201, 133, 146, 0.035), transparent 32%);
+    background-size:
+      34px 34px,
+      34px 34px,
+      auto,
+      auto;
+    mix-blend-mode: screen;
+    opacity: 0.72;
+  }
+
+  .mori-panel {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--mori-border-muted);
+    background:
+      linear-gradient(145deg, rgba(34, 29, 26, 0.94), rgba(14, 12, 11, 0.92)),
+      radial-gradient(circle at top left, rgba(201, 133, 146, 0.11), transparent 38%);
+    box-shadow: 0 24px 80px var(--mori-shadow);
+  }
+
+  .mori-panel::before,
+  .mori-panel::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mori-border), transparent);
+  }
+
+  .mori-panel::before {
+    top: 1rem;
+  }
+
+  .mori-panel::after {
+    bottom: 1rem;
+  }
+
+  .mori-panel__glow {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 8% 0%, rgba(228, 176, 184, 0.12), transparent 34%),
+      radial-gradient(circle at 92% 100%, rgba(135, 114, 95, 0.1), transparent 30%);
+  }
+
+  .mori-panel__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .mori-frame,
+  .mori-card {
+    border: 1px solid var(--mori-border-muted);
+    background: rgba(17, 16, 15, 0.86);
+    box-shadow: inset 0 0 0 1px rgba(245, 234, 216, 0.04);
+  }
+
+  .mori-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.25rem;
+    transition:
+      border-color 180ms ease,
+      transform 180ms ease,
+      background 180ms ease;
+  }
+
+  .mori-card:hover {
+    border-color: rgba(228, 176, 184, 0.42);
+    transform: translateY(-2px);
+  }
+
+  .mori-button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--mori-border);
+    padding: 0.7rem 1.15rem;
+    font-family: var(--font-cormorant-garamond), Georgia, serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+    transition:
+      border-color 160ms ease,
+      background 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .mori-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .mori-button:focus-visible,
+  .mori-input:focus-visible,
+  .mori-variant-option:focus-visible {
+    outline: 2px solid var(--mori-focus);
+    outline-offset: 3px;
+  }
+
+  .mori-button:disabled,
+  .mori-variant-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+  }
+
+  .mori-button--primary {
+    background: rgba(201, 133, 146, 0.18);
+    color: var(--mori-ivory);
+  }
+
+  .mori-button--primary:hover:not(:disabled) {
+    border-color: rgba(228, 176, 184, 0.72);
+    background: rgba(201, 133, 146, 0.28);
+  }
+
+  .mori-button--secondary {
+    background: rgba(245, 234, 216, 0.04);
+    color: var(--mori-parchment);
+  }
+
+  .mori-button--secondary:hover:not(:disabled) {
+    border-color: rgba(245, 234, 216, 0.52);
+    background: rgba(245, 234, 216, 0.08);
+  }
+
+  .mori-button--danger {
+    border-color: rgba(252, 165, 165, 0.42);
+    background: rgba(127, 29, 29, 0.2);
+    color: #fecaca;
+  }
+
+  .mori-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mori-parchment);
+  }
+
+  .mori-input {
+    width: 100%;
+    border: 1px solid var(--mori-border-muted);
+    background: rgba(8, 7, 6, 0.72);
+    padding: 0.75rem 0.9rem;
+    color: var(--mori-ivory);
+  }
+
+  .mori-input::placeholder {
+    color: rgba(169, 151, 133, 0.84);
+  }
+
+  .mori-badge {
+    display: inline-flex;
+    align-items: center;
+    border-width: 1px;
+    background: rgba(8, 7, 6, 0.52);
+    padding: 0.25rem 0.55rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .mori-image-frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border: 1px solid var(--mori-border-muted);
+    background:
+      radial-gradient(circle at center, rgba(245, 234, 216, 0.09), rgba(17, 16, 15, 0.92) 62%),
+      var(--mori-ink);
+  }
+
+  .mori-state {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    color: var(--mori-parchment-muted);
+  }
+
+  .mori-loader {
+    display: inline-block;
+    height: 2.75rem;
+    width: 2.75rem;
+    border: 3px solid rgba(228, 176, 184, 0.42);
+    border-right-color: transparent;
+    animation: moriSpin 900ms linear infinite;
+  }
+
+  .mori-unavailable {
+    display: grid;
+    gap: 0.6rem;
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    background: rgba(120, 53, 15, 0.14);
+    padding: 1rem;
+  }
+
+  .mori-variant-option {
+    min-height: 44px;
+    border: 1px solid var(--mori-border-muted);
+    background: rgba(245, 234, 216, 0.04);
+    padding: 0.65rem 0.8rem;
+    color: var(--mori-parchment);
+    text-align: left;
+  }
+
+  .mori-variant-option--selected {
+    border-color: rgba(228, 176, 184, 0.68);
+    background: rgba(201, 133, 146, 0.16);
+    color: var(--mori-ivory);
+  }
+
+  .mori-variant-option--unavailable {
+    opacity: 0.48;
+  }
+
+  .mori-ambient-petal {
+    position: absolute;
+    left: var(--mori-petal-left);
+    top: var(--mori-petal-top);
+    height: 0.8rem;
+    width: 0.55rem;
+    border-radius: 60% 40% 65% 35%;
+    background: linear-gradient(135deg, rgba(228, 176, 184, 0.88), rgba(201, 133, 146, 0.34));
+    box-shadow: 0 0 12px rgba(228, 176, 184, 0.28);
+    transform: rotate(38deg);
+    animation: moriPetalDrift var(--mori-petal-duration) linear var(--mori-petal-delay) infinite;
+  }
+}
+
+@keyframes moriSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes moriPetalDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.84;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--mori-petal-drift), var(--mori-petal-fall), 0)
+      rotate(var(--mori-petal-rotate));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mori-ambient-petal,
+  .mori-loader {
+    animation: none !important;
+  }
+
+  .mori-card:hover,
+  .mori-button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
 /* Smooth scroll behavior for anchor links and programmatic scrolling */
 html {
   scroll-behavior: smooth;

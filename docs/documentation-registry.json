@@ -39,6 +39,16 @@
       "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
     },
     {
+      "path": "docs/design/mori-visual-system.md",
+      "domain": "visual-design",
+      "status": "canonical",
+      "owner": "visual-system",
+      "lastVerifiedDate": "2026-07-25",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/mori-visual-system.test.ts",
+      "warning": "Controls visual direction and evidence gates; does not authorize application, provider, database, or Production mutations."
+    },
+    {
       "path": "README.md",
       "domain": "product-brand",
       "status": "current-reference",

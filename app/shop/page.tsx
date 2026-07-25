@@ -1,4 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
+import { MoriContainer, MoriPage } from '../components/mori';
 import BuyReadyShopCatalog from '../components/shop/BuyReadyShopCatalog';
 import { DecorativeSectionHeader, StorefrontPanel } from '../components/shop/StorefrontPrimitives';
 
@@ -14,11 +15,11 @@ export function generateMetadata() {
 
 export default function ShopPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#080611] text-white">
+    <MoriPage>
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,148,201,0.18),transparent_30%),radial-gradient(circle_at_84%_18%,rgba(132,92,255,0.16),transparent_28%),linear-gradient(180deg,rgba(8,6,17,0.2),rgba(8,6,17,0.94))]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(90deg,transparent,rgba(255,222,233,0.08),transparent)]" />
 
-      <div className="relative z-10 container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+      <MoriContainer className="py-12">
         <DecorativeSectionHeader
           eyebrow="Curated grove market"
           title="Shop the Otaku-mori collection"
@@ -42,7 +43,7 @@ export default function ShopPage() {
           </div>
           <BuyReadyShopCatalog />
         </StorefrontPanel>
-      </div>
-    </main>
+      </MoriContainer>
+    </MoriPage>
   );
 }

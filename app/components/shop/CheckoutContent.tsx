@@ -4,7 +4,7 @@ import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import GlassPanel from '../GlassPanel';
+import { MoriButton, MoriPanel } from '@/app/components/mori';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 
@@ -211,8 +211,10 @@ export default function CheckoutContent() {
 
       {/* Checkout Form */}
       <div className="space-y-6">
-        <GlassPanel className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Shipping Information</h2>
+        <MoriPanel className="p-6">
+          <h2 className="font-display text-xl font-semibold text-[var(--mori-ivory)] mb-4">
+            Shipping Information
+          </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-zinc-300 mb-2">
@@ -224,7 +226,7 @@ export default function CheckoutContent() {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your first name"
                 required
               />
@@ -239,7 +241,7 @@ export default function CheckoutContent() {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your last name"
                 required
               />
@@ -254,7 +256,7 @@ export default function CheckoutContent() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your email"
                 required
               />
@@ -269,7 +271,7 @@ export default function CheckoutContent() {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your address"
                 required
               />
@@ -284,7 +286,7 @@ export default function CheckoutContent() {
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your city"
                 required
               />
@@ -299,7 +301,7 @@ export default function CheckoutContent() {
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your state"
                 required
               />
@@ -314,7 +316,7 @@ export default function CheckoutContent() {
                 name="zipCode"
                 value={formData.zipCode}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 placeholder="Enter your ZIP code"
                 required
               />
@@ -328,7 +330,7 @@ export default function CheckoutContent() {
                 name="country"
                 value={formData.country}
                 onChange={handleInputChange}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-fuchsia-400 focus:outline-none"
+                className="mori-input"
                 required
               >
                 <option value="US">United States</option>
@@ -338,27 +340,31 @@ export default function CheckoutContent() {
               </select>
             </div>
           </div>
-        </GlassPanel>
+        </MoriPanel>
 
-        <GlassPanel className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Payment</h2>
-          <p className="text-zinc-400 mb-4">
+        <MoriPanel className="p-6">
+          <h2 className="font-display text-xl font-semibold text-[var(--mori-ivory)] mb-4">
+            Payment
+          </h2>
+          <p className="text-[var(--mori-parchment-muted)] mb-4">
             You'll be redirected to Stripe for secure payment processing.
           </p>
-          <div className="flex items-center gap-2 text-sm text-zinc-400">
+          <div className="flex items-center gap-2 text-sm text-[var(--mori-taupe)]">
             <span></span>
             <span>Secure payment powered by Stripe</span>
           </div>
-        </GlassPanel>
+        </MoriPanel>
       </div>
 
       {/* Order Summary */}
       <div className="space-y-6">
         {/* Available Discounts */}
         {!loadingDiscounts && availableDiscounts.length > 0 && (
-          <GlassPanel className="p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Available Rewards</h2>
-            <p className="text-sm text-zinc-400 mb-4">
+          <MoriPanel className="p-6">
+            <h2 className="font-display text-xl font-semibold text-[var(--mori-ivory)] mb-4">
+              Available Rewards
+            </h2>
+            <p className="text-sm text-[var(--mori-parchment-muted)] mb-4">
               Select a discount voucher to apply to your order:
             </p>
             <div className="space-y-2">
@@ -435,11 +441,13 @@ export default function CheckoutContent() {
                 );
               })}
             </div>
-          </GlassPanel>
+          </MoriPanel>
         )}
 
-        <GlassPanel className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
+        <MoriPanel className="p-6">
+          <h2 className="font-display text-xl font-semibold text-[var(--mori-ivory)] mb-4">
+            Order Summary
+          </h2>
 
           <div className="space-y-4">
             {items.map((item) => (
@@ -524,16 +532,16 @@ export default function CheckoutContent() {
             </div>
           </div>
 
-          <button
+          <MoriButton
             onClick={handleCheckout}
             disabled={isProcessing}
-            className="mt-6 w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="mt-6 w-full px-6 py-4"
           >
             {isProcessing ? 'Processing...' : 'Proceed to Payment'}
-          </button>
+          </MoriButton>
 
           <p className="mt-4 text-center text-xs text-zinc-400">{t('cart', 'purchaseJoke')}</p>
-        </GlassPanel>
+        </MoriPanel>
       </div>
     </div>
   );

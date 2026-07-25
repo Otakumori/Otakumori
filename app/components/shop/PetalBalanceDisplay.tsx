@@ -1,102 +1,38 @@
 'use client';
 
-import { logger } from '@/app/lib/logger';
-import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
-import { getNextReward, getRewardProgress } from '@/app/lib/petal-economy';
 import Link from 'next/link';
-import { paths } from '@/lib/paths';
+import { useUser } from '@clerk/nextjs';
+
+import { MoriUnavailableState } from '@/app/components/mori';
 
 /**
- * Display petal balance and next reward progress in shop pages
+ * PetalWallet-backed balances are deliberately not queried until the missing
+ * Production relation is resolved. This keeps cart commerce dependable while
+ * preserving the future reward surface.
  */
 export function PetalBalanceDisplay() {
   const { isSignedIn } = useUser();
-  const [balance, setBalance] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!isSignedIn) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchBalance = async () => {
-      try {
-        const response = await fetch('/api/v1/petals/wallet');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.ok) {
-            setBalance(result.data.balance);
-          }
-        }
-      } catch (error) {
-        logger.error('Failed to fetch petal balance:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBalance();
-  }, [isSignedIn]);
 
   if (!isSignedIn) {
     return (
-      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-6">
-        <p className="text-sm text-white/70 mb-2">
-          <Link href="/sign-in" className="text-pink-300 hover:text-pink-400 underline">
-            Sign in
-          </Link>{' '}
-          to earn and use petals for discounts!
-        </p>
-      </div>
+      <MoriUnavailableState
+        title="Petal Pouch coming later"
+        description="Sign-in still works, but petal rewards are not shown in cart until the wallet backend is verified."
+        action={
+          <Link href="/sign-in" className="text-sm text-[var(--mori-sakura-light)] underline underline-offset-4">
+            Sign in to your account
+          </Link>
+        }
+        className="mb-6"
+      />
     );
   }
-
-  if (loading) {
-    return (
-      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-6">
-        <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
-      </div>
-    );
-  }
-
-  const nextReward = balance !== null ? getNextReward(balance) : null;
-  const progress = balance !== null ? getRewardProgress(balance) : null;
 
   return (
-    <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 backdrop-blur-lg border border-pink-500/30 rounded-xl p-4 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <p className="text-sm text-white/70 mb-1">Your Petal Balance</p>
-          <p className="text-2xl font-bold text-pink-300">{balance?.toLocaleString() || 0}</p>
-        </div>
-        <span className="text-3xl" role="img" aria-label="Petals">
-          <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
-        </span>
-      </div>
-
-      {nextReward && progress && (
-        <div className="mt-4 pt-4 border-t border-white/20">
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-white/70">Next Reward: {nextReward.description}</span>
-            <span className="text-pink-300 font-medium">{progress.petalsNeeded} needed</span>
-          </div>
-          <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300"
-              style={{ width: `${progress.progress * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      <Link
-        href={paths.shop()}
-        className="mt-4 block text-center text-sm text-pink-300 hover:text-pink-400 underline"
-      >
-        View available petal discounts →
-      </Link>
-    </div>
+    <MoriUnavailableState
+      title="Petal Pouch is temporarily unavailable"
+      description="Your cart, variants, totals, and checkout remain available. Petal balances and rewards will return after the wallet relation is restored."
+      className="mb-6"
+    />
   );
 }
