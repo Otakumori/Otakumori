@@ -476,7 +476,7 @@ describe('documentation registry validation', () => {
       sourceBaselineCommit?: string;
       documents: Array<{ path: string; lastVerifiedCommit?: string }>;
     };
-    expect(registry.sourceBaselineCommit).toBe('4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d');
+    expect(registry.sourceBaselineCommit).toBe('4dd488f5a681d169615e637366872057ee2e7429');
     expect(registry.lastReviewedCommit).toBeUndefined();
     expect(
       registry.documents.find((doc) => doc.path === 'docs/repository-documentation.md')

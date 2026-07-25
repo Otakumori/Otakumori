@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastReviewedDate": "2026-07-21",
+  "lastReviewedDate": "2026-07-22",
   "documents": [
     {
       "path": "docs/repository-documentation.md",
@@ -19,6 +19,24 @@
       "lastVerifiedDate": "2026-07-21",
       "maintenance": "manual",
       "verification": "corepack pnpm docs:security:check"
+    },
+    {
+      "path": "AGENTS.md",
+      "domain": "repository-operations",
+      "status": "canonical",
+      "owner": "repository-operations",
+      "lastVerifiedDate": "2026-07-22",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
+    },
+    {
+      "path": "docs/repository-validation.md",
+      "domain": "repository-validation",
+      "status": "canonical",
+      "owner": "repository-operations",
+      "lastVerifiedDate": "2026-07-22",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
     },
     {
       "path": "README.md",
@@ -331,5 +349,5 @@
       "entryPoint": "docs/repository-documentation.md"
     }
   ],
-  "sourceBaselineCommit": "4e3cdcd43ea10a21ce306e40fdc7ededa6380f0d"
+  "sourceBaselineCommit": "4dd488f5a681d169615e637366872057ee2e7429"
 }
