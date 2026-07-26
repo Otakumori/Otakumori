@@ -13,6 +13,7 @@ import MiniGameStats from '../components/profile/MiniGameStats';
 import RecentActivity from '../components/profile/RecentActivity';
 import CosmeticsTab from '../components/profile/CosmeticsTab';
 import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +38,8 @@ export default async function ProfilePage() {
 
   // Guest view
   if (!isAuthenticated) {
+    const appOrigin = await resolveServerAppOrigin();
+
     return (
       <div className="mx-auto max-w-6xl px-6 py-10">
         <ProfileHeader />
@@ -49,7 +52,7 @@ export default async function ProfilePage() {
             progress and unlock rewards!
           </p>
           <a
-            href={buildCanonicalSignInUrl('/profile')}
+            href={buildCanonicalSignInUrl('/profile', appOrigin)}
             className="inline-block px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-colors"
           >
             Sign In

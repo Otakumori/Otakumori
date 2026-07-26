@@ -1,11 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-import {
-  FALLBACK_APP_ORIGIN,
-  buildCanonicalSignInUrl,
-  buildCanonicalUserProfileUrl,
-} from '@/app/lib/auth/accountUrls';
+import { buildCanonicalSignInUrl, buildCanonicalUserProfileUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 import { generateSEO } from '@/app/lib/seo';
 
 export function generateMetadata() {
@@ -18,10 +15,11 @@ export function generateMetadata() {
 
 export default async function AccountPage() {
   const { userId } = await auth();
+  const appOrigin = await resolveServerAppOrigin();
 
   if (!userId) {
-    redirect(buildCanonicalSignInUrl('/account', FALLBACK_APP_ORIGIN));
+    redirect(buildCanonicalSignInUrl('/account', appOrigin));
   }
 
-  redirect(buildCanonicalUserProfileUrl('/profile', FALLBACK_APP_ORIGIN));
+  redirect(buildCanonicalUserProfileUrl('/profile', appOrigin));
 }

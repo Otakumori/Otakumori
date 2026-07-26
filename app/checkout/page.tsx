@@ -3,7 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import FooterDark from '../components/FooterDark';
 import CheckoutContent from '../components/shop/CheckoutContent';
-import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 import { t } from '@/lib/microcopy';
 
 export function generateMetadata() {
@@ -17,7 +18,7 @@ export default async function CheckoutPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect(buildCanonicalSignInUrl('/checkout', FALLBACK_APP_ORIGIN));
+    redirect(buildCanonicalSignInUrl('/checkout', await resolveServerAppOrigin()));
   }
 
   return (

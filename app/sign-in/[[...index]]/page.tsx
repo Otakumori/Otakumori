@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
-import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 
 type AuthRedirectPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -14,5 +15,5 @@ export default async function SignInPage({ searchParams }: AuthRedirectPageProps
   const params = (await searchParams) ?? {};
   const returnUrl = firstParam(params.redirect_url) ?? firstParam(params.redirect) ?? '/';
 
-  redirect(buildCanonicalSignInUrl(returnUrl, FALLBACK_APP_ORIGIN));
+  redirect(buildCanonicalSignInUrl(returnUrl, await resolveServerAppOrigin()));
 }

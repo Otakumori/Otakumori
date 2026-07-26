@@ -5,6 +5,42 @@ test.describe('Critical User Journey', () => {
   test('should complete sign-in, browse products, add to cart, and checkout', async ({
     page,
   }: any) => {
+    const localApplicationOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+    let capturedClerkUrl: string | null = null;
+    const applicationServerErrors: string[] = [];
+    const checkoutOrPaymentRequests: string[] = [];
+
+    page.on('response', (response: any) => {
+      const url = response.url();
+      if (
+        localApplicationOrigins.some((origin) => url.startsWith(origin)) &&
+        response.status() >= 500
+      ) {
+        applicationServerErrors.push(`${response.status()} ${url}`);
+      }
+    });
+
+    page.on('request', (request: any) => {
+      const url = request.url();
+      if (
+        url.includes('/api/v1/checkout/session') ||
+        url.includes('/api/checkout/session') ||
+        url.includes('api.stripe.com') ||
+        url.includes('checkout.stripe.com')
+      ) {
+        checkoutOrPaymentRequests.push(url);
+      }
+    });
+
+    await page.route('https://accounts.otaku-mori.com/sign-in**', async (route: any) => {
+      capturedClerkUrl = route.request().url();
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: '<!doctype html><title>Stubbed Clerk boundary</title><main>Stubbed Clerk sign-in boundary</main>',
+      });
+    });
+
     // Navigate to home page
     await page.goto('/');
     await expect(page).toHaveTitle(/Otaku-mori/);
@@ -63,11 +99,35 @@ test.describe('Critical User Journey', () => {
     expect(await cartItems.count()).toBeGreaterThan(0);
 
     // Proceed to checkout
+    const cartOrigin = new URL(page.url()).origin;
+    const authBoundaryRequest = page.waitForRequest((request: any) =>
+      request.url().startsWith('https://accounts.otaku-mori.com/sign-in'),
+    );
+
     await page.click('[data-testid="checkout-button"]');
+    const authRequest = await authBoundaryRequest;
 
     // The internal checkout route is protected. Without a real Clerk session,
-    // this journey must fail closed and preserve the intended return path.
-    await expect(page).toHaveURL(/\/sign-in\?redirect_url=\/checkout$/, { timeout: 15000 });
+    // this journey must stop at the hosted Clerk boundary and preserve the
+    // same application origin without automating Clerk or Cloudflare.
+    await expect(page.getByText('Stubbed Clerk sign-in boundary')).toBeVisible({
+      timeout: 15000,
+    });
+
+    const clerkUrl = new URL(capturedClerkUrl ?? authRequest.url());
+    expect(clerkUrl.origin).toBe('https://accounts.otaku-mori.com');
+    expect(clerkUrl.pathname).toBe('/sign-in');
+
+    const redirectUrl = clerkUrl.searchParams.get('redirect_url');
+    expect(redirectUrl).toBeTruthy();
+
+    const parsedRedirectUrl = new URL(redirectUrl!);
+    expect(parsedRedirectUrl.origin).toBe(cartOrigin);
+    expect(parsedRedirectUrl.pathname).toBe('/checkout');
+    expect(parsedRedirectUrl.origin).not.toBe('https://www.otaku-mori.com');
+
+    expect(applicationServerErrors).toEqual([]);
+    expect(checkoutOrPaymentRequests).toEqual([]);
 
     // Note: We don't complete the actual payment in e2e tests
     // In a real test environment, you'd use Stripe test cards

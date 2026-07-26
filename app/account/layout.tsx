@@ -1,13 +1,14 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-import { FALLBACK_APP_ORIGIN, buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect(buildCanonicalSignInUrl('/account', FALLBACK_APP_ORIGIN));
+    redirect(buildCanonicalSignInUrl('/account', await resolveServerAppOrigin()));
   }
 
   return (
