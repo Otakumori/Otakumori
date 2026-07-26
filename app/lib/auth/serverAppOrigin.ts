@@ -2,9 +2,10 @@ import 'server-only';
 
 import { headers } from 'next/headers';
 
-import { FALLBACK_APP_ORIGIN } from '@/app/lib/auth/accountUrls';
+import { FALLBACK_APP_ORIGIN, STAGING_APP_ORIGIN } from '@/app/lib/auth/accountUrls';
 
 const LOCAL_APP_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+const STAGING_APP_HOST = new URL(STAGING_APP_ORIGIN).hostname;
 
 type RuntimeProcess = {
   env?: Record<string, string | undefined>;
@@ -73,6 +74,21 @@ function normalizeLocalOrigin(hostHeader: string | null, protoHeader: string | n
   }
 }
 
+function firstHeaderValue(value: string | null) {
+  return value?.split(',')[0]?.trim() || null;
+}
+
+function normalizeStagingPreviewOrigin(hostHeader: string | null, protoHeader: string | null) {
+  const host = firstHeaderValue(hostHeader)?.toLowerCase();
+  const protocol = firstHeaderValue(protoHeader)?.toLowerCase();
+
+  if (host === STAGING_APP_HOST && protocol === 'https') {
+    return STAGING_APP_ORIGIN;
+  }
+
+  return null;
+}
+
 export async function resolveServerAppOrigin() {
   const vercelEnv = readRuntimeEnv('VERCEL_ENV') ?? readRuntimeEnv('VERCEL_ENVIRONMENT');
 
@@ -80,15 +96,20 @@ export async function resolveServerAppOrigin() {
     return FALLBACK_APP_ORIGIN;
   }
 
+  const requestHeaders = await headers();
+
   if (vercelEnv === 'preview') {
     return (
+      normalizeStagingPreviewOrigin(
+        requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host'),
+        requestHeaders.get('x-forwarded-proto') ?? requestHeaders.get('x-forwarded-protocol'),
+      ) ??
       normalizeVercelPreviewOrigin(readRuntimeEnv('VERCEL_BRANCH_URL')) ??
       normalizeVercelPreviewOrigin(readRuntimeEnv('VERCEL_URL')) ??
       FALLBACK_APP_ORIGIN
     );
   }
 
-  const requestHeaders = await headers();
   return (
     normalizeLocalOrigin(
       requestHeaders.get('host'),
@@ -100,4 +121,5 @@ export async function resolveServerAppOrigin() {
 export const serverAppOriginTestInternals = {
   normalizeVercelPreviewOrigin,
   normalizeLocalOrigin,
+  normalizeStagingPreviewOrigin,
 };
