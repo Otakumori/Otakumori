@@ -14,8 +14,9 @@
     "tablesPresent": ["User", "Cart", "_prisma_migrations"],
     "tablesMissing": ["Wishlist", "PetalWallet"],
     "columnsMissing": {
-      "User": ["avatarBundle", "avatarConfig", "avatarRendering"],
-      "UserAchievement": ["updatedAt"]
+      "User": ["avatarBundle", "avatarConfig", "avatarRendering", "updatedAt"],
+      "UserAchievement": ["updatedAt"],
+      "Wallet": ["createdAt", "updatedAt"]
     },
     "rowCounts": {
       "User": 0,
@@ -57,10 +58,14 @@
     {
       "route": "POST /api/v1/checkout/session",
       "classification": "schema-drift-and-error-exposure",
-      "sanitizedError": "User avatar JSON column missing"
+      "sanitizedError": "User avatar JSON or timestamp column missing"
     }
   ],
-  "candidateMigration": "prisma/migrations/20260726160000_authenticated_data_boundary_readiness/migration.sql",
+  "candidateMigrations": [
+    "prisma/migrations/20260726160000_authenticated_data_boundary_readiness/migration.sql",
+    "prisma/migrations/20260726162000_authenticated_user_updated_at_readiness/migration.sql",
+    "prisma/migrations/20260726164000_wallet_timestamp_readiness/migration.sql"
+  ],
   "destructiveOperations": [],
   "requiresAuthorizedRehearsal": true
 }

@@ -1,12 +1,15 @@
 # Authenticated Data Boundary Readiness
 
-Status: candidate only. Do not apply this migration to Production until it has been rehearsed on an authorized temporary Neon branch.
+Status: candidate only. Do not apply these migrations to Production until they have been rehearsed on an authorized temporary Neon branch.
 
 ## Source And Target
 
 - Source code baseline: PR #73 head `2f05cc57e8aaa8e5fb5bea59e8a95c79c8773f79`.
 - Target schema: current `prisma/schema.prisma` for authenticated account, cart, wishlist, petal, profile, and checkout paths.
-- Candidate migration: `prisma/migrations/20260726160000_authenticated_data_boundary_readiness/migration.sql`.
+- Candidate migrations:
+  - `prisma/migrations/20260726160000_authenticated_data_boundary_readiness/migration.sql`.
+  - `prisma/migrations/20260726162000_authenticated_user_updated_at_readiness/migration.sql`.
+  - `prisma/migrations/20260726164000_wallet_timestamp_readiness/migration.sql`.
 
 ## Verified Production Drift
 
@@ -17,10 +20,13 @@ Read-only evidence shows these Production gaps affect currently executed authent
 - Missing column: `User.avatarBundle`.
 - Missing column: `User.avatarConfig`.
 - Missing column: `User.avatarRendering`.
+- Missing column: `User.updatedAt`.
 - Missing column: `UserAchievement.updatedAt`.
+- Missing column: `Wallet.createdAt`.
+- Missing column: `Wallet.updatedAt`.
 - Production local `User` row count: zero at time of inspection.
 
-The repository migrations contain existing structures for `PetalLedger`, `UserProfile`, `UserSettings`, and `PrivacySettings`, but no committed migration was found for `Wishlist`, `PetalWallet`, `PetalTransaction`, the avatar JSON fields, or `UserAchievement.updatedAt`.
+The repository migrations contain existing structures for `PetalLedger`, `UserProfile`, `UserSettings`, and `PrivacySettings`, but no committed migration was found for `Wishlist`, `PetalWallet`, `PetalTransaction`, the avatar JSON fields, `User.updatedAt`, `UserAchievement.updatedAt`, or `Wallet` timestamps.
 
 ## Runtime Impact
 
@@ -35,7 +41,9 @@ The repository migrations contain existing structures for `PetalLedger`, `UserPr
 Additive objects:
 
 - Adds nullable JSON columns `User.avatarBundle`, `User.avatarConfig`, and `User.avatarRendering`.
+- Adds `User.updatedAt` with a non-null default.
 - Adds `UserAchievement.updatedAt` with a non-null default.
+- Adds `Wallet.createdAt` and `Wallet.updatedAt` with non-null defaults.
 - Creates `Wishlist` with user/product foreign keys, unique user/product pair, and supporting indexes.
 - Creates `PetalWallet` with local user foreign key, unique user key, and supporting index.
 - Creates `PetalTransaction` with local user foreign key and supporting indexes.
@@ -43,7 +51,7 @@ Additive objects:
 ## Lock And Data Analysis
 
 - `ADD COLUMN IF NOT EXISTS` nullable JSON columns should be metadata-only on modern PostgreSQL.
-- `UserAchievement.updatedAt` adds a non-null column with a constant default; rehearse for lock duration before Production.
+- `User.updatedAt`, `UserAchievement.updatedAt`, and `Wallet` timestamps add non-null columns with constant defaults; rehearse for lock duration before Production.
 - New empty tables and indexes are additive.
 - Foreign keys on newly created empty tables should not scan existing large data.
 - No data deletion, table drop, enum narrowing, destructive rename, reset, or migration-history rewrite is included.
@@ -58,7 +66,7 @@ Additive objects:
 
 On an authorized temporary Neon branch only:
 
-1. Apply the candidate migration.
+1. Apply the candidate migrations.
 2. Confirm required tables, columns, indexes, and foreign keys exist.
 3. Run focused authenticated-boundary tests.
 4. Smoke account routes without creating provider orders or payments.
@@ -67,7 +75,7 @@ On an authorized temporary Neon branch only:
 
 ## Rollback Strategy
 
-The preferred rollback is code rollback because the migration is additive and compatible with current main and PR #73. Dropping new objects is not authorized as an automatic rollback because it can destroy user data after traffic begins writing to those tables.
+The preferred rollback is code rollback because the migrations are additive and compatible with current main and PR #73. Dropping new objects is not authorized as an automatic rollback because it can destroy user data after traffic begins writing to those tables.
 
 ## Deployment Order
 
