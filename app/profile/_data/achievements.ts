@@ -1,15 +1,20 @@
 import { PrismaClient } from '@prisma/client';
-import { auth } from '@clerk/nextjs/server';
+import { AuthenticationRequiredError, requireLocalViewer } from '@/app/lib/auth/viewer';
 
 const db = new PrismaClient();
 
 export async function loadAchievementsForProfile() {
-  const { userId } = await auth();
+  let localUserId: string | null = null;
+  try {
+    ({ localUserId } = await requireLocalViewer());
+  } catch (error) {
+    if (!(error instanceof AuthenticationRequiredError)) throw error;
+  }
   const catalog = await db.achievement.findMany({ orderBy: { id: 'asc' } }).catch(() => []);
-  const owned = userId
+  const owned = localUserId
     ? await db.userAchievement
         .findMany({
-          where: { userId },
+          where: { userId: localUserId },
           include: { Achievement: { select: { code: true, points: true } } },
         })
         .catch(() => [])

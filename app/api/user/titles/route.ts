@@ -6,18 +6,35 @@ export const maxDuration = 10; // optional guard
 
 import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 
 export async function GET() {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    let localUserId: string;
+    try {
+      ({ localUserId } = await requireLocalViewer());
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
+      }
+      if (error instanceof LocalUserUnavailableError) {
+        return schemaUnavailableResponse('titles_user_unavailable');
+      }
+      throw error;
+    }
+
+    if (!localUserId) {
       return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
     }
 
     const titles = await prisma.userTitle.findMany({
-      where: { userId },
+      where: { userId: localUserId },
       orderBy: { awardedAt: 'desc' },
     });
 

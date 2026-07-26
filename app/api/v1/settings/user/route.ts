@@ -3,12 +3,17 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
-import { auth } from '@clerk/nextjs/server';
 import type { Prisma, UserSettings as PrismaUserSettings } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { UserSettingsUpdateSchema } from '@/app/lib/contracts';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { logger } from '@/app/lib/logger';
 import { db } from '@/lib/db';
 
@@ -78,25 +83,31 @@ function normaliseSettings(settings: PrismaUserSettings) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
-    logger.request(request, 'Fetching user settings', { userId });
+    logger.request(request, 'Fetching user settings');
 
     let settings = await db.userSettings.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
     });
 
     if (!settings) {
       settings = await db.userSettings.create({
-        data: { userId },
+        data: { userId: localUserId },
       });
     }
 
     return NextResponse.json({ ok: true, data: normaliseSettings(settings) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Account settings are temporarily unavailable.' },
+        { status: 503 },
+      );
+    }
     logger.apiError(request, 'Failed to fetch user settings', error as Error);
     return NextResponse.json({ ok: false, error: 'Failed to fetch settings' }, { status: 500 });
   }
@@ -104,36 +115,41 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = await request.json();
     const updates = UserSettingsUpdateSchema.parse(body);
 
     logger.request(request, 'Updating user settings', {
-      userId,
       extra: { updates: Object.keys(updates) },
     });
 
-    const existing = await db.userSettings.findUnique({ where: { userId } });
+    const existing = await db.userSettings.findUnique({ where: { userId: localUserId } });
 
     if (!existing) {
       const created = await db.userSettings.create({
-        data: buildCreateData(userId, updates),
+        data: buildCreateData(localUserId, updates),
       });
 
       return NextResponse.json({ ok: true, data: normaliseSettings(created) });
     }
 
     const updated = await db.userSettings.update({
-      where: { userId },
+      where: { userId: localUserId },
       data: buildUpdateData(existing, updates),
     });
 
     return NextResponse.json({ ok: true, data: normaliseSettings(updated) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Account settings are temporarily unavailable.' },
+        { status: 503 },
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid settings data' }, { status: 400 });
     }

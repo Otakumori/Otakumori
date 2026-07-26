@@ -10,7 +10,7 @@ import { PetalBalanceDisplay } from './PetalBalanceDisplay';
 import { EmptyCart } from '@/app/components/empty-states';
 
 export default function CartContent() {
-  const { items, updateQuantity, removeItem } = useCart();
+  const { items, updateQuantity, removeItem, syncWarning, retryServerSync } = useCart();
   const isUpdating = false;
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -103,6 +103,18 @@ export default function CartContent() {
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4" data-testid="cart-items">
         <PetalBalanceDisplay />
+        {syncWarning && (
+          <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+            <p>{syncWarning}</p>
+            <button
+              type="button"
+              onClick={retryServerSync}
+              className="mt-2 rounded-lg border border-amber-200/40 px-3 py-1 text-xs text-amber-50 hover:bg-amber-200/10"
+            >
+              Retry sync
+            </button>
+          </div>
+        )}
         {items.map((item) => (
           <GlassPanel key={item.id} className="p-4" data-testid="cart-item">
             <div className="flex items-center gap-4">

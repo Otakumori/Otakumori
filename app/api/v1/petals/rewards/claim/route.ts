@@ -1,9 +1,15 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { generateRequestId } from '@/lib/requestId';
 import { PETAL_REWARDS } from '@/app/lib/petal-economy';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -20,13 +26,7 @@ export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'AUTH_REQUIRED', requestId },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = await req.json();
     const { threshold } = ClaimRewardSchema.parse(body);
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Get user's petal balance
     const wallet = await db.petalWallet.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
     });
 
     if (!wallet || wallet.balance < threshold) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     // Check if reward already claimed
     const existingClaim = await db.couponGrant.findFirst({
       where: {
-        userId,
+        userId: localUserId,
         discountRewardId: reward.rewardId || undefined,
       },
     });
@@ -97,12 +97,12 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate coupon code
-        const couponCode = `PETAL${threshold}-${userId.slice(0, 8).toUpperCase()}`;
+        const couponCode = `PETAL${threshold}-${localUserId.slice(0, 8).toUpperCase()}`;
 
         // Grant coupon to user
         await db.couponGrant.create({
           data: {
-            userId,
+            userId: localUserId,
             code: couponCode,
             discountType: 'PERCENT',
             percentOff: reward.value as number,
@@ -153,13 +153,22 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        { ok: false, error: 'AUTH_REQUIRED', requestId },
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
     logger.error('[Claim Petal Reward] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,
         error: 'INTERNAL_ERROR',
-        message: error.message,
+        message: 'Petal rewards are temporarily unavailable.',
         requestId,
       },
       { status: 500 },

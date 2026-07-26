@@ -7,6 +7,7 @@ import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
+import { normalizeApiErrorMessage } from '@/app/lib/api-error-message';
 
 interface AvailableDiscount {
   id: string;
@@ -23,6 +24,7 @@ export default function CheckoutContent() {
   const _router = useRouter();
   const { items } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [_couponInput, _setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
   const [preview, setPreview] = useState<any>(null);
@@ -135,6 +137,7 @@ export default function CheckoutContent() {
 
   const handleCheckout = async () => {
     setIsProcessing(true);
+    setCheckoutError(null);
     try {
       // Build CheckoutRequest items
       const checkoutItems = items.map((i) => ({
@@ -181,12 +184,18 @@ export default function CheckoutContent() {
         }),
       });
 
-      const { url } = await response.json();
-      if (url) {
+      const result = await response.json().catch(() => null);
+      const url = result?.data?.url ?? result?.url;
+      if (response.ok && url) {
         window.location.href = url;
+        return;
       }
+      const message = normalizeApiErrorMessage(result?.error, 'Checkout could not be started.');
+      const requestId = typeof result?.requestId === 'string' ? ` Request ID: ${result.requestId}` : '';
+      setCheckoutError(`${message}${requestId}`);
     } catch (error) {
       logger.error('Checkout failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      setCheckoutError('Checkout could not be started. Please try again later.');
     } finally {
       setIsProcessing(false);
     }
@@ -345,6 +354,11 @@ export default function CheckoutContent() {
           <p className="text-zinc-400 mb-4">
             You'll be redirected to Stripe for secure payment processing.
           </p>
+          {checkoutError && (
+            <div className="mb-4 rounded-xl border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100">
+              {checkoutError}
+            </div>
+          )}
           <div className="flex items-center gap-2 text-sm text-zinc-400">
             <span></span>
             <span>Secure payment powered by Stripe</span>

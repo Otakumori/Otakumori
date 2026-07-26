@@ -1,13 +1,25 @@
 
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
+import {
+  LocalUserUnavailableError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import { randomUUID } from 'crypto';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  const u = await currentUser();
-  if (!u) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  let localUserId: string;
+  try {
+    ({ localUserId } = await requireLocalViewer());
+  } catch (error) {
+    if (error instanceof LocalUserUnavailableError) {
+      return schemaUnavailableResponse('petals_user_unavailable');
+    }
+
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
 
   const { amount, reason } = (await req.json()) as { amount: number; reason: string };
   if (!Number.isInteger(amount) || amount <= 0) {
@@ -27,21 +39,21 @@ export async function POST(req: Request) {
       });
 
       const user = await tx.user.findUnique({
-        where: { id: u.id },
+        where: { id: localUserId },
         select: { petalBalance: true },
       });
       const balance = user?.petalBalance ?? 0;
       if (balance < amount) throw new Error('Insufficient petals');
 
-      await tx.user.update({ where: { id: u.id }, data: { petalBalance: { decrement: amount } } });
+      await tx.user.update({ where: { id: localUserId }, data: { petalBalance: { decrement: amount } } });
       await tx.petalLedger.create({
-        data: { userId: u.id, type: 'spend', amount: -amount, reason: reason || 'spend' },
+        data: { userId: localUserId, type: 'spend', amount: -amount, reason: reason || 'spend' },
       });
 
       const [updated, entries] = await Promise.all([
-        tx.user.findUnique({ where: { id: u.id }, select: { petalBalance: true } }),
+        tx.user.findUnique({ where: { id: localUserId }, select: { petalBalance: true } }),
         tx.petalLedger.findMany({
-          where: { userId: u.id },
+          where: { userId: localUserId },
           orderBy: { createdAt: 'desc' },
           take: 200,
         }),
@@ -61,7 +73,7 @@ export async function POST(req: Request) {
     });
 
     if (result === 'DUP') {
-      const ledger = await currentLedger(u.id);
+      const ledger = await currentLedger(localUserId);
       return NextResponse.json({ ok: true, data: ledger });
     }
     return NextResponse.json({ ok: true, data: result });

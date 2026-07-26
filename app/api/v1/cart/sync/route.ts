@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db as prisma } from '@/lib/db';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { validateLoadedPrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 interface SyncCartItem {
@@ -28,10 +32,7 @@ function isValidItem(item: unknown): item is SyncCartItem {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = (await req.json()) as SyncCartBody;
     const items = Array.isArray(body?.items) ? body.items : null;
@@ -102,9 +103,9 @@ export async function POST(req: Request) {
     }
 
     const cart = await prisma.cart.upsert({
-      where: { userId },
+      where: { userId: localUserId },
       update: {},
-      create: { userId },
+      create: { userId: localUserId },
     });
 
     const syncedItems: Array<{ productId: string; variantId: string; quantity: number }> = [];
@@ -145,6 +146,18 @@ export async function POST(req: Request) {
       data: syncedItems,
     });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Account data is temporarily unavailable. Your local cart was preserved.',
+        },
+        { status: 503 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Cart sync failed:',

@@ -14,6 +14,11 @@ import RecentActivity from '../components/profile/RecentActivity';
 import CosmeticsTab from '../components/profile/CosmeticsTab';
 import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+} from '@/app/lib/auth/viewer';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,18 +31,26 @@ export function generateMetadata() {
 }
 export default async function ProfilePage() {
   let profileData = null;
-  let isAuthenticated = false;
+  let profileState: 'ready' | 'signed-out' | 'provisioning-unavailable' | 'schema-unavailable' | 'error' =
+    'signed-out';
 
   try {
     profileData = await getProfileData();
-    isAuthenticated = true;
-  } catch {
-    // User not authenticated - show guest view
-    isAuthenticated = false;
+    profileState = 'ready';
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      profileState = 'signed-out';
+    } else if (error instanceof LocalUserUnavailableError) {
+      profileState = 'provisioning-unavailable';
+    } else if (isMissingSchemaError(error)) {
+      profileState = 'schema-unavailable';
+    } else {
+      profileState = 'error';
+    }
   }
 
   // Guest view
-  if (!isAuthenticated) {
+  if (profileState === 'signed-out') {
     const appOrigin = await resolveServerAppOrigin();
 
     return (
@@ -57,6 +70,33 @@ export default async function ProfilePage() {
           >
             Sign In
           </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (profileState !== 'ready') {
+    const copy = {
+      'provisioning-unavailable': {
+        title: 'Profile setup is temporarily unavailable',
+        body: 'You are signed in, but Otaku-mori could not prepare your local profile data yet. Please try again shortly.',
+      },
+      'schema-unavailable': {
+        title: 'Profile data is being prepared',
+        body: 'Your session is active, but the profile database is not ready for this feature yet.',
+      },
+      error: {
+        title: 'Profile temporarily unavailable',
+        body: 'We could not load your profile right now. Please try again later.',
+      },
+    }[profileState];
+
+    return (
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <ProfileHeader />
+        <div className="mt-8 rounded-2xl border border-amber-400/30 bg-black/50 p-12 text-center">
+          <h2 className="text-2xl font-semibold text-white mb-4">{copy.title}</h2>
+          <p className="text-zinc-300 mb-6 max-w-md mx-auto">{copy.body}</p>
         </div>
       </div>
     );

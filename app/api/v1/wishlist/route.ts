@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import {
   WishlistToggleSchema,
   createApiSuccess,
@@ -17,17 +23,7 @@ export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
-        {
-          status: 401,
-          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
-        },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     // Check idempotency
     const idempotencyKey = req.headers.get('x-idempotency-key');
@@ -73,8 +69,8 @@ export async function POST(req: NextRequest) {
       // Check if item is already in wishlist
       const existingItem = await db.wishlist.findUnique({
         where: {
-          userId_productId: {
-            userId,
+            userId_productId: {
+            userId: localUserId,
             productId,
           },
         },
@@ -87,7 +83,7 @@ export async function POST(req: NextRequest) {
         await db.wishlist.delete({
           where: {
             userId_productId: {
-              userId,
+              userId: localUserId,
               productId,
             },
           },
@@ -97,7 +93,7 @@ export async function POST(req: NextRequest) {
         // Add to wishlist
         const wishlistItem = await db.wishlist.create({
           data: {
-            userId,
+            userId: localUserId,
             productId,
           },
         });
@@ -131,6 +127,18 @@ export async function POST(req: NextRequest) {
 
     return rateLimitedHandler(req);
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
+        {
+          status: 401,
+          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
+        },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error('Error toggling wishlist item:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
@@ -145,17 +153,7 @@ export async function GET(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
-        {
-          status: 401,
-          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
-        },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const { searchParams } = new URL(req.url);
     const cursor = searchParams.get('cursor');
@@ -163,7 +161,7 @@ export async function GET(req: NextRequest) {
 
     const wishlistItems = await db.wishlist.findMany({
       where: {
-        userId,
+        userId: localUserId,
       },
       orderBy: {
         createdAt: 'desc',
@@ -209,6 +207,18 @@ export async function GET(req: NextRequest) {
       ),
     );
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
+        {
+          status: 401,
+          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
+        },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error('Error fetching wishlist:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(

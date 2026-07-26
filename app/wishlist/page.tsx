@@ -11,6 +11,7 @@ import { EmptyWishlist } from '@/app/components/empty-states';
 import { ShopGridSkeleton } from '@/app/components/ui/Skeleton';
 import GlassPanel from '@/app/components/GlassPanel';
 import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { normalizeApiErrorMessage } from '@/app/lib/api-error-message';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -56,7 +57,7 @@ export default function WishlistPage() {
       if (data.ok) {
         setWishlist(data.data.items || []);
       } else {
-        setError(data.error || 'Failed to load wishlist');
+        setError(normalizeApiErrorMessage(data.error, 'Failed to load wishlist'));
       }
     } catch (err) {
       setError('Failed to load wishlist');
@@ -85,7 +86,7 @@ export default function WishlistPage() {
         // Item was removed, update local state
         setWishlist((prev) => prev.filter((item) => item.id !== itemId));
       } else if (!data.ok) {
-        setError(data.error || 'Failed to remove item');
+        setError(normalizeApiErrorMessage(data.error, 'Failed to remove item'));
       }
     } catch (err) {
       setError('Failed to remove item');

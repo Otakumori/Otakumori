@@ -3,6 +3,7 @@
 import { logger } from '@/app/lib/logger';
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
+import { normalizeApiErrorMessage } from '@/app/lib/api-error-message';
 
 interface CartItem {
   id: string;
@@ -24,6 +25,8 @@ interface CartContextType {
   removeItem: (_lineKey: string) => void;
   updateQuantity: (_lineKey: string, _quantity: number) => void;
   clearCart: () => void;
+  syncWarning: string | null;
+  retryServerSync: () => void;
 }
 
 interface ServerCartItem {
@@ -112,6 +115,7 @@ function normalizeServerCartItems(serverItems: ServerCartItem[]): CartItem[] {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hasLoadedLocal, setHasLoadedLocal] = useState(false);
+  const [syncWarning, setSyncWarning] = useState<string | null>(null);
   const { isSignedIn, userId } = useAuth();
   const hasHydratedServerRef = useRef(false);
   const lastSyncedSignatureRef = useRef<string>('');
@@ -122,7 +126,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const signature = getCartSignature(payloadItems);
     if (signature === lastSyncedSignatureRef.current) return;
     lastSyncedSignatureRef.current = signature;
-    await syncCartToPrisma(payloadItems);
+    const result = await syncCartToPrisma(payloadItems);
+    if (result.ok) {
+      setSyncWarning(null);
+    } else {
+      setSyncWarning(result.message);
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -152,15 +161,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const hydrateFromServer = async () => {
       try {
         const response = await fetch('/api/v1/cart');
-        if (!response.ok) throw new Error('Failed to fetch server cart');
-
-        const result = await response.json();
-        if (!result.ok) throw new Error(result.error || 'Failed to fetch server cart');
+        const result = await response.json().catch(() => null);
+        if (!response.ok || !result?.ok) {
+          throw new Error(normalizeApiErrorMessage(result?.error, 'Failed to fetch server cart'));
+        }
 
         const serverItems = normalizeServerCartItems(Array.isArray(result.data) ? result.data : []);
         if (cancelled) return;
 
         hasHydratedServerRef.current = true;
+        setSyncWarning(null);
         setItems((currentItems) => {
           const mergedItems = reconcileCartItems(serverItems, currentItems);
           return areCartItemsEqual(mergedItems, currentItems) ? currentItems : mergedItems;
@@ -168,6 +178,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         logger.error('Failed to hydrate cart from server:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         hasHydratedServerRef.current = true;
+        if (!cancelled) {
+          setSyncWarning('Your local cart is preserved, but account cart sync is temporarily unavailable.');
+        }
       }
     };
 
@@ -226,11 +239,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => {
     setItems([]);
+    setSyncWarning(null);
     lastSyncedSignatureRef.current = '';
     if (typeof window !== 'undefined') localStorage.removeItem('cart');
   }, []);
 
-  const value = useMemo(() => ({ items, total, itemCount, addItem, removeItem, updateQuantity, clearCart }), [items, total, itemCount, addItem, removeItem, updateQuantity, clearCart]);
+  const retryServerSync = useCallback(() => {
+    hasHydratedServerRef.current = false;
+    lastSyncedSignatureRef.current = '';
+    void syncItems(items);
+  }, [items, syncItems]);
+
+  const value = useMemo(() => ({ items, total, itemCount, addItem, removeItem, updateQuantity, clearCart, syncWarning, retryServerSync }), [items, total, itemCount, addItem, removeItem, updateQuantity, clearCart, syncWarning, retryServerSync]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
@@ -243,7 +263,7 @@ export function useCart() {
   return context;
 }
 
-async function syncCartToPrisma(cartItems: CartItem[]) {
+async function syncCartToPrisma(cartItems: CartItem[]): Promise<{ ok: true } | { ok: false; message: string }> {
   try {
     const response = await fetch('/api/v1/cart/sync', {
       method: 'POST',
@@ -253,11 +273,17 @@ async function syncCartToPrisma(cartItems: CartItem[]) {
       }),
     });
 
-    if (!response.ok) throw new Error('Failed to sync cart');
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result?.ok) {
+      throw new Error(normalizeApiErrorMessage(result?.error, 'Failed to sync cart'));
+    }
 
-    const result = await response.json();
-    if (!result.ok) throw new Error(result.error || 'Failed to sync cart');
+    return { ok: true };
   } catch (error) {
     logger.error('Cart sync error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    return {
+      ok: false,
+      message: 'Your local cart is preserved, but account cart sync is temporarily unavailable.',
+    };
   }
 }

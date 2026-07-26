@@ -1,12 +1,17 @@
 export const runtime = 'nodejs';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { prisma } from '@/app/lib/prisma';
 import { CheckoutRequest } from '@/app/lib/contracts';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
 import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 import { getDiscountConfig } from '@/app/config/petalTuning';
@@ -49,13 +54,7 @@ export async function POST(req: NextRequest) {
       const stripe = getStripeClient();
 
       stage = 'auth';
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json(
-          { ok: false, error: 'Unauthorized', requestId, stage },
-          { status: 401 },
-        );
-      }
+      const viewer = await requireLocalViewer();
 
       stage = 'idempotency_header';
       const idempotencyKey = req.headers.get('x-idempotency-key');
@@ -86,17 +85,13 @@ export async function POST(req: NextRequest) {
         parsed.data as any;
 
       stage = 'load_user';
-      let user = await prisma.user.findFirst({ where: { clerkId: userId } });
-      if (!user) {
-        stage = 'create_missing_user';
-        user = await prisma.user.create({
-          data: {
-            clerkId: userId,
-            email: shippingInfo?.email ?? '',
-            username: `user_${userId.slice(0, 8)}`,
-          },
-        });
-      }
+      const user = {
+        id: viewer.localUserId,
+        clerkId: viewer.clerkUserId,
+        email: viewer.email,
+        username: viewer.username,
+        displayName: viewer.displayName,
+      };
 
       stage = 'validate_items';
       const safeItems = [];
@@ -362,7 +357,7 @@ export async function POST(req: NextRequest) {
           successUrl ??
           `${getRuntimeOrigin()}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancelUrl ?? `${getRuntimeOrigin()}/shop/cart`,
-        client_reference_id: userId,
+        client_reference_id: viewer.clerkUserId,
         customer_email: shippingInfo?.email ?? user.email,
         shipping_address_collection: {
           allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'],
@@ -401,10 +396,27 @@ export async function POST(req: NextRequest) {
         { requestId, stage },
         error instanceof Error ? error : new Error(String(error)),
       );
+      if (error instanceof AuthenticationRequiredError) {
+        return NextResponse.json(
+          { ok: false, error: 'Unauthorized', requestId, stage },
+          { status: 401 },
+        );
+      }
+      if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'Checkout is temporarily unavailable while account data is prepared.',
+            requestId,
+            stage,
+          },
+          { status: 503 },
+        );
+      }
       return NextResponse.json(
         {
           ok: false,
-          error: error instanceof Error ? error.message : 'Unhandled checkout session error',
+          error: 'Checkout could not be started. Please try again later.',
           requestId,
           stage,
         },
