@@ -1,13 +1,15 @@
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { db } from '@/app/lib/db';
-import { generateRequestId } from '@/lib/request-id';
+import { generateRequestId } from '@/app/lib/request-id';
 import { withRateLimit } from '@/app/lib/rate-limiting';
+import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
-  return withRateLimit('activity-feed-get', async () => {
+const getActivityFeed = withRateLimit(
+  'activity-feed-get',
+  async (req: NextRequest): Promise<Response> => {
     const requestId = generateRequestId();
 
     try {
@@ -130,7 +132,12 @@ export async function GET(req: NextRequest) {
         requestId,
       });
     } catch (error) {
-      console.error('Activity feed error:', error);
+      logger.error(
+        'Activity feed error:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       return NextResponse.json(
         {
           ok: false,
@@ -140,6 +147,7 @@ export async function GET(req: NextRequest) {
         { status: 500 },
       );
     }
-  });
-}
+  },
+);
 
+export const GET = getActivityFeed;
