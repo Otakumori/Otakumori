@@ -36,9 +36,18 @@ const getActivityFeed = withRateLimit(
 
       // Get query parameters
       const { searchParams } = new URL(req.url);
-      const limit = parseInt(searchParams.get('limit') || '10', 10);
-      const offset = parseInt(searchParams.get('offset') || '0', 10);
+      const requestedLimit = Number.parseInt(searchParams.get('limit') || '10', 10);
+      const offset = Number.parseInt(searchParams.get('offset') || '0', 10);
       const type = searchParams.get('type'); // Optional filter by activity type
+
+      if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || !Number.isInteger(offset) || offset < 0) {
+        return NextResponse.json(
+          { ok: false, error: 'Invalid pagination parameters', requestId },
+          { status: 400 },
+        );
+      }
+
+      const limit = Math.min(requestedLimit, 50);
 
       // Query recent activities
       const activities = await db.activity.findMany({
@@ -49,7 +58,7 @@ const getActivityFeed = withRateLimit(
         orderBy: {
           createdAt: 'desc',
         },
-        take: Math.min(limit, 50), // Cap at 50
+        take: limit,
         skip: offset,
       });
 

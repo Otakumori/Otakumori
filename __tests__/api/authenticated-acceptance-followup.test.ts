@@ -250,6 +250,31 @@ describe('activity feed authenticated acceptance follow-up', () => {
     expect(mocks.appDb.activity.findMany).toHaveBeenCalledTimes(1);
   });
 
+  it('rejects invalid activity pagination before querying Prisma', async () => {
+    const { GET } = await import('@/app/api/v1/activity/feed/route');
+
+    const response = await GET(request('/api/v1/activity/feed?limit=abc&offset=-1'));
+    const body = await json(response);
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe('Invalid pagination parameters');
+    expect(mocks.appDb.activity.findMany).not.toHaveBeenCalled();
+  });
+
+  it('caps excessive activity limits at the bounded maximum', async () => {
+    const { GET } = await import('@/app/api/v1/activity/feed/route');
+
+    const response = await GET(request('/api/v1/activity/feed?limit=500&offset=2'));
+
+    expect(response.status).toBe(200);
+    expect(mocks.appDb.activity.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        take: 50,
+        skip: 2,
+      }),
+    );
+  });
+
   it('returns 200 for a populated activity feed', async () => {
     mocks.appDb.activity.findMany.mockResolvedValue([
       {
