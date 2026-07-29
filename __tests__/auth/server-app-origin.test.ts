@@ -44,6 +44,44 @@ describe('trusted server application origin', () => {
     );
   });
 
+  it('prefers the exact HTTPS staging alias for Preview requests received through staging', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    vi.stubEnv('VERCEL_URL', 'otaku-mori-fallback.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'staging.otaku-mori.com',
+      'x-forwarded-proto': 'https',
+    });
+
+    await expect(resolveServerAppOrigin()).resolves.toBe('https://staging.otaku-mori.com');
+  });
+
+  it('does not use staging alias for HTTP, variant, port, or contaminated Preview hosts', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+
+    for (const headers of [
+      { 'x-forwarded-host': 'staging.otaku-mori.com', 'x-forwarded-proto': 'http' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com:443', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'evil.staging.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com.evil.example', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'preview.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'user:pass@staging.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com/path', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': ' staging.otaku-mori.com ', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com, evil.example', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'evil.example, staging.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com', 'x-forwarded-proto': 'https, http' },
+      { 'x-forwarded-host': 'staging.otaku-mori.com\r\nx-evil: yes', 'x-forwarded-proto': 'https' },
+    ]) {
+      mockRequestHeaders(headers);
+
+      await expect(resolveServerAppOrigin()).resolves.toBe(
+        'https://otaku-mori-git-auth-otaku-mori-babe.vercel.app',
+      );
+    }
+  });
+
   it('falls back to VERCEL_URL when the Preview branch URL is absent', async () => {
     vi.stubEnv('VERCEL_ENV', 'preview');
     vi.stubEnv('VERCEL_URL', 'otaku-mori-fallback.vercel.app');
@@ -91,7 +129,8 @@ describe('trusted server application origin', () => {
   });
 
   it('normalizes helper internals without accepting paths, credentials, or ports', () => {
-    const { normalizeVercelPreviewOrigin } = serverAppOriginTestInternals;
+    const { normalizeStagingPreviewOrigin, normalizeVercelPreviewOrigin } =
+      serverAppOriginTestInternals;
 
     expect(normalizeVercelPreviewOrigin('otaku-mori.vercel.app')).toBe(
       'https://otaku-mori.vercel.app',
@@ -99,5 +138,9 @@ describe('trusted server application origin', () => {
     expect(normalizeVercelPreviewOrigin('otaku-mori.vercel.app/path')).toBeNull();
     expect(normalizeVercelPreviewOrigin('user:pass@otaku-mori.vercel.app')).toBeNull();
     expect(normalizeVercelPreviewOrigin('otaku-mori.vercel.app:443')).toBeNull();
+    expect(normalizeStagingPreviewOrigin('staging.otaku-mori.com', 'https')).toBe(
+      'https://staging.otaku-mori.com',
+    );
+    expect(normalizeStagingPreviewOrigin('staging.otaku-mori.com:443', 'https')).toBeNull();
   });
 });
