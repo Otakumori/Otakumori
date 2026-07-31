@@ -56,7 +56,19 @@ describe('trusted server application origin', () => {
     await expect(resolveServerAppOrigin()).resolves.toBe('https://staging.otaku-mori.com');
   });
 
-  it('does not use staging alias for HTTP, variant, port, or contaminated Preview hosts', async () => {
+  it('prefers the exact HTTPS PR #73 Preview alias before Vercel branch metadata', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    vi.stubEnv('VERCEL_URL', 'otaku-mori-fallback.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'PR73-Preview.Otaku-Mori.Com',
+      'x-forwarded-proto': 'https',
+    });
+
+    await expect(resolveServerAppOrigin()).resolves.toBe('https://pr73-preview.otaku-mori.com');
+  });
+
+  it('does not use trusted Preview aliases for HTTP, variant, port, or contaminated hosts', async () => {
     vi.stubEnv('VERCEL_ENV', 'preview');
     vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
 
@@ -73,6 +85,22 @@ describe('trusted server application origin', () => {
       { 'x-forwarded-host': 'evil.example, staging.otaku-mori.com', 'x-forwarded-proto': 'https' },
       { 'x-forwarded-host': 'staging.otaku-mori.com', 'x-forwarded-proto': 'https, http' },
       { 'x-forwarded-host': 'staging.otaku-mori.com\r\nx-evil: yes', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'pr73-preview.otaku-mori.com', 'x-forwarded-proto': 'http' },
+      { 'x-forwarded-host': 'pr73-preview.otaku-mori.com:443', 'x-forwarded-proto': 'https' },
+      { 'x-forwarded-host': 'pr74-preview.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      {
+        'x-forwarded-host': 'pr73-preview.otaku-mori.com.attacker.example',
+        'x-forwarded-proto': 'https',
+      },
+      { 'x-forwarded-host': 'evil-pr73-preview.otaku-mori.com', 'x-forwarded-proto': 'https' },
+      {
+        'x-forwarded-host': 'pr73-preview.otaku-mori.com, evil.example',
+        'x-forwarded-proto': 'https',
+      },
+      {
+        'x-forwarded-host': 'user:pass@pr73-preview.otaku-mori.com',
+        'x-forwarded-proto': 'https',
+      },
     ]) {
       mockRequestHeaders(headers);
 
@@ -142,5 +170,8 @@ describe('trusted server application origin', () => {
       'https://staging.otaku-mori.com',
     );
     expect(normalizeStagingPreviewOrigin('staging.otaku-mori.com:443', 'https')).toBeNull();
+    expect(normalizeStagingPreviewOrigin('pr73-preview.otaku-mori.com', 'https')).toBe(
+      'https://pr73-preview.otaku-mori.com',
+    );
   });
 });

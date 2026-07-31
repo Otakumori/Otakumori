@@ -1,11 +1,13 @@
 export const ACCOUNTS_ORIGIN = 'https://accounts.otaku-mori.com';
 export const FALLBACK_APP_ORIGIN = 'https://www.otaku-mori.com';
 export const STAGING_APP_ORIGIN = 'https://staging.otaku-mori.com';
+export const PR73_PREVIEW_APP_ORIGIN = 'https://pr73-preview.otaku-mori.com';
 
 const TRUSTED_APP_ORIGINS = new Set([
   'https://www.otaku-mori.com',
   'https://otaku-mori.com',
   STAGING_APP_ORIGIN,
+  PR73_PREVIEW_APP_ORIGIN,
 ]);
 const LOCAL_APP_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 

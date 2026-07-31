@@ -20,6 +20,7 @@ vi.mock('next/navigation', () => ({
 const mockedAuth = vi.mocked(auth);
 const mockedHeaders = vi.mocked(headers);
 const mockedRedirect = vi.mocked(redirect);
+const PR73_PREVIEW_ORIGIN = 'https://pr73-preview.otaku-mori.com';
 
 function mockRequestHeaders(values: Record<string, string | null>) {
   mockedHeaders.mockResolvedValue({
@@ -66,6 +67,22 @@ describe('account and local auth route redirects', () => {
       'https://otaku-mori-git-auth-otaku-mori-babe.vercel.app/account',
     );
     expect(url.searchParams.get('redirect_url')).not.toBe('https://www.otaku-mori.com/account');
+  });
+
+  it('preserves the exact PR #73 custom Preview origin for account redirects', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'pr73-preview.otaku-mori.com',
+      'x-forwarded-proto': 'https',
+    });
+
+    const target = await expectRedirect(() => AccountPage());
+    const url = new URL(target);
+
+    expect(url.origin).toBe('https://accounts.otaku-mori.com');
+    expect(url.pathname).toBe('/sign-in');
+    expect(url.searchParams.get('redirect_url')).toBe(`${PR73_PREVIEW_ORIGIN}/account`);
   });
 
   it('preserves local request origins for signed-out /account visitors', async () => {
@@ -126,6 +143,22 @@ describe('account and local auth route redirects', () => {
     );
   });
 
+  it('preserves the exact PR #73 custom Preview origin for signed-out checkout', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'pr73-preview.otaku-mori.com',
+      'x-forwarded-proto': 'https',
+    });
+
+    const target = await expectRedirect(() => CheckoutPage());
+    const url = new URL(target);
+
+    expect(url.origin).toBe('https://accounts.otaku-mori.com');
+    expect(url.pathname).toBe('/sign-in');
+    expect(url.searchParams.get('redirect_url')).toBe(`${PR73_PREVIEW_ORIGIN}/checkout`);
+  });
+
   it('redirects signed-out local checkout to hosted sign-in with a local checkout return URL', async () => {
     mockRequestHeaders({ host: '127.0.0.1:3000', 'x-forwarded-proto': 'http' });
 
@@ -164,6 +197,24 @@ describe('account and local auth route redirects', () => {
     );
   });
 
+  it('preserves the exact PR #73 custom Preview origin in the local sign-in shim', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'pr73-preview.otaku-mori.com',
+      'x-forwarded-proto': 'https',
+    });
+
+    const target = await expectRedirect(() =>
+      SignInPage({ searchParams: Promise.resolve({ redirect_url: '/shop' }) }),
+    );
+    const url = new URL(target);
+
+    expect(url.origin).toBe('https://accounts.otaku-mori.com');
+    expect(url.pathname).toBe('/sign-in');
+    expect(url.searchParams.get('redirect_url')).toBe(`${PR73_PREVIEW_ORIGIN}/shop`);
+  });
+
   it('turns the local sign-up route into a hosted Account Portal redirect', async () => {
     const target = await expectRedirect(() =>
       SignUpPage({ searchParams: Promise.resolve({ redirect_url: '/profile' }) }),
@@ -173,6 +224,24 @@ describe('account and local auth route redirects', () => {
     expect(url.origin).toBe('https://accounts.otaku-mori.com');
     expect(url.pathname).toBe('/sign-up');
     expect(url.searchParams.get('redirect_url')).toBe('https://www.otaku-mori.com/profile');
+  });
+
+  it('preserves the exact PR #73 custom Preview origin in the local sign-up shim', async () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
+    mockRequestHeaders({
+      'x-forwarded-host': 'pr73-preview.otaku-mori.com',
+      'x-forwarded-proto': 'https',
+    });
+
+    const target = await expectRedirect(() =>
+      SignUpPage({ searchParams: Promise.resolve({ redirect_url: '/profile' }) }),
+    );
+    const url = new URL(target);
+
+    expect(url.origin).toBe('https://accounts.otaku-mori.com');
+    expect(url.pathname).toBe('/sign-up');
+    expect(url.searchParams.get('redirect_url')).toBe(`${PR73_PREVIEW_ORIGIN}/profile`);
   });
 
   it('preserves local request origins in the local sign-up shim', async () => {
