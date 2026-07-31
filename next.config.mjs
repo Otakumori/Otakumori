@@ -3,6 +3,7 @@ import path from 'node:path';
 import { env } from './env.mjs';
 
 const isVercelPreview = process.env.VERCEL_ENV === 'preview';
+const isVercelBuild = process.env.VERCEL === '1';
 
 if (isVercelPreview) {
   for (const key of [
@@ -47,6 +48,11 @@ const nextConfig = {
   // Temporarily disable ESLint during build for deployment
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // GitHub CI and local validation run `pnpm typecheck`; avoid Vercel's duplicate pass
+    // after compile because the 8 GB Preview builder was OOM-killed during that phase.
+    ignoreBuildErrors: isVercelBuild,
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion', '@radix-ui/react-icons'],
