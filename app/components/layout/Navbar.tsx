@@ -11,7 +11,6 @@ import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
-import { buildCanonicalSignInUrl, buildCanonicalSignUpUrl } from '@/app/lib/auth/accountUrls';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -78,6 +77,24 @@ const GAME_FACE_LINKS = [
   { label: 'All Games', href: paths.games(), description: 'Browse every cube face and challenge.' },
 ];
 
+function normalizeLocalReturnPath(pathname: string | null) {
+  if (
+    !pathname ||
+    !pathname.startsWith('/') ||
+    pathname.startsWith('//') ||
+    pathname.includes('\\')
+  ) {
+    return '/';
+  }
+
+  return pathname;
+}
+
+function buildLocalAuthHref(route: '/sign-in' | '/sign-up', pathname: string | null) {
+  const params = new URLSearchParams({ redirect_url: normalizeLocalReturnPath(pathname) });
+  return `${route}?${params.toString()}`;
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -104,8 +121,8 @@ export default function Navbar() {
     requireAuthForWishlist,
     signOut,
   } = account;
-  const signInHref = useMemo(() => buildCanonicalSignInUrl(pathname || '/'), [pathname]);
-  const signUpHref = useMemo(() => buildCanonicalSignUpUrl(pathname || '/'), [pathname]);
+  const signInHref = useMemo(() => buildLocalAuthHref('/sign-in', pathname), [pathname]);
+  const signUpHref = useMemo(() => buildLocalAuthHref('/sign-up', pathname), [pathname]);
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
