@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2, Lock } from 'lucide-react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useCart } from '../../components/cart/CartProvider';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { paths } from '@/lib/paths';
 
 interface ShippingInfo {
@@ -81,7 +82,7 @@ export default function CheckoutPage() {
   const { items: cart, total, removeItem } = useCart();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(paths.checkout())}`;
+  const signInHref = buildCanonicalSignInUrl(paths.checkout());
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',

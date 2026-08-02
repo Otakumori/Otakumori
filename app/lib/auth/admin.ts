@@ -9,6 +9,8 @@ import { currentUser, auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { isAdminEmail, ADMIN_EMAILS } from '@/app/lib/config/admin';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 import { type NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -47,7 +49,7 @@ export async function requireAdmin(): Promise<{ id: string; email: string | null
   const authResult = await auth();
 
   if (!authResult.userId) {
-    redirect('/sign-in?redirect_url=/admin');
+    redirect(buildCanonicalSignInUrl('/admin', await resolveServerAppOrigin()));
   }
 
   if (!hasAdminRole(authResult.sessionClaims)) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import FooterDark from '@/app/components/FooterDark';
 import { EmptyWishlist } from '@/app/components/empty-states';
 import { ShopGridSkeleton } from '@/app/components/ui/Skeleton';
 import GlassPanel from '@/app/components/GlassPanel';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -29,24 +30,16 @@ interface WishlistItem {
 }
 
 export default function WishlistPage() {
-  const { isSignedIn, userId } = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
   const router = useRouter();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<Set<string>>(new Set());
+  const fetchedUserIdRef = useRef<string | null>(null);
+  const redirectedSignedOutRef = useRef(false);
 
-  useEffect(() => {
-    if (!isSignedIn) {
-      router.push('/sign-in?redirect_url=/wishlist');
-      return;
-    }
-    if (userId) {
-      fetchWishlist();
-    }
-  }, [isSignedIn, userId, router]);
-
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -60,11 +53,37 @@ export default function WishlistPage() {
     } catch (err) {
       setError('Failed to load wishlist');
       const logger = await getLogger();
-      logger.error('Wishlist fetch error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Wishlist fetch error:',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      fetchedUserIdRef.current = null;
+      setLoading(false);
+      if (!redirectedSignedOutRef.current) {
+        redirectedSignedOutRef.current = true;
+        router.push(buildCanonicalSignInUrl('/wishlist'));
+      }
+      return;
+    }
+
+    redirectedSignedOutRef.current = false;
+
+    if (userId && fetchedUserIdRef.current !== userId) {
+      fetchedUserIdRef.current = userId;
+      void fetchWishlist();
+    }
+  }, [fetchWishlist, isLoaded, isSignedIn, router, userId]);
 
   const handleRemove = async (itemId: string, productId: string) => {
     if (removing.has(itemId)) return;
@@ -89,7 +108,12 @@ export default function WishlistPage() {
     } catch (err) {
       setError('Failed to remove item');
       const logger = await getLogger();
-      logger.error('Remove wishlist error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Remove wishlist error:',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setRemoving((prev) => {
         const next = new Set(prev);
@@ -99,11 +123,11 @@ export default function WishlistPage() {
     }
   };
 
-  if (!isSignedIn) {
+  if (isLoaded && !isSignedIn) {
     return null; // Will redirect
   }
 
-  if (loading) {
+  if (!isLoaded || loading) {
     return (
       <>
         <main className="relative z-10 min-h-screen bg-[#080611]">

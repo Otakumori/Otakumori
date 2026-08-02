@@ -2,6 +2,7 @@
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useAuth } from '@/app/hooks/useAuth';
+import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
@@ -11,7 +12,7 @@ interface RouteGuardProps {
   requireAdmin?: boolean;
   fallback?: ReactNode;
   redirectTo?: string;
-  }
+}
 
 export function RouteGuard({
   children,
@@ -27,21 +28,13 @@ export function RouteGuard({
     if (!isLoaded) return;
 
     if (requireAuth && !isSignedIn) {
-      const url = new URL('/sign-in', window.location.origin);
-      if (redirectTo) {
-        url.searchParams.set('redirect_url', redirectTo);
-      }
-      router.push(url.toString());
+      window.location.assign(buildCanonicalSignInUrl(redirectTo || window.location.href));
       return;
     }
 
     if (requireAdmin && (!isSignedIn || !isAdmin)) {
       if (!isSignedIn) {
-        const url = new URL('/sign-in', window.location.origin);
-        if (redirectTo) {
-          url.searchParams.set('redirect_url', redirectTo);
-        }
-        router.push(url.toString());
+        window.location.assign(buildCanonicalSignInUrl(redirectTo || window.location.href));
       } else {
         router.push('/unauthorized');
       }

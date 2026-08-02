@@ -3,29 +3,21 @@
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { clientEnv } from '@/env/client';
+import { buildCanonicalSignInUrl, buildCanonicalSignUpUrl } from '@/app/lib/auth/accountUrls';
 
 export default function UserMenu() {
   // Call useUser to maintain session persistence and auth state synchronization
   useUser();
-  const [redirectParam, setRedirectParam] = useState<string>('');
+  const [returnUrl, setReturnUrl] = useState<string>('/');
 
   useEffect(() => {
     try {
-      const href = window.location.pathname + window.location.search;
-      setRedirectParam(`redirect_url=${encodeURIComponent(href)}`);
+      setReturnUrl(window.location.href);
     } catch {}
   }, []);
 
-  const signInUrl = useMemo(() => {
-    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
-    return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
-  }, [redirectParam]);
-
-  const signUpUrl = useMemo(() => {
-    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up';
-    return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
-  }, [redirectParam]);
+  const signInUrl = useMemo(() => buildCanonicalSignInUrl(returnUrl), [returnUrl]);
+  const signUpUrl = useMemo(() => buildCanonicalSignUpUrl(returnUrl), [returnUrl]);
 
   return (
     <div className="flex items-center gap-3">
