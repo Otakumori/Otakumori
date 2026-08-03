@@ -245,7 +245,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const retryServerSync = useCallback(() => {
-    hasHydratedServerRef.current = false;
     lastSyncedSignatureRef.current = '';
     void syncItems(items);
   }, [items, syncItems]);

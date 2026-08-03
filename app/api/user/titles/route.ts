@@ -24,7 +24,7 @@ export async function GET() {
         return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
       }
       if (error instanceof LocalUserUnavailableError) {
-        return schemaUnavailableResponse('titles_user_unavailable');
+        return NextResponse.json(schemaUnavailableResponse('titles_user_unavailable'), { status: 503 });
       }
       throw error;
     }

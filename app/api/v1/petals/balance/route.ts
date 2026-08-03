@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest) {
       ({ localUserId } = await requireLocalViewer());
     } catch (error) {
       if (error instanceof LocalUserUnavailableError) {
-        return schemaUnavailableResponse('petals_user_unavailable');
+        return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
       }
 
       return NextResponse.json(

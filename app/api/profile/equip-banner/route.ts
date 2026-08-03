@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
     if (error instanceof LocalUserUnavailableError) {
-      return schemaUnavailableResponse('profile_user_unavailable');
+      return NextResponse.json(schemaUnavailableResponse('profile_user_unavailable'), { status: 503 });
     }
 
     logger.error(
