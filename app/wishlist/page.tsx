@@ -38,6 +38,7 @@ export default function WishlistPage() {
   const [error, setError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<Set<string>>(new Set());
   const fetchedUserIdRef = useRef<string | null>(null);
+  const redirectedSignedOutRef = useRef(false);
 
   const fetchWishlist = useCallback(async () => {
     try {
@@ -53,7 +54,12 @@ export default function WishlistPage() {
     } catch (err) {
       setError('Failed to load wishlist');
       const logger = await getLogger();
-      logger.error('Wishlist fetch error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Wishlist fetch error:',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setLoading(false);
     }
@@ -61,12 +67,19 @@ export default function WishlistPage() {
 
   useEffect(() => {
     if (!isLoaded) return;
+
     if (!isSignedIn) {
       fetchedUserIdRef.current = null;
       setLoading(false);
-      router.push(buildCanonicalSignInUrl('/wishlist'));
+      if (!redirectedSignedOutRef.current) {
+        redirectedSignedOutRef.current = true;
+        router.push(buildCanonicalSignInUrl('/wishlist'));
+      }
       return;
     }
+
+    redirectedSignedOutRef.current = false;
+
     if (userId && fetchedUserIdRef.current !== userId) {
       fetchedUserIdRef.current = userId;
       void fetchWishlist();
@@ -96,7 +109,12 @@ export default function WishlistPage() {
     } catch (err) {
       setError('Failed to remove item');
       const logger = await getLogger();
-      logger.error('Remove wishlist error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Remove wishlist error:',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setRemoving((prev) => {
         const next = new Set(prev);

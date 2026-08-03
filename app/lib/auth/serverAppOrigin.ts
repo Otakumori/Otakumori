@@ -2,10 +2,17 @@ import 'server-only';
 
 import { headers } from 'next/headers';
 
-import { FALLBACK_APP_ORIGIN, STAGING_APP_ORIGIN } from '@/app/lib/auth/accountUrls';
+import {
+  FALLBACK_APP_ORIGIN,
+  PR73_PREVIEW_APP_ORIGIN,
+  STAGING_APP_ORIGIN,
+} from '@/app/lib/auth/accountUrls';
 
 const LOCAL_APP_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
-const STAGING_APP_HOST = new URL(STAGING_APP_ORIGIN).hostname;
+const TRUSTED_PREVIEW_ORIGINS_BY_HOST = new Map([
+  [new URL(STAGING_APP_ORIGIN).hostname, STAGING_APP_ORIGIN],
+  [new URL(PR73_PREVIEW_APP_ORIGIN).hostname, PR73_PREVIEW_APP_ORIGIN],
+]);
 
 type RuntimeProcess = {
   env?: Record<string, string | undefined>;
@@ -50,6 +57,23 @@ function normalizeVercelPreviewOrigin(candidate?: string) {
   }
 }
 
+function singleCleanHeaderValue(value: string | null) {
+  if (!value || value !== value.trim() || value.includes(',')) return null;
+  if (/[\u0000-\u001f\u007f]/.test(value)) return null;
+  return value.toLowerCase();
+}
+
+function normalizeStagingPreviewOrigin(hostHeader: string | null, protoHeader: string | null) {
+  const host = singleCleanHeaderValue(hostHeader);
+  const protocol = singleCleanHeaderValue(protoHeader);
+
+  if (host && protocol === 'https') {
+    return TRUSTED_PREVIEW_ORIGINS_BY_HOST.get(host) ?? null;
+  }
+
+  return null;
+}
+
 function normalizeLocalOrigin(hostHeader: string | null, protoHeader: string | null) {
   if (!hostHeader) return null;
 
@@ -72,21 +96,6 @@ function normalizeLocalOrigin(hostHeader: string | null, protoHeader: string | n
   } catch {
     return null;
   }
-}
-
-function firstHeaderValue(value: string | null) {
-  return value?.split(',')[0]?.trim() || null;
-}
-
-function normalizeStagingPreviewOrigin(hostHeader: string | null, protoHeader: string | null) {
-  const host = firstHeaderValue(hostHeader)?.toLowerCase();
-  const protocol = firstHeaderValue(protoHeader)?.toLowerCase();
-
-  if (host === STAGING_APP_HOST && protocol === 'https') {
-    return STAGING_APP_ORIGIN;
-  }
-
-  return null;
 }
 
 export async function resolveServerAppOrigin() {
@@ -120,6 +129,6 @@ export async function resolveServerAppOrigin() {
 
 export const serverAppOriginTestInternals = {
   normalizeVercelPreviewOrigin,
-  normalizeLocalOrigin,
   normalizeStagingPreviewOrigin,
+  normalizeLocalOrigin,
 };
