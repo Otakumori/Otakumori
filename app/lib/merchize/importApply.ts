@@ -6,6 +6,7 @@ import {
   countsMatch,
   MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION,
   loadMerchizeImportPlan,
+  merchizeImportSourceIsVerified,
   preflightCounts,
   verifyMerchizeImportPreflightSignature,
   type CanonicalMerchizeProduct,
@@ -315,6 +316,30 @@ async function createAuditRecord(
   });
 }
 
+function blockedResultWithoutAudit(input: {
+  requestId: string;
+  preflight: MerchizeImportPreflight;
+  error: MerchizeImportApplyError;
+}): MerchizeImportApplyResult {
+  return {
+    ok: false,
+    provider: 'merchize',
+    mode: 'hidden_local_import',
+    replayed: false,
+    status: 'blocked',
+    requestId: input.requestId,
+    productCount: input.preflight.productCount,
+    inserted: 0,
+    updated: 0,
+    skipped: 0,
+    blocked: input.preflight.wouldBlock,
+    public: false,
+    purchasable: false,
+    products: [],
+    error: input.error.message,
+  };
+}
+
 async function markBlocked(
   auditRecord: AuditRecord,
   preflight: MerchizeImportPreflight,
@@ -508,6 +533,17 @@ export async function applyMerchizeHiddenLocalImport(
   if (existingReplay) return existingReplay;
 
   const { preflight, manifest } = await (input.loadPlan ?? loadMerchizeImportPlan)();
+  if (!merchizeImportSourceIsVerified(manifest)) {
+    return blockedResultWithoutAudit({
+      requestId: input.requestId,
+      preflight,
+      error: new MerchizeImportApplyError(
+        'Merchize import source is not a verified seller-product catalog.',
+        'seller_product_source_unverified',
+      ),
+    });
+  }
+
   let auditRecord: AuditRecord;
 
   try {

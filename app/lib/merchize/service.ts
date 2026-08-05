@@ -46,6 +46,25 @@ export interface MerchizeProduct {
   };
 }
 
+export type MerchizeCatalogScope = 'fulfillment_blank_catalog' | 'seller_products' | 'unknown';
+export type MerchizeCatalogCompleteness = 'complete' | 'incomplete' | 'unknown';
+
+export interface MerchizeCatalogPagination {
+  total: number | null;
+  limit: number | null;
+  page: number | null;
+  loadedCount: number;
+  completeness: MerchizeCatalogCompleteness;
+}
+
+export interface MerchizeProductCollection {
+  products: MerchizeProduct[];
+  rawProductCount: number;
+  payloadShapeKeys: string[];
+  catalogScope: MerchizeCatalogScope;
+  pagination: MerchizeCatalogPagination;
+}
+
 export interface MerchizeConnectionResult {
   success: boolean;
   endpoint: string;
@@ -63,6 +82,9 @@ export interface MerchizePreflightIssue {
 
 export interface MerchizeCatalogPreflight {
   connection: MerchizeConnectionResult;
+  catalogScope: MerchizeCatalogScope;
+  completeness: MerchizeCatalogCompleteness;
+  pagination: MerchizeCatalogPagination;
   productCount: number;
   normalizedProductCount: number;
   variantCount: number;
@@ -73,6 +95,7 @@ export interface MerchizeCatalogPreflight {
   duplicateProductIdCount: number;
   duplicateSkuCount: number;
   payloadShapeKeys: string[];
+  safeToNormalize: boolean;
   safeToImport: boolean;
   issues: MerchizePreflightIssue[];
   products: Array<{
@@ -182,6 +205,19 @@ function coerceNumber(value: unknown): number | null {
   if (typeof value === 'string') {
     const parsed = Number(value.replace(/[^\\d.-]/g, ''));
     return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+function coerceNonNegativeInteger(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isInteger(value) && value >= 0 ? value : null;
+  }
+
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    const parsed = Number(value.trim());
+    return Number.isSafeInteger(parsed) ? parsed : null;
   }
 
   return null;
@@ -535,6 +571,51 @@ function extractPayloadKeys(payload: unknown): string[] | undefined {
   return Object.keys(payload as JsonRecord).slice(0, 12);
 }
 
+function extractPaginationRecord(payload: unknown): JsonRecord | null {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return null;
+  }
+
+  const record = payload as JsonRecord;
+  if (record.data && typeof record.data === 'object' && !Array.isArray(record.data)) {
+    return record.data as JsonRecord;
+  }
+
+  return record;
+}
+
+function extractCatalogPagination(
+  payload: unknown,
+  loadedCount: number,
+): MerchizeCatalogPagination {
+  const record = extractPaginationRecord(payload);
+  const total = record ? coerceNonNegativeInteger(record.total) : null;
+  const limit = record ? coerceNonNegativeInteger(record.limit) : null;
+  const page = record ? coerceNonNegativeInteger(record.page) : null;
+
+  if (total == null || limit == null || page == null) {
+    return { total, limit, page, loadedCount, completeness: 'unknown' };
+  }
+
+  if (limit <= 0 || page <= 0 || loadedCount > limit || loadedCount > total) {
+    return { total, limit, page, loadedCount, completeness: 'unknown' };
+  }
+
+  const loadedThroughCurrentPage = page * limit;
+  const expectedCurrentPageCount = Math.max(0, Math.min(limit, total - (page - 1) * limit));
+  if (loadedCount !== expectedCurrentPageCount) {
+    return { total, limit, page, loadedCount, completeness: 'unknown' };
+  }
+
+  return {
+    total,
+    limit,
+    page,
+    loadedCount,
+    completeness: loadedThroughCurrentPage >= total ? 'complete' : 'incomplete',
+  };
+}
+
 export class MerchizeService {
   private readonly baseUrl: string;
   private readonly accessToken: string;
@@ -626,16 +707,31 @@ export class MerchizeService {
     page?: number;
     search?: string;
   }): Promise<MerchizeProduct[]> {
+    return (await this.getProductCollection(options)).products;
+  }
+
+  async getProductCollection(options?: {
+    limit?: number;
+    page?: number;
+    search?: string;
+  }): Promise<MerchizeProductCollection> {
     const { body } = await this.request('/product/catalog', {
       limit: options?.limit ?? 50,
       page: options?.page ?? 1,
       search: options?.search,
     });
     const collection = extractCatalogProducts(body);
-
-    return collection
+    const products = collection
       .map((item, index) => normalizeProduct(item, index))
       .filter((item): item is MerchizeProduct => Boolean(item));
+
+    return {
+      products,
+      rawProductCount: collection.length,
+      payloadShapeKeys: extractPayloadKeys(body) ?? [],
+      catalogScope: 'fulfillment_blank_catalog',
+      pagination: extractCatalogPagination(body, collection.length),
+    };
   }
 
   async preflightCatalog(options?: {
@@ -648,6 +744,7 @@ export class MerchizeService {
     };
     const { response, body } = await this.request('/product/catalog', query);
     const collection = extractCatalogProducts(body);
+    const pagination = extractCatalogPagination(body, collection.length);
     const products = collection
       .map((item, index) => normalizeProduct(item, index))
       .filter((item): item is MerchizeProduct => Boolean(item));
@@ -727,6 +824,35 @@ export class MerchizeService {
       });
     }
 
+    issues.push({
+      code: 'unsupported_provider_catalog_scope',
+      message:
+        'The connected Merchize endpoint is the fulfillment blank catalog, not a verified seller-created product source.',
+      count: products.length,
+    });
+
+    if (pagination.completeness !== 'complete') {
+      issues.push({
+        code: 'provider_catalog_completeness_unverified',
+        message: 'Merchize pagination metadata does not prove a complete seller-product catalog.',
+        count: products.length,
+      });
+    }
+
+    const safeToNormalize =
+      products.length > 0 &&
+      !issues.some((issue) =>
+        [
+          'empty_provider_catalog',
+          'unnormalized_products',
+          'duplicate_merchize_product_ids',
+          'duplicate_merchize_skus',
+          'variants_missing_provider_ids',
+          'products_missing_images',
+          'products_missing_price',
+        ].includes(issue.code),
+      );
+
     return {
       connection: {
         success: true,
@@ -735,6 +861,9 @@ export class MerchizeService {
         productCount: products.length,
         sampleKeys: extractPayloadKeys(body),
       },
+      catalogScope: 'fulfillment_blank_catalog',
+      completeness: pagination.completeness,
+      pagination,
       productCount: collection.length,
       normalizedProductCount: products.length,
       variantCount,
@@ -745,7 +874,8 @@ export class MerchizeService {
       duplicateProductIdCount,
       duplicateSkuCount,
       payloadShapeKeys: extractPayloadKeys(body) ?? [],
-      safeToImport: issues.length === 0 && products.length > 0,
+      safeToNormalize,
+      safeToImport: false,
       issues,
       products: products.slice(0, 24).map((product) => ({
         provider: product.provider,

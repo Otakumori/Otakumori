@@ -33,6 +33,8 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
       route: '/api/admin/merchize/import/preflight',
       extra: {
         productCount: preflight.productCount,
+        catalogScope: preflight.catalogScope,
+        completeness: preflight.completeness,
         wouldInsert: preflight.wouldInsert,
         wouldUpdate: preflight.wouldUpdate,
         wouldBlock: preflight.wouldBlock,

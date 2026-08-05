@@ -33,6 +33,9 @@ export const GET = withAdminAuth(async (request: NextRequest) => {
       extra: {
         productCount: preflight.productCount,
         normalizedProductCount: preflight.normalizedProductCount,
+        catalogScope: preflight.catalogScope,
+        completeness: preflight.completeness,
+        safeToNormalize: preflight.safeToNormalize,
         safeToImport: preflight.safeToImport,
         issueCount: preflight.issues.length,
       },

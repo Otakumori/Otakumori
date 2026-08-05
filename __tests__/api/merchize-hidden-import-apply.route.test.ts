@@ -124,9 +124,51 @@ function merchizeProduct(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function sellerSourceContext(products: Array<ReturnType<typeof merchizeProduct>>) {
+  return {
+    catalogScope: 'seller_products' as const,
+    completeness: 'complete' as const,
+    pagination: {
+      total: products.length,
+      limit: Math.max(products.length, 1),
+      page: 1,
+      loadedCount: products.length,
+      completeness: 'complete' as const,
+    },
+  };
+}
+
+function blankCatalogSourceContext(products: Array<ReturnType<typeof merchizeProduct>>) {
+  return {
+    catalogScope: 'fulfillment_blank_catalog' as const,
+    completeness: 'complete' as const,
+    pagination: {
+      total: products.length,
+      limit: Math.max(products.length, 1),
+      page: 1,
+      loadedCount: products.length,
+      completeness: 'complete' as const,
+    },
+  };
+}
+
+function productCollection(
+  products: Array<ReturnType<typeof merchizeProduct>>,
+  sourceContext = sellerSourceContext(products),
+) {
+  return {
+    products,
+    rawProductCount: products.length,
+    payloadShapeKeys: ['success', 'data'],
+    catalogScope: sourceContext.catalogScope,
+    pagination: sourceContext.pagination,
+  };
+}
+
 function serviceMock(products = [merchizeProduct()], overrides: Record<string, unknown> = {}) {
   return {
     getProducts: vi.fn().mockResolvedValue(products),
+    getProductCollection: vi.fn().mockResolvedValue(productCollection(products)),
     createProduct: vi.fn(),
     updateProduct: vi.fn(),
     deleteProduct: vi.fn(),
@@ -208,6 +250,7 @@ async function callPOST(body: Record<string, unknown>, headers: Record<string, s
 async function signedPreflightBody(products = [merchizeProduct()]) {
   const preflight = await buildMerchizeImportPreflightForProducts(products as never, {
     now: new Date(),
+    sourceContext: sellerSourceContext(products),
   });
 
   return {
@@ -318,6 +361,47 @@ describe('Merchize hidden local import apply route', () => {
       expect(db.providerImportOperation.create).not.toHaveBeenCalled();
       expect(db.$transaction).not.toHaveBeenCalled();
     }
+  });
+
+  it('rejects fulfillment blank catalog source before audit creation or catalog mutation', async () => {
+    const products = [merchizeProduct()];
+    const blankPreflight = await buildMerchizeImportPreflightForProducts(products as never, {
+      now: new Date(),
+      sourceContext: blankCatalogSourceContext(products),
+    });
+    vi.mocked(getMerchizeService).mockReturnValue(
+      serviceMock(products, {
+        getProductCollection: vi
+          .fn()
+          .mockResolvedValue(productCollection(products, blankCatalogSourceContext(products))),
+      }) as never,
+    );
+
+    const { response, json } = await callPOST(
+      {
+        confirmation: 'APPLY HIDDEN MERCHIZE IMPORT',
+        manifestVersion: blankPreflight.manifestVersion,
+        preflightFingerprint: blankPreflight.preflightFingerprint,
+        fingerprintExpiresAt: blankPreflight.fingerprintExpiresAt,
+        preflightSignature: blankPreflight.preflightSignature,
+        expectedProductCount: blankPreflight.productCount,
+        expectedInsertCount: blankPreflight.wouldInsert,
+        expectedUpdateCount: blankPreflight.wouldUpdate,
+        expectedSkipCount: blankPreflight.wouldSkip,
+        expectedBlockCount: blankPreflight.wouldBlock,
+      },
+      { 'x-idempotency-key': 'blank-catalog-idempotency-key' },
+    );
+
+    expect(response.status).toBe(422);
+    expect(json.data).toMatchObject({
+      ok: false,
+      status: 'blocked',
+      error: 'Merchize import source is not a verified seller-product catalog.',
+    });
+    expect(db.providerImportOperation.create).not.toHaveBeenCalled();
+    expect(db.providerImportOperation.update).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
   });
 
   it('inserts hidden, inactive, non-purchasable Merchize records with provider-neutral identities', async () => {
