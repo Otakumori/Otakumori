@@ -53,6 +53,44 @@ async function loadDiagnosticRoute() {
   return import('@/app/api/diagnostic/route');
 }
 
+async function loadMetricsRoute() {
+  vi.resetModules();
+  vi.doMock('@/env/client', () => {
+    throw new Error('unexpected client env validation during metrics route import');
+  });
+  vi.doMock('@/env.mjs', () => ({
+    env: {
+      NODE_ENV: 'test',
+    },
+  }));
+  vi.doMock('@/env/server', () => {
+    throw new Error('unexpected server env validation during metrics route import');
+  });
+  vi.doMock('@/app/lib/db', () => {
+    throw new Error('unexpected database import during metrics route import');
+  });
+  vi.doMock('@/lib/db', () => {
+    throw new Error('unexpected database import during metrics route import');
+  });
+  vi.doMock('@/app/lib/redis', () => {
+    throw new Error('unexpected Redis import during metrics route import');
+  });
+  vi.doMock('@/app/lib/redis-rest', () => {
+    throw new Error('unexpected Redis import during metrics route import');
+  });
+  vi.doMock('@/lib/redis', () => {
+    throw new Error('unexpected Redis import during metrics route import');
+  });
+  vi.doMock('@/app/lib/logger', () => ({
+    logger: {
+      warn: vi.fn(),
+      error: vi.fn(),
+    },
+  }));
+
+  return import('@/app/api/metrics/route');
+}
+
 describe('Sanity webhook containment', () => {
   it('accepts a configured webhook with a valid signature', async () => {
     const secret = 'synthetic-sanity-secret';
@@ -260,6 +298,60 @@ describe('Inngest health and diagnostics containment', () => {
     expect(serialized).not.toContain('DATABASE_URL');
     expect(serialized).not.toContain('INNGEST_EVENT_KEY');
     expect(serialized).not.toContain('true');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Metrics route containment', () => {
+  it('imports without eager Clerk/client env validation or external calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    const route = await loadMetricsRoute();
+
+    expect(route.GET).toBeTypeOf('function');
+    expect(route.POST).toBeTypeOf('function');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns only coarse metrics without provider calls or env-name disclosure', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const { GET } = await loadMetricsRoute();
+
+    const response = await GET();
+    const json = await response.json();
+    const serialized = JSON.stringify(json);
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(json.metrics)).toBe(true);
+    expect(json.period).toEqual({
+      from: expect.any(Number),
+      to: expect.any(Number),
+    });
+    expect(json.historicalCount).toBe(0);
+    expect(serialized).not.toContain('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
+    expect(serialized).not.toContain('CLERK_SECRET_KEY');
+    expect(serialized).not.toContain('DATABASE_URL');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('accepts client metrics without external calls or environment disclosure', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const { POST } = await loadMetricsRoute();
+
+    const response = await POST(
+      new Request('http://localhost/api/metrics', {
+        method: 'POST',
+        body: JSON.stringify({ page: '/shop', metric: 'synthetic' }),
+      }),
+    );
+    const json = await response.json();
+    const serialized = JSON.stringify(json);
+
+    expect(response.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.received).toBe(2);
+    expect(serialized).not.toContain('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
+    expect(serialized).not.toContain('CLERK_SECRET_KEY');
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
