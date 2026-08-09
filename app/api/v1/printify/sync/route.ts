@@ -7,7 +7,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/app/lib/logger';
 import { getPrintifyService, type PrintifyProduct } from '@/app/lib/printify/service';
 import { db } from '@/app/lib/db';
-import { env } from '@/env/server';
+import { env } from '@/env.mjs';
 import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
 
@@ -23,26 +23,15 @@ end
 return 0
 `;
 
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
-
-const preflightRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, '10 m'),
-  prefix: 'otakumori:catalog-sync:preflight-rate',
-});
-
-const applyRateLimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(1, '10 m'),
-  prefix: 'otakumori:catalog-sync:apply-rate',
-});
-
 type AuthContext = {
   kind: 'internal' | 'admin';
   userId?: string;
+};
+
+type RuntimeConfig = {
+  internalAuthToken: string | undefined;
+  redisUrl: string | undefined;
+  redisToken: string | undefined;
 };
 
 type ValidationIssue = {
@@ -90,6 +79,44 @@ function hasValue(value: string | undefined | null): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function readRuntimeConfig(): RuntimeConfig {
+  return {
+    internalAuthToken: env.INTERNAL_AUTH_TOKEN?.trim(),
+    redisUrl: env.UPSTASH_REDIS_REST_URL?.trim(),
+    redisToken: env.UPSTASH_REDIS_REST_TOKEN?.trim(),
+  };
+}
+
+function createRedisClient() {
+  const config = readRuntimeConfig();
+
+  if (!hasValue(config.redisUrl) || !hasValue(config.redisToken)) {
+    return null;
+  }
+
+  return new Redis({
+    url: config.redisUrl,
+    token: config.redisToken,
+  });
+}
+
+function createRateLimiter(operation: 'preflight' | 'apply') {
+  const redis = createRedisClient();
+  if (!redis) return null;
+
+  return new Ratelimit({
+    redis,
+    limiter:
+      operation === 'apply'
+        ? Ratelimit.slidingWindow(1, '10 m')
+        : Ratelimit.slidingWindow(20, '10 m'),
+    prefix:
+      operation === 'apply'
+        ? 'otakumori:catalog-sync:apply-rate'
+        : 'otakumori:catalog-sync:preflight-rate',
+  });
+}
+
 function getRequestId(request: NextRequest) {
   return (
     request.headers.get('x-request-id') || request.headers.get('x-correlation-id') || randomUUID()
@@ -120,7 +147,7 @@ function extractInternalToken(request: NextRequest) {
 
 async function authorize(request: NextRequest, requestId: string): Promise<AuthContext | Response> {
   const suppliedInternalToken = extractInternalToken(request);
-  const expectedInternalToken = env.INTERNAL_AUTH_TOKEN?.trim();
+  const expectedInternalToken = readRuntimeConfig().internalAuthToken;
 
   if (hasValue(suppliedInternalToken)) {
     if (
@@ -176,7 +203,20 @@ async function enforceDistributedRateLimit(
   operation: 'preflight' | 'apply',
   requestId: string,
 ) {
-  const limiter = operation === 'apply' ? applyRateLimit : preflightRateLimit;
+  const limiter = createRateLimiter(operation);
+  if (!limiter) {
+    logger.error('printify_catalog_sync_rate_limit_unavailable', {
+      requestId,
+      route: ROUTE,
+      extra: { operation },
+    });
+    return json(
+      { ok: false, error: 'Catalog sync rate limit unavailable.', requestId },
+      { status: 503 },
+      requestId,
+    );
+  }
+
   const key = `${operation}:${rateLimitIdentity(authContext)}`;
 
   try {
@@ -213,6 +253,24 @@ async function enforceDistributedRateLimit(
 
 async function acquireApplyLock(requestId: string) {
   const ownerToken = randomUUID();
+  const redis = createRedisClient();
+
+  if (!redis) {
+    logger.error('printify_catalog_sync_lock_unavailable', {
+      requestId,
+      route: ROUTE,
+      extra: { operation: 'apply' },
+    });
+    return {
+      ownerToken: null,
+      redis: null,
+      response: json(
+        { ok: false, error: 'Catalog sync lock unavailable.', requestId },
+        { status: 503 },
+        requestId,
+      ),
+    };
+  }
 
   try {
     const acquired = await redis.set(APPLY_LOCK_KEY, ownerToken, {
@@ -231,7 +289,7 @@ async function acquireApplyLock(requestId: string) {
       };
     }
 
-    return { ownerToken, response: null };
+    return { ownerToken, redis, response: null };
   } catch {
     logger.error('printify_catalog_sync_lock_unavailable', {
       requestId,
@@ -240,6 +298,7 @@ async function acquireApplyLock(requestId: string) {
     });
     return {
       ownerToken: null,
+      redis: null,
       response: json(
         { ok: false, error: 'Catalog sync lock unavailable.', requestId },
         { status: 503 },
@@ -249,7 +308,11 @@ async function acquireApplyLock(requestId: string) {
   }
 }
 
-async function releaseApplyLock(ownerToken: string, requestId: string) {
+async function releaseApplyLock(
+  redis: NonNullable<ReturnType<typeof createRedisClient>>,
+  ownerToken: string,
+  requestId: string,
+) {
   try {
     await redis.eval(RELEASE_APPLY_LOCK_SCRIPT, [APPLY_LOCK_KEY], [ownerToken]);
   } catch {
@@ -648,7 +711,8 @@ export async function POST(request: NextRequest) {
   const lease = await acquireApplyLock(requestId);
   if (lease.response) return lease.response;
   const ownerToken = lease.ownerToken;
-  if (!ownerToken) {
+  const lockRedis = lease.redis;
+  if (!ownerToken || !lockRedis) {
     return json(
       { ok: false, error: 'Catalog sync lock unavailable.', requestId },
       { status: 503 },
@@ -716,6 +780,6 @@ export async function POST(request: NextRequest) {
     );
     return json({ ok: false, error: sanitizeError(error), requestId }, { status: 500 }, requestId);
   } finally {
-    await releaseApplyLock(ownerToken, requestId);
+    await releaseApplyLock(lockRedis, ownerToken, requestId);
   }
 }

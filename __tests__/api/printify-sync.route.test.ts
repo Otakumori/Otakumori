@@ -7,6 +7,11 @@ import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
 import { callGET, callPOST } from '@/tests/helpers/route';
 
 const upstashMocks = vi.hoisted(() => {
+  const routeEnv: {
+    INTERNAL_AUTH_TOKEN?: string;
+    UPSTASH_REDIS_REST_URL?: string;
+    UPSTASH_REDIS_REST_TOKEN?: string;
+  } = {};
   const redisClient = {
     set: vi.fn(),
     eval: vi.fn(),
@@ -18,6 +23,7 @@ const upstashMocks = vi.hoisted(() => {
     remaining: number;
     reset: number;
   }> = [];
+  const rateLimitErrors: Error[] = [];
   const rateLimitInstances: Array<{ prefix: string; limit: ReturnType<typeof vi.fn> }> = [];
   const Redis = vi.fn(() => redisClient);
   const Ratelimit = vi.fn((config: { prefix: string }) => {
@@ -25,6 +31,8 @@ const upstashMocks = vi.hoisted(() => {
       prefix: config.prefix,
       limit: vi.fn(async (key: string) => {
         rateLimitCalls.push({ key, prefix: config.prefix });
+        const error = rateLimitErrors.shift();
+        if (error) throw error;
         return (
           rateLimitQueue.shift() ?? {
             success: true,
@@ -47,8 +55,10 @@ const upstashMocks = vi.hoisted(() => {
     redisClient,
     Redis,
     Ratelimit,
+    routeEnv,
     rateLimitCalls,
     rateLimitQueue,
+    rateLimitErrors,
     rateLimitInstances,
   };
 });
@@ -61,20 +71,15 @@ vi.mock('@upstash/ratelimit', () => ({
   Ratelimit: upstashMocks.Ratelimit,
 }));
 
+vi.mock('@/env.mjs', () => ({
+  env: upstashMocks.routeEnv,
+}));
+
 vi.mock('@/app/lib/db', () => ({
   db: {
     product: {
       findMany: vi.fn(),
     },
-  },
-}));
-
-vi.mock('@/env/server', () => ({
-  env: {
-    INTERNAL_AUTH_TOKEN: 'test-internal-token',
-    UPSTASH_REDIS_REST_URL: 'https://redis.example',
-    UPSTASH_REDIS_REST_TOKEN: 'test-redis-token',
-    PRINTIFY_SHOP_ID: 'test-shop',
   },
 }));
 
@@ -219,6 +224,12 @@ describe('Printify protected catalog sync API', () => {
     vi.clearAllMocks();
     upstashMocks.rateLimitCalls.length = 0;
     upstashMocks.rateLimitQueue.length = 0;
+    upstashMocks.rateLimitErrors.length = 0;
+    upstashMocks.rateLimitInstances.length = 0;
+
+    upstashMocks.routeEnv.INTERNAL_AUTH_TOKEN = 'test-internal-token';
+    upstashMocks.routeEnv.UPSTASH_REDIS_REST_URL = 'https://redis.example';
+    upstashMocks.routeEnv.UPSTASH_REDIS_REST_TOKEN = 'synthetic-redis-token';
 
     vi.mocked(auth).mockReturnValue({ userId: null } as any);
     service = createServiceMock();
@@ -233,6 +244,25 @@ describe('Printify protected catalog sync API', () => {
     });
     upstashMocks.redisClient.set.mockResolvedValue('OK');
     upstashMocks.redisClient.eval.mockResolvedValue(1);
+  });
+
+  it('imports without eager full server env validation, Redis construction, or provider calls', async () => {
+    vi.resetModules();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    vi.doMock('@/env/server', () => {
+      throw new Error('unexpected full server env validation during Printify sync route import');
+    });
+
+    const mod = await route();
+
+    expect(mod.GET).toBeTypeOf('function');
+    expect(mod.POST).toBeTypeOf('function');
+    expect(upstashMocks.Redis).not.toHaveBeenCalled();
+    expect(upstashMocks.Ratelimit).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(vi.mocked(getPrintifyService)).not.toHaveBeenCalled();
+    expect(vi.mocked(syncPrintifyProducts)).not.toHaveBeenCalled();
   });
 
   it('rejects unauthenticated sync requests', async () => {
@@ -792,8 +822,7 @@ describe('Printify protected catalog sync API', () => {
   });
 
   it('fails closed when Redis rate limiting is unavailable', async () => {
-    const preflightLimiter = upstashMocks.rateLimitInstances[0];
-    preflightLimiter.limit.mockRejectedValueOnce(new Error('redis down'));
+    upstashMocks.rateLimitErrors.push(new Error('redis down'));
 
     const { res, json } = await callPOST(
       await route(),
@@ -804,6 +833,22 @@ describe('Printify protected catalog sync API', () => {
     expect(res.status).toBe(503);
     expect(json.error).toMatch(/rate limit unavailable/i);
     expect(service.getProducts).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when Redis runtime configuration is missing', async () => {
+    delete upstashMocks.routeEnv.UPSTASH_REDIS_REST_URL;
+    delete upstashMocks.routeEnv.UPSTASH_REDIS_REST_TOKEN;
+
+    const { res, json } = await callPOST(
+      await route(),
+      { operation: 'preflight' },
+      { headers: internalHeaders() },
+    );
+
+    expect(res.status).toBe(503);
+    expect(json.error).toMatch(/rate limit unavailable/i);
+    expect(upstashMocks.Redis).not.toHaveBeenCalled();
+    expect(vi.mocked(getPrintifyService)).not.toHaveBeenCalled();
   });
 
   it('acquires a distributed lock before apply', async () => {
