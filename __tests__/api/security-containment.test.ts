@@ -106,6 +106,94 @@ describe('Sanity webhook containment', () => {
 });
 
 describe('Inngest health and diagnostics containment', () => {
+  it('imports Printify sync functions without eager full server env validation or provider calls', async () => {
+    vi.resetModules();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    vi.doMock('@/env/server', () => {
+      throw new Error('unexpected full server env validation during Printify sync import');
+    });
+    vi.doMock('@/env.mjs', () => ({
+      env: {
+        PRINTIFY_SHOP_ID: 'synthetic-shop',
+      },
+    }));
+    vi.doMock('@/app/lib/db', () => ({
+      db: {},
+    }));
+    vi.doMock('@/lib/db', () => ({
+      db: {},
+    }));
+    vi.doMock('@/app/lib/logger', () => ({
+      logger: {
+        error: vi.fn(),
+      },
+    }));
+
+    const syncModule = await import('@/lib/catalog/printifySync');
+
+    expect(syncModule.syncPrintifyProducts).toBeTypeOf('function');
+    expect(syncModule.syncSinglePrintifyProduct).toBeTypeOf('function');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('imports the Inngest serve route without route-level provider calls', async () => {
+    vi.resetModules();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const sendSpy = vi.fn();
+
+    vi.doMock('@/env.mjs', () => ({
+      env: {
+        INNGEST_SIGNING_KEY: 'synthetic-signing-key',
+      },
+    }));
+    vi.doMock('@/inngest/client', () => ({
+      inngest: {
+        send: sendSpy,
+        createFunction: vi.fn((config, trigger, handler) => ({ config, trigger, handler })),
+      },
+    }));
+    vi.doMock('../../../inngest/client', () => ({
+      inngest: {
+        send: sendSpy,
+        createFunction: vi.fn((config, trigger, handler) => ({ config, trigger, handler })),
+      },
+    }));
+    vi.doMock('../../../inngest/functions', () => ({
+      syncUserToSupabase: { id: 'sync-user-to-supabase' },
+      updatePrintifyProducts: { id: 'update-printify-products' },
+      processOrder: { id: 'process-order' },
+      sendOrderConfirmation: { id: 'send-order-confirmation' },
+      sendOrderConfirmationEmail: { id: 'send-order-confirmation-email' },
+      syncInventory: { id: 'sync-inventory' },
+      processPaymentWebhook: { id: 'process-payment-webhook' },
+      dailyInventorySync: { id: 'daily-inventory-sync' },
+      weeklyProductUpdate: { id: 'weekly-product-update' },
+      retryFailedOperation: { id: 'retry-failed-operation' },
+      cleanupOldData: { id: 'cleanup-old-data' },
+      cleanupOldGLBFiles: { id: 'cleanup-old-glb-files' },
+      fulfillOrder: { id: 'fulfill-order' },
+    }));
+    vi.doMock('../../../inngest/glb-generation', () => ({
+      generateGLBBackground: { id: 'generate-glb-background' },
+    }));
+    vi.doMock('inngest/next', () => ({
+      serve: vi.fn(() => ({
+        GET: vi.fn(),
+        POST: vi.fn(),
+        PUT: vi.fn(),
+      })),
+    }));
+
+    const route = await import('@/app/api/inngest/route');
+
+    expect(route.GET).toBeTypeOf('function');
+    expect(route.POST).toBeTypeOf('function');
+    expect(route.PUT).toBeTypeOf('function');
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(sendSpy).not.toHaveBeenCalled();
+  });
+
   it('returns coarse Inngest health without config names or network probes', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const { GET } = await loadInngestHealthRoute('synthetic-event-key', 'synthetic-signing-key');
