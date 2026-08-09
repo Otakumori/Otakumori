@@ -85,7 +85,7 @@ The system automatically verifies:
 npm run api:health
 
 # Verify in .env file
-PRINTIFY_API_KEY=your_key_here
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=your_shop_id
 ```
 
@@ -98,7 +98,7 @@ PRINTIFY_SHOP_ID=your_shop_id
 ```bash
 # Check middleware.ts configuration
 # Verify Clerk environment variables
-CLERK_SECRET_KEY=sk_...
+CLERK_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 ```
 

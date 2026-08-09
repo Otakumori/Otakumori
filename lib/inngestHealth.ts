@@ -31,11 +31,8 @@ export async function bootCheckInngest() {
   const hasSigningKey = !!env.INNGEST_SIGNING_KEY;
 
   if (!hasEventKey || !hasSigningKey) {
-    const missing = [];
-    if (!hasEventKey) missing.push('INNGEST_EVENT_KEY');
-    if (!hasSigningKey) missing.push('INNGEST_SIGNING_KEY');
-
-    console.warn('[Inngest] Missing env:', missing.join(', '));
+    console.warn('[Inngest] Required server configuration is unavailable.');
+    return;
   }
 
   // If we're in production but serveUrl points to localhost, skip
@@ -46,27 +43,9 @@ export async function bootCheckInngest() {
   try {
     const res = await fetch(serveUrl, { method: 'GET' });
     if (!res.ok) {
-      console.error(
-        `[Inngest] GET ${serveUrl} failed: ${res.status} – check middleware/public routes`,
-      );
+      console.error(`[Inngest] Serve endpoint health check failed: ${res.status}`);
     }
   } catch (e: any) {
-    console.error(`[Inngest] GET ${serveUrl} error:`, e?.message || e);
-  }
-
-  try {
-    const res = await fetch(serveUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'healthcheck/inngest',
-        data: { boot: true, at: new Date().toISOString() },
-      }),
-    });
-    if (!res.ok) {
-      console.error(`[Inngest] POST ${serveUrl} failed: ${res.status} – check keys/serve URL`);
-    }
-  } catch (e: any) {
-    console.error(`[Inngest] POST ${serveUrl} error:`, e?.message || e);
+    console.error('[Inngest] Serve endpoint health check errored:', e?.message || e);
   }
 }

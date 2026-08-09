@@ -2,27 +2,20 @@ import 'dotenv/config';
 
 const SERVE_URL = process.env.INNGEST_SERVE_URL;
 if (!SERVE_URL) {
-  console.error('INNGEST_SERVE_URL not set');
-  process.exit(1);
-}
-const need = ['INNGEST_EVENT_KEY', 'INNGEST_SIGNING_KEY'].filter((k) => !process.env[k]);
-if (need.length) {
-  console.error('Missing env:', need.join(', '));
+  console.error('Inngest serve URL is not configured.');
   process.exit(1);
 }
 
-const getRes = await fetch(SERVE_URL);
-if (!getRes.ok) {
-  console.error('GET failed', getRes.status);
+const requiredKeys = ['INNGEST_EVENT_KEY', 'INNGEST_SIGNING_KEY'];
+if (requiredKeys.some((key) => !process.env[key])) {
+  console.error('Required Inngest configuration is unavailable.');
   process.exit(1);
 }
-const postRes = await fetch(SERVE_URL, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ name: 'healthcheck/inngest', data: { ci: true } }),
-});
-if (!postRes.ok) {
-  console.error('POST failed', postRes.status);
+
+const response = await fetch(SERVE_URL);
+if (!response.ok) {
+  console.error('Inngest serve endpoint health check failed', response.status);
   process.exit(1);
 }
-console.log('✅ Inngest OK');
+
+console.log('Inngest serve endpoint health check passed. No event was sent.');

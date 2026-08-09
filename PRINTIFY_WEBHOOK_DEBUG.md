@@ -97,25 +97,25 @@ Make sure these are set in your Vercel environment:
 
 ```bash
 # Printify
-PRINTIFY_API_KEY=your_api_key_here
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=your_shop_id_here
 
 # Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Clerk
-CLERK_SECRET_KEY=sk_test_...
+CLERK_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 
 # Supabase
-DATABASE_URL=postgresql://...
+DATABASE_URL=<set-in-provider>
 NEXT_PUBLIC_SUPABASE_URL=https://...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 
 # Redis (Upstash)
 UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=your_token_here
+UPSTASH_REDIS_REST_TOKEN=<set-in-provider>
 
 # General
 NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app

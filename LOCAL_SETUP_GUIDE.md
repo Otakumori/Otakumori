@@ -23,13 +23,13 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # Database (PostgreSQL) - Choose ONE option below:
 
 # Option 1: Supabase PostgreSQL (if you have a Supabase project)
-# DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+# DATABASE_URL=<set-in-provider>
 
 # Option 2: Neon (Free & Fast - Recommended for quick setup)
-# DATABASE_URL=postgresql://[USERNAME]:[PASSWORD]@[HOST]/[DATABASE]?sslmode=require
+# DATABASE_URL=<set-in-provider>
 
 # Option 3: Local PostgreSQL (if you have it installed)
-# DATABASE_URL=postgresql://postgres:password@localhost:5432/otakumori_dev
+# DATABASE_URL=<set-in-provider>
 
 # Placeholder - replace with your actual database URL
 DATABASE_URL=<DATABASE_URL>
@@ -37,8 +37,8 @@ DATABASE_URL=<DATABASE_URL>
 # Clerk Authentication (REQUIRED)
 # Get these from https://dashboard.clerk.com/
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
-CLERK_SECRET_KEY=sk_test_your_secret_key_here
-CLERK_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+CLERK_SECRET_KEY=<set-in-provider>
+CLERK_WEBHOOK_SECRET=<set-in-provider>
 
 # Clerk URLs
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
@@ -49,12 +49,12 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 # NEXT_PUBLIC_SUPABASE_ANON_KEY=[YOUR-ANON-KEY]
 
 # Optional Services (can be filled later)
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
-STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret_here
-PRINTIFY_API_KEY=your_printify_api_key_here
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=your_shop_id_here
 UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your_token_here
+UPSTASH_REDIS_REST_TOKEN=<set-in-provider>
 
 # Security
 PETAL_SALT=your_random_salt_here_32_chars_minimum
@@ -71,7 +71,7 @@ If you already have a Supabase project:
 
 1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Go to Settings → Database
-3. Copy the connection string (it looks like: `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
+3. Copy the connection string (it looks like: `postgresql://<set-in-provider>`)
 4. Paste it as your `DATABASE_URL` in `.env.local`
 
 ### Option B: Quick Setup with Neon (Recommended for new projects)

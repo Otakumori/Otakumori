@@ -65,8 +65,8 @@ If you want to just **test the build** without connecting to a real database:
 
 ```env
 # Temporary placeholder (won't work for actual database operations)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/otakumori_dev"
-DIRECT_URL="postgresql://postgres:postgres@localhost:5432/otakumori_dev"
+DATABASE_URL="postgresql://<set-in-provider>"
+DIRECT_URL="postgresql://<set-in-provider>"
 ```
 
 Then run:

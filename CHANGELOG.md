@@ -48,7 +48,7 @@
 ```bash
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
-CLERK_SECRET_KEY=sk_live_...
+CLERK_SECRET_KEY=<set-in-provider>
 
 # Optional: Custom Clerk Domain (if using proxy)
 NEXT_PUBLIC_CLERK_PROXY_URL=https://clerk.otaku-mori.com
