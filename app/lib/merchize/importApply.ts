@@ -12,7 +12,7 @@ import {
   type MerchizeImportPreflight,
   type MerchizeImportPreflightCounts,
 } from '@/app/lib/merchize/importPreflight';
-import { env } from '@/env/server';
+import { env } from '@/env.mjs';
 
 export const MERCHIZE_IMPORT_PROVIDER = 'merchize';
 export const MERCHIZE_IMPORT_ACTION = 'hidden_local_import';
