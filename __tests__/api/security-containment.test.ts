@@ -91,6 +91,27 @@ async function loadMetricsRoute() {
   return import('@/app/api/metrics/route');
 }
 
+async function loadBlogSlugPage() {
+  vi.resetModules();
+  vi.doMock('@/env/client', () => {
+    throw new Error('unexpected client env validation during blog slug page import');
+  });
+  vi.doMock('@/env.mjs', () => ({
+    env: {
+      NODE_ENV: 'test',
+      NEXT_PUBLIC_LIVE_DATA: '0',
+      NEXT_PUBLIC_PROBE_MODE: '1',
+    },
+  }));
+  vi.doMock('@/app/lib/logger', () => ({
+    logger: {
+      error: vi.fn(),
+    },
+  }));
+
+  return import('@/app/blog/[slug]/page');
+}
+
 describe('Sanity webhook containment', () => {
   it('accepts a configured webhook with a valid signature', async () => {
     const secret = 'synthetic-sanity-secret';
@@ -172,6 +193,16 @@ describe('Inngest health and diagnostics containment', () => {
 
     expect(syncModule.syncPrintifyProducts).toBeTypeOf('function');
     expect(syncModule.syncSinglePrintifyProduct).toBeTypeOf('function');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('imports the blog slug page without eager full client env validation or network calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    const pageModule = await loadBlogSlugPage();
+
+    expect(pageModule.default).toBeTypeOf('function');
+    expect(pageModule.generateMetadata).toBeTypeOf('function');
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
