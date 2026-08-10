@@ -66,10 +66,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      DATABASE_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+      DIRECT_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+      STRIPE_SECRET_KEY: sk_test_ci_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+      CLERK_SECRET_KEY: sk_test_ci_placeholder
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
       CLERK_PROXY_URL: ''
       NEXT_PUBLIC_CLERK_PROXY_URL: ''
+      PRINTIFY_API_KEY: ci_placeholder
+      PRINTIFY_SHOP_ID: ci_placeholder
+      UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
+      UPSTASH_REDIS_REST_TOKEN: ci_placeholder
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
 
     steps:
       - name: Checkout code
@@ -162,10 +171,19 @@ jobs:
         env:
           PORT: 3000
           LIGHTHOUSE_CI: '1'
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          DATABASE_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          DIRECT_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          CLERK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
           CLERK_PROXY_URL: ''
           NEXT_PUBLIC_CLERK_PROXY_URL: ''
+          PRINTIFY_API_KEY: ci_placeholder
+          PRINTIFY_SHOP_ID: ci_placeholder
+          UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
+          UPSTASH_REDIS_REST_TOKEN: ci_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
           NEXT_PUBLIC_FEATURE_HERO: '1'
           NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
           NEXT_PUBLIC_FEATURE_SHOP: '1'
@@ -230,10 +248,19 @@ jobs:
           sleep 30
         env:
           PORT: 3000
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          DATABASE_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          DIRECT_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          CLERK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
           CLERK_PROXY_URL: ''
           NEXT_PUBLIC_CLERK_PROXY_URL: ''
+          PRINTIFY_API_KEY: ci_placeholder
+          PRINTIFY_SHOP_ID: ci_placeholder
+          UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
+          UPSTASH_REDIS_REST_TOKEN: ci_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
           NEXT_PUBLIC_FEATURE_HERO: '1'
           NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
           NEXT_PUBLIC_FEATURE_SHOP: '1'
