@@ -44,11 +44,7 @@ if (missing.length > 0) {
   console.error(
     '1) Create ' + envFile + ' in repo root and add the missing keys with test values.',
   );
-  console.error('   Example .env.test contents:');
-  console.error('     DATABASE_URL=postgresql://postgres:password@localhost:5432/otakumori_test');
-  console.error('     BLOB_READ_WRITE_TOKEN=test');
-  console.error('     BLOB_PUBLIC_BASE_URL=http://localhost:3001');
-  console.error('     BLOB_BUCKET_PREFIX=om');
+  console.error('   Use .env.test.example as the placeholder-only template.');
   console.error('\n2) For Vercel, use: `vercel env add NAME` or set via dashboard.');
   process.exit(1);
 } else {

@@ -14,8 +14,8 @@ You MUST set these environment variables in Vercel before deployment:
 
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_clerk_key
-CLERK_SECRET_KEY=sk_test_your_actual_clerk_secret
-CLERK_WEBHOOK_SECRET=whsec_your_actual_webhook_secret
+CLERK_SECRET_KEY=<set-in-provider>
+CLERK_WEBHOOK_SECRET=<set-in-provider>
 ```
 
 #### **Supabase Database:**
@@ -31,15 +31,15 @@ SUPABASE_STORAGE_BUCKET=your_storage_bucket_name
 
 ```bash
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_stripe_key
-STRIPE_SECRET_KEY=sk_test_your_actual_stripe_secret
-STRIPE_WEBHOOK_SECRET=whsec_your_actual_stripe_webhook_secret
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 STRIPE_WEBHOOK_URL=https://your-domain.vercel.app/api/webhooks/stripe
 ```
 
 #### **Printify Integration:**
 
 ```bash
-PRINTIFY_API_KEY=your_actual_printify_api_key
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=your_actual_printify_shop_id
 ```
 
@@ -55,7 +55,7 @@ INNGEST_SERVE_URL=https://your-domain.vercel.app/api/inngest
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
-AUTH_SECRET=your_secure_random_string_here
+AUTH_SECRET=<set-in-provider>
 ```
 
 ## **🚀 Deployment Steps**

@@ -32,28 +32,28 @@ DATABASE_URL=<DATABASE_URL>
 DIRECT_URL=<DATABASE_URL>
 
 # === Clerk (REQUIRED) ===
-CLERK_SECRET_KEY=sk_test_your_key
+CLERK_SECRET_KEY=<set-in-local-env>
 CLERK_ENCRYPTION_KEY=your_32_char_encryption_key
-CLERK_WEBHOOK_SECRET=whsec_your_secret
+CLERK_WEBHOOK_SECRET=<set-in-local-env>
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_PROXY_URL=https://otaku-mori.com
 
 # === Stripe (REQUIRED) ===
-STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_SECRET_KEY=<set-in-local-env>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
-STRIPE_WEBHOOK_SECRET=whsec_your_secret
+STRIPE_WEBHOOK_SECRET=<set-in-local-env>
 
 # === Redis (REQUIRED) ===
 UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your_token
+UPSTASH_REDIS_REST_TOKEN=<set-in-local-env>
 
 # === Vercel Blob (REQUIRED) ===
 BLOB_READ_WRITE_TOKEN=your_blob_token
 
 # === Security Keys ===
-API_KEY=your_api_key
+API_KEY=<set-in-local-env>
 CRON_SECRET=your_cron_secret
 PETAL_SALT=your_petal_salt
 GAME_HMAC_SECRET=your_32_byte_secret
@@ -95,4 +95,3 @@ echo "   - CLERK_SECRET_KEY"
 echo "   - All other keys marked as REQUIRED"
 echo ""
 echo "🚀 After updating keys, restart your dev server: npm run dev"
-

@@ -456,11 +456,11 @@ Award Petals (1 per $1)
 
 ```bash
 # Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Printify
-PRINTIFY_API_KEY=...
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=...
 PRINTIFY_API_URL=https://api.printify.com/v1
 
@@ -469,7 +469,7 @@ INNGEST_EVENT_KEY=...
 INNGEST_SIGNING_KEY=signkey-prod-...
 
 # Database
-DATABASE_URL=postgresql://...
+DATABASE_URL=<set-in-provider>
 
 # Site
 NEXT_PUBLIC_SITE_URL=https://otaku-mori.com

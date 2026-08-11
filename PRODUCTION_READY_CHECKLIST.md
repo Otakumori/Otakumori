@@ -72,17 +72,17 @@
 ```bash
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_*** or pk_test_***
-CLERK_SECRET_KEY=sk_live_*** or sk_test_***
+CLERK_SECRET_KEY=<set-in-provider> or sk_test_***
 
 # Database
-DATABASE_URL=postgresql://...
+DATABASE_URL=<set-in-provider>
 
 # Printify Integration
-PRINTIFY_API_KEY=your_api_key_here
+PRINTIFY_API_KEY=<set-in-provider>
 PRINTIFY_SHOP_ID=your_shop_id_here
 
 # Stripe Payments
-STRIPE_SECRET_KEY=sk_live_*** or sk_test_***
+STRIPE_SECRET_KEY=<set-in-provider> or sk_test_***
 ```
 
 ### Optional but Recommended
@@ -93,15 +93,15 @@ NEXT_PUBLIC_APP_URL=https://otaku-mori.com
 NEXT_PUBLIC_SITE_URL=https://otaku-mori.com
 
 # Webhooks
-CLERK_WEBHOOK_SECRET=whsec_***
-STRIPE_WEBHOOK_SECRET=whsec_***
+CLERK_WEBHOOK_SECRET=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Redis (for rate limiting)
 UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=...
+UPSTASH_REDIS_REST_TOKEN=<set-in-provider>
 
 # Email
-RESEND_API_KEY=re_***
+RESEND_API_KEY=<set-in-provider>
 ```
 
 ## 🚀 Deployment Steps

@@ -1,7 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { db } from '@/app/lib/db';
 import { getMerchizeService, type MerchizeProduct } from '@/app/lib/merchize/service';
-import { env } from '@/env/server';
+import { env } from '@/env.mjs';
 import { providerProductRef } from '@/lib/catalog/provider';
 
 export const MERCHIZE_HIDDEN_IMPORT_MANIFEST_VERSION = 'merchize-hidden-local-import-v1';

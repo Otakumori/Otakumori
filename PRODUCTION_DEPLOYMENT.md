@@ -12,25 +12,25 @@ DATABASE_URL="<DATABASE_URL>"
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
+CLERK_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 
 # Vercel Blob Storage
-BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
+BLOB_READ_WRITE_TOKEN=<set-in-provider>
 
 # Stripe
-STRIPE_SECRET_KEY=sk_test_...
+STRIPE_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Printify
-PRINTIFY_API_KEY=your_printify_api_key_here
+PRINTIFY_API_KEY=<set-in-provider>
 
 # Email (Resend)
-RESEND_API_KEY=re_...
+RESEND_API_KEY=<set-in-provider>
 
 # Inngest
 INNGEST_EVENT_KEY=your_inngest_event_key
@@ -38,11 +38,11 @@ INNGEST_SIGNING_KEY=your_inngest_signing_key
 
 # Redis (Upstash)
 UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=...
+UPSTASH_REDIS_REST_TOKEN=<set-in-provider>
 
 # Sentry
 NEXT_PUBLIC_SENTRY_DSN=https://...
-SENTRY_AUTH_TOKEN=your_sentry_auth_token
+SENTRY_AUTH_TOKEN=<set-in-provider>
 
 # App Configuration
 NEXT_PUBLIC_APP_URL=https://your-domain.com

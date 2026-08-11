@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { safeFetch, probeEndpoint, fetchLiveData, isBlocked, isSuccess } from '@/lib/safeFetch';
-import { clientEnv } from '@/env/client';
+import { env } from '@/env.mjs';
 
 // Mock the env module
-vi.mock('@/env/client', () => ({
-  clientEnv: {
+vi.mock('@/env.mjs', () => ({
+  env: {
     NEXT_PUBLIC_LIVE_DATA: '0',
     NEXT_PUBLIC_PROBE_MODE: '1',
   },
@@ -17,13 +17,37 @@ global.fetch = mockFetch;
 describe('safeFetch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    global.fetch = mockFetch;
     // Reset env mock to default values
-    clientEnv.NEXT_PUBLIC_LIVE_DATA = '0';
-    clientEnv.NEXT_PUBLIC_PROBE_MODE = '1';
+    env.NEXT_PUBLIC_LIVE_DATA = '0';
+    env.NEXT_PUBLIC_PROBE_MODE = '1';
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe('build-time import safety', () => {
+    it('imports without eager full client env validation or network calls', async () => {
+      vi.resetModules();
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+      vi.doMock('@/env/client', () => {
+        throw new Error('unexpected client env validation during safeFetch import');
+      });
+      vi.doMock('@/env.mjs', () => ({
+        env: {
+          NEXT_PUBLIC_LIVE_DATA: '0',
+          NEXT_PUBLIC_PROBE_MODE: '1',
+        },
+      }));
+
+      const mod = await import('@/lib/safeFetch');
+
+      expect(mod.safeFetch).toBeTypeOf('function');
+      expect(mod.probeEndpoint).toBeTypeOf('function');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
   });
 
   describe('when live data is disabled', () => {
@@ -114,7 +138,7 @@ describe('safeFetch', () => {
 
   describe('when live data is enabled', () => {
     beforeEach(() => {
-      clientEnv.NEXT_PUBLIC_LIVE_DATA = '1';
+      env.NEXT_PUBLIC_LIVE_DATA = '1';
     });
 
     it('should make live request when allowLive is true', async () => {
@@ -212,7 +236,7 @@ describe('safeFetch', () => {
     });
 
     it('fetchLiveData should call safeFetch with allowLive=true', async () => {
-      clientEnv.NEXT_PUBLIC_LIVE_DATA = '1';
+      env.NEXT_PUBLIC_LIVE_DATA = '1';
       const mockData = { data: 'test' };
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -273,8 +297,8 @@ describe('safeFetch', () => {
 
     testCases.forEach(({ name, env: envVars, options, expected }) => {
       it(`should handle ${name}`, async () => {
-        clientEnv.NEXT_PUBLIC_LIVE_DATA = envVars.NEXT_PUBLIC_LIVE_DATA;
-        clientEnv.NEXT_PUBLIC_PROBE_MODE = envVars.NEXT_PUBLIC_PROBE_MODE;
+        env.NEXT_PUBLIC_LIVE_DATA = envVars.NEXT_PUBLIC_LIVE_DATA;
+        env.NEXT_PUBLIC_PROBE_MODE = envVars.NEXT_PUBLIC_PROBE_MODE;
 
         if (expected.source === 'probe' || expected.source === 'live') {
           mockFetch.mockResolvedValueOnce({

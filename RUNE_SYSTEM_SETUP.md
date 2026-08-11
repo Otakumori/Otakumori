@@ -25,15 +25,15 @@ Ensure these environment variables are set in your `.env.local`:
 
 ```bash
 # Stripe Configuration
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Clerk Authentication
-CLERK_SECRET_KEY=sk_test_...
+CLERK_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 
 # Database
-DATABASE_URL="postgresql://..."
+DATABASE_URL="postgresql://<set-in-provider>"
 
 # Petal System
 PETAL_SALT="your-secure-salt-here"

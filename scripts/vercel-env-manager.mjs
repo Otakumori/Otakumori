@@ -8,7 +8,7 @@
  * Usage:
  *   node scripts/vercel-env-manager.mjs                    # Audit only
  *   node scripts/vercel-env-manager.mjs --apply            # Audit and fix missing vars
- *   VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs   # With explicit token
+ *   node scripts/vercel-env-manager.mjs                    # With VERCEL_TOKEN set in the environment
  *
  * Requirements:
  *   - Vercel CLI installed: npm i -g vercel
@@ -507,7 +507,7 @@ function checkSuspiciousValue(key, value, environment) {
       !value.startsWith('postgres://') &&
       !value.startsWith('prisma://')
     ) {
-      return 'Should start with postgresql://, postgres://, or prisma://';
+      return 'Should use a supported PostgreSQL or Prisma URL scheme';
     }
   }
 
@@ -537,7 +537,7 @@ function printEnvironmentReport(environment, result) {
     console.log(`\n SUSPICIOUS VALUES (${result.suspicious.length}):`);
     result.suspicious.forEach(({ key, value, reason }) => {
       console.log(`   • ${key}: ${reason}`);
-      console.log(`     Value: ${value}`);
+      console.log('     Value: REDACTED');
     });
   }
 
@@ -726,16 +726,16 @@ OPTIONS:
 
 EXAMPLES:
   # Audit only (safe, read-only)
-  VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs
+  node scripts/vercel-env-manager.mjs
 
   # Audit and show manual fix commands
-  VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs --apply
+  node scripts/vercel-env-manager.mjs --apply
 
   # Pull all Vercel env vars to local file for comparison
-  VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs --pull
+  node scripts/vercel-env-manager.mjs --pull
 
   # Verbose output with debug information
-  VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs --verbose
+  node scripts/vercel-env-manager.mjs --verbose
 
 REQUIREMENTS:
   - VERCEL_TOKEN environment variable (get from https://vercel.com/account/tokens)
@@ -751,7 +751,7 @@ WHAT IT CHECKS:
 
 SAFETY:
   - Read-only by default (--apply shows manual commands)
-  - Never prints full secret values (masked to first 3 chars)
+  - Never prints secret values
   - Windows PowerShell friendly
 `);
 }
@@ -771,7 +771,7 @@ async function main() {
   if (!process.env.VERCEL_TOKEN) {
     log('VERCEL_TOKEN environment variable is required', 'error');
     log('Get it from: https://vercel.com/account/tokens', 'info');
-    log('Usage: VERCEL_TOKEN=xxx node scripts/vercel-env-manager.mjs', 'info');
+    log('Usage: set VERCEL_TOKEN in the environment, then run node scripts/vercel-env-manager.mjs', 'info');
     log('Or run with --help for more options', 'info');
     process.exit(1);
   }

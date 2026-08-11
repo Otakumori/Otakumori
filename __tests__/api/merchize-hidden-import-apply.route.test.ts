@@ -50,6 +50,15 @@ vi.mock('@/app/lib/logger', () => ({
 
 vi.mock('@/env.mjs', () => ({
   env: {
+    get AUTH_SECRET() {
+      return process.env.AUTH_SECRET;
+    },
+    get CLERK_SECRET_KEY() {
+      return process.env.CLERK_SECRET_KEY;
+    },
+    get MERCHIZE_LOCAL_IMPORT_ENABLED() {
+      return process.env.MERCHIZE_LOCAL_IMPORT_ENABLED;
+    },
     UPSTASH_REDIS_REST_URL: '',
     UPSTASH_REDIS_REST_TOKEN: '',
   },
@@ -273,6 +282,24 @@ describe('Merchize hidden local import apply route', () => {
       async (callback: (tx: unknown) => Promise<void>) => callback(transactionClient()),
     );
     vi.mocked(getMerchizeService).mockReturnValue(serviceMock() as never);
+  });
+
+  it('does not require Clerk environment configuration during route module import', async () => {
+    delete process.env.AUTH_SECRET;
+    delete process.env.CLERK_SECRET_KEY;
+    delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    process.env.MERCHIZE_LOCAL_IMPORT_ENABLED = '';
+
+    const mod = await applyRoute();
+
+    expect(typeof mod.POST).toBe('function');
+
+    noSession();
+    const { response, json } = await callPOST({});
+    expect(response.status).toBe(401);
+    expect(json.error).toBe('AUTH_REQUIRED');
+    expect(getMerchizeService).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
   });
 
   it('requires authentication and admin authorization', async () => {

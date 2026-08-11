@@ -10,7 +10,7 @@ Add these to your `.env.local` file:
 
 ```bash
 # Resend (server only)
-RESEND_API_KEY=__your_resend_key__
+RESEND_API_KEY=<set-in-provider>
 EMAIL_FROM="Otaku-Mori <orders@otaku-mori.com>"
 
 # Supabase Admin (server only)

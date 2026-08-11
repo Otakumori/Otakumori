@@ -285,7 +285,7 @@ function checkSuspiciousValue(
       !value.startsWith('postgres://') &&
       !value.startsWith('prisma://')
     ) {
-      return 'DATABASE_URL should start with postgresql://, postgres://, or prisma://';
+      return 'DATABASE_URL should use a supported PostgreSQL or Prisma URL scheme';
     }
   }
 
@@ -442,7 +442,7 @@ function printFixSuggestions(results: Record<string, EnvAuditResult>) {
 
 function getExampleValue(key: string): string {
   const examples: Record<string, string> = {
-    DATABASE_URL: 'postgresql://user:pass@host:5432/db',
+    DATABASE_URL: '<set-database-url>',
     CLERK_SECRET_KEY: 'sk_live_...',
     CLERK_ENCRYPTION_KEY: 'your-encryption-key',
     CLERK_WEBHOOK_SECRET: 'whsec_...',

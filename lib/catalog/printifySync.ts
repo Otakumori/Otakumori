@@ -3,7 +3,7 @@ import { db } from '@/app/lib/db';
 import type { PrintifyProduct } from '@/app/lib/printify/service';
 import { type PrintifySyncResult } from '@/app/lib/printify/service';
 import { integrationRef, normalizeCategorySlug } from '@/lib/catalog/mapPrintify';
-import { env } from '@/env/server';
+import { env } from '@/env.mjs';
 import { logger } from '@/app/lib/logger';
 
 type SyncOptions = {

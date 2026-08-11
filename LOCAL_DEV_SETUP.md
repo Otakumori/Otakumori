@@ -34,11 +34,11 @@ Create a file named `.env.local` in your project root with these essential keys:
 ```bash
 # === Core Application ===
 NODE_ENV=development
-DATABASE_URL=your_neon_dev_database_url
-DIRECT_URL=your_neon_dev_direct_url
+DATABASE_URL=<set-in-provider>
+DIRECT_URL=<set-in-provider>
 
 # === Clerk Authentication (DEVELOPMENT KEYS) ===
-CLERK_SECRET_KEY=sk_test_YOUR_DEV_SECRET_KEY_HERE
+CLERK_SECRET_KEY=<set-in-provider>
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_YOUR_DEV_PUBLISHABLE_KEY_HERE
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up

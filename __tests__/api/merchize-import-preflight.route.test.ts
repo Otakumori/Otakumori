@@ -53,6 +53,12 @@ vi.mock('@/app/lib/logger', () => ({
 
 vi.mock('@/env.mjs', () => ({
   env: {
+    get AUTH_SECRET() {
+      return process.env.AUTH_SECRET;
+    },
+    get CLERK_SECRET_KEY() {
+      return process.env.CLERK_SECRET_KEY;
+    },
     UPSTASH_REDIS_REST_URL: '',
     UPSTASH_REDIS_REST_TOKEN: '',
   },

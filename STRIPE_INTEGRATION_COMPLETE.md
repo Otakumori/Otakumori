@@ -186,8 +186,8 @@ Award Petals (1 per $1)
 
 ```bash
 # Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SECRET_KEY=<set-in-provider>
+STRIPE_WEBHOOK_SECRET=<set-in-provider>
 
 # Inngest
 INNGEST_EVENT_KEY=...
