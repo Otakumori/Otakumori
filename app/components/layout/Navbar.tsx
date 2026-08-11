@@ -414,6 +414,7 @@ export default function Navbar() {
             ) : !isLoaded ? (
               <div
                 className="flex min-h-[44px] w-36 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+                role="status"
                 aria-busy="true"
                 aria-label="Loading account state"
               >
@@ -717,6 +718,7 @@ export default function Navbar() {
                 ) : !isLoaded ? (
                   <div
                     className="flex min-h-[44px] items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+                    role="status"
                     aria-busy="true"
                     aria-label="Loading account state"
                   >
