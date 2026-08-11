@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalBalanceDisplay } from './PetalBalanceDisplay';
 import { EmptyCart } from '@/app/components/empty-states';
+import { MoriButton, MoriInput, MoriPanel, MoriPrice } from '@/app/components/mori';
 
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
@@ -104,9 +104,9 @@ export default function CartContent() {
       <div className="lg:col-span-2 space-y-4" data-testid="cart-items">
         <PetalBalanceDisplay />
         {items.map((item) => (
-          <GlassPanel key={item.id} className="p-4" data-testid="cart-item">
+          <MoriPanel key={item.id} className="p-4" data-testid="cart-item">
             <div className="flex items-center gap-4">
-              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl">
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden border border-[var(--mori-border-muted)]">
                 <Image
                   src={item.image}
                   alt={item.name}
@@ -117,26 +117,28 @@ export default function CartContent() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white truncate">{item.name}</h3>
+                <h3 className="font-display text-lg font-semibold text-[var(--mori-ivory)] truncate">
+                  {item.name}
+                </h3>
                 {item.selectedVariant?.title && (
-                  <p className="text-sm text-zinc-400">{item.selectedVariant.title}</p>
+                  <p className="text-sm text-[var(--mori-taupe)]">{item.selectedVariant.title}</p>
                 )}
-                <p className="text-fuchsia-300 font-semibold">${item.price}</p>
+                <MoriPrice className="text-lg">${item.price}</MoriPrice>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
                   disabled={isUpdating || item.quantity <= 1}
-                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mori-button mori-button--secondary px-3 py-2"
                 >
                   -
                 </button>
-                <span className="w-8 text-center text-white">{item.quantity}</span>
+                <span className="w-8 text-center text-[var(--mori-ivory)]">{item.quantity}</span>
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
                   disabled={isUpdating}
-                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mori-button mori-button--secondary px-3 py-2"
                 >
                   +
                 </button>
@@ -145,59 +147,62 @@ export default function CartContent() {
               <button
                 onClick={() => removeItem(item.id)}
                 disabled={isUpdating}
-                className="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mori-button mori-button--danger px-3 py-2 text-xs"
               >
                 Remove
               </button>
             </div>
-          </GlassPanel>
+          </MoriPanel>
         ))}
       </div>
 
       {/* Order Summary */}
       <div className="lg:col-span-1">
-        <GlassPanel className="p-6 sticky top-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
+        <MoriPanel className="p-6 sticky top-8">
+          <h2 className="font-display text-xl font-semibold text-[var(--mori-ivory)] mb-4">
+            Order Summary
+          </h2>
 
           <div className="space-y-3">
-            <div className="flex justify-between text-zinc-300">
+            <div className="flex justify-between text-[var(--mori-parchment-muted)]">
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
             {/* Coupons */}
             <div className="mt-2">
-              <label htmlFor="couponCode" className="block text-sm text-zinc-300 mb-1">
+              <label htmlFor="couponCode" className="mori-label mb-1">
                 Coupon Code
               </label>
               <div className="flex gap-2">
-                <input
+                <MoriInput
                   id="couponCode"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
                   placeholder="Enter code"
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                  className="flex-1"
                   aria-label="Coupon code"
                 />
-                <button
+                <MoriButton
+                  type="button"
                   onClick={addCode}
-                  className="rounded-xl bg-fuchsia-500/90 px-3 py-2 text-white hover:bg-fuchsia-500"
+                  className="px-3 py-2"
                   aria-label="Apply coupon"
                 >
                   Apply
-                </button>
+                </MoriButton>
               </div>
               {codes.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {codes.map((c) => (
                     <span
                       key={c}
-                      className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white"
+                      className="inline-flex items-center gap-1 border border-[var(--mori-border-muted)] bg-black/20 px-2 py-1 text-xs text-[var(--mori-ivory)]"
                     >
                       {c}
                       <button
                         aria-label={`Remove ${c}`}
                         onClick={() => removeCode(c)}
-                        className="ml-1 text-zinc-300 hover:text-white"
+                        className="ml-1 text-[var(--mori-taupe)] hover:text-[var(--mori-ivory)]"
                       >
                         ×
                       </button>
@@ -206,7 +211,7 @@ export default function CartContent() {
                 </div>
               )}
               {preview?.codesApplied && preview.codesApplied.length > 0 && (
-                <div className="mt-2 space-y-1 text-xs text-zinc-300">
+                <div className="mt-2 space-y-1 text-xs text-[var(--mori-parchment-muted)]">
                   {preview.codesApplied.map((ap) => (
                     <div key={ap.code} className="flex justify-between">
                       <span>
@@ -217,27 +222,29 @@ export default function CartContent() {
                   ))}
                 </div>
               )}
-              {busyPreview && <div className="mt-1 text-xs text-zinc-400">Checking…</div>}
+              {busyPreview && (
+                <div className="mt-1 text-xs text-[var(--mori-taupe)]">Checking...</div>
+              )}
               {preview?.messages && preview.messages.length > 0 && (
                 <div className="mt-2 text-xs text-amber-300">{preview.messages.join(', ')}</div>
               )}
             </div>
-            <div className="flex justify-between text-zinc-300">
+            <div className="flex justify-between text-[var(--mori-parchment-muted)]">
               <span>Tax</span>
               <span>${tax.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-zinc-300">
+            <div className="flex justify-between text-[var(--mori-parchment-muted)]">
               <span>Shipping</span>
               <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between text-[var(--mori-parchment-muted)]">
                 <span>Discounts</span>
                 <span className="text-emerald-300">- ${discount.toFixed(2)}</span>
               </div>
             )}
-            <div className="border-t border-white/10 pt-3">
-              <div className="flex justify-between text-lg font-semibold text-white">
+            <div className="border-t border-[var(--mori-border-muted)] pt-3">
+              <div className="flex justify-between text-lg font-semibold text-[var(--mori-ivory)]">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
@@ -251,14 +258,16 @@ export default function CartContent() {
                 query: codes.length ? { coupons: codes.join(',') } : undefined,
               } as any
             }
-            className="mt-6 block w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 text-center font-semibold text-white hover:bg-fuchsia-500 transition-colors"
+            className="mori-button mori-button--primary mt-6 flex w-full px-6 py-4"
             data-testid="checkout-button"
           >
             {t('cart', 'checkoutClarity')}
           </Link>
 
-          <p className="mt-2 text-center text-xs text-zinc-400">{t('cart', 'checkoutFlavor')}</p>
-        </GlassPanel>
+          <p className="mt-2 text-center text-xs text-[var(--mori-taupe)]">
+            {t('cart', 'checkoutFlavor')}
+          </p>
+        </MoriPanel>
       </div>
     </div>
   );

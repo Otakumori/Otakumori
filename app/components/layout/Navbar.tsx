@@ -179,9 +179,9 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : 'border-b border-white/5'}`}
+      className={`navbar-scroll relative z-50 w-full border-b font-ui transition-all duration-300 ${isScrolled ? 'scrolled border-[var(--mori-border-muted)] shadow-lg shadow-black/80' : 'border-[var(--mori-border-muted)]'}`}
       style={{
-        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.95)' : 'rgba(26, 24, 22, 0.7)',
+        backgroundColor: isScrolled ? 'rgba(8, 7, 6, 0.96)' : 'rgba(17, 16, 15, 0.78)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
@@ -194,7 +194,7 @@ export default function Navbar() {
       </a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         <Link href={paths.home()} className="flex items-center group py-1">
-          <div className="relative w-32 h-32 md:w-36 md:h-36">
+          <div className="relative h-20 w-20 md:h-24 md:w-24">
             <Image
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
@@ -229,7 +229,7 @@ export default function Navbar() {
             </button>
             {activeDropdown === 'shop' && (
               <div
-                className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
+                className="mori-panel absolute top-full left-0 mt-2 w-96 p-6 z-50"
                 role="dialog"
                 aria-label="Shop menu"
                 tabIndex={-1}
@@ -264,7 +264,7 @@ export default function Navbar() {
                         <Link
                           key={category.href}
                           href={category.href}
-                          className="rounded-lg p-4 min-h-[44px] transition-colors hover:bg-white/10"
+                          className="min-h-[44px] border border-transparent p-4 transition-colors hover:border-[var(--mori-border-muted)] hover:bg-white/5"
                         >
                           <span className="block text-sm font-medium text-white">
                             {category.label}
@@ -299,7 +299,7 @@ export default function Navbar() {
             </button>
             {activeDropdown === 'games' && (
               <div
-                className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
+                className="mori-panel absolute top-full left-0 mt-2 w-96 p-6 z-50"
                 role="dialog"
                 aria-label="Mini-games menu"
                 tabIndex={-1}
@@ -313,7 +313,7 @@ export default function Navbar() {
                           <Link
                             key={game.id}
                             href={`/mini-games/${game.id}`}
-                            className="flex items-center gap-3 rounded-lg p-4 min-h-[44px] transition-colors hover:bg-white/10"
+                            className="flex min-h-[44px] items-center gap-3 border border-transparent p-4 transition-colors hover:border-[var(--mori-border-muted)] hover:bg-white/5"
                           >
                             <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-pink-500 to-purple-600 text-white">
                               <span className="text-xs uppercase tracking-wide">{game.status}</span>
@@ -340,7 +340,7 @@ export default function Navbar() {
                         <Link
                           key={face.href}
                           href={face.href}
-                          className="rounded-lg p-4 min-h-[44px] transition-colors hover:bg-white/10"
+                          className="min-h-[44px] border border-transparent p-4 transition-colors hover:border-[var(--mori-border-muted)] hover:bg-white/5"
                         >
                           <span className="block text-sm font-medium text-white">{face.label}</span>
                           <span className="mt-1 block text-xs text-white/60">
@@ -450,7 +450,7 @@ export default function Navbar() {
                 </button>
                 {showUserMenu && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-56 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg shadow-lg z-50"
+                    className="mori-panel absolute right-0 top-full mt-2 w-56 shadow-lg z-50"
                     role="dialog"
                     aria-label="User menu"
                     tabIndex={-1}
@@ -544,7 +544,7 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-black/95 backdrop-blur-lg border-l border-white/20 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto">
+          <div className="mori-panel lg:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] border-l border-[var(--mori-border-muted)] z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto">
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h2 className="text-lg font-semibold text-white">Menu</h2>

@@ -3,7 +3,6 @@
 import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';
 import { t } from '@/lib/microcopy';
@@ -16,6 +15,14 @@ import { HeaderButton } from '@/components/ui/header-button';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalDiscountBadge } from '@/app/components/shop/PetalDiscountBadge';
+import {
+  MoriBadge,
+  MoriErrorState,
+  MoriLink,
+  MoriLoadingState,
+  MoriPage,
+  MoriPrice,
+} from '@/app/components/mori';
 import { StorefrontPanel } from '@/app/components/shop/StorefrontPrimitives';
 import { productImageMode } from '@/app/components/shop/StorefrontProductCard';
 
@@ -231,53 +238,38 @@ export default function ProductClient({ productId }: { productId: string }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080611] flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-300 border-r-transparent" />
-          <p className="mt-4 text-pink-100">Loading treasure...</p>
-        </div>
-      </div>
+      <MoriPage className="flex items-center justify-center">
+        <MoriLoadingState label="Loading treasure..." />
+      </MoriPage>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-[#080611]">
+      <MoriPage>
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
-          <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Not Found
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">{error || 'This treasure has gone missing.'}</p>
-            <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
-                Return to Shop
-              </Button>
-            </Link>
-          </StorefrontPanel>
+          <MoriErrorState
+            title="Product Not Found"
+            description={error || 'This treasure has gone missing.'}
+            action={<MoriLink href={paths.shop()}>Return to Shop</MoriLink>}
+          />
         </div>
-      </div>
+      </MoriPage>
     );
   }
 
   const imageUrl = displayImageUrl;
   if (!imageUrl) {
     return (
-      <div className="min-h-screen bg-[#080611]">
+      <MoriPage>
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
-          <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Image Not Available
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">This product is missing required images.</p>
-            <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
-                Return to Shop
-              </Button>
-            </Link>
-          </StorefrontPanel>
+          <MoriErrorState
+            title="Product Image Not Available"
+            description="This product is missing required images."
+            action={<MoriLink href={paths.shop()}>Return to Shop</MoriLink>}
+          />
         </div>
-      </div>
+      </MoriPage>
     );
   }
 
@@ -291,7 +283,7 @@ export default function ProductClient({ productId }: { productId: string }) {
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#080611] text-white">
+    <MoriPage className="text-[var(--mori-ivory)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,148,201,0.16),transparent_30%),radial-gradient(circle_at_84%_18%,rgba(132,92,255,0.14),transparent_28%),linear-gradient(180deg,rgba(8,6,17,0.1),rgba(8,6,17,0.94))]" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <nav className="mb-8">
@@ -329,12 +321,9 @@ export default function ProductClient({ productId }: { productId: string }) {
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full"
-                  >
+                  <MoriBadge key={index} tone="accent">
                     {tag}
-                  </span>
+                  </MoriBadge>
                 ))}
               </div>
             )}
@@ -351,13 +340,10 @@ export default function ProductClient({ productId }: { productId: string }) {
                 </h1>
               </div>
               <div className="flex items-center gap-4 mb-6">
-                <p
-                  className="font-display text-3xl font-semibold text-pink-100"
-                  data-testid="product-price"
-                >
+                <MoriPrice className="text-3xl" data-testid="product-price">
                   {currency === 'USD' ? '$' : currency}
                   {currentPrice.toFixed(2)}
-                </p>
+                </MoriPrice>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
               <PetalDiscountBadge productPrice={currentPrice} />
@@ -385,14 +371,14 @@ export default function ProductClient({ productId }: { productId: string }) {
                     const variant = product.variants?.find((v) => v.id === e.target.value);
                     if (variant) setSelectedVariant(variant);
                   }}
-                  className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
+                  className="mori-input"
                 >
                   {product.variants.map((variant) => (
                     <option
                       key={variant.id}
                       value={variant.id}
                       disabled={!variant.isEnabled || !variant.inStock}
-                      className="bg-purple-900"
+                      className="bg-[var(--mori-ink)]"
                     >
                       {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
                       {(
@@ -416,7 +402,7 @@ export default function ProductClient({ productId }: { productId: string }) {
                 max="99"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
+                className="mori-input"
               />
             </StorefrontPanel>
 
@@ -462,6 +448,6 @@ export default function ProductClient({ productId }: { productId: string }) {
           </div>
         </div>
       </div>
-    </div>
+    </MoriPage>
   );
 }

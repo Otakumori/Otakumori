@@ -1,4 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
+import { MoriContainer, MoriPage, MoriSectionHeading } from '../components/mori';
 import FooterDark from '../components/FooterDark';
 import CartContent from '../components/shop/CartContent';
 import { t } from '@/lib/microcopy';
@@ -14,16 +15,20 @@ export function generateMetadata() {
 export default async function CartPage() {
   return (
     <>
-      <main className="relative z-10 min-h-screen bg-[#080611]">
-        <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
+      <MoriPage className="relative z-10">
+        <MoriContainer className="max-w-4xl py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">{t('cart', 'gatherGear')}</h1>
-            <p className="mt-2 text-zinc-300/90">Review your items before proceeding to checkout</p>
+            <MoriSectionHeading as="h1" className="md:text-4xl">
+              {t('cart', 'gatherGear')}
+            </MoriSectionHeading>
+            <p className="mt-2 text-[var(--mori-parchment-muted)]">
+              Review your inventory before proceeding to checkout.
+            </p>
           </div>
 
           <CartContent />
-        </div>
-      </main>
+        </MoriContainer>
+      </MoriPage>
       <FooterDark />
     </>
   );

@@ -1,6 +1,14 @@
-import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import HomeSoapstoneDialog from './HomeSoapstoneDialog';
+import {
+  MoriBody,
+  MoriCard,
+  MoriEyebrow,
+  MoriLink,
+  MoriMeta,
+  MoriPanel,
+  MoriSectionHeading,
+} from '@/app/components/mori';
 import { StorefrontPanel } from '@/app/components/shop/StorefrontPrimitives';
 
 const containSectionStyle: CSSProperties = {
@@ -59,66 +67,58 @@ const HOME_SECTION_CARDS: HomeSectionCard[] = [
 function SectionHeader() {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <p className="font-ui text-sm font-medium uppercase tracking-[0.32em] text-sakura-50/70">
-        The path through the grove
-      </p>
-      <h2 className="font-display mt-4 text-balance text-3xl font-semibold tracking-tight text-white md:text-5xl">
+      <MoriEyebrow>The path through the grove</MoriEyebrow>
+      <MoriSectionHeading className="mt-4">
         Shop, play, and return to a world that feels handmade.
-      </h2>
-      <p className="font-body mt-5 text-base leading-8 text-white/70 md:text-lg">
+      </MoriSectionHeading>
+      <MoriBody className="mt-5 md:text-lg">
         The sakura tree stays as the signature living landmark. The sections below it use quiet
         ornamental frames, clear entry points, and server-owned routes so the atmosphere never gets
         in the way of browsing.
-      </p>
+      </MoriBody>
     </div>
   );
 }
 
 function HomeSectionCard({ card }: { card: HomeSectionCard }) {
   return (
-    <article className="group relative overflow-hidden rounded-[1.8rem] border border-pink-100/14 bg-[#120d17]/82 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.24)] transition-transform duration-200 hover:-translate-y-1 hover:border-sakura-300/38 focus-within:border-sakura-300/50 md:p-7">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,126,179,0.18),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_48%)] opacity-75 transition-opacity duration-200 group-hover:opacity-100" />
+    <MoriCard className="group p-6 md:p-7">
       <div className="relative z-10 flex h-full flex-col">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <p className="font-ui text-xs font-semibold uppercase tracking-[0.26em] text-sakura-50/70">
-            {card.eyebrow}
-          </p>
-          <span className="font-ui rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-white/60">
-            {card.status}
-          </span>
+          <MoriEyebrow>{card.eyebrow}</MoriEyebrow>
+          <MoriMeta>{card.status}</MoriMeta>
         </div>
 
-        <h3 className="font-display text-2xl font-semibold text-white">{card.title}</h3>
-        <p className="font-body mt-4 flex-1 text-sm leading-7 text-white/68">{card.description}</p>
+        <h3 className="font-display text-2xl font-semibold text-[var(--mori-ivory)]">
+          {card.title}
+        </h3>
+        <p className="font-body mt-4 flex-1 text-sm leading-7 text-[var(--mori-parchment-muted)]">
+          {card.description}
+        </p>
 
-        <Link
-          href={card.href}
-          className="font-ui focus-ring mt-7 inline-flex w-fit items-center rounded-full border border-sakura-300/25 bg-sakura-300/10 px-4 py-2 text-sm font-medium text-sakura-50 transition hover:border-sakura-50/50 hover:bg-sakura-300/18"
-        >
+        <MoriLink href={card.href} className="mt-7 w-fit" variant="secondary">
           {card.cta}
-        </Link>
+        </MoriLink>
       </div>
-    </article>
+    </MoriCard>
   );
 }
 
 function PerformanceGuardrails() {
   return (
-    <StorefrontPanel
+    <MoriPanel
       aria-labelledby="home-guardrails-title"
       className="mx-auto mt-24 max-w-5xl p-6 text-white/75 md:p-8"
       style={containSectionStyle}
     >
-      <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
-        Build standard
-      </p>
+      <MoriEyebrow>Build standard</MoriEyebrow>
       <h2
         id="home-guardrails-title"
-        className="font-display mt-3 text-2xl font-semibold text-white"
+        className="font-display mt-3 text-2xl font-semibold text-[var(--mori-ivory)]"
       >
         UI, UX, performance, memory, and data safety carry equal weight.
       </h2>
-      <div className="font-body mt-6 grid gap-4 text-sm leading-7 md:grid-cols-2">
+      <div className="font-body mt-6 grid gap-4 text-sm leading-7 text-[var(--mori-parchment-muted)] md:grid-cols-2">
         <p>
           This skeleton is server-first and static by default. It does not add timers, observers,
           third-party scripts, external fetches, or arbitrary client-trusted grant calls to the
@@ -130,21 +130,19 @@ function PerformanceGuardrails() {
           server-validated claim paths.
         </p>
       </div>
-    </StorefrontPanel>
+    </MoriPanel>
   );
 }
 
 function HomeFooter() {
   return (
     <footer className="mx-auto mt-20 max-w-5xl text-center" style={containSectionStyle}>
-      <StorefrontPanel className="p-6 text-white/75 md:p-8">
-        <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-sakura-50/70">
-          Community signs
-        </p>
-        <h2 className="font-display mt-3 text-2xl font-semibold text-white">
+      <StorefrontPanel className="p-6 text-[var(--mori-parchment-muted)] md:p-8">
+        <MoriEyebrow>Community signs</MoriEyebrow>
+        <h2 className="font-display mt-3 text-2xl font-semibold text-[var(--mori-ivory)]">
           Leave a sign for fellow travelers
         </h2>
-        <p className="font-body mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/68">
+        <p className="font-body mx-auto mt-4 max-w-2xl text-sm leading-7">
           Soapstone posting stays behind its owned route and auth flow; the homepage keeps the
           public invitation visible without depending on live community data.
         </p>
@@ -165,7 +163,7 @@ function HomeFooter() {
 
 export default function HomeMain() {
   return (
-    <main className="relative z-20 bg-[#080611] px-4 py-20 text-white sm:px-6 lg:px-8">
+    <main className="mori-page relative z-20 px-4 py-20 sm:px-6 lg:px-8">
       <section
         aria-labelledby="home-sections-title"
         className="mx-auto max-w-7xl"

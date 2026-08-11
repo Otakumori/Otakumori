@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { stripHtml } from '@/lib/html';
 import { paths } from '@/lib/paths';
+import { MoriBadge, MoriCard, MoriImageFrame, MoriPrice } from '@/app/components/mori';
 import { StorefrontButton } from './StorefrontPrimitives';
 
 function getStartingPriceLabel(product: CatalogProduct) {
@@ -56,9 +56,7 @@ export function ProductPrice({ product }: { product: CatalogProduct }) {
           Starting at
         </p>
       ) : null}
-      <p className="font-display text-xl font-semibold text-pink-100">
-        {getStartingPriceLabel(product)}
-      </p>
+      <MoriPrice className="text-xl">{getStartingPriceLabel(product)}</MoriPrice>
     </div>
   );
 }
@@ -75,18 +73,13 @@ export function ProductImageFrame({
   mode: string;
 }) {
   return (
-    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.55rem] border border-pink-100/12 bg-[radial-gradient(circle_at_center,rgba(255,235,245,0.09),rgba(12,8,18,0.92)_62%)]">
-      <Image
-        src={image}
-        alt={title}
-        fill
-        className={`${mode} transition-transform duration-500 group-hover:scale-[1.035]`}
-        sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-        priority={priority}
-        unoptimized
-      />
-      <div className="pointer-events-none absolute inset-3 rounded-[1.2rem] border border-white/8" />
-    </div>
+    <MoriImageFrame
+      src={image}
+      alt={title}
+      priority={priority}
+      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+      mode={mode}
+    />
   );
 }
 
@@ -102,8 +95,7 @@ export function StorefrontProductCard({
   const productHref = paths.product(product.id);
 
   return (
-    <article className="group relative overflow-hidden rounded-[1.8rem] border border-pink-100/14 bg-[#140f18]/88 p-3 shadow-[0_18px_60px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-pink-100/28">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,153,204,0.14),transparent_36%)] opacity-80" />
+    <MoriCard className="group p-3" data-testid="product-card-shell">
       <div className="relative z-10">
         <Link href={productHref} className="block" data-testid="product-card">
           <ProductImageFrame
@@ -115,22 +107,20 @@ export function StorefrontProductCard({
         </Link>
 
         {product.provider ? (
-          <div className="absolute right-5 top-5 rounded-full border border-white/12 bg-black/68 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-pink-50/82">
-            {product.provider}
-          </div>
+          <MoriBadge className="absolute right-5 top-5">{product.provider}</MoriBadge>
         ) : null}
 
         <div className="space-y-4 p-3 pt-5">
           <div className="flex items-start justify-between gap-4">
             <Link href={productHref} className="min-w-0 flex-1">
-              <h2 className="line-clamp-2 font-display text-xl font-semibold leading-snug text-[#f7eadf] transition-colors hover:text-pink-100">
+              <h2 className="line-clamp-2 font-display text-xl font-semibold leading-snug text-[var(--mori-ivory)] transition-colors hover:text-[var(--mori-sakura-light)]">
                 {product.title}
               </h2>
             </Link>
             <ProductPrice product={product} />
           </div>
 
-          <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-[#f5d6dc]/68">
+          <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-[var(--mori-parchment-muted)]">
             {summary || 'Premium quality print-on-demand merchandise.'}
           </p>
 
@@ -139,7 +129,7 @@ export function StorefrontProductCard({
           </Link>
         </div>
       </div>
-    </article>
+    </MoriCard>
   );
 }
 
