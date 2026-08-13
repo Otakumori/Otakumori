@@ -111,6 +111,8 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const totalCount = achievements.length;
+  const completionPercentage =
+    totalCount > 0 ? Math.min(100, Math.max(0, Math.round((unlockedCount / totalCount) * 100))) : 0;
 
   return (
     <div className="space-y-6">
@@ -124,16 +126,14 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-fuchsia-300">
-              {Math.round((unlockedCount / totalCount) * 100)}%
-            </div>
+            <div className="text-2xl font-bold text-fuchsia-300">{completionPercentage}%</div>
             <div className="text-sm text-zinc-400">Complete</div>
           </div>
         </div>
         <div className="mt-4 w-full bg-white/10 rounded-full h-2">
           <div
             className="bg-fuchsia-400 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
+            style={{ width: `${completionPercentage}%` }}
           />
         </div>
       </GlassPanel>

@@ -3,12 +3,17 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
-import { auth } from '@clerk/nextjs/server';
 import type { PrivacySettings as PrismaPrivacySettings, Prisma } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { PrivacySettingsUpdateSchema } from '@/app/lib/contracts';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { logger } from '@/app/lib/logger';
 import { db } from '@/lib/db';
 
@@ -22,23 +27,29 @@ function normalise(settings: PrismaPrivacySettings) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
-    logger.request(request, 'Fetching privacy settings', { userId });
+    logger.request(request, 'Fetching privacy settings');
 
     let settings = await db.privacySettings.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
     });
 
     if (!settings) {
-      settings = await db.privacySettings.create({ data: { userId } });
+      settings = await db.privacySettings.create({ data: { userId: localUserId } });
     }
 
     return NextResponse.json({ ok: true, data: normalise(settings) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Privacy settings are temporarily unavailable.' },
+        { status: 503 },
+      );
+    }
     logger.apiError(request, 'Failed to fetch privacy settings', error as Error);
     return NextResponse.json(
       { ok: false, error: 'Failed to fetch privacy settings' },
@@ -49,36 +60,41 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = await request.json();
     const updates = PrivacySettingsUpdateSchema.parse(body);
 
     logger.request(request, 'Updating privacy settings', {
-      userId,
       extra: { updates: Object.keys(updates) },
     });
 
-    const existing = await db.privacySettings.findUnique({ where: { userId } });
+    const existing = await db.privacySettings.findUnique({ where: { userId: localUserId } });
 
     if (!existing) {
       const created = await db.privacySettings.create({
-        data: buildCreateData(userId, updates),
+        data: buildCreateData(localUserId, updates),
       });
 
       return NextResponse.json({ ok: true, data: normalise(created) });
     }
 
     const updated = await db.privacySettings.update({
-      where: { userId },
+      where: { userId: localUserId },
       data: buildUpdateData(updates),
     });
 
     return NextResponse.json({ ok: true, data: normalise(updated) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Privacy settings are temporarily unavailable.' },
+        { status: 503 },
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { ok: false, error: 'Invalid privacy settings data' },

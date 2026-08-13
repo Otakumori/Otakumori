@@ -20,6 +20,14 @@ function isLocalAppOrigin(url: URL) {
   return LOCAL_APP_HOSTS.has(url.hostname) || LOCAL_APP_HOSTS.has(url.host);
 }
 
+function hasExplicitPort(raw: string) {
+  const trimmed = raw.trim();
+  if (!/^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)) return false;
+
+  const authority = trimmed.replace(/^[a-z][a-z\d+.-]*:\/\//i, '').split(/[/?#]/, 1)[0] ?? '';
+  return /:\d+$/.test(authority);
+}
+
 function isAllowedReturnOrigin(candidate: URL, appOrigin: URL) {
   if (TRUSTED_APP_ORIGINS.has(candidate.origin)) return true;
 
@@ -30,14 +38,6 @@ function isAllowedReturnOrigin(candidate: URL, appOrigin: URL) {
   }
 
   return false;
-}
-
-function hasExplicitPort(raw: string) {
-  const trimmed = raw.trim();
-  if (!/^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)) return false;
-
-  const authority = trimmed.replace(/^[a-z][a-z\d+.-]*:\/\//i, '').split(/[/?#]/, 1)[0] ?? '';
-  return /:\d+$/.test(authority);
 }
 
 export function safeReturnUrl(returnUrl?: string, explicitAppOrigin?: string) {

@@ -1,12 +1,13 @@
 import { vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { requireLocalViewer } from '@/app/lib/auth/viewer';
 import { GET as getCart, POST as updateCart } from '@/app/api/v1/cart/route';
 
-// Mock Clerk auth
-vi.mock('@clerk/nextjs/server', () => ({
-  auth: vi.fn(),
+vi.mock('@/app/lib/auth/viewer', () => ({
+  AuthenticationRequiredError: class AuthenticationRequiredError extends Error {},
+  LocalUserUnavailableError: class LocalUserUnavailableError extends Error {},
+  requireLocalViewer: vi.fn(),
 }));
 
 // Mock Prisma
@@ -28,14 +29,21 @@ vi.mock('@/lib/db', () => ({
 describe('Cart API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(requireLocalViewer).mockResolvedValue({
+      clerkUserId: 'clerk_user_123',
+      localUserId: 'local_user_123',
+      email: 'user@example.invalid',
+      username: 'traveler',
+      displayName: null,
+      avatarUrl: null,
+    });
   });
 
   describe('GET /api/v1/cart', () => {
     it('should return cart items for authenticated user', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
       vi.mocked(db.cart.findUnique).mockResolvedValue({
         id: 'cart_1',
-        userId: 'user_123',
+        userId: 'local_user_123',
         CartItem: [
           {
             id: 'item_1',
@@ -64,10 +72,14 @@ describe('Cart API', () => {
       expect(data.ok).toBe(true);
       expect(data.data).toHaveLength(1);
       expect(data.data[0].productId).toBe('prod_1');
+      expect(db.cart.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: 'local_user_123' } }),
+      );
     });
 
     it('should return 401 for unauthenticated user', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: null } as any);
+      const { AuthenticationRequiredError } = await import('@/app/lib/auth/viewer');
+      vi.mocked(requireLocalViewer).mockRejectedValue(new AuthenticationRequiredError());
 
       const req = new NextRequest('http://localhost/api/v1/cart');
       const response = await getCart(req);
@@ -81,7 +93,6 @@ describe('Cart API', () => {
 
   describe('POST /api/v1/cart', () => {
     it('should add item to cart for authenticated user', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
       vi.mocked(db.product.findUnique).mockResolvedValue({
         id: 'prod_1',
         name: 'Test Product',
@@ -108,7 +119,7 @@ describe('Cart API', () => {
       } as any);
       vi.mocked(db.cart.findUnique).mockResolvedValue({
         id: 'cart_1',
-        userId: 'user_123',
+        userId: 'local_user_123',
       } as any);
       vi.mocked(db.cartItem.upsert).mockResolvedValue({
         id: 'item_1',
@@ -142,10 +153,11 @@ describe('Cart API', () => {
       expect(data.ok).toBe(true);
       expect(data.data.productId).toBe('prod_1');
       expect(data.data.quantity).toBe(2);
+      expect(db.cart.findUnique).toHaveBeenCalledWith({ where: { userId: 'local_user_123' } });
+      expect(db.cart.findUnique).not.toHaveBeenCalledWith({ where: { userId: 'clerk_user_123' } });
     });
 
     it('rejects hidden products before cart persistence', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
       vi.mocked(db.product.findUnique).mockResolvedValue({
         id: 'prod_1',
         name: 'Hidden Product',
@@ -179,7 +191,6 @@ describe('Cart API', () => {
     });
 
     it('rejects non-Printify products before cart persistence', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
       vi.mocked(db.product.findUnique).mockResolvedValue({
         id: 'prod_1',
         name: 'Merchize Product',
@@ -214,7 +225,6 @@ describe('Cart API', () => {
     });
 
     it('should return 404 for non-existent product', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' } as any);
       vi.mocked(db.product.findUnique).mockResolvedValue(null);
 
       const req = new NextRequest('http://localhost/api/v1/cart', {

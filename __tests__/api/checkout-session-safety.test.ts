@@ -3,8 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 import { db } from '@/app/lib/db';
+import { LocalUserUnavailableError, requireLocalViewer } from '@/app/lib/auth/viewer';
 
 const stripeSessionCreate = vi.hoisted(() => vi.fn());
+
+vi.mock('@/app/lib/auth/viewer', () => ({
+  AuthenticationRequiredError: class AuthenticationRequiredError extends Error {},
+  LocalUserUnavailableError: class LocalUserUnavailableError extends Error {},
+  isMissingSchemaError: vi.fn(() => false),
+  requireLocalViewer: vi.fn(),
+}));
 
 vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn(),
@@ -150,7 +158,15 @@ function merchizeProduct() {
 describe('checkout session safety gates', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_1' } as never);
+    vi.mocked(auth).mockResolvedValue({ userId: 'clerk_user_1' } as never);
+    vi.mocked(requireLocalViewer).mockResolvedValue({
+      clerkUserId: 'clerk_user_1',
+      localUserId: 'local_user_1',
+      email: 'ada@example.invalid',
+      username: 'traveler',
+      displayName: null,
+      avatarUrl: null,
+    });
   });
 
   it('/api/v1/checkout/session rejects hidden products before Stripe', async () => {
@@ -163,6 +179,7 @@ describe('checkout session safety gates', () => {
     expect(response.status).toBe(400);
     expect(json.error).toMatch(/no longer available/i);
     expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(prisma.user.create).not.toHaveBeenCalled();
   });
 
   it('/api/v1/checkout/session rejects non-Printify products before Stripe', async () => {
@@ -175,6 +192,23 @@ describe('checkout session safety gates', () => {
     expect(response.status).toBe(400);
     expect(json.error).toMatch(/no longer available/i);
     expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(prisma.user.create).not.toHaveBeenCalled();
+  });
+
+  it('/api/v1/checkout/session does not expose raw local-user readiness errors', async () => {
+    vi.mocked(requireLocalViewer).mockRejectedValue(
+      new LocalUserUnavailableError('Prisma column User.avatarBundle does not exist'),
+    );
+    const mod = await import('../../app/api/v1/checkout/session/route');
+
+    const response = await mod.POST(request('http://localhost/api/v1/checkout/session'));
+    const json = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(json.error).toBe('Checkout is temporarily unavailable while account data is prepared.');
+    expect(JSON.stringify(json)).not.toContain('avatarBundle');
+    expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(prisma.user.create).not.toHaveBeenCalled();
   });
 
   it('/api/checkout/session rejects hidden products before Stripe', async () => {

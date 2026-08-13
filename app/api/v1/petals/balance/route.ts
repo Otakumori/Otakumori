@@ -1,7 +1,11 @@
 import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import {
+  LocalUserUnavailableError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import { PetalService } from '@/app/lib/petals';
 import { generateRequestId } from '@/lib/requestId';
 
@@ -12,8 +16,14 @@ export async function GET(_req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    let localUserId: string;
+    try {
+      ({ localUserId } = await requireLocalViewer());
+    } catch (error) {
+      if (error instanceof LocalUserUnavailableError) {
+        return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+      }
+
       return NextResponse.json(
         { ok: false, error: 'AUTH_REQUIRED', requestId },
         { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
@@ -22,7 +32,7 @@ export async function GET(_req: NextRequest) {
 
     // Use PetalService to get balance info (includes lifetimePetalsEarned)
     const petalService = new PetalService();
-    const petalInfo = await petalService.getUserPetalInfo(userId, requestId);
+    const petalInfo = await petalService.getUserPetalInfo(localUserId, requestId);
 
     if (!petalInfo.success || !petalInfo.data) {
       return NextResponse.json(

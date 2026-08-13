@@ -1,11 +1,28 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { requireUserId } from '@/app/lib/auth';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 
 const db = new PrismaClient();
 
 export async function POST(req: Request) {
-  const userId = await requireUserId();
+  let localUserId: string;
+  try {
+    ({ localUserId } = await requireLocalViewer());
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(schemaUnavailableResponse('profile_user_unavailable'), { status: 503 });
+    }
+    throw error;
+  }
+
   const { gamertag } = await req.json();
   if (typeof gamertag !== 'string' || gamertag.length < 3 || gamertag.length > 24) {
     return new NextResponse('Invalid gamertag', { status: 400 });
@@ -16,7 +33,7 @@ export async function POST(req: Request) {
     return new NextResponse('Invalid characters', { status: 400 });
   }
 
-  const profile = await db.userProfile.findUnique({ where: { userId } });
+  const profile = await db.userProfile.findUnique({ where: { userId: localUserId } });
   const now = new Date();
   if (profile?.gamertagChangedAt) {
     const diff = now.getTime() - profile.gamertagChangedAt.getTime();
@@ -30,9 +47,9 @@ export async function POST(req: Request) {
   }
 
   await db.userProfile.upsert({
-    where: { userId },
+    where: { userId: localUserId },
     update: { gamertag, gamertagChangedAt: now },
-    create: { userId, gamertag, gamertagChangedAt: now },
+    create: { userId: localUserId, gamertag, gamertagChangedAt: now },
   });
 
   return NextResponse.json({ ok: true });

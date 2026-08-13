@@ -1,7 +1,13 @@
 import { logger } from '@/app/lib/logger';
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import { generateRequestId } from '@/lib/requestId';
 
 export const runtime = 'nodejs';
@@ -10,19 +16,13 @@ export async function GET(_req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'AUTH_REQUIRED', requestId },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     // Get or create wallet
     const wallet = await db.petalWallet.upsert({
-      where: { userId },
+      where: { userId: localUserId },
       create: {
-        userId,
+        userId: localUserId,
         balance: 0,
         lifetimeEarned: 0,
         currentStreak: 0,
@@ -36,7 +36,7 @@ export async function GET(_req: NextRequest) {
 
     const todayCollected = await db.petalTransaction.aggregate({
       where: {
-        userId,
+        userId: localUserId,
         source: 'homepage_collection',
         createdAt: { gte: today },
       },
@@ -45,7 +45,7 @@ export async function GET(_req: NextRequest) {
 
     // Get recent transactions
     const recentTransactions = await db.petalTransaction.findMany({
-      where: { userId },
+      where: { userId: localUserId },
       orderBy: { createdAt: 'desc' },
       take: 10,
     });
@@ -69,10 +69,19 @@ export async function GET(_req: NextRequest) {
       },
       requestId,
     });
-  } catch (error: any) {
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        { ok: false, error: 'AUTH_REQUIRED', requestId },
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
     logger.error('[Petals Wallet] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      { ok: false, error: 'INTERNAL_ERROR', message: 'Petal wallet is temporarily unavailable.', requestId },
       { status: 500 },
     );
   }

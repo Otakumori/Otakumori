@@ -1,31 +1,18 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { db } from '@/app/lib/db';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: {
-            code: 'AUTH_REQUIRED',
-            message: 'Authentication required',
-          },
-        },
-        {
-          status: 401,
-          headers: {
-            'x-otm-reason': 'AUTH_REQUIRED',
-          },
-        },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '8'), 20); // Max 20 orders
@@ -33,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Fetch recent completed orders for the user
     const orders = await db.order.findMany({
       where: {
-        userId,
+        userId: localUserId,
         status: {
           in: ['shipped', 'in_production', 'pending'], // Only show meaningful statuses
         },
@@ -64,6 +51,35 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: 'AUTH_REQUIRED',
+            message: 'Authentication required',
+          },
+        },
+        {
+          status: 401,
+          headers: {
+            'x-otm-reason': 'AUTH_REQUIRED',
+          },
+        },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: 'SCHEMA_UNAVAILABLE',
+            message: 'Order history is temporarily unavailable.',
+          },
+        },
+        { status: 503 },
+      );
+    }
     logger.error('Failed to fetch recent orders:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(

@@ -9,8 +9,10 @@ import { env } from '@/env';
 export const dynamic = 'force-dynamic';
 
 /**
- * Clerk webhook handler
- * Sets default avatar presets for new users
+ * Deprecated Clerk webhook endpoint.
+ *
+ * The canonical identity endpoint is /api/webhooks/clerk. Keep this route verified while the
+ * live dashboard destination is audited, but do not perform provider writes from it.
  */
 
 const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
@@ -58,57 +60,9 @@ export async function POST(req: NextRequest) {
 
   // Handle the webhook
   const eventType = evt.type;
+  logger.warn('Deprecated Clerk webhook endpoint received event', undefined, { eventType });
 
-  if (eventType === 'user.created') {
-    const { id, email_addresses, public_metadata } = evt.data;
-    logger.warn(`Creating user ${id} with ${email_addresses?.length || 0} email addresses`);
-
-    // New user created
-
-    // Set default avatar preset if not already set
-    if (!public_metadata?.avatarPreset) {
-      try {
-        // Import Clerk client dynamically to avoid issues
-        const { clerkClient } = await import('@clerk/nextjs/server');
-
-        // Set a default avatar preset
-        const defaultPreset = {
-          gender: 'female',
-          hair: 'long',
-          hairColor: 'pink',
-          eyes: 'blue',
-          skin: 'fair',
-          outfit: 'casual',
-          accessories: [],
-        };
-
-        const client = await clerkClient();
-        await client.users.updateUserMetadata(id, {
-          publicMetadata: {
-            ...public_metadata,
-            avatarPreset: defaultPreset,
-            joinedAt: new Date().toISOString(),
-          },
-        });
-
-        // Set default avatar preset for user
-      } catch (error) {
-        logger.error('Error setting avatar preset', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-        // Don't fail the webhook if avatar preset setting fails
-      }
-    }
-  }
-
-  if (eventType === 'user.updated') {
-    const { id, public_metadata } = evt.data;
-    logger.warn(`Updating user ${id} metadata`);
-    // User updated
-
-    // Log avatar preset changes for debugging
-    if (public_metadata?.avatarPreset) {
-      // Avatar preset updated for user
-    }
-  }
-
-  return new Response('', { status: 200 });
+  return new Response('Deprecated Clerk webhook endpoint; use /api/webhooks/clerk', {
+    status: 202,
+  });
 }

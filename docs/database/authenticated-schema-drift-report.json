@@ -1,0 +1,71 @@
+{
+  "status": "candidate-readiness-only",
+  "sourceCodeHead": "2f05cc57e8aaa8e5fb5bea59e8a95c79c8773f79",
+  "productionDeployment": "dpl_9Lf6NHvhocmFnT8qFCsoo34EqerT",
+  "productionSource": "21af5fff70aed71abf8bf21e830c5e460e43ba93",
+  "databaseBranch": {
+    "project": "divine-term-94053009",
+    "branch": "main",
+    "branchId": "br-raspy-glitter-a506lvk3"
+  },
+  "liveSchemaEvidence": {
+    "source": "read-only owner-provided database state plus sanitized runtime logs",
+    "sqlRunByThisTask": false,
+    "tablesPresent": ["User", "Cart", "_prisma_migrations"],
+    "tablesMissing": ["Wishlist", "PetalWallet"],
+    "columnsMissing": {
+      "User": ["avatarBundle", "avatarConfig", "avatarRendering", "updatedAt"],
+      "UserAchievement": ["updatedAt"],
+      "Wallet": ["createdAt", "updatedAt"]
+    },
+    "rowCounts": {
+      "User": 0,
+      "Cart": 0
+    }
+  },
+  "migrationHistoryEvidence": {
+    "wishlistMigrationFound": false,
+    "petalWalletMigrationFound": false,
+    "petalTransactionMigrationFound": false,
+    "userAvatarJsonMigrationFound": false,
+    "userAchievementUpdatedAtMigrationFound": false,
+    "userProfileMigrationFound": true,
+    "userSettingsMigrationFound": true,
+    "privacySettingsMigrationFound": true,
+    "petalLedgerMigrationFound": true
+  },
+  "runtimeFailures": [
+    {
+      "route": "GET /api/v1/cart",
+      "classification": "identity-boundary",
+      "sanitizedError": "foreign key violation on Cart.userId"
+    },
+    {
+      "route": "GET /api/v1/wishlist",
+      "classification": "schema-drift",
+      "sanitizedError": "Wishlist table missing"
+    },
+    {
+      "route": "GET /api/v1/petals/wallet",
+      "classification": "schema-drift-and-identity-boundary",
+      "sanitizedError": "PetalWallet table missing"
+    },
+    {
+      "route": "GET /profile",
+      "classification": "schema-drift-and-ui-state",
+      "sanitizedError": "UserAchievement.updatedAt column missing"
+    },
+    {
+      "route": "POST /api/v1/checkout/session",
+      "classification": "schema-drift-and-error-exposure",
+      "sanitizedError": "User avatar JSON or timestamp column missing"
+    }
+  ],
+  "candidateMigrations": [
+    "prisma/migrations/20260726160000_authenticated_data_boundary_readiness/migration.sql",
+    "prisma/migrations/20260726162000_authenticated_user_updated_at_readiness/migration.sql",
+    "prisma/migrations/20260726164000_wallet_timestamp_readiness/migration.sql"
+  ],
+  "destructiveOperations": [],
+  "requiresAuthorizedRehearsal": true
+}

@@ -1,8 +1,12 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db as prisma } from '@/lib/db';
 import { CartUpdateSchema } from '@/app/lib/contracts';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 import { validateLoadedPrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 
 function serializeCartItem(item: {
@@ -38,13 +42,10 @@ export async function GET(req: NextRequest) {
       userAgent: req.headers.get('user-agent'),
     });
 
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     let cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
       include: {
         CartItem: {
           include: {
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest) {
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId },
+        data: { userId: localUserId },
         include: {
           CartItem: {
             include: {
@@ -95,6 +96,18 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: cart.CartItem.map(serializeCartItem) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Account data is temporarily unavailable. Please try again shortly.',
+        },
+        { status: 503 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error fetching cart:',
@@ -108,10 +121,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = await req.json();
     const parsed = CartUpdateSchema.safeParse(body);
@@ -147,12 +157,12 @@ export async function POST(req: NextRequest) {
     }
 
     let cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
     });
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId },
+        data: { userId: localUserId },
       });
     }
 
@@ -191,6 +201,18 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: serializeCartItem(cartItem) });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Account data is temporarily unavailable. Please try again shortly.',
+        },
+        { status: 503 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Error updating cart:',

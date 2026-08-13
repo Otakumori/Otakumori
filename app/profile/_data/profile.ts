@@ -1,19 +1,19 @@
 // app/profile/_data/profile.ts
 import { prisma } from '@/app/lib/prisma';
-import { requireUserId } from '@/app/lib/auth';
+import { LocalUserUnavailableError, requireLocalViewer } from '@/app/lib/auth/viewer';
 import { currentUser } from '@clerk/nextjs/server';
 
 export async function getProfileData() {
-  const userId = await requireUserId();
+  const viewer = await requireLocalViewer();
   const user = await currentUser();
 
   if (!user) {
-    throw new Error('User not found');
+    throw new LocalUserUnavailableError('Clerk identity could not be loaded for profile');
   }
 
   // Get user profile data
   const profile = await prisma.userProfile.findUnique({
-    where: { userId },
+    where: { userId: viewer.localUserId },
     select: {
       gamertag: true,
       gamertagChangedAt: true,
@@ -23,7 +23,7 @@ export async function getProfileData() {
 
   // Get achievements data
   const achievements = await prisma.userAchievement.findMany({
-    where: { userId },
+    where: { userId: viewer.localUserId },
     include: {
       Achievement: {
         select: {
@@ -44,6 +44,7 @@ export async function getProfileData() {
     : new Date();
 
   return {
+    viewer,
     user,
     achievements,
     ownedCodes,

@@ -1,8 +1,14 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { generateRequestId } from '@/lib/requestId';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -29,27 +35,21 @@ export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'AUTH_REQUIRED', requestId },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const body = await req.json();
     const { localBalance, localTransactions } = SyncPetalsSchema.parse(body);
 
     // Get cloud wallet
     const cloudWallet = await db.petalWallet.findUnique({
-      where: { userId },
+      where: { userId: localUserId },
     });
 
     if (!cloudWallet) {
       // Create wallet if it doesn't exist
       const newWallet = await db.petalWallet.create({
         data: {
-          userId,
+          userId: localUserId,
           balance: localBalance,
           lifetimeEarned: localBalance,
           lastCollectedAt: new Date(),
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     // If local balance is higher, update cloud
     if (syncedBalance !== cloudBalance) {
       await db.petalWallet.update({
-        where: { userId },
+        where: { userId: localUserId },
         data: {
           balance: syncedBalance,
           // Only update lifetimeEarned if synced balance is higher
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
       for (const localTx of localTransactions) {
         const existingTx = await db.petalTransaction.findFirst({
           where: {
-            userId,
+            userId: localUserId,
             amount: localTx.amount,
             source: localTx.source,
             createdAt: new Date(localTx.timestamp),
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
           // Create missing transaction
           await db.petalTransaction.create({
             data: {
-              userId,
+              userId: localUserId,
               amount: localTx.amount,
               source: localTx.source,
               description: `Synced transaction from device`,
@@ -123,13 +123,22 @@ export async function POST(req: NextRequest) {
       },
       requestId,
     });
-  } catch (error: any) {
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        { ok: false, error: 'AUTH_REQUIRED', requestId },
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
     logger.error('[Petal Sync] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,
         error: 'INTERNAL_ERROR',
-        message: error.message,
+        message: 'Petal sync is temporarily unavailable.',
         requestId,
       },
       { status: 500 },

@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { env } from '@/env.mjs';
 import { db } from '@/lib/db';
 import { type WebhookEvent } from '@clerk/nextjs/server';
+import { upsertLocalUserFromClerkWebhook } from '@/app/lib/auth/viewer';
 
 export async function POST(request: NextRequest) {
   const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
@@ -56,45 +57,20 @@ export async function POST(request: NextRequest) {
   const eventType = evt.type;
 
   if (eventType === 'user.created') {
-    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
-
     try {
-      // Create user profile in database
-      await db.user.create({
-        data: {
-          email: email_addresses[0]?.email_address || '',
-          username: `user_${id.slice(0, 8)}`,
-          displayName: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
-          avatarUrl: image_url || null,
-          clerkId: id,
-          visibility: 'PUBLIC',
-        },
-      });
-
-      // `User profile created for ${id}`
+      await upsertLocalUserFromClerkWebhook(evt.data);
     } catch (error) {
       logger.error('Error creating user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-      // Don't throw error to avoid webhook retry
+      return new NextResponse('Local user provisioning failed', { status: 500 });
     }
   }
 
   if (eventType === 'user.updated') {
-    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
-
     try {
-      // Update user profile in database
-      await db.user.update({
-        where: { id },
-        data: {
-          email: email_addresses[0]?.email_address || '',
-          displayName: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
-          avatarUrl: image_url || null,
-        },
-      });
-
-      // `User profile updated for ${id}`
+      await upsertLocalUserFromClerkWebhook(evt.data);
     } catch (error) {
       logger.error('Error updating user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      return new NextResponse('Local user update failed', { status: 500 });
     }
   }
 
@@ -103,16 +79,17 @@ export async function POST(request: NextRequest) {
 
     try {
       // Soft delete user profile
-      await db.user.update({
-        where: { id },
+      await db.user.updateMany({
+        where: { clerkId: id },
         data: {
-          visibility: 'PRIVATE',
+          visibility: 'private',
         },
       });
 
       // `User profile soft deleted for ${id}`
     } catch (error) {
       logger.error('Error soft deleting user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      return new NextResponse('Local user delete failed', { status: 500 });
     }
   }
 
