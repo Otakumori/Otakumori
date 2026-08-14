@@ -122,7 +122,7 @@ export const PETAL_RULES: Record<
  * Input for granting petals
  */
 export interface GrantPetalsInput {
-  userId?: string | null; // Handle guest users if supported
+  userId?: string | null; // Local User.id; null handles guest users if supported.
   amount: number;
   source: PetalSource;
   metadata?: Record<string, unknown>; // game id, score, etc.
@@ -145,6 +145,7 @@ export interface GrantPetalsResult {
     | 'RATE_LIMITED'
     | 'DAILY_LIMIT_REACHED'
     | 'AUTH_REQUIRED'
+    | 'SCHEMA_UNAVAILABLE'
     | 'INTERNAL_ERROR';
   limited?: boolean; // True if amount was capped by daily limit
   dailyRemaining?: number; // Remaining daily allowance for this source
@@ -389,7 +390,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
       // Sync User.petalBalance for backward compatibility
       await tx.user.updateMany({
-        where: { clerkId: userId },
+        where: { id: userId },
         data: {
           petalBalance: wallet.balance,
         },
@@ -417,15 +418,40 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
       dailyRemaining,
     };
   } catch (error) {
+    const { isMissingSchemaError } = await import('@/app/lib/auth/viewer');
+
+    if (isMissingSchemaError(error)) {
+      logger.warn('[Petals] Grant schema unavailable', undefined, {
+        userId: userId ? userId.substring(0, 8) + '...' : 'guest',
+        requestId,
+        extra: { source },
+      });
+
+      return {
+        success: false,
+        granted: 0,
+        newBalance: 0,
+        lifetimeEarned: 0,
+        error: 'Petal grants are temporarily unavailable.',
+        errorCode: 'SCHEMA_UNAVAILABLE',
+      };
+    }
+
     // Log error without leaking sensitive data
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorName = error instanceof Error ? error.name : typeof error;
+    const errorCode =
+      error && typeof error === 'object' && 'code' in error
+        ? String((error as { code?: unknown }).code)
+        : undefined;
     logger.error(
       '[Petals] Grant failed',
       {
         userId: userId ? userId.substring(0, 8) + '...' : 'guest',
         requestId,
+        extra: { source, errorName, errorCode },
       },
-      new Error(`Grant failed: source=${source}, error=${errorMessage}`),
+      undefined,
+      new Error('Petal grant failed'),
     );
 
     return {

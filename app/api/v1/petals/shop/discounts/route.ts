@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { getPolicyFromRequest } from '@/app/lib/policy/fromRequest';
+import { isMissingSchemaError, schemaUnavailableResponse } from '@/app/lib/auth/viewer';
+import { generateRequestId } from '@/lib/requestId';
 
 export const runtime = 'nodejs';
 
@@ -11,6 +13,8 @@ export const runtime = 'nodejs';
  * Filters by NSFW preference and achievement requirements
  */
 export async function GET(req: Request) {
+  const requestId = generateRequestId();
+
   try {
     const { userId } = await auth();
     const policy = getPolicyFromRequest(req);
@@ -119,7 +123,22 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    logger.error('Error fetching discount rewards:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    if (isMissingSchemaError(error)) {
+      logger.warn('discount_rewards_schema_unavailable', { requestId });
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
+
+    const errorName = error instanceof Error ? error.name : typeof error;
+    const errorCode =
+      error && typeof error === 'object' && 'code' in error
+        ? String((error as { code?: unknown }).code)
+        : undefined;
+    logger.error(
+      'discount_rewards_fetch_failed',
+      { requestId, extra: { errorName, errorCode } },
+      undefined,
+      new Error('Discount rewards fetch failed'),
+    );
+    return NextResponse.json({ ok: false, error: 'Internal server error', requestId }, { status: 500 });
   }
 }
