@@ -5,6 +5,13 @@ import { generateRequestId } from '@/lib/requestId';
 import { grantPetals } from '@/app/lib/petals/grant';
 import { calculateGameReward } from '@/app/config/petalTuning';
 import { logger } from '@/app/lib/logger';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 
 export const runtime = 'nodejs';
 
@@ -60,9 +67,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Use centralized grantPetals function
+    let localUserId: string;
+    try {
+      const viewer = await requireLocalViewer();
+      localUserId = viewer.localUserId;
+    } catch (error) {
+      if (error instanceof AuthenticationRequiredError) {
+        return NextResponse.json(
+          { ok: false, error: 'AUTH_REQUIRED', requestId },
+          { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+        );
+      }
+      if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+        return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+      }
+      throw error;
+    }
+
+    // Use centralized grantPetals function with the local User.id foreign-key target.
     const result = await grantPetals({
-      userId,
+      userId: localUserId,
       amount: petalAmount,
       source: 'mini_game',
       metadata: {
@@ -77,6 +101,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
+      if (result.errorCode === 'SCHEMA_UNAVAILABLE') {
+        return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+      }
+
       const statusCode =
         result.errorCode === 'RATE_LIMITED'
           ? 429
@@ -114,7 +142,12 @@ export async function POST(req: NextRequest) {
     logger.error('[Petals Earn] Error', { requestId }, new Error(errorMessage));
 
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: errorMessage, requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Unable to earn petals right now.',
+        requestId,
+      },
       { status: 500 },
     );
   }
