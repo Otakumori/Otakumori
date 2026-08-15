@@ -1,117 +1,93 @@
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
+import HeroSearch from './HeroSearch';
 
-const entryLinks = [
-  { label: 'Shop', href: paths.shop(), description: 'Merch and drops' },
-  { label: 'Mini-games', href: paths.games(), description: 'Play for petals' },
-  { label: 'Blog', href: paths.blogIndex(), description: 'Lore and notes' },
-  { label: 'Profile', href: paths.profile(), description: 'Traveler identity' },
+const footerLinks = [
+  { label: 'Shop', href: paths.shop() },
+  { label: 'Mini-Games', href: paths.games() },
+  { label: 'Blog', href: paths.blogIndex() },
+  { label: 'Profile', href: paths.profile() },
+  { label: 'Petals', href: '/profile/petals' },
+  { label: 'Cart', href: paths.cart() },
 ];
 
 export default function HeroContent() {
   return (
-    <div className="relative z-20 flex min-h-[100svh] items-end px-4 pb-8 pt-28 sm:px-6 md:items-center md:py-20 lg:px-10">
-      <div className="mx-auto grid w-full max-w-7xl gap-5 lg:grid-cols-[minmax(0,0.98fr)_minmax(300px,0.52fr)] lg:items-end">
-        <div className="max-w-3xl rounded-[2rem] border border-[#f6dcc7]/18 bg-[#09070c]/58 px-5 py-6 text-left shadow-[0_30px_100px_rgba(0,0,0,0.42)] backdrop-blur-md sm:px-8 sm:py-8 md:rounded-[2.5rem]">
-          <p className="font-ui text-xs font-semibold uppercase tracking-[0.34em] text-[#f2bfd1]">
-            Welcome, traveler
-          </p>
+    <div className="relative z-20 flex min-h-[138svh] flex-col px-4 pb-8 pt-24 text-[#fff4e8] sm:px-6 md:min-h-[128svh] md:px-10 xl:min-h-[122svh]">
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl items-end pb-[11svh] md:items-center md:justify-end md:pb-0 md:pt-14">
+        <div className="w-full max-w-[33rem] text-left md:mr-[5vw] lg:mr-[8vw]">
+          <div className="w-fit rounded-full border border-[#f7d7c8]/16 bg-[#080509]/18 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[#f2bfd1]/86 shadow-[0_10px_34px_rgba(0,0,0,0.28)] backdrop-blur-[2px]">
+            Sanctuary open
+          </div>
 
           <h1
             id="home-hero-title"
-            className="font-display mt-4 max-w-3xl text-balance text-4xl font-semibold tracking-tight text-[#f8eadc] sm:text-5xl md:text-7xl"
+            className="font-display mt-4 max-w-[30rem] text-balance text-2xl font-semibold leading-tight tracking-tight text-[#fff1e4] drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] sm:text-3xl md:text-4xl"
           >
-            The sakura grove is open.
+            Welcome to the sanctuary, traveler.
           </h1>
-          <p className="font-body mt-5 max-w-2xl text-base leading-8 text-[#f7dcd5]/82 md:text-lg">
-            Step into Otaku-mori to shop anime-inspired goods, play small rituals, and tend your
-            traveler identity under the ancient tree.
-          </p>
 
-          <form
-            action="/search"
-            className="mt-7 flex flex-col gap-3 rounded-[1.5rem] border border-[#f7d7c8]/20 bg-black/32 p-3 shadow-inner shadow-black/30 sm:flex-row"
-            role="search"
-          >
-            <label htmlFor="home-world-search" className="sr-only">
-              Search Otaku-mori products, games, and stories
-            </label>
-            <input
-              id="home-world-search"
-              name="q"
-              type="search"
-              placeholder="Search merch, games, stories..."
-              className="min-h-[48px] flex-1 rounded-full border border-white/10 bg-[#120d13]/82 px-5 text-sm text-[#fff7ef] outline-none transition placeholder:text-[#f8d8dd]/52 focus:border-[#f3b3c8]/60 focus:ring-2 focus:ring-[#f3b3c8]/25"
-            />
-            <button
-              type="submit"
-              className="min-h-[48px] rounded-full border border-[#ffe3ca]/40 bg-[#f0b2bf]/20 px-6 text-sm font-semibold text-[#fff4e8] transition hover:border-[#fff0d9]/65 hover:bg-[#f0b2bf]/28 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/35"
-            >
-              Search the grove
-            </button>
-          </form>
+          <HeroSearch />
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link
               href={paths.shop()}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[#ffe3ca]/45 bg-[#f8bdc9]/22 px-6 text-sm font-semibold text-[#fff3e6] transition hover:border-[#fff1df]/70 hover:bg-[#f8bdc9]/30 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/35"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[#ffe3ca]/52 bg-[#f7c2bf]/18 px-6 text-sm font-semibold text-[#fff3e6] shadow-[0_16px_44px_rgba(0,0,0,0.36)] backdrop-blur-md transition hover:border-[#fff1df]/78 hover:bg-[#f8bdc9]/25 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/35"
             >
-              Visit the shop
+              Gear up &rarr;
             </Link>
+            <span className="text-xs font-medium text-[#f7dcd5]/76 drop-shadow-[0_2px_10px_rgba(0,0,0,0.78)]">
+              Add to bottomless cart.
+            </span>
             <Link
-              href={paths.games()}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/14 bg-white/7 px-6 text-sm font-semibold text-white transition hover:border-[#f5c5d2]/35 hover:bg-white/11 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
+              href="/profile/petals"
+              className="inline-flex min-h-[40px] items-center rounded-full border border-[#f3b3c8]/22 bg-[#09060b]/32 px-4 text-xs font-semibold text-[#ffe9ef] backdrop-blur-[3px] transition hover:border-[#f3b3c8]/48 hover:bg-[#f3b3c8]/10 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
             >
-              Play mini-games
-            </Link>
-            <Link
-              href={paths.profile()}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/14 bg-white/7 px-6 text-sm font-semibold text-white transition hover:border-[#f5c5d2]/35 hover:bg-white/11 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
-            >
-              Open profile
+              Petals drift from the tree
             </Link>
           </div>
         </div>
+      </div>
 
-        <aside className="rounded-[1.8rem] border border-[#f6dcc7]/18 bg-[#09070c]/52 p-4 shadow-[0_26px_80px_rgba(0,0,0,0.36)] backdrop-blur-md sm:p-5 lg:mb-4">
-          <div className="rounded-[1.35rem] border border-[#f6dcc7]/14 bg-[#150f14]/70 p-4">
-            <p className="font-ui text-xs font-semibold uppercase tracking-[0.28em] text-[#f2bfd1]/80">
-              Petal Pouch
+      <footer
+        className="relative mx-auto mt-auto w-full max-w-7xl pb-5 pt-10"
+        aria-labelledby="home-root-footer-title"
+        data-testid="mori-root-footer"
+      >
+        <div className="pointer-events-none absolute inset-x-[-8vw] top-0 h-px bg-gradient-to-r from-transparent via-[#dfb9a2]/34 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-[-8vw] top-0 h-40 bg-[radial-gradient(ellipse_at_9%_0%,rgba(73,42,36,0.62),transparent_42%),radial-gradient(ellipse_at_45%_0%,rgba(51,31,30,0.44),transparent_46%),linear-gradient(to_bottom,rgba(9,5,7,0.18),transparent)]" />
+        <div className="relative grid gap-8 border-t border-[#f6dcc7]/14 pt-8 md:grid-cols-[1.1fr_1fr] md:items-end">
+          <div>
+            <p className="font-ui text-xs font-semibold uppercase tracking-[0.3em] text-[#f2bfd1]/76">
+              Fresh Blooms
             </p>
-            <p className="font-display mt-2 text-2xl font-semibold text-[#fff4e8]">
-              Petals start at the canopy.
-            </p>
-            <p className="font-body mt-3 text-sm leading-6 text-[#f7dcd5]/72">
-              Earned petals, profile progress, and rewards stay on their owned routes. The homepage
-              keeps the world visible without shortcutting auth or grant flows.
-            </p>
-            <Link
-              href="/profile/petals"
-              className="mt-4 inline-flex min-h-[44px] items-center rounded-full border border-[#f3b3c8]/24 bg-[#f3b3c8]/10 px-4 text-sm font-medium text-[#ffe9ef] transition hover:border-[#f3b3c8]/45 hover:bg-[#f3b3c8]/16 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
+            <h2
+              id="home-root-footer-title"
+              className="font-display mt-3 max-w-xl text-2xl font-semibold text-[#fff1e4] drop-shadow-[0_3px_14px_rgba(0,0,0,0.7)] md:text-3xl"
             >
-              View petals
-            </Link>
+              The roots keep the world together.
+            </h2>
+            <p className="font-body mt-3 max-w-xl text-sm leading-7 text-[#f7dcd5]/72">
+              The world isn&apos;t perfect, but your taste in anime, games, and websites are.
+            </p>
           </div>
 
-          <nav aria-label="Homepage entry points" className="mt-4 grid gap-2">
-            {entryLinks.map((link) => (
+          <nav
+            aria-label="Rooted homepage navigation"
+            className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"
+          >
+            {footerLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="group flex min-h-[54px] items-center justify-between rounded-2xl border border-white/10 bg-white/[0.045] px-4 text-left transition hover:border-[#f3b3c8]/35 hover:bg-white/[0.075] focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
+                className="rounded-full border border-[#f6dcc7]/14 bg-[#080509]/24 px-4 py-3 text-center text-[#fff4e8]/82 backdrop-blur-[2px] transition hover:border-[#f3b3c8]/42 hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
               >
-                <span>
-                  <span className="block text-sm font-semibold text-[#fff4e8]">{link.label}</span>
-                  <span className="block text-xs text-[#f7dcd5]/58">{link.description}</span>
-                </span>
-                <span className="text-[#f3b3c8]/70 transition group-hover:translate-x-0.5">
-                  &rarr;
-                </span>
+                {link.label}
               </Link>
             ))}
           </nav>
-        </aside>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }

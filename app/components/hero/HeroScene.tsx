@@ -15,12 +15,12 @@ type PetalStyle = CSSProperties & {
 };
 
 const CANOPY_ANCHORS = [
-  { x: 18, y: 19 },
-  { x: 28, y: 15 },
-  { x: 38, y: 18 },
-  { x: 49, y: 25 },
-  { x: 61, y: 18 },
-  { x: 73, y: 26 },
+  { x: 7, y: 18 },
+  { x: 14, y: 12 },
+  { x: 24, y: 17 },
+  { x: 34, y: 22 },
+  { x: 46, y: 17 },
+  { x: 58, y: 24 },
 ];
 
 function usePrefersReducedMotion() {
@@ -52,10 +52,10 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
         top: anchor.y + spread,
         delay: (index % 8) * 0.65,
         duration: scene.motion.reducedMotion ? 22 : 12 + (index % 6) * 1.4,
-        drift,
-        fall: 52 + (index % 7) * 7,
+        drift: drift * 0.72,
+        fall: 44 + (index % 7) * 6,
         rotate: (index % 2 === 0 ? 1 : -1) * (70 + index * 9),
-        scale: 0.72 + (index % 4) * 0.1,
+        scale: 0.48 + (index % 4) * 0.08,
       };
     });
   }, [
@@ -88,10 +88,10 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
           <span
             key={`${scene.bucket}-${petal.id}`}
             data-testid="mori-petal"
-            className={`${styles.petal} absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)]`}
+            className={`${styles.petal} absolute h-5 w-5 rounded-full text-pink-100/52 drop-shadow-[0_3px_5px_rgba(40,15,28,0.42)]`}
             style={petalStyle}
           >
-            <span className="block rotate-45 text-lg leading-none">❀</span>
+            <span className="block rotate-45 text-sm leading-none">❀</span>
           </span>
         );
       })}
@@ -127,7 +127,15 @@ export default function HeroScene() {
       data-scene-bucket={scene.bucket}
       data-scene-timezone={scene.timezone}
       data-testid="mori-hero-scene"
-      style={{ '--mori-object-position': scene.artDirection.desktop } as CSSProperties}
+      style={
+        {
+          '--mori-object-position': scene.artDirection.desktop,
+          '--mori-object-position-mobile': scene.artDirection.mobilePortrait,
+          '--mori-object-position-landscape': scene.artDirection.mobileLandscape,
+          '--mori-object-position-tablet': scene.artDirection.tablet,
+          '--mori-object-position-wide': scene.artDirection.wide,
+        } as CSSProperties
+      }
     >
       <Image
         src={imageSrc}
@@ -158,7 +166,7 @@ export default function HeroScene() {
         }}
       />
       <TreePetalEmitter scene={scene} />
-      <div className="absolute inset-0 z-[7] bg-[radial-gradient(circle_at_center,transparent_36%,rgba(3,2,8,0.44)_78%),linear-gradient(to_bottom,rgba(5,3,10,0.12),rgba(5,3,10,0.46))]" />
+      <div className="absolute inset-0 z-[7] bg-[radial-gradient(circle_at_70%_42%,rgba(3,2,8,0.1)_0%,rgba(3,2,8,0.34)_33%,transparent_54%),linear-gradient(to_bottom,rgba(5,3,10,0.06),rgba(5,3,10,0.18)_62%,rgba(5,3,10,0.68))]" />
     </div>
   );
 }

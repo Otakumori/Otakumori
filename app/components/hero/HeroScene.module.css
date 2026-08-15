@@ -14,34 +14,26 @@
 }
 
 @media (max-width: 639px) and (orientation: portrait) {
-  .scene[data-scene-bucket='earlyMorning'],
-  .scene[data-scene-bucket='morning'],
-  .scene[data-scene-bucket='afternoon'],
-  .scene[data-scene-bucket='lateAfternoon'],
-  .scene[data-scene-bucket='night'] {
-    --mori-object-position: 33% 50%;
-  }
-
-  .scene[data-scene-bucket='specialTwilight'] {
-    --mori-object-position: 32% 50%;
+  .scene {
+    --mori-object-position: var(--mori-object-position-mobile);
   }
 }
 
 @media (max-width: 900px) and (orientation: landscape) {
   .scene {
-    --mori-object-position: 42% 50%;
+    --mori-object-position: var(--mori-object-position-landscape);
   }
 }
 
 @media (min-width: 640px) and (max-width: 1023px) {
   .scene {
-    --mori-object-position: 44% 50%;
+    --mori-object-position: var(--mori-object-position-tablet);
   }
 }
 
 @media (min-width: 1600px) {
   .scene {
-    --mori-object-position: 50% 50%;
+    --mori-object-position: var(--mori-object-position-wide);
   }
 }
 

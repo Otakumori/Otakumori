@@ -8,31 +8,29 @@ describe('homepage hero content', () => {
     render(<HeroContent />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: /the sakura grove is open/i }),
+      screen.getByRole('heading', { level: 1, name: /welcome to the sanctuary, traveler/i }),
     ).toBeInTheDocument();
 
     const search = screen.getByRole('searchbox', {
       name: /search otaku-mori products, games, and stories/i,
     });
     expect(search).toHaveAttribute('name', 'q');
+    expect(search).toHaveAttribute('placeholder', "What are ya eyein'?");
 
-    expect(screen.getByRole('button', { name: /search the grove/i })).toHaveAttribute(
-      'type',
-      'submit',
-    );
-    expect(screen.getByRole('link', { name: /^visit the shop$/i })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /^search$/i })).toHaveAttribute('type', 'submit');
+    expect(screen.getByRole('link', { name: /^gear up/i })).toHaveAttribute(
       'href',
       '/shop',
     );
-    expect(screen.getByRole('link', { name: /^play mini-games$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^mini-games$/i })).toHaveAttribute(
       'href',
       '/mini-games',
     );
-    expect(screen.getByRole('link', { name: /^open profile$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^profile$/i })).toHaveAttribute(
       'href',
       '/profile',
     );
-    expect(screen.getByRole('link', { name: /^view petals$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^petals$/i })).toHaveAttribute(
       'href',
       '/profile/petals',
     );
@@ -43,6 +41,9 @@ describe('homepage hero content', () => {
 
     expect(screen.queryByRole('button', { name: /collect/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /grant/i })).not.toBeInTheDocument();
-    expect(screen.getByText(/without shortcutting auth or grant flows/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /petals drift from the tree/i })).toHaveAttribute(
+      'href',
+      '/profile/petals',
+    );
   });
 });
