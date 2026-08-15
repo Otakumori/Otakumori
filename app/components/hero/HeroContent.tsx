@@ -41,6 +41,7 @@ export default function HeroContent() {
             </span>
             <Link
               href="/profile/petals"
+              prefetch={false}
               className="inline-flex min-h-[40px] items-center rounded-full border border-[#f3b3c8]/22 bg-[#09060b]/32 px-4 text-xs font-semibold text-[#ffe9ef] backdrop-blur-[3px] transition hover:border-[#f3b3c8]/48 hover:bg-[#f3b3c8]/10 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
             >
               Petals drift from the tree
@@ -80,6 +81,7 @@ export default function HeroContent() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className="rounded-full border border-[#f6dcc7]/14 bg-[#080509]/24 px-4 py-3 text-center text-[#fff4e8]/82 backdrop-blur-[2px] transition hover:border-[#f3b3c8]/42 hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
               >
                 {link.label}
