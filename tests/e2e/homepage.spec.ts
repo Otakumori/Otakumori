@@ -39,22 +39,12 @@ test.describe('Homepage', () => {
     expect(maxCssDurationMs(style.transitionDuration)).toBeLessThanOrEqual(0.01);
   });
 
-  test('should collect interactive petals in hero section', async ({ page }) => {
-    // Wait for petals to load
-    await page.waitForTimeout(2000);
-
-    // Find interactive petals
-    const petals = page.locator('[data-petal-id]');
-    const petalCount = await petals.count();
-
-    if (petalCount > 0) {
-      // Click on the first petal
-      await petals.first().click();
-
-      // Verify petal was collected (opacity should be 0)
-      const firstPetal = petals.first();
-      await expect(firstPetal).toHaveCSS('opacity', '0');
-    }
+  test('should render canopy-origin petals as decorative weather, not grant controls', async ({
+    page,
+  }) => {
+    const petalEmitter = page.getByTestId('mori-petal-emitter');
+    await expect(petalEmitter).toBeVisible();
+    await expect(page.getByRole('button', { name: /collect.*petal/i })).toHaveCount(0);
   });
 
   test('should not intercept clicks on content cards', async ({ page }) => {
@@ -187,7 +177,7 @@ test.describe('Homepage', () => {
 async function expectHeroHeading(page: import('@playwright/test').Page) {
   const heroHeading = page.getByRole('heading', {
     level: 1,
-    name: /Rest beneath the sakura tree/i,
+    name: /The sakura grove is open/i,
   });
 
   await expect(heroHeading).toHaveCount(1);

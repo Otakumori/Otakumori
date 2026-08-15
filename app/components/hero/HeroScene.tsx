@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { resolveHomeScene, type HomeSceneState } from './homeScene';
+import styles from './HeroScene.module.css';
+
+const INITIAL_SCENE_DATE = new Date(2026, 0, 1, 12);
 
 type PetalStyle = CSSProperties & {
   '--petal-drift': string;
@@ -12,12 +15,12 @@ type PetalStyle = CSSProperties & {
 };
 
 const CANOPY_ANCHORS = [
-  { x: 26, y: 26 },
+  { x: 18, y: 19 },
+  { x: 28, y: 15 },
   { x: 38, y: 18 },
-  { x: 51, y: 22 },
-  { x: 64, y: 19 },
-  { x: 73, y: 30 },
-  { x: 45, y: 34 },
+  { x: 49, y: 25 },
+  { x: 61, y: 18 },
+  { x: 73, y: 26 },
 ];
 
 function usePrefersReducedMotion() {
@@ -37,7 +40,6 @@ function usePrefersReducedMotion() {
 }
 
 function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
-  const [collected, setCollected] = useState<number | null>(null);
   const petals = useMemo(() => {
     return Array.from({ length: scene.motion.petalDensity }, (_, index) => {
       const anchor = CANOPY_ANCHORS[index % CANOPY_ANCHORS.length];
@@ -56,29 +58,26 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
         scale: 0.72 + (index % 4) * 0.1,
       };
     });
-  }, [scene.bucket, scene.motion.petalDensity, scene.motion.reducedMotion, scene.motion.windStrength]);
-
-  function collectPreview(id: number) {
-    setCollected(id);
-    window.dispatchEvent(
-      new CustomEvent('petal:collect-preview', {
-        detail: { id, source: 'homepage-tree', bucket: scene.bucket },
-      }),
-    );
-
-    window.setTimeout(() => setCollected((current) => (current === id ? null : current)), 650);
-  }
+  }, [
+    scene.bucket,
+    scene.motion.petalDensity,
+    scene.motion.reducedMotion,
+    scene.motion.windStrength,
+  ]);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-[6] overflow-hidden">
+    <div
+      className="pointer-events-none absolute inset-0 z-[6] overflow-hidden"
+      aria-hidden="true"
+      data-testid="mori-petal-emitter"
+    >
       {petals.map((petal) => {
         const petalStyle: PetalStyle = {
           left: `${petal.left}%`,
           top: `${petal.top}%`,
           transform: `scale(${petal.scale})`,
-          animation: scene.motion.reducedMotion
-            ? undefined
-            : `treePetalDrift ${petal.duration}s linear ${petal.delay}s infinite`,
+          animationDuration: scene.motion.reducedMotion ? undefined : `${petal.duration}s`,
+          animationDelay: scene.motion.reducedMotion ? undefined : `${petal.delay}s`,
           '--petal-drift': `${petal.drift}vw`,
           '--petal-fall': `${petal.fall}vh`,
           '--petal-rotate': `${petal.rotate}deg`,
@@ -86,20 +85,14 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
         };
 
         return (
-          <button
+          <span
             key={`${scene.bucket}-${petal.id}`}
-            type="button"
-            tabIndex={-1}
-            aria-label="Collect preview sakura petal"
-            onClick={() => collectPreview(petal.id)}
-            className="pointer-events-auto absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)] transition-transform duration-300 hover:scale-125 focus:outline-none"
+            data-testid="mori-petal"
+            className={`${styles.petal} absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)]`}
             style={petalStyle}
           >
             <span className="block rotate-45 text-lg leading-none">❀</span>
-            {collected === petal.id ? (
-              <span className="absolute inset-0 rounded-full border border-pink-100/70 animate-ping" />
-            ) : null}
-          </button>
+          </span>
         );
       })}
     </div>
@@ -108,7 +101,10 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
 
 export default function HeroScene() {
   const reducedMotion = usePrefersReducedMotion();
-  const [scene, setScene] = useState(() => resolveHomeScene(new Date(), reducedMotion));
+  const [scene, setScene] = useState<HomeSceneState>(() => ({
+    ...resolveHomeScene(INITIAL_SCENE_DATE, false),
+    timezone: 'local',
+  }));
   const [imageSrc, setImageSrc] = useState(scene.asset.src);
 
   useEffect(() => {
@@ -126,15 +122,20 @@ export default function HeroScene() {
   }, [scene.asset.src]);
 
   return (
-    <div className="absolute inset-0 z-0 bg-[#080611]">
+    <div
+      className={`${styles.scene} absolute inset-0 z-0 bg-[#080611]`}
+      data-scene-bucket={scene.bucket}
+      data-scene-timezone={scene.timezone}
+      data-testid="mori-hero-scene"
+      style={{ '--mori-object-position': scene.artDirection.desktop } as CSSProperties}
+    >
       <Image
-        src={encodeURI(imageSrc)}
+        src={imageSrc}
         alt={scene.asset.alt}
         fill
         priority
-        unoptimized
         sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out"
+        className={`${styles.image} absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out`}
         onError={() => {
           if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
         }}
@@ -158,25 +159,6 @@ export default function HeroScene() {
       />
       <TreePetalEmitter scene={scene} />
       <div className="absolute inset-0 z-[7] bg-[radial-gradient(circle_at_center,transparent_36%,rgba(3,2,8,0.44)_78%),linear-gradient(to_bottom,rgba(5,3,10,0.12),rgba(5,3,10,0.46))]" />
-
-      <style>{`
-        @keyframes treePetalDrift {
-          0% {
-            opacity: 0;
-            transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
-          }
-          8% {
-            opacity: 0.9;
-          }
-          45% {
-            transform: translate3d(calc(var(--petal-drift) * 0.45 + var(--petal-gust)), calc(var(--petal-fall) * 0.48), 0) rotate(calc(var(--petal-rotate) * 0.5)) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translate3d(var(--petal-drift), var(--petal-fall), 0) rotate(var(--petal-rotate)) scale(0.76);
-          }
-        }
-      `}</style>
     </div>
   );
 }

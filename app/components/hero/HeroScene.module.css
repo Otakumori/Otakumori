@@ -1,0 +1,75 @@
+.scene {
+  --mori-object-position: 50% 50%;
+}
+
+.image {
+  object-fit: cover;
+  object-position: var(--mori-object-position);
+}
+
+.petal {
+  animation-name: treePetalDrift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@media (max-width: 639px) and (orientation: portrait) {
+  .scene[data-scene-bucket='earlyMorning'],
+  .scene[data-scene-bucket='morning'],
+  .scene[data-scene-bucket='afternoon'],
+  .scene[data-scene-bucket='lateAfternoon'],
+  .scene[data-scene-bucket='night'] {
+    --mori-object-position: 33% 50%;
+  }
+
+  .scene[data-scene-bucket='specialTwilight'] {
+    --mori-object-position: 32% 50%;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .scene {
+    --mori-object-position: 42% 50%;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .scene {
+    --mori-object-position: 44% 50%;
+  }
+}
+
+@media (min-width: 1600px) {
+  .scene {
+    --mori-object-position: 50% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petal {
+    animation: none !important;
+  }
+}
+
+@keyframes treePetalDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+  }
+  8% {
+    opacity: 0.9;
+  }
+  45% {
+    transform: translate3d(
+        calc(var(--petal-drift) * 0.45 + var(--petal-gust)),
+        calc(var(--petal-fall) * 0.48),
+        0
+      )
+      rotate(calc(var(--petal-rotate) * 0.5)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--petal-drift), var(--petal-fall), 0)
+      rotate(var(--petal-rotate)) scale(0.76);
+  }
+}

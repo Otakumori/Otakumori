@@ -14,6 +14,14 @@ export type HomeSceneAsset = {
   alt: string;
 };
 
+export type HomeSceneArtDirection = {
+  mobilePortrait: string;
+  mobileLandscape: string;
+  tablet: string;
+  desktop: string;
+  wide: string;
+};
+
 export type HomeSceneMotion = {
   windAngle: number;
   windStrength: number;
@@ -27,64 +35,128 @@ export type HomeSceneMotion = {
 export type HomeSceneState = {
   bucket: HomeSceneBucket;
   asset: HomeSceneAsset;
+  artDirection: HomeSceneArtDirection;
   motion: HomeSceneMotion;
+  timezone: string;
 };
 
-const SAKURA_TREE_SCENE = '/assets/images/cherry-tree@1x.webp';
+const WORLD_ASSET_ROOT = '/assets/home/world';
+const FALLBACK_TIMEZONE = 'local';
+
+function worldAsset(name: string) {
+  return `${WORLD_ASSET_ROOT}/${name}.png`;
+}
 
 export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
   earlyMorning: {
     bucket: 'earlyMorning',
     label: 'Early morning',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-early-morning'),
+    fallback: worldAsset('mori-world-morning'),
     alt: 'Otakumori sakura tree scene in early morning light',
   },
   morning: {
     bucket: 'morning',
     label: 'Morning',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-morning'),
+    fallback: worldAsset('mori-world-afternoon'),
     alt: 'Otakumori sakura tree scene in soft morning light',
   },
   afternoon: {
     bucket: 'afternoon',
     label: 'Afternoon',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-afternoon'),
+    fallback: worldAsset('mori-world-sunset'),
     alt: 'Otakumori sakura tree scene in afternoon light',
   },
   lateAfternoon: {
     bucket: 'lateAfternoon',
     label: 'Late afternoon',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-sunset'),
+    fallback: worldAsset('mori-world-night'),
     alt: 'Otakumori sakura tree scene in late afternoon light',
   },
   night: {
     bucket: 'night',
     label: 'Night',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-night'),
+    fallback: worldAsset('mori-world-sunset'),
     alt: 'Otakumori sakura tree scene at night',
   },
   specialTwilight: {
     bucket: 'specialTwilight',
     label: 'Special twilight',
-    src: SAKURA_TREE_SCENE,
-    fallback: SAKURA_TREE_SCENE,
+    src: worldAsset('mori-world-twilight'),
+    fallback: worldAsset('mori-world-night'),
     alt: 'Otakumori sakura tree scene in special twilight glow',
   },
 };
 
-export function resolveHomeSceneBucket(hour = new Date().getHours()): HomeSceneBucket {
-  const safeHour = Number.isFinite(hour) ? Math.max(0, Math.min(23, Math.floor(hour))) : 12;
+export const HOME_SCENE_ART_DIRECTION: Record<HomeSceneBucket, HomeSceneArtDirection> = {
+  earlyMorning: {
+    mobilePortrait: '33% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+  morning: {
+    mobilePortrait: '33% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+  afternoon: {
+    mobilePortrait: '33% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+  lateAfternoon: {
+    mobilePortrait: '33% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+  night: {
+    mobilePortrait: '33% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+  specialTwilight: {
+    mobilePortrait: '32% 50%',
+    mobileLandscape: '42% 50%',
+    tablet: '44% 50%',
+    desktop: '50% 50%',
+    wide: '50% 50%',
+  },
+};
+
+function safeHourFromDate(date: Date): number {
+  const hour = date.getHours();
+
+  return Number.isFinite(hour) ? Math.max(0, Math.min(23, Math.floor(hour))) : 12;
+}
+
+export function isSpecialTwilightDate(date = new Date()): boolean {
+  return date.getDate() === 1;
+}
+
+export function resolveHomeSceneBucket(date = new Date()): HomeSceneBucket {
+  const safeHour = safeHourFromDate(date);
 
   if (safeHour >= 5 && safeHour < 8) return 'earlyMorning';
   if (safeHour >= 8 && safeHour < 12) return 'morning';
-  if (safeHour >= 12 && safeHour < 16) return 'afternoon';
-  if (safeHour >= 16 && safeHour < 19) return 'lateAfternoon';
-  if (safeHour >= 19 && safeHour < 21) return 'specialTwilight';
+  if (safeHour >= 12 && safeHour < 17) return 'afternoon';
+  if (safeHour >= 17 && safeHour < 20) return 'lateAfternoon';
+  if (safeHour >= 20 && safeHour < 21 && isSpecialTwilightDate(date)) {
+    return 'specialTwilight';
+  }
 
   return 'night';
 }
@@ -156,11 +228,23 @@ export function resolveHomeSceneMotion(
 }
 
 export function resolveHomeScene(date = new Date(), reducedMotion = false): HomeSceneState {
-  const bucket = resolveHomeSceneBucket(date.getHours());
+  const bucket = resolveHomeSceneBucket(date);
 
   return {
     bucket,
     asset: HOME_SCENE_ASSETS[bucket] ?? HOME_SCENE_ASSETS.afternoon,
+    artDirection: HOME_SCENE_ART_DIRECTION[bucket] ?? HOME_SCENE_ART_DIRECTION.afternoon,
     motion: resolveHomeSceneMotion(bucket, reducedMotion),
+    timezone: resolveBrowserTimeZone(),
   };
+}
+
+export function resolveBrowserTimeZone() {
+  if (typeof Intl === 'undefined') return FALLBACK_TIMEZONE;
+
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || FALLBACK_TIMEZONE;
+  } catch {
+    return FALLBACK_TIMEZONE;
+  }
 }
