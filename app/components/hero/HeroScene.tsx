@@ -127,27 +127,22 @@ export default function HeroScene() {
       data-scene-bucket={scene.bucket}
       data-scene-timezone={scene.timezone}
       data-testid="mori-hero-scene"
-      style={
-        {
-          '--mori-object-position': scene.artDirection.desktop,
-          '--mori-object-position-mobile': scene.artDirection.mobilePortrait,
-          '--mori-object-position-landscape': scene.artDirection.mobileLandscape,
-          '--mori-object-position-tablet': scene.artDirection.tablet,
-          '--mori-object-position-wide': scene.artDirection.wide,
-        } as CSSProperties
-      }
     >
-      <Image
-        src={imageSrc}
-        alt={scene.asset.alt}
-        fill
-        priority
-        sizes="100vw"
-        className={`${styles.image} absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out`}
-        onError={() => {
-          if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
-        }}
-      />
+      <div className={styles.worldExtension} data-testid="mori-world-extension">
+        <div className={styles.scenePlate} data-testid="mori-scene-plate">
+          <Image
+            src={imageSrc}
+            alt={scene.asset.alt}
+            fill
+            priority
+            sizes="(min-aspect-ratio: 1264/843) calc((100svh - 5rem) * 1.499), 100vw"
+            className={`${styles.image} absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter] duration-[1600ms] ease-out`}
+            onError={() => {
+              if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
+            }}
+          />
+        </div>
+      </div>
 
       <div
         className="absolute inset-0 z-[3] transition-opacity duration-[2200ms]"

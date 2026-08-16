@@ -50,10 +50,13 @@ describe('homepage hero scene client island', () => {
 
     const scene = await screen.findByTestId('mori-hero-scene');
     await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'specialTwilight'));
+    expect(screen.getByTestId('mori-world-extension')).toBeInTheDocument();
+    expect(screen.getByTestId('mori-scene-plate')).toBeInTheDocument();
 
     const images = screen.getAllByRole('img', { name: /Otakumori sakura tree scene/i });
     expect(images).toHaveLength(1);
     expect(images[0]).toHaveAttribute('src', '/assets/home/world/mori-world-twilight.png');
+    expect(images[0].className).toContain('image');
   });
 
   it('keeps reduced-motion petal density bounded', async () => {

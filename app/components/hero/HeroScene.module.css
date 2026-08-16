@@ -1,10 +1,62 @@
 .scene {
-  --mori-object-position: 50% 50%;
+  --mori-plate-top: clamp(4.5rem, 8svh, 6rem);
+  --mori-plate-ratio: 1.499;
+}
+
+.worldExtension {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  padding-top: var(--mori-plate-top);
+  background:
+    radial-gradient(circle at 11% 17%, rgba(235, 153, 183, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 24%, rgba(128, 163, 198, 0.2), transparent 34%),
+    linear-gradient(180deg, #0d1620 0%, #121925 38%, #071016 66%, #060407 100%);
+}
+
+.worldExtension::before,
+.worldExtension::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+.worldExtension::before {
+  top: 0;
+  height: 56svh;
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(226, 126, 164, 0.18), transparent 38%),
+    radial-gradient(ellipse at 74% 10%, rgba(144, 166, 200, 0.18), transparent 44%);
+}
+
+.worldExtension::after {
+  bottom: -1px;
+  height: 52svh;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(78, 49, 37, 0.7), transparent 38%),
+    radial-gradient(ellipse at 42% 0%, rgba(36, 23, 23, 0.58), transparent 44%),
+    linear-gradient(180deg, rgba(7, 8, 12, 0), rgba(7, 4, 7, 0.72) 42%, #070407 100%);
+}
+
+.scenePlate {
+  position: relative;
+  z-index: 2;
+  aspect-ratio: 1264 / 843;
+  width: min(100vw, calc((100svh - var(--mori-plate-top)) * var(--mori-plate-ratio)));
+  max-height: calc(100svh - var(--mori-plate-top));
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: clamp(0px, 0.7vw, 12px);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
 }
 
 .image {
-  object-fit: cover;
-  object-position: var(--mori-object-position);
+  object-fit: contain;
+  object-position: 50% 50%;
 }
 
 .petal {
@@ -15,25 +67,25 @@
 
 @media (max-width: 639px) and (orientation: portrait) {
   .scene {
-    --mori-object-position: var(--mori-object-position-mobile);
+    --mori-plate-top: clamp(5.5rem, 11svh, 6.75rem);
   }
 }
 
 @media (max-width: 900px) and (orientation: landscape) {
   .scene {
-    --mori-object-position: var(--mori-object-position-landscape);
+    --mori-plate-top: clamp(3.25rem, 7svh, 4rem);
   }
 }
 
 @media (min-width: 640px) and (max-width: 1023px) {
   .scene {
-    --mori-object-position: var(--mori-object-position-tablet);
+    --mori-plate-top: clamp(5rem, 8svh, 6rem);
   }
 }
 
 @media (min-width: 1600px) {
   .scene {
-    --mori-object-position: var(--mori-object-position-wide);
+    --mori-plate-top: clamp(4.75rem, 7svh, 6.25rem);
   }
 }
 

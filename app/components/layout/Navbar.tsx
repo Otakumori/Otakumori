@@ -394,7 +394,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <GlobalSearch className="hidden xl:block" />
+          {!isHome && <GlobalSearch className="hidden xl:block" />}
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"

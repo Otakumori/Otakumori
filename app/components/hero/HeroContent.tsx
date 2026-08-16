@@ -14,17 +14,13 @@ const footerLinks = [
 export default function HeroContent() {
   return (
     <div className="relative z-20 flex min-h-[138svh] flex-col px-4 pb-8 pt-24 text-[#fff4e8] sm:px-6 md:min-h-[128svh] md:px-10 xl:min-h-[122svh]">
-      <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl items-end pb-[11svh] md:items-center md:justify-end md:pb-0 md:pt-14">
-        <div className="w-full max-w-[33rem] text-left md:mr-[5vw] lg:mr-[8vw]">
-          <div className="w-fit rounded-full border border-[#f7d7c8]/16 bg-[#080509]/18 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[#f2bfd1]/86 shadow-[0_10px_34px_rgba(0,0,0,0.28)] backdrop-blur-[2px]">
-            Sanctuary open
-          </div>
-
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl items-end pb-[7svh] md:items-center md:justify-end md:pb-0 md:pt-[12svh]">
+        <div className="w-full max-w-[31rem] text-left md:mr-[5vw] lg:mr-[8vw]">
           <h1
             id="home-hero-title"
-            className="font-display mt-4 max-w-[30rem] text-balance text-2xl font-semibold leading-tight tracking-tight text-[#fff1e4] drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] sm:text-3xl md:text-4xl"
+            className="font-display max-w-[24rem] text-balance text-lg font-semibold leading-tight tracking-tight text-[#fff1e4] drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] sm:text-xl md:text-2xl"
           >
-            Welcome to the sanctuary, traveler.
+            You found Otaku-mori.
           </h1>
 
           <HeroSearch />
@@ -35,16 +31,6 @@ export default function HeroContent() {
               className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[#ffe3ca]/52 bg-[#f7c2bf]/18 px-6 text-sm font-semibold text-[#fff3e6] shadow-[0_16px_44px_rgba(0,0,0,0.36)] backdrop-blur-md transition hover:border-[#fff1df]/78 hover:bg-[#f8bdc9]/25 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/35"
             >
               Gear up &rarr;
-            </Link>
-            <span className="text-xs font-medium text-[#f7dcd5]/76 drop-shadow-[0_2px_10px_rgba(0,0,0,0.78)]">
-              Add to bottomless cart.
-            </span>
-            <Link
-              href="/profile/petals"
-              prefetch={false}
-              className="inline-flex min-h-[40px] items-center rounded-full border border-[#f3b3c8]/22 bg-[#09060b]/32 px-4 text-xs font-semibold text-[#ffe9ef] backdrop-blur-[3px] transition hover:border-[#f3b3c8]/48 hover:bg-[#f3b3c8]/10 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/25"
-            >
-              Petals drift from the tree
             </Link>
           </div>
         </div>

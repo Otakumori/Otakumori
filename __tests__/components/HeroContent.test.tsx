@@ -8,8 +8,9 @@ describe('homepage hero content', () => {
     render(<HeroContent />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: /welcome to the sanctuary, traveler/i }),
+      screen.getByRole('heading', { level: 1, name: /you found otaku-mori/i }),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/sanctuary open/i)).not.toBeInTheDocument();
 
     const search = screen.getByRole('searchbox', {
       name: /search otaku-mori products, games, and stories/i,
@@ -41,9 +42,7 @@ describe('homepage hero content', () => {
 
     expect(screen.queryByRole('button', { name: /collect/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /grant/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /petals drift from the tree/i })).toHaveAttribute(
-      'href',
-      '/profile/petals',
-    );
+    expect(screen.queryByText(/petals drift from the tree/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/add to bottomless cart/i)).not.toBeInTheDocument();
   });
 });
