@@ -449,6 +449,6 @@
   },
   "packageManager": "pnpm@10.15.1",
   "engines": {
-    "node": ">=20.12 <21"
+    "node": "24.x"
   }
 }
