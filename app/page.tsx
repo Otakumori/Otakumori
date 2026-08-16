@@ -5,7 +5,7 @@ export const revalidate = 60;
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Welcome to the sanctuary, traveler. — Otaku-mori',
+    title: 'You found Otaku-mori.',
     description: 'Anime x gaming shop + play — petals, runes, rewards.',
     url: '/',
   });
