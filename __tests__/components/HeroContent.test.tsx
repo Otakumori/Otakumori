@@ -35,6 +35,11 @@ describe('homepage hero content', () => {
       'href',
       '/profile/petals',
     );
+    expect(screen.getByTestId('mori-root-footer')).toHaveAttribute(
+      'data-root-footer-contract',
+      'production-art-pending',
+    );
+    expect(screen.getByRole('navigation', { name: /homepage utility navigation/i })).toBeInTheDocument();
   });
 
   it('does not render any unsafe local petal grant or auth shortcut controls', () => {

@@ -1,15 +1,7 @@
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
 import HeroSearch from './HeroSearch';
-
-const footerLinks = [
-  { label: 'Shop', href: paths.shop() },
-  { label: 'Mini-Games', href: paths.games() },
-  { label: 'Blog', href: paths.blogIndex() },
-  { label: 'Profile', href: paths.profile() },
-  { label: 'Petals', href: '/profile/petals' },
-  { label: 'Cart', href: paths.cart() },
-];
+import RootFooter from './RootFooter';
 
 export default function HeroContent() {
   return (
@@ -36,46 +28,7 @@ export default function HeroContent() {
         </div>
       </div>
 
-      <footer
-        className="relative mx-auto mt-auto w-full max-w-7xl pb-5 pt-10"
-        aria-labelledby="home-root-footer-title"
-        data-testid="mori-root-footer"
-      >
-        <div className="pointer-events-none absolute inset-x-[-8vw] top-0 h-px bg-gradient-to-r from-transparent via-[#dfb9a2]/34 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-[-8vw] top-0 h-40 bg-[radial-gradient(ellipse_at_9%_0%,rgba(73,42,36,0.62),transparent_42%),radial-gradient(ellipse_at_45%_0%,rgba(51,31,30,0.44),transparent_46%),linear-gradient(to_bottom,rgba(9,5,7,0.18),transparent)]" />
-        <div className="relative grid gap-8 border-t border-[#f6dcc7]/14 pt-8 md:grid-cols-[1.1fr_1fr] md:items-end">
-          <div>
-            <p className="font-ui text-xs font-semibold uppercase tracking-[0.3em] text-[#f2bfd1]/76">
-              Fresh Blooms
-            </p>
-            <h2
-              id="home-root-footer-title"
-              className="font-display mt-3 max-w-xl text-2xl font-semibold text-[#fff1e4] drop-shadow-[0_3px_14px_rgba(0,0,0,0.7)] md:text-3xl"
-            >
-              The roots keep the world together.
-            </h2>
-            <p className="font-body mt-3 max-w-xl text-sm leading-7 text-[#f7dcd5]/72">
-              The world isn&apos;t perfect, but your taste in anime, games, and websites are.
-            </p>
-          </div>
-
-          <nav
-            aria-label="Rooted homepage navigation"
-            className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"
-          >
-            {footerLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                prefetch={false}
-                className="rounded-full border border-[#f6dcc7]/14 bg-[#080509]/24 px-4 py-3 text-center text-[#fff4e8]/82 backdrop-blur-[2px] transition hover:border-[#f3b3c8]/42 hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </footer>
+      <RootFooter />
     </div>
   );
 }

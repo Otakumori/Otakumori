@@ -11,6 +11,7 @@ import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
+import PetalWalletNavLink from '@/app/components/nav/PetalWalletNavLink';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -395,6 +396,11 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           {!isHome && <GlobalSearch className="hidden xl:block" />}
+          <PetalWalletNavLink
+            isLoaded={isLoaded}
+            isSignedIn={isSignedIn}
+            signInHref={signInHref}
+          />
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
@@ -696,6 +702,13 @@ export default function Navbar() {
                   <MessageCircle className="w-5 h-5" aria-hidden="true" />
                   <span>Community</span>
                 </button>
+                <PetalWalletNavLink
+                  isLoaded={isLoaded}
+                  isSignedIn={isSignedIn}
+                  signInHref={signInHref}
+                  variant="mobile"
+                  onNavigate={() => setIsMenuOpen(false)}
+                />
                 <Link
                   href={paths.cart()}
                   onClick={() => setIsMenuOpen(false)}
