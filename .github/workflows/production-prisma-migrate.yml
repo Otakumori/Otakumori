@@ -44,7 +44,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: '20'
   PNPM_VERSION: '10.15.1'
   SKIP_ENV_VALIDATION: '1'
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -152,7 +151,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: 'package.json'
+          check-latest: true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

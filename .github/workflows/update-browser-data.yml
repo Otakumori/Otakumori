@@ -28,7 +28,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.12'
+          node-version-file: 'package.json'
+          check-latest: true
 
       - name: Enable pnpm
         run: |
@@ -44,6 +45,28 @@ jobs:
           pnpm up -D baseline-browser-mapping@latest caniuse-lite@latest browserslist@latest
 
       - name: Verify lockfile and build
+        env:
+          DATABASE_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          DIRECT_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          CLERK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
+          CLERK_PROXY_URL: ''
+          NEXT_PUBLIC_CLERK_PROXY_URL: ''
+          PRINTIFY_API_KEY: ci_placeholder
+          PRINTIFY_SHOP_ID: ci_placeholder
+          UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
+          UPSTASH_REDIS_REST_TOKEN: ci_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+          NEXT_PUBLIC_FEATURE_HERO: '1'
+          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+          NEXT_PUBLIC_FEATURE_SHOP: '1'
+          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
+          NEXT_PUBLIC_FEATURE_BLOG: '1'
+          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+          NEXT_PUBLIC_LIVE_DATA: '0'
+          NEXT_PUBLIC_PROBE_MODE: '1'
         run: |
           pnpm install --frozen-lockfile
           pnpm prisma generate

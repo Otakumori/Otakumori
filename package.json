@@ -400,7 +400,7 @@
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "axe-core": "^4.10.3",
-    "baseline-browser-mapping": "^2.11.9",
+    "baseline-browser-mapping": "^2.11.14",
     "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.21",
@@ -449,6 +449,6 @@
   },
   "packageManager": "pnpm@10.15.1",
   "engines": {
-    "node": ">=20.12 <21"
+    "node": "24.x"
   }
 }
