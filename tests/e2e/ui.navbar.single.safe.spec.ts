@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+import { expectSinglePrimaryNavigation } from './helpers/home';
+
 test.describe('Navbar Single Rendering', () => {
   test('should render exactly one navbar on homepage', async ({ page }) => {
     await page.goto('/');
@@ -7,14 +9,9 @@ test.describe('Navbar Single Rendering', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
-    // Count the exposed navigation landmark. The header container is separate
-    // from the nested nav and should not be treated as a duplicate navbar.
-    const navbarCount = await page.getByRole('navigation').count();
-    expect(navbarCount).toBe(1);
-
-    // Verify the navbar is visible
-    const navbar = page.getByRole('navigation').first();
-    await expect(navbar).toBeVisible();
+    await expectSinglePrimaryNavigation(page);
+    await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: /homepage utility navigation/i })).toBeVisible();
   });
 
   test('should render exactly one navbar on mini-games page', async ({ page }) => {
@@ -23,14 +20,7 @@ test.describe('Navbar Single Rendering', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
-    // Count the exposed navigation landmark. The header container is separate
-    // from the nested nav and should not be treated as a duplicate navbar.
-    const navbarCount = await page.getByRole('navigation').count();
-    expect(navbarCount).toBe(1);
-
-    // Verify the navbar is visible
-    const navbar = page.getByRole('navigation').first();
-    await expect(navbar).toBeVisible();
+    await expectSinglePrimaryNavigation(page);
   });
 
   test('should not have duplicate navigation elements', async ({ page }) => {
@@ -39,21 +29,10 @@ test.describe('Navbar Single Rendering', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
 
-    // Check for common navbar selectors
-    const navSelectors = [
-      'nav',
-      '[role="navigation"]',
-      'header',
-      '.navbar',
-      '.navigation',
-      '.header',
-    ];
-
-    for (const selector of navSelectors) {
-      const elements = await page.locator(selector).count();
-      if (elements > 0) {
-        expect(elements).toBe(1);
-      }
-    }
+    await expectSinglePrimaryNavigation(page);
+    await expect(page.locator('header')).toHaveCount(1);
+    await expect(page.getByRole('navigation')).toHaveCount(3);
+    await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: /homepage utility navigation/i })).toBeVisible();
   });
 });

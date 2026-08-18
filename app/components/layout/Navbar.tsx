@@ -198,7 +198,10 @@ export default function Navbar() {
       >
         Skip to main content
       </a>
-      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
+      <nav
+        aria-label="Primary navigation"
+        className="container mx-auto flex items-center justify-between px-4 py-3"
+      >
         <Link href={paths.home()} className="flex items-center group py-1">
           <div
             className={`relative ${isHome ? 'h-20 w-20 md:h-24 md:w-24' : 'h-32 w-32 md:h-36 md:w-36'}`}
@@ -570,7 +573,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 p-4 space-y-1">
+              <nav aria-label="Mobile menu navigation" className="flex-1 p-4 space-y-1">
                 <Link
                   href={paths.home()}
                   onClick={() => setIsMenuOpen(false)}
