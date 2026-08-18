@@ -2,7 +2,16 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { resolveHomeScene, type HomeSceneState } from './homeScene';
+import {
+  HOME_SCENE_CROSSFADE_MS,
+  HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS,
+  HOME_SCENE_ASSETS,
+  resolveHomeScene,
+  resolveHomeSceneImageSrc,
+  resolveNextHomeSceneBucket,
+  type HomeSceneState,
+  type HomeSceneSurfaceFamily,
+} from './homeScene';
 import styles from './HeroScene.module.css';
 
 const INITIAL_SCENE_DATE = new Date(2026, 0, 1, 12);
@@ -23,6 +32,24 @@ const CANOPY_ANCHORS = [
   { x: 58, y: 24 },
 ];
 
+type SceneLayer = {
+  key: string;
+  src: string;
+  fallback: string;
+  alt: string;
+};
+
+function createSceneLayer(scene: HomeSceneState, family: HomeSceneSurfaceFamily): SceneLayer {
+  const image = resolveHomeSceneImageSrc(scene.asset, family);
+
+  return {
+    key: `${scene.bucket}-${family}-${image.src}`,
+    src: image.src,
+    fallback: image.fallback,
+    alt: scene.asset.alt,
+  };
+}
+
 function usePrefersReducedMotion() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -37,6 +64,37 @@ function usePrefersReducedMotion() {
   }, []);
 
   return reducedMotion;
+}
+
+function useHomeSceneSurfaceFamily(): HomeSceneSurfaceFamily {
+  const [family, setFamily] = useState<HomeSceneSurfaceFamily>('canonical');
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 1024px)');
+    const update = () => setFamily(query.matches ? 'wide' : 'canonical');
+
+    update();
+    query.addEventListener('change', update);
+
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  return family;
+}
+
+function preloadImage(src: string) {
+  if (typeof document === 'undefined') return;
+  const alreadyPreloaded = Array.from(
+    document.head.querySelectorAll<HTMLLinkElement>('link[rel="preload"]'),
+  ).some((link) => link.href.endsWith(src));
+
+  if (alreadyPreloaded) return;
+
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = src;
+  document.head.appendChild(link);
 }
 
 function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
@@ -101,11 +159,15 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
 
 export default function HeroScene() {
   const reducedMotion = usePrefersReducedMotion();
+  const surfaceFamily = useHomeSceneSurfaceFamily();
   const [scene, setScene] = useState<HomeSceneState>(() => ({
     ...resolveHomeScene(INITIAL_SCENE_DATE, false),
     timezone: 'local',
   }));
-  const [imageSrc, setImageSrc] = useState(scene.asset.src);
+  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() =>
+    createSceneLayer(resolveHomeScene(INITIAL_SCENE_DATE, false), 'canonical'),
+  );
+  const [incomingLayer, setIncomingLayer] = useState<SceneLayer | null>(null);
 
   useEffect(() => {
     setScene(resolveHomeScene(new Date(), reducedMotion));
@@ -118,29 +180,85 @@ export default function HeroScene() {
   }, [reducedMotion]);
 
   useEffect(() => {
-    setImageSrc(scene.asset.src);
-  }, [scene.asset.src]);
+    const nextLayer = createSceneLayer(scene, surfaceFamily);
+
+    if (nextLayer.key === displayedLayer.key) return;
+
+    if (reducedMotion) {
+      setIncomingLayer(null);
+      setDisplayedLayer(nextLayer);
+      return;
+    }
+
+    setIncomingLayer(nextLayer);
+
+    const timeout = window.setTimeout(() => {
+      setDisplayedLayer(nextLayer);
+      setIncomingLayer(null);
+    }, HOME_SCENE_CROSSFADE_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [displayedLayer.key, reducedMotion, scene, surfaceFamily]);
+
+  useEffect(() => {
+    const nextBucket = resolveNextHomeSceneBucket(scene.bucket);
+    const nextAsset = HOME_SCENE_ASSETS[nextBucket];
+    const currentImage = resolveHomeSceneImageSrc(scene.asset, surfaceFamily);
+    const nextImage = resolveHomeSceneImageSrc(nextAsset, surfaceFamily);
+
+    preloadImage(currentImage.src);
+    preloadImage(nextImage.src);
+  }, [scene.asset, scene.bucket, surfaceFamily]);
 
   return (
     <div
       className={`${styles.scene} absolute inset-0 z-0 bg-[#080611]`}
       data-scene-bucket={scene.bucket}
       data-scene-timezone={scene.timezone}
+      data-scene-surface-family={surfaceFamily}
       data-testid="mori-hero-scene"
     >
       <div className={styles.worldExtension} data-testid="mori-world-extension">
         <div className={styles.scenePlate} data-testid="mori-scene-plate">
           <Image
-            src={imageSrc}
-            alt={scene.asset.alt}
+            key={displayedLayer.key}
+            src={displayedLayer.src}
+            alt={incomingLayer ? '' : displayedLayer.alt}
+            aria-hidden={incomingLayer ? 'true' : undefined}
             fill
             priority
-            sizes="(min-aspect-ratio: 1264/843) calc((100svh - 5rem) * 1.499), 100vw"
-            className={`${styles.image} absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter] duration-[1600ms] ease-out`}
+            sizes="(min-width: 1024px) 100vw, (min-aspect-ratio: 1264/843) calc((100svh - 5rem) * 1.499), 100vw"
+            className={`${styles.image} ${styles.imageLayer} ${
+              incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
+            } absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter] ease-out`}
+            style={{
+              transitionDuration: `${reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS}ms`,
+            }}
             onError={() => {
-              if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
+              if (displayedLayer.src !== displayedLayer.fallback) {
+                setDisplayedLayer({ ...displayedLayer, src: displayedLayer.fallback });
+              }
             }}
           />
+          {incomingLayer ? (
+            <Image
+              key={incomingLayer.key}
+              src={incomingLayer.src}
+              alt={incomingLayer.alt}
+              fill
+              priority={false}
+              sizes="(min-width: 1024px) 100vw, (min-aspect-ratio: 1264/843) calc((100svh - 5rem) * 1.499), 100vw"
+              className={`${styles.image} ${styles.imageLayer} ${styles.imageLayerEntering} absolute inset-0 h-full w-full opacity-95 transition-[opacity,filter] ease-out`}
+              style={{
+                animationDuration: `${HOME_SCENE_CROSSFADE_MS}ms`,
+              }}
+              onError={() => {
+                if (incomingLayer.src !== incomingLayer.fallback) {
+                  setIncomingLayer({ ...incomingLayer, src: incomingLayer.fallback });
+                }
+              }}
+            />
+          ) : null}
         </div>
       </div>
 

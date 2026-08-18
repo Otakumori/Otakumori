@@ -1,6 +1,7 @@
 .scene {
   --mori-plate-top: clamp(4.5rem, 8svh, 6rem);
   --mori-plate-ratio: 1.499;
+  --mori-wide-plate-ratio: 1954 / 805;
 }
 
 .worldExtension {
@@ -35,11 +36,11 @@
 
 .worldExtension::after {
   bottom: -1px;
-  height: 52svh;
+  height: 35svh;
   background:
-    radial-gradient(ellipse at 12% 8%, rgba(78, 49, 37, 0.7), transparent 38%),
-    radial-gradient(ellipse at 42% 0%, rgba(36, 23, 23, 0.58), transparent 44%),
-    linear-gradient(180deg, rgba(7, 8, 12, 0), rgba(7, 4, 7, 0.72) 42%, #070407 100%);
+    radial-gradient(ellipse at 16% 6%, rgba(65, 37, 32, 0.42), transparent 38%),
+    radial-gradient(ellipse at 48% 0%, rgba(29, 20, 23, 0.38), transparent 44%),
+    linear-gradient(180deg, rgba(7, 8, 12, 0), rgba(7, 4, 7, 0.42) 55%, #070407 100%);
 }
 
 .scenePlate {
@@ -50,19 +51,50 @@
   max-height: calc(100svh - var(--mori-plate-top));
   flex: 0 0 auto;
   overflow: hidden;
-  border-radius: clamp(0px, 0.7vw, 12px);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .image {
-  object-fit: contain;
+  object-fit: cover;
   object-position: 50% 50%;
+}
+
+.imageLayer {
+  filter: saturate(1.02);
+}
+
+.imageLayerActive {
+  opacity: 0.96;
+}
+
+.imageLayerUnder {
+  opacity: 0.96;
+  filter: saturate(1.02) brightness(0.98);
+}
+
+.imageLayerEntering {
+  animation-name: moriWorldCrossfadeIn;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
 }
 
 .petal {
   animation-name: treePetalDrift;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+@media (min-width: 1024px) {
+  .scene {
+    --mori-plate-top: clamp(4rem, 6svh, 5.5rem);
+  }
+
+  .scenePlate {
+    aspect-ratio: 1954 / 805;
+    width: 100vw;
+    max-height: calc(100svh - var(--mori-plate-top));
+  }
 }
 
 @media (max-width: 639px) and (orientation: portrait) {
@@ -93,6 +125,26 @@
   .petal {
     animation: none !important;
   }
+
+  .imageLayer {
+    transition-duration: 1ms !important;
+  }
+
+  .imageLayerEntering {
+    animation-duration: 1ms !important;
+  }
+}
+
+@keyframes moriWorldCrossfadeIn {
+  0% {
+    opacity: 0;
+    filter: saturate(1.02) brightness(0.92);
+  }
+
+  100% {
+    opacity: 0.96;
+    filter: saturate(1.02) brightness(1);
+  }
 }
 
 @keyframes treePetalDrift {
@@ -113,7 +165,7 @@
   }
   100% {
     opacity: 0;
-    transform: translate3d(var(--petal-drift), var(--petal-fall), 0)
-      rotate(var(--petal-rotate)) scale(0.76);
+    transform: translate3d(var(--petal-drift), var(--petal-fall), 0) rotate(var(--petal-rotate))
+      scale(0.76);
   }
 }

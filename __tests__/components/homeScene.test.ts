@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   HOME_SCENE_ASSETS,
+  resolveHomeSceneImageSrc,
+  resolveNextHomeSceneBucket,
   resolveBrowserTimeZone,
   resolveHomeScene,
   resolveHomeSceneBucket,
@@ -41,13 +43,53 @@ describe('homepage adaptive world scene mapping', () => {
     expect(HOME_SCENE_ASSETS.earlyMorning.src).toBe(
       '/assets/home/world/mori-world-early-morning.png',
     );
+    expect(HOME_SCENE_ASSETS.earlyMorning.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-early-morning-wide.png',
+    );
     expect(HOME_SCENE_ASSETS.morning.src).toBe('/assets/home/world/mori-world-morning.png');
+    expect(HOME_SCENE_ASSETS.morning.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-morning-wide.png',
+    );
     expect(HOME_SCENE_ASSETS.afternoon.src).toBe('/assets/home/world/mori-world-afternoon.png');
+    expect(HOME_SCENE_ASSETS.afternoon.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-afternoon-wide.png',
+    );
     expect(HOME_SCENE_ASSETS.lateAfternoon.src).toBe('/assets/home/world/mori-world-sunset.png');
+    expect(HOME_SCENE_ASSETS.lateAfternoon.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-sunset-wide.png',
+    );
     expect(HOME_SCENE_ASSETS.night.src).toBe('/assets/home/world/mori-world-night.png');
+    expect(HOME_SCENE_ASSETS.night.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-night-wide.png',
+    );
     expect(HOME_SCENE_ASSETS.specialTwilight.src).toBe(
       '/assets/home/world/mori-world-twilight.png',
     );
+    expect(HOME_SCENE_ASSETS.specialTwilight.wideSrc).toBe(
+      '/assets/home/world/wide/mori-world-twilight-wide.png',
+    );
+  });
+
+  it('selects wide or canonical scene assets without changing the time bucket', () => {
+    const scene = resolveHomeScene(localDate(12), false);
+
+    expect(resolveHomeSceneImageSrc(scene.asset, 'canonical')).toEqual({
+      src: '/assets/home/world/mori-world-afternoon.png',
+      fallback: '/assets/home/world/mori-world-sunset.png',
+    });
+    expect(resolveHomeSceneImageSrc(scene.asset, 'wide')).toEqual({
+      src: '/assets/home/world/wide/mori-world-afternoon-wide.png',
+      fallback: '/assets/home/world/wide/mori-world-sunset-wide.png',
+    });
+  });
+
+  it('preloads only the next chronological scene candidate', () => {
+    expect(resolveNextHomeSceneBucket('earlyMorning')).toBe('morning');
+    expect(resolveNextHomeSceneBucket('morning')).toBe('afternoon');
+    expect(resolveNextHomeSceneBucket('afternoon')).toBe('lateAfternoon');
+    expect(resolveNextHomeSceneBucket('lateAfternoon')).toBe('night');
+    expect(resolveNextHomeSceneBucket('night')).toBe('earlyMorning');
+    expect(resolveNextHomeSceneBucket('specialTwilight')).toBe('night');
   });
 
   it('reduces petal density and gust motion for reduced-motion users', () => {

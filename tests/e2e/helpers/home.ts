@@ -33,7 +33,21 @@ export async function expectRootFooterContract(page: Page) {
   const footer = rootFooter(page);
 
   await expect(footer).toBeVisible();
-  await expect(footer).toHaveAttribute('data-root-footer-contract', 'production-art-pending');
+  await expect(footer).toHaveAttribute('data-root-footer-contract', 'wide-world-integrated');
+  await expect(footer.locator('[data-root-region="shared-underground-art"]')).toHaveCount(1);
   await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
-  await expect(page.getByRole('navigation', { name: /homepage utility navigation/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Cart$/i })).toHaveAttribute('href', '/shop/cart');
+  await expect(page.getByRole('link', { name: /^Wishlist$/i })).toHaveAttribute(
+    'href',
+    '/wishlist',
+  );
+  await expect(page.getByRole('link', { name: /^Petal Wallet$/i })).toHaveAttribute(
+    'href',
+    '/profile/petals',
+  );
+  await expect(page.getByRole('button', { name: /open soapstone note/i })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: /otakumori social links/i })).toBeVisible();
+  await expect(
+    page.getByRole('navigation', { name: /homepage utility navigation/i }),
+  ).toBeVisible();
 }

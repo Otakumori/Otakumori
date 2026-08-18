@@ -19,27 +19,32 @@ describe('homepage hero content', () => {
     expect(search).toHaveAttribute('placeholder', "What are ya eyein'?");
 
     expect(screen.getByRole('button', { name: /^search$/i })).toHaveAttribute('type', 'submit');
-    expect(screen.getByRole('link', { name: /^gear up/i })).toHaveAttribute(
-      'href',
-      '/shop',
-    );
+    expect(screen.getByRole('link', { name: /^gear up/i })).toHaveAttribute('href', '/shop');
     expect(screen.getByRole('link', { name: /^mini-games$/i })).toHaveAttribute(
       'href',
       '/mini-games',
     );
-    expect(screen.getByRole('link', { name: /^profile$/i })).toHaveAttribute(
-      'href',
-      '/profile',
+    expect(screen.getByRole('link', { name: /^profile$/i })).toHaveAttribute('href', '/profile');
+    expect(screen.getByTestId('mori-root-footer')).toHaveAttribute(
+      'data-root-footer-contract',
+      'wide-world-integrated',
     );
-    expect(screen.getByRole('link', { name: /^petals$/i })).toHaveAttribute(
+    expect(
+      screen
+        .getByTestId('mori-root-footer')
+        .querySelector('[data-root-region="shared-underground-art"]'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^cart$/i })).toHaveAttribute('href', '/shop/cart');
+    expect(screen.getByRole('link', { name: /^wishlist$/i })).toHaveAttribute('href', '/wishlist');
+    expect(screen.getByRole('link', { name: /^petal wallet$/i })).toHaveAttribute(
       'href',
       '/profile/petals',
     );
-    expect(screen.getByTestId('mori-root-footer')).toHaveAttribute(
-      'data-root-footer-contract',
-      'production-art-pending',
-    );
-    expect(screen.getByRole('navigation', { name: /homepage utility navigation/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open soapstone note/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: /homepage utility navigation/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: /otakumori social links/i })).toBeInTheDocument();
   });
 
   it('does not render any unsafe local petal grant or auth shortcut controls', () => {

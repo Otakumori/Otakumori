@@ -26,6 +26,9 @@ function stubMatchMedia(matches: boolean) {
 describe('homepage hero scene client island', () => {
   afterEach(() => {
     cleanup();
+    document.head.querySelectorAll('link[rel="preload"]').forEach((node) => {
+      node.remove();
+    });
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
     vi.resetModules();
@@ -57,6 +60,18 @@ describe('homepage hero scene client island', () => {
     expect(images).toHaveLength(1);
     expect(images[0]).toHaveAttribute('src', '/assets/home/world/mori-world-twilight.png');
     expect(images[0].className).toContain('image');
+    await waitFor(() => {
+      const preloadHrefs = Array.from(
+        document.head.querySelectorAll<HTMLLinkElement>('link[rel="preload"]'),
+      ).map((link) => link.href);
+
+      expect(
+        preloadHrefs.some((href) => href.endsWith('/assets/home/world/mori-world-twilight.png')),
+      ).toBe(true);
+      expect(
+        preloadHrefs.some((href) => href.endsWith('/assets/home/world/mori-world-night.png')),
+      ).toBe(true);
+    });
   });
 
   it('keeps reduced-motion petal density bounded', async () => {

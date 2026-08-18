@@ -11,8 +11,12 @@ export type HomeSceneAsset = {
   label: string;
   src: string;
   fallback: string;
+  wideSrc: string;
+  wideFallback: string;
   alt: string;
 };
+
+export type HomeSceneSurfaceFamily = 'canonical' | 'wide';
 
 export type HomeSceneArtDirection = {
   mobilePortrait: string;
@@ -41,11 +45,19 @@ export type HomeSceneState = {
 };
 
 const WORLD_ASSET_ROOT = '/assets/home/world';
+const WIDE_WORLD_ASSET_ROOT = `${WORLD_ASSET_ROOT}/wide`;
 const FALLBACK_TIMEZONE = 'local';
 
 function worldAsset(name: string) {
   return `${WORLD_ASSET_ROOT}/${name}.png`;
 }
+
+function wideWorldAsset(name: string) {
+  return `${WIDE_WORLD_ASSET_ROOT}/${name}.png`;
+}
+
+export const HOME_SCENE_CROSSFADE_MS = 14_000;
+export const HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS = 0;
 
 export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
   earlyMorning: {
@@ -53,6 +65,8 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Early morning',
     src: worldAsset('mori-world-early-morning'),
     fallback: worldAsset('mori-world-morning'),
+    wideSrc: wideWorldAsset('mori-world-early-morning-wide'),
+    wideFallback: wideWorldAsset('mori-world-morning-wide'),
     alt: 'Otakumori sakura tree scene in early morning light',
   },
   morning: {
@@ -60,6 +74,8 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Morning',
     src: worldAsset('mori-world-morning'),
     fallback: worldAsset('mori-world-afternoon'),
+    wideSrc: wideWorldAsset('mori-world-morning-wide'),
+    wideFallback: wideWorldAsset('mori-world-afternoon-wide'),
     alt: 'Otakumori sakura tree scene in soft morning light',
   },
   afternoon: {
@@ -67,6 +83,8 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Afternoon',
     src: worldAsset('mori-world-afternoon'),
     fallback: worldAsset('mori-world-sunset'),
+    wideSrc: wideWorldAsset('mori-world-afternoon-wide'),
+    wideFallback: wideWorldAsset('mori-world-sunset-wide'),
     alt: 'Otakumori sakura tree scene in afternoon light',
   },
   lateAfternoon: {
@@ -74,6 +92,8 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Late afternoon',
     src: worldAsset('mori-world-sunset'),
     fallback: worldAsset('mori-world-night'),
+    wideSrc: wideWorldAsset('mori-world-sunset-wide'),
+    wideFallback: wideWorldAsset('mori-world-night-wide'),
     alt: 'Otakumori sakura tree scene in late afternoon light',
   },
   night: {
@@ -81,6 +101,8 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Night',
     src: worldAsset('mori-world-night'),
     fallback: worldAsset('mori-world-sunset'),
+    wideSrc: wideWorldAsset('mori-world-night-wide'),
+    wideFallback: wideWorldAsset('mori-world-sunset-wide'),
     alt: 'Otakumori sakura tree scene at night',
   },
   specialTwilight: {
@@ -88,8 +110,19 @@ export const HOME_SCENE_ASSETS: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Special twilight',
     src: worldAsset('mori-world-twilight'),
     fallback: worldAsset('mori-world-night'),
+    wideSrc: wideWorldAsset('mori-world-twilight-wide'),
+    wideFallback: wideWorldAsset('mori-world-night-wide'),
     alt: 'Otakumori sakura tree scene in special twilight glow',
   },
+};
+
+const NEXT_SCENE_BUCKET: Record<HomeSceneBucket, HomeSceneBucket> = {
+  earlyMorning: 'morning',
+  morning: 'afternoon',
+  afternoon: 'lateAfternoon',
+  lateAfternoon: 'night',
+  night: 'earlyMorning',
+  specialTwilight: 'night',
 };
 
 export const HOME_SCENE_ART_DIRECTION: Record<HomeSceneBucket, HomeSceneArtDirection> = {
@@ -237,6 +270,16 @@ export function resolveHomeScene(date = new Date(), reducedMotion = false): Home
     motion: resolveHomeSceneMotion(bucket, reducedMotion),
     timezone: resolveBrowserTimeZone(),
   };
+}
+
+export function resolveHomeSceneImageSrc(asset: HomeSceneAsset, family: HomeSceneSurfaceFamily) {
+  return family === 'wide'
+    ? { src: asset.wideSrc, fallback: asset.wideFallback }
+    : { src: asset.src, fallback: asset.fallback };
+}
+
+export function resolveNextHomeSceneBucket(bucket: HomeSceneBucket): HomeSceneBucket {
+  return NEXT_SCENE_BUCKET[bucket] ?? 'afternoon';
 }
 
 export function resolveBrowserTimeZone() {
