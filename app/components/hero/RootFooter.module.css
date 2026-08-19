@@ -1,8 +1,13 @@
 .rootFooter {
-  --root-surface-overlap: clamp(2.5rem, 4vw, 4.5rem);
+  /*
+   * The approved root master intentionally contains a surface registration strip.
+   * Runtime hides that duplicated time-of-day surface and begins at the soil/root cutaway.
+   */
+  --root-art-surface-crop: 13vw;
+  --root-surface-overlap: clamp(0.75rem, 1.4vw, 1.75rem);
   margin-top: calc(var(--root-surface-overlap) * -1);
   padding-top: var(--root-surface-overlap);
-  min-height: clamp(42rem, 62vw, 54rem);
+  min-height: clamp(42rem, 58vw, 52rem);
   overflow: hidden;
   isolation: isolate;
   background: #070407;
@@ -10,11 +15,11 @@
 
 .rootArt {
   position: absolute;
-  inset: 0 calc(50% - 50vw) 0 calc(50% - 50vw);
+  inset: 0;
   z-index: -2;
   background-color: #070407;
   background-image: url('/assets/home/root-footer/root-underground-wide.png');
-  background-position: top center;
+  background-position: center calc(0px - var(--root-art-surface-crop));
   background-size: 100% auto;
   background-repeat: no-repeat;
   pointer-events: none;
@@ -23,8 +28,8 @@
 .rootArt::after {
   content: '';
   position: absolute;
-  inset: 62% 0 0;
-  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.72) 50%, #070407 84%);
+  inset: 68% 0 0;
+  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.62) 48%, #070407 84%);
   pointer-events: none;
 }
 
@@ -39,12 +44,13 @@
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-  padding-top: clamp(7rem, 14vw, 12rem);
+  padding-top: clamp(9rem, 17vw, 14rem);
 }
 
 @media (max-width: 767px) {
   .rootFooter {
-    --root-surface-overlap: clamp(2rem, 7vw, 3.5rem);
+    --root-art-surface-crop: 12vw;
+    --root-surface-overlap: clamp(0.5rem, 2vw, 1rem);
     min-height: 48rem;
   }
 
