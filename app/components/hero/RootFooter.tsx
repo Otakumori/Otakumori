@@ -31,7 +31,7 @@ const socialLinks = [
 export default function RootFooter() {
   return (
     <footer
-      className={`${styles.rootFooter} relative mx-auto w-full max-w-7xl px-0 pb-8`}
+      className={`${styles.rootFooter} relative w-full px-0 pb-8`}
       aria-labelledby="home-root-footer-title"
       data-testid="mori-root-footer"
       data-root-footer-contract="wide-world-integrated"
@@ -46,7 +46,7 @@ export default function RootFooter() {
         aria-hidden="true"
         data-root-region="world-to-root-joint"
       />
-      <div className={`${styles.contentShell} px-5 pb-8 sm:px-7 md:px-8`}>
+      <div className={`${styles.contentShell} mx-auto w-full max-w-7xl px-5 pb-8 sm:px-7 md:px-8`}>
         <div className="grid gap-8 md:grid-cols-[1.05fr_1.15fr] md:items-end">
           <div data-root-region="footer-voice">
             <p className="font-ui text-xs font-semibold uppercase tracking-[0.3em] text-[#f2bfd1]/76">
