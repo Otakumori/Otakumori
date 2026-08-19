@@ -1,4 +1,5 @@
 import './globals.css';
+import './mori-visual-system.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
