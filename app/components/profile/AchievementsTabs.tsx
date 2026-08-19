@@ -13,7 +13,6 @@ type Achievement = {
   progress?: number;
   maxProgress?: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  // Optional typed source from API; when present we prefer this for grouping
   source?: 'site' | 'petal' | 'memory' | 'rhythm' | 'bubble' | 'puzzle' | string;
 };
 
@@ -22,7 +21,6 @@ export default function AchievementsTabs({ achievements }: { achievements: Achie
     'all' | 'site' | 'petal' | 'memory' | 'rhythm' | 'bubble' | 'puzzle'
   >('all');
 
-  // Prefer typed source if present, otherwise use heuristics
   const groups = useMemo(() => {
     const site: Achievement[] = [];
     const petal: Achievement[] = [];
@@ -71,29 +69,36 @@ export default function AchievementsTabs({ achievements }: { achievements: Achie
     }
   }, [tab, achievements, groups]);
 
-  const TabBtn = ({ id, label }: { id: typeof tab; label: string }) => (
-    <button
-      onClick={() => setTab(id)}
-      className={[
-        'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-        tab === id ? 'bg-pink-600 text-white' : 'bg-white/10 text-zinc-200 hover:bg-white/15',
-      ].join(' ')}
-      data-testid={`ach-tab-${id}`}
-    >
-      {label}
-    </button>
-  );
+  const tabs: Array<{ id: typeof tab; label: string }> = [
+    { id: 'all', label: 'All' },
+    { id: 'site', label: 'Site-wide' },
+    { id: 'petal', label: 'Petal Samurai' },
+    { id: 'memory', label: 'Memory Match' },
+    { id: 'rhythm', label: 'Rhythm Beat' },
+    { id: 'bubble', label: 'Bubble Girl' },
+    { id: 'puzzle', label: 'Puzzle Reveal' },
+  ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <TabBtn id="all" label="All" />
-        <TabBtn id="site" label="Site-wide" />
-        <TabBtn id="petal" label="Petal Samurai" />
-        <TabBtn id="memory" label="Memory Match" />
-        <TabBtn id="rhythm" label="Rhythm Beat" />
-        <TabBtn id="bubble" label="Bubble Girl" />
-        <TabBtn id="puzzle" label="Puzzle Reveal" />
+    <div className="space-y-6">
+      <div className="flex gap-1 overflow-x-auto border-b border-white/10 pb-3" role="tablist" aria-label="Achievement collection filters">
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.id}
+            onClick={() => setTab(item.id)}
+            className={`shrink-0 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
+              tab === item.id
+                ? 'border border-[#c7a97f]/30 bg-[#a9855f]/15 text-[#fff1e4]'
+                : 'border border-transparent text-[#cdbbb7] hover:border-white/10 hover:bg-white/[0.035] hover:text-white'
+            }`}
+            data-testid={`ach-tab-${item.id}`}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
       <AchievementsGrid achievements={current} />
     </div>
