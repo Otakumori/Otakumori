@@ -1,0 +1,26 @@
+.heroRoot {
+  --mori-surface-height: 100svh;
+  min-height: var(--mori-surface-height);
+}
+
+.heroContent {
+  min-height: var(--mori-surface-height);
+}
+
+.surfaceContent {
+  min-height: var(--mori-surface-height);
+}
+
+@media (min-width: 1024px) {
+  .heroRoot {
+    --mori-surface-height: min(
+      100svh,
+      calc(clamp(4rem, 6svh, 5.5rem) + (100vw * 805 / 1954))
+    );
+  }
+
+  .heroContent,
+  .surfaceContent {
+    min-height: var(--mori-surface-height);
+  }
+}
