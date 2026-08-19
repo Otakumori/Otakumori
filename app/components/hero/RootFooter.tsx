@@ -46,7 +46,7 @@ export default function RootFooter() {
         aria-hidden="true"
         data-root-region="world-to-root-joint"
       />
-      <div className={`${styles.contentShell} rounded-[2rem] p-5 sm:p-7 md:p-8`}>
+      <div className={`${styles.contentShell} px-5 pb-8 sm:px-7 md:px-8`}>
         <div className="grid gap-8 md:grid-cols-[1.05fr_1.15fr] md:items-end">
           <div data-root-region="footer-voice">
             <p className="font-ui text-xs font-semibold uppercase tracking-[0.3em] text-[#f2bfd1]/76">
