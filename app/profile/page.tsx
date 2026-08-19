@@ -29,6 +29,7 @@ export function generateMetadata() {
     url: '/profile',
   });
 }
+
 export default async function ProfilePage() {
   let profileData = null;
   let profileState: 'ready' | 'signed-out' | 'provisioning-unavailable' | 'schema-unavailable' | 'error' =
@@ -49,29 +50,26 @@ export default async function ProfilePage() {
     }
   }
 
-  // Guest view
   if (profileState === 'signed-out') {
     const appOrigin = await resolveServerAppOrigin();
 
     return (
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <ProfileHeader />
-        <div className="mt-8 rounded-2xl border border-white/10 bg-black/50 p-12 text-center">
-          <h2 className="text-2xl font-semibold text-white mb-4">
-            Sign in to view your Otaku-mori profile
-          </h2>
-          <p className="text-zinc-300 mb-6 max-w-md mx-auto">
-            Profiles track your lifetime petals, achievements, and avatar. Sign in to see your
-            progress and unlock rewards!
-          </p>
-          <a
-            href={buildCanonicalSignInUrl('/profile', appOrigin)}
-            className="inline-block px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-colors"
-          >
-            Sign In
-          </a>
+      <main className="mori-page pt-24">
+        <div className="mori-shell py-10">
+          <ProfileHeader />
+          <div className="mori-panel mt-8 p-8 text-center sm:p-12">
+            <h2 className="font-display text-2xl font-semibold text-[#fff1e4]">
+              Sign in to view your Otaku-mori profile
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#cdbbb7] sm:text-base">
+              Profiles track your lifetime petals, achievements, avatar, game records, and rewards.
+            </p>
+            <a href={buildCanonicalSignInUrl('/profile', appOrigin)} className="mori-button-primary mt-6">
+              Sign In
+            </a>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -92,13 +90,15 @@ export default async function ProfilePage() {
     }[profileState];
 
     return (
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <ProfileHeader />
-        <div className="mt-8 rounded-2xl border border-amber-400/30 bg-black/50 p-12 text-center">
-          <h2 className="text-2xl font-semibold text-white mb-4">{copy.title}</h2>
-          <p className="text-zinc-300 mb-6 max-w-md mx-auto">{copy.body}</p>
+      <main className="mori-page pt-24">
+        <div className="mori-shell py-10">
+          <ProfileHeader />
+          <div className="mori-panel mt-8 border-[#a9855f]/25 p-8 text-center sm:p-12">
+            <h2 className="font-display text-2xl font-semibold text-[#fff1e4]">{copy.title}</h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#cdbbb7] sm:text-base">{copy.body}</p>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -113,50 +113,44 @@ export default async function ProfilePage() {
   const displayName = _user?.fullName || _user?.username || 'Wanderer';
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10 space-y-8">
-      {/* Steam-style Header */}
-      <ProfileHeader displayName={displayName} />
+    <main className="mori-page pt-24">
+      <div className="mori-shell space-y-8 py-10">
+        <ProfileHeader displayName={displayName} />
 
-      {/* Gamertag */}
-      {gamertag && <OneTapGamertag initial={gamertag} />}
+        <OneTapGamertag initial={gamertag} />
 
-      {/* Two-column Layout */}
-      <ProfileLayout
-        left={
-          <>
-            <ProfileAvatarCard />
-            <ProfileStatsCard />
-          </>
-        }
-        right={
-          <ProfileTabs
-            overview={
-              <div className="space-y-6">
-                {/* Rewards Summary */}
-                <RewardsSummary />
-
-                {/* Daily Quests */}
-                <div className="rounded-xl border border-white/10 bg-black/50 p-5">
-                  <DailyQuests />
+        <ProfileLayout
+          left={
+            <>
+              <ProfileAvatarCard />
+              <ProfileStatsCard />
+            </>
+          }
+          right={
+            <ProfileTabs
+              overview={
+                <div className="space-y-6">
+                  <RewardsSummary />
+                  <div className="mori-panel p-5">
+                    <DailyQuests />
+                  </div>
+                  <div className="mori-panel p-5">
+                    <RecentActivity />
+                  </div>
                 </div>
-
-                {/* Recent Activity */}
-                <div className="rounded-xl border border-white/10 bg-black/50 p-5">
-                  <RecentActivity />
+              }
+              achievements={<AchievementsPanel />}
+              games={
+                <div className="mori-panel p-5">
+                  <h2 className="font-display mb-4 text-xl font-semibold text-[#fff1e4]">Game Stats</h2>
+                  <MiniGameStats />
                 </div>
-              </div>
-            }
-            achievements={<AchievementsPanel />}
-            games={
-              <div className="rounded-xl border border-white/10 bg-black/50 p-5">
-                <h2 className="text-xl font-semibold text-white mb-4">Game Stats</h2>
-                <MiniGameStats />
-              </div>
-            }
-            cosmetics={<CosmeticsTab />}
-          />
-        }
-      />
-    </div>
+              }
+              cosmetics={<CosmeticsTab />}
+            />
+          }
+        />
+      </div>
+    </main>
   );
 }
