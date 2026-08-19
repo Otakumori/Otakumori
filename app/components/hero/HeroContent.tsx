@@ -5,8 +5,8 @@ import RootFooter from './RootFooter';
 
 export default function HeroContent() {
   return (
-    <div className="relative z-20 flex min-h-[138svh] flex-col px-4 pb-8 pt-24 text-[#fff4e8] sm:px-6 md:min-h-[128svh] md:px-10 xl:min-h-[122svh]">
-      <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl items-end pb-[7svh] md:items-center md:justify-end md:pb-0 md:pt-[12svh]">
+    <div className="relative z-20 flex flex-col text-[#fff4e8]">
+      <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl items-end px-4 pb-[7svh] pt-24 sm:px-6 md:items-center md:justify-end md:px-10 md:pb-0 md:pt-[12svh]">
         <div className="w-full max-w-[31rem] text-left md:mr-[5vw] lg:mr-[8vw]">
           <h1
             id="home-hero-title"
