@@ -6,7 +6,7 @@ export default function HeroRoot() {
   return (
     <section
       id="main-content"
-      className="relative isolate min-h-[138svh] w-full overflow-hidden bg-[#080611] md:min-h-[128svh] xl:min-h-[122svh]"
+      className="relative isolate w-full overflow-hidden bg-[#080611]"
       aria-labelledby="home-hero-title"
     >
       <HeroScene />
