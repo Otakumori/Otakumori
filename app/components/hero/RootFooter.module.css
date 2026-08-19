@@ -1,20 +1,23 @@
 .rootFooter {
-  --root-surface-overlap: clamp(6rem, 14vw, 10rem);
+  --root-surface-overlap: clamp(2.5rem, 4vw, 4.5rem);
   margin-top: calc(var(--root-surface-overlap) * -1);
   padding-top: var(--root-surface-overlap);
-  min-height: clamp(32rem, 56vw, 46rem);
+  min-height: clamp(42rem, 62vw, 54rem);
   overflow: hidden;
   isolation: isolate;
+  background: #070407;
 }
 
 .rootArt {
   position: absolute;
   inset: 0 calc(50% - 50vw) 0 calc(50% - 50vw);
   z-index: -2;
-  background:
-    linear-gradient(180deg, rgba(5, 3, 7, 0) 0%, rgba(5, 3, 7, 0.18) 22%, rgba(5, 3, 7, 0.72) 100%),
-    url('/assets/home/root-footer/root-underground-wide.png') top center / cover no-repeat,
-    #090507;
+  background-color: #070407;
+  background-image: url('/assets/home/root-footer/root-underground-wide.png');
+  background-position: top center;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 .rootArt::after {
@@ -22,38 +25,41 @@
   position: absolute;
   inset: 55% 0 0;
   background:
-    radial-gradient(ellipse at 24% 0%, rgba(210, 124, 165, 0.2), transparent 42%),
-    radial-gradient(ellipse at 76% 0%, rgba(255, 186, 104, 0.16), transparent 38%),
-    linear-gradient(180deg, rgba(7, 4, 8, 0), #070407 76%);
+    radial-gradient(ellipse at 24% 0%, rgba(210, 124, 165, 0.12), transparent 42%),
+    radial-gradient(ellipse at 76% 0%, rgba(255, 186, 104, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.78) 48%, #070407 82%);
+  pointer-events: none;
 }
 
 .surfaceSeam {
-  position: absolute;
-  inset-inline: calc(50% - 50vw);
-  top: var(--root-surface-overlap);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(246, 220, 199, 0.36), transparent);
+  display: none;
 }
 
 .contentShell {
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(246, 220, 199, 0.12);
-  background:
-    radial-gradient(ellipse at 12% 0%, rgba(251, 166, 200, 0.14), transparent 44%),
-    radial-gradient(ellipse at 88% 18%, rgba(255, 185, 120, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(8, 5, 9, 0.38), rgba(8, 5, 9, 0.68));
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(4px);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding-top: clamp(7rem, 14vw, 12rem);
 }
 
 @media (max-width: 767px) {
   .rootFooter {
-    --root-surface-overlap: clamp(4.5rem, 22vw, 7rem);
-    min-height: 42rem;
+    --root-surface-overlap: clamp(2rem, 7vw, 3.5rem);
+    min-height: 48rem;
   }
 
   .rootArt {
-    background-size: auto 100%;
+    left: 50%;
+    right: auto;
+    width: max(100vw, 64rem);
+    transform: translateX(-50%);
+    background-size: 100% auto;
+  }
+
+  .contentShell {
+    padding-top: clamp(8rem, 28vw, 13rem);
   }
 }
