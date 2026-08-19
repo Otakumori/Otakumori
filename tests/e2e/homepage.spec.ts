@@ -26,7 +26,6 @@ test.describe('Homepage', () => {
     const cherryTree = page.getByRole('img', { name: /Otakumori sakura tree scene/i });
     await expect(cherryTree).toBeVisible();
 
-    // The app collapses motion to near-zero durations for reduced motion.
     const style = await cherryTree.evaluate((el) => {
       const computedStyle = window.getComputedStyle(el);
       return {
@@ -121,14 +120,19 @@ test.describe('Homepage', () => {
     // Check for proper heading structure
     await expectCurrentHomeHero(page);
 
-    // Check for proper alt text on images
+    // Every image must explicitly declare alt. Decorative crossfade layers may correctly use alt="".
     const images = page.locator('img');
     const imageCount = await images.count();
 
     for (let i = 0; i < imageCount; i++) {
       const img = images.nth(i);
       const alt = await img.getAttribute('alt');
-      expect(alt).toBeTruthy();
+      expect(alt).not.toBeNull();
+
+      if (alt === '') {
+        const ariaHidden = await img.getAttribute('aria-hidden');
+        expect(ariaHidden === 'true' || ariaHidden === null).toBeTruthy();
+      }
     }
 
     // Check for proper button labels
