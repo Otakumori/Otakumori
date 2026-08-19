@@ -216,7 +216,7 @@ export default function HeroScene() {
 
   return (
     <div
-      className={`${styles.scene} absolute inset-0 z-0 bg-[#080611]`}
+      className={`${styles.scene} absolute inset-x-0 top-0 z-0 h-[100svh] bg-[#080611]`}
       data-scene-bucket={scene.bucket}
       data-scene-timezone={scene.timezone}
       data-scene-surface-family={surfaceFamily}
