@@ -210,6 +210,10 @@ export default function HeroScene() {
     preloadImage(nextImage.src);
   }, [scene.asset, scene.bucket, surfaceFamily]);
 
+  const ambientTransitionClass = reducedMotion
+    ? 'transition-none'
+    : 'transition-opacity duration-[2200ms]';
+
   return (
     <div
       className={`${styles.scene} absolute inset-0 z-0 bg-[#080611]`}
@@ -263,19 +267,19 @@ export default function HeroScene() {
       </div>
 
       <div
-        className="absolute inset-0 z-[3] transition-opacity duration-[2200ms]"
+        className={`absolute inset-0 z-[3] ${ambientTransitionClass}`}
         style={{
           opacity: scene.motion.mistOpacity,
           background:
-            'radial-gradient(circle at 30% 26%, rgba(255,214,235,0.34), transparent 34%), radial-gradient(circle at 78% 22%, rgba(184,152,255,0.28), transparent 30%), linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 42%)',
+            'radial-gradient(circle at 30% 26%, rgba(255,214,235,0.22), transparent 34%), radial-gradient(circle at 78% 22%, rgba(184,152,255,0.16), transparent 30%), linear-gradient(to bottom, rgba(255,255,255,0.05), transparent 42%)',
         }}
       />
       <div
-        className="absolute inset-0 z-[4] transition-opacity duration-[2200ms]"
+        className={`absolute inset-0 z-[4] ${ambientTransitionClass}`}
         style={{
           opacity: scene.motion.glowOpacity,
           background:
-            'radial-gradient(circle at 50% 38%, rgba(255,127,190,0.54), transparent 36%), radial-gradient(circle at 52% 62%, rgba(125,90,255,0.4), transparent 48%)',
+            'radial-gradient(circle at 50% 38%, rgba(255,127,190,0.26), transparent 36%), radial-gradient(circle at 52% 62%, rgba(125,90,255,0.18), transparent 48%)',
         }}
       />
       <TreePetalEmitter scene={scene} />
