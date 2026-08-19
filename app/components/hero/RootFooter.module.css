@@ -23,11 +23,8 @@
 .rootArt::after {
   content: '';
   position: absolute;
-  inset: 55% 0 0;
-  background:
-    radial-gradient(ellipse at 24% 0%, rgba(210, 124, 165, 0.12), transparent 42%),
-    radial-gradient(ellipse at 76% 0%, rgba(255, 186, 104, 0.1), transparent 38%),
-    linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.78) 48%, #070407 82%);
+  inset: 62% 0 0;
+  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.72) 50%, #070407 84%);
   pointer-events: none;
 }
 
@@ -49,14 +46,6 @@
   .rootFooter {
     --root-surface-overlap: clamp(2rem, 7vw, 3.5rem);
     min-height: 48rem;
-  }
-
-  .rootArt {
-    left: 50%;
-    right: auto;
-    width: max(100vw, 64rem);
-    transform: translateX(-50%);
-    background-size: 100% auto;
   }
 
   .contentShell {
