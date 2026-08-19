@@ -8,10 +8,6 @@ interface ProfileHeaderProps {
   tagline?: string;
 }
 
-/**
- * Steam-style profile header banner
- * Shows display name, tagline, and petal stats on the right
- */
 export default function ProfileHeader({ displayName, tagline }: ProfileHeaderProps) {
   const { user, isSignedIn } = useUser();
   const { balance, lifetimeEarned, isGuest } = usePetalBalance();
@@ -20,44 +16,40 @@ export default function ProfileHeader({ displayName, tagline }: ProfileHeaderPro
   const userTagline = tagline || 'Embrace the shadows, master the art.';
 
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-purple-900/50 via-pink-900/30 to-black/80 p-6 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl" />
-      </div>
+    <section className="mori-panel relative overflow-hidden p-5 sm:p-6">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_0%,rgba(169,133,95,0.09),transparent_30%),radial-gradient(circle_at_12%_100%,rgba(117,72,88,0.09),transparent_28%)]"
+        aria-hidden="true"
+      />
 
-      <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        {/* Left: User Info */}
-        <div className="flex-1">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{userName}</h1>
-          <p className="text-sm md:text-base text-zinc-300 italic">{userTagline}</p>
+      <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-[#fff1e4] md:text-4xl">
+            {userName}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#cdbbb7] md:text-base">{userTagline}</p>
         </div>
 
-        {/* Right: Petal Stats */}
         {isSignedIn && !isGuest ? (
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Current Balance */}
-            <div className="rounded-xl border border-pink-500/30 bg-pink-500/10 backdrop-blur-sm p-4 min-w-[140px]">
-              <div className="text-xs text-pink-200/70 mb-1">Petals</div>
-              <div className="text-2xl font-bold text-white">{balance.toLocaleString()}</div>
-              <div className="text-[10px] text-pink-200/50 mt-1">Current balance</div>
+          <dl className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+            <div className="mori-panel-soft min-w-[8.5rem] p-4">
+              <dt className="text-[10px] uppercase tracking-[0.14em] text-[#8f7f7d]">Petals</dt>
+              <dd className="mt-2 font-display text-2xl font-semibold text-[#fff1e4]">{balance.toLocaleString()}</dd>
+              <div className="mt-1 text-[10px] text-[#756b67]">Current balance</div>
             </div>
-
-            {/* Lifetime Petals */}
-            <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-4 min-w-[140px]">
-              <div className="text-xs text-purple-200/70 mb-1">Lifetime Petals</div>
-              <div className="text-2xl font-bold text-white">{lifetimeEarned.toLocaleString()}</div>
-              <div className="text-[10px] text-purple-200/50 mt-1">Total earned</div>
+            <div className="mori-panel-soft min-w-[8.5rem] p-4">
+              <dt className="text-[10px] uppercase tracking-[0.14em] text-[#8f7f7d]">Lifetime</dt>
+              <dd className="mt-2 font-display text-2xl font-semibold text-[#c7a97f]">{lifetimeEarned.toLocaleString()}</dd>
+              <div className="mt-1 text-[10px] text-[#756b67]">Petals earned</div>
             </div>
-          </div>
+          </dl>
         ) : (
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
-            <div className="text-xs text-zinc-400 mb-1">Sign in to track petals</div>
-            <div className="text-sm text-zinc-300">Your progress will be saved</div>
+          <div className="mori-panel-soft p-4 text-sm text-[#cdbbb7]">
+            <div>Sign in to track petals.</div>
+            <div className="mt-1 text-xs text-[#8f7f7d]">Your progress will be saved.</div>
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
