@@ -25,10 +25,15 @@ interface Sparkle extends Position {
   life: number;
 }
 
+const PETAL_SPRITE_SRC = '/assets/images/petal_sprite.png';
+const PETAL_SPRITE_COLUMNS = 4;
+const PETAL_SPRITE_ROWS = 3;
+
 export default function FallingPetals({ onPetalCollect, counterPosition }: FallingPetalsProps) {
   const [petals, setPetals] = useState<Petal[]>([]);
   const [_sparkles, setSparkles] = useState<Sparkle[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const petalSpriteRef = useRef<HTMLImageElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastSpawnTimeRef = useRef(0);
   const petalIdCounter = useRef(0);
@@ -43,6 +48,17 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handler);
     return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const image = new window.Image();
+    image.decoding = 'async';
+    image.src = PETAL_SPRITE_SRC;
+    petalSpriteRef.current = image;
+
+    return () => {
+      petalSpriteRef.current = null;
+    };
   }, []);
 
   // Get counter position for collection animation target
@@ -205,6 +221,8 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
           })
           .filter((p): p is Petal => p !== null);
 
+        const petalSprite = petalSpriteRef.current;
+
         // Draw petals
         updatedPetals.forEach((petal) => {
           ctx.save();
@@ -212,12 +230,29 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
           ctx.rotate((petal.rotation * Math.PI) / 180);
           ctx.globalAlpha = petal.opacity;
 
-          // Draw petal shape (ellipse) - reduced size for subtle aesthetic
-          ctx.fillStyle = petal.color;
-          ctx.beginPath();
-          // Scale down: 4-6px radius instead of 8-12px (50% reduction)
-          ctx.ellipse(0, 0, 4 * petal.scale, 6 * petal.scale, 0, 0, Math.PI * 2);
-          ctx.fill();
+          if (petalSprite?.complete && petalSprite.naturalWidth > 0) {
+            const frameWidth = petalSprite.naturalWidth / PETAL_SPRITE_COLUMNS;
+            const frameHeight = petalSprite.naturalHeight / PETAL_SPRITE_ROWS;
+            const frame = petal.variant % (PETAL_SPRITE_COLUMNS * PETAL_SPRITE_ROWS);
+            const sx = (frame % PETAL_SPRITE_COLUMNS) * frameWidth;
+            const sy = Math.floor(frame / PETAL_SPRITE_COLUMNS) * frameHeight;
+            const width = 18 * petal.scale;
+            const height = 14 * petal.scale;
+
+            ctx.drawImage(
+              petalSprite,
+              sx,
+              sy,
+              frameWidth,
+              frameHeight,
+              -width / 2,
+              -height / 2,
+              width,
+              height,
+            );
+          } else {
+            drawFallbackPetal(ctx, petal);
+          }
 
           // Add glow for rare petals
           if (petal.isRare) {
@@ -283,4 +318,26 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
       aria-label="Falling cherry blossom petals - click to collect"
     />
   );
+}
+
+function drawFallbackPetal(ctx: CanvasRenderingContext2D, petal: Petal) {
+  const width = 5 * petal.scale;
+  const height = 7 * petal.scale;
+  const gradient = ctx.createLinearGradient(0, -height, 0, height);
+
+  gradient.addColorStop(0, '#ffe1ec');
+  gradient.addColorStop(0.58, petal.color);
+  gradient.addColorStop(1, '#c96f8e');
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.moveTo(0, -height);
+  ctx.bezierCurveTo(width, -height * 0.45, width * 0.92, height * 0.26, 0, height);
+  ctx.bezierCurveTo(-width * 0.86, height * 0.24, -width, -height * 0.45, 0, -height);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(120, 45, 72, 0.26)';
+  ctx.lineWidth = 0.55;
+  ctx.stroke();
 }

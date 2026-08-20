@@ -2,20 +2,31 @@
 
 import { useState, useEffect, useMemo, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ANIMATION, UI } from '@/app/lib/petals/constants';
+import { useAuth } from '@clerk/nextjs';
+import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
 
 interface PetalCounterProps {
   count: number;
   lastValue?: number;
+  guestDailyLimit?: number;
+  guestDailyRemaining?: number;
+  guestDailyCapReached?: boolean;
 }
 
-function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
+function PetalCounterComponent({
+  count,
+  lastValue = 1,
+  guestDailyLimit = 50,
+  guestDailyRemaining = 50,
+  guestDailyCapReached = false,
+}: PetalCounterProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
   const [showMultiplier, setShowMultiplier] = useState(false);
   const [prevCount, setPrevCount] = useState(count);
   const [displayCount, setDisplayCount] = useState(count);
   const animationFrameRef = useRef<number | null>(null);
+  const { isSignedIn } = useAuth();
 
   // Smooth number animation
   useEffect(() => {
@@ -70,6 +81,11 @@ function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
   const formattedCount = useMemo(() => {
     return displayCount.toLocaleString();
   }, [displayCount]);
+  const shouldShowGuestPrompt =
+    !isSignedIn &&
+    (guestDailyCapReached ||
+      count >= COLLECTION.GUEST_DAILY_PROMPT_THRESHOLD ||
+      guestDailyRemaining <= guestDailyLimit - COLLECTION.GUEST_DAILY_PROMPT_THRESHOLD);
 
   return (
     <motion.button
@@ -203,6 +219,22 @@ function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
         >
           <div className="w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </motion.div>
+
+        <AnimatePresence>
+          {shouldShowGuestPrompt && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.18 }}
+              className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-[#f6dcc7]/16 bg-[#12090d]/88 px-3 py-2 text-left text-[11px] leading-4 text-[#ffe8df]/78 shadow-[0_12px_28px_rgba(0,0,0,0.34)]"
+            >
+              {guestDailyCapReached
+                ? 'Guest petals are full for today. Sign in to keep future blooms.'
+                : "Almost at today's guest bloom limit. Sign in to keep collecting."}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Rare multiplier indicator */}
@@ -220,12 +252,9 @@ function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
               <motion.span
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.5 }}
-                className="text-lg"
-                role="img"
-                aria-label="Star"
-              >
-                <span>⭐</span>
-              </motion.span>
+                className="h-3 w-3 rounded-full bg-yellow-100 shadow-[0_0_12px_rgba(254,240,138,0.9)]"
+                aria-hidden="true"
+              />
             </div>
           </motion.div>
         )}

@@ -19,6 +19,7 @@ export interface Petal {
   isRare: boolean;
   value: number;
   seed: number; // For deterministic wind patterns
+  variant: number;
   isCollecting?: boolean;
   collectionProgress?: number;
 }
@@ -48,6 +49,7 @@ export function createPetal(id: number, color: string, isRare: boolean, value: n
     isRare,
     value,
     seed: Math.random() * 1000,
+    variant: id % 12,
   };
 }
 

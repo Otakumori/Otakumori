@@ -21,6 +21,7 @@ type PetalStyle = CSSProperties & {
   '--petal-fall': string;
   '--petal-rotate': string;
   '--petal-gust': string;
+  '--petal-sprite-position': string;
 };
 
 const CANOPY_ANCHORS = [
@@ -97,6 +98,13 @@ function preloadImage(src: string) {
   document.head.appendChild(link);
 }
 
+function resolvePetalSpritePosition(variant: number) {
+  const column = variant % 4;
+  const row = Math.floor(variant / 4) % 3;
+
+  return `${(column / 3) * 100}% ${(row / 2) * 100}%`;
+}
+
 function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
   const petals = useMemo(() => {
     return Array.from({ length: scene.motion.petalDensity }, (_, index) => {
@@ -114,6 +122,7 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
         fall: 44 + (index % 7) * 6,
         rotate: (index % 2 === 0 ? 1 : -1) * (70 + index * 9),
         scale: 0.48 + (index % 4) * 0.08,
+        variant: index % 12,
       };
     });
   }, [
@@ -131,6 +140,7 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
     >
       {petals.map((petal) => {
         const petalStyle: PetalStyle = {
+          backgroundImage: 'url(/assets/images/petal_sprite.png)',
           left: `${petal.left}%`,
           top: `${petal.top}%`,
           transform: `scale(${petal.scale})`,
@@ -140,17 +150,17 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
           '--petal-fall': `${petal.fall}vh`,
           '--petal-rotate': `${petal.rotate}deg`,
           '--petal-gust': `${scene.motion.gustStrength * 24}vw`,
+          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
         };
 
         return (
           <span
             key={`${scene.bucket}-${petal.id}`}
             data-testid="mori-petal"
-            className={`${styles.petal} absolute h-5 w-5 rounded-full text-pink-100/52 drop-shadow-[0_3px_5px_rgba(40,15,28,0.42)]`}
+            data-petal-variant={petal.variant}
+            className={`${styles.petal} absolute`}
             style={petalStyle}
-          >
-            <span className="block rotate-45 text-sm leading-none">❀</span>
-          </span>
+          />
         );
       })}
     </div>

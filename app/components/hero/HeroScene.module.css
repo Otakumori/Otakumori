@@ -80,9 +80,17 @@
 }
 
 .petal {
+  width: 2rem;
+  height: 1.6rem;
   animation-name: treePetalDrift;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  background-image: url('/assets/images/petal_sprite.png');
+  background-position: var(--petal-sprite-position);
+  background-repeat: no-repeat;
+  background-size: 400% 300%;
+  filter: drop-shadow(0 4px 5px rgba(40, 15, 28, 0.32));
+  opacity: 0.62;
 }
 
 @media (min-width: 1024px) {
