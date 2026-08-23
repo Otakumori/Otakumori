@@ -1,343 +1,296 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
 import {
-  createPetal,
-  updatePetalPhysics,
-  shouldRemovePetal,
-  isPointInPetal,
-  calculateCollectionAnimation,
-  generateSparkles,
-  type Petal,
-  type Position,
-} from '@/app/lib/petals/physics';
-import { SPAWN, PETAL_VALUES, COLORS, UI } from '@/app/lib/petals/constants';
-import { getPetalColor } from '@/app/lib/petals/seasonDetection';
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from 'react';
+import { useHomeSceneContext } from '@/app/components/hero/HomeSceneContext';
+import { HOME_SCENE_MANIFEST, resolvePetalSpritePosition } from '@/app/components/hero/homeScene';
+import { PETAL_VALUES, SPAWN, UI } from '@/app/lib/petals/constants';
+import type { Position } from '@/app/lib/petals/physics';
+import styles from './FallingPetals.module.css';
 
 interface FallingPetalsProps {
   onPetalCollect: (petalId: number, value: number, x: number, y: number) => void;
   counterPosition?: Position;
 }
 
-interface Sparkle extends Position {
+type CollectiblePetal = {
   id: number;
-  opacity: number;
-  life: number;
+  lane: number;
+  sourceNudgeX: number;
+  sourceNudgeY: number;
+  drift: number;
+  fall: number;
+  duration: number;
+  delay: number;
+  rotation: number;
+  scale: number;
+  variant: number;
+  value: number;
+};
+
+type PetalStyle = CSSProperties & {
+  '--collectible-left': string;
+  '--collectible-top': string;
+  '--collectible-drift': string;
+  '--collectible-fall': string;
+  '--collectible-rotation': string;
+  '--collectible-scale': string;
+  '--collectible-duration': string;
+  '--collectible-delay': string;
+  '--petal-sprite-position': string;
+  '--petal-nudge-x': string;
+  '--petal-nudge-y': string;
+};
+
+const DESKTOP_PETAL_COUNT = 6;
+const COMPACT_PETAL_COUNT = 4;
+const POINTER_INFLUENCE_RADIUS = 112;
+
+function createCollectiblePetal(id: number): CollectiblePetal {
+  const lane = id % 6;
+  const isRare = id % Math.max(2, Math.round(1 / SPAWN.RARE_CHANCE)) === 0;
+
+  return {
+    id,
+    lane,
+    sourceNudgeX: (((id * 7) % 11) - 5) * 14,
+    sourceNudgeY: ((id * 13) % 38) + 20,
+    drift: 150 + ((id * 11) % 170),
+    fall: 320 + ((id * 9) % 190),
+    duration: 13 + (id % 5) * 1.8,
+    delay: -(id % 7) * 1.7,
+    rotation: (id % 2 === 0 ? 1 : -1) * (190 + (id % 4) * 48),
+    scale: 0.74 + (id % 3) * 0.12,
+    variant: id % HOME_SCENE_MANIFEST.petals.frameCount,
+    value: isRare ? PETAL_VALUES.RARE : PETAL_VALUES.COMMON,
+  };
 }
 
-const PETAL_SPRITE_SRC = '/assets/images/petal_sprite.png';
-const PETAL_SPRITE_COLUMNS = 4;
-const PETAL_SPRITE_ROWS = 3;
+function getDevicePetalCount() {
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  const constrained =
+    window.matchMedia('(max-width: 639px)').matches ||
+    (typeof memory === 'number' && memory <= 4) ||
+    (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4);
+
+  return constrained ? COMPACT_PETAL_COUNT : DESKTOP_PETAL_COUNT;
+}
 
 export default function FallingPetals({ onPetalCollect, counterPosition }: FallingPetalsProps) {
-  const [petals, setPetals] = useState<Petal[]>([]);
-  const [_sparkles, setSparkles] = useState<Sparkle[]>([]);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const petalSpriteRef = useRef<HTMLImageElement | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const lastSpawnTimeRef = useRef(0);
-  const petalIdCounter = useRef(0);
-  const startTimeRef = useRef(Date.now());
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const { projection, reducedMotion } = useHomeSceneContext();
+  const [petalCount, setPetalCount] = useState(COMPACT_PETAL_COUNT);
+  const [generation, setGeneration] = useState(0);
+  const [collectingIds, setCollectingIds] = useState<Set<number>>(() => new Set());
+  const [isActive, setIsActive] = useState(true);
+  const layerRef = useRef<HTMLDivElement>(null);
+  const isIntersectingRef = useRef(true);
+  const pointerFrameRef = useRef<number | null>(null);
+  const nextIdRef = useRef(100);
 
-  // Check for reduced motion preference
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    setPetalCount(getDevicePetalCount());
   }, []);
 
   useEffect(() => {
-    const image = new window.Image();
-    image.decoding = 'async';
-    image.src = PETAL_SPRITE_SRC;
-    petalSpriteRef.current = image;
+    const layer = layerRef.current;
+    if (!layer) return;
+
+    const updateActivity = () =>
+      setIsActive(document.visibilityState === 'visible' && isIntersectingRef.current);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersectingRef.current = Boolean(entry?.isIntersecting);
+        updateActivity();
+      },
+      { threshold: 0.04 },
+    );
+
+    observer.observe(layer);
+    document.addEventListener('visibilitychange', updateActivity);
 
     return () => {
-      petalSpriteRef.current = null;
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', updateActivity);
     };
   }, []);
 
-  // Get counter position for collection animation target
-  const getCounterPosition = useCallback((): Position => {
+  useEffect(
+    () => () => {
+      if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
+    },
+    [],
+  );
+
+  const petals = useMemo(
+    () =>
+      Array.from({ length: petalCount }, (_, index) =>
+        createCollectiblePetal(generation * 17 + index),
+      ),
+    [generation, petalCount],
+  );
+
+  const resolveCounterPosition = useCallback((): Position => {
     if (counterPosition) return counterPosition;
 
-    // Default to bottom-right corner
+    const counter = document.querySelector<HTMLElement>('[data-petal-counter]');
+    if (counter) {
+      const bounds = counter.getBoundingClientRect();
+      return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
+    }
+
     return {
       x: window.innerWidth - UI.COUNTER_BOTTOM_RIGHT_MARGIN - 30,
-      y: window.innerHeight - UI.COUNTER_BOTTOM_RIGHT_MARGIN - 16,
+      y: window.innerHeight - UI.COUNTER_BOTTOM_RIGHT_MARGIN - 20,
     };
   }, [counterPosition]);
 
-  // Handle petal click
-  const handlePetalClick = useCallback(
-    (petal: Petal) => {
-      if (petal.isCollecting) return;
+  const handlePointerMove = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    const { clientX, clientY } = event;
+    if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
 
-      // Mark petal as collecting
-      setPetals((prev) =>
-        prev.map((p) =>
-          p.id === petal.id
-            ? {
-                ...p,
-                isCollecting: true,
-                collectionProgress: 0,
-              }
-            : p,
-        ),
-      );
+    pointerFrameRef.current = requestAnimationFrame(() => {
+      layerRef.current
+        ?.querySelectorAll<HTMLElement>('[data-collectible-petal]')
+        .forEach((petal) => {
+          const bounds = petal.getBoundingClientRect();
+          const centerX = bounds.left + bounds.width / 2;
+          const centerY = bounds.top + bounds.height / 2;
+          const dx = clientX - centerX;
+          const dy = clientY - centerY;
+          const distance = Math.hypot(dx, dy);
+          const influence = Math.max(0, 1 - distance / POINTER_INFLUENCE_RADIUS);
 
-      // Spawn sparkles
-      const sparklePositions = generateSparkles({ x: petal.x, y: petal.y }, UI.SPARKLE_COUNT);
-      const newSparkles = sparklePositions.map((pos, i) => ({
-        ...pos,
-        id: Date.now() + i,
-        opacity: 1,
-        life: 1,
-      }));
-      setSparkles((prev) => [...prev, ...newSparkles]);
-
-      // Notify parent
-      onPetalCollect(petal.id, petal.value, petal.x, petal.y);
-    },
-    [onPetalCollect],
-  );
-
-  // Handle canvas click
-  const handleCanvasClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickPos: Position = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-
-      // Find clicked petal (check in reverse order for top-most)
-      for (let i = petals.length - 1; i >= 0; i--) {
-        const petal = petals[i];
-        if (!petal.isCollecting && isPointInPetal(clickPos, petal)) {
-          handlePetalClick(petal);
-          break;
-        }
-      }
-    },
-    [petals, handlePetalClick],
-  );
-
-  // Spawn new petals
-  const spawnPetal = useCallback(() => {
-    const currentPetalColor = getPetalColor();
-    const isRare = Math.random() < SPAWN.RARE_CHANCE;
-    const color = isRare ? COLORS.RARE : currentPetalColor;
-    const value = isRare ? PETAL_VALUES.RARE : PETAL_VALUES.COMMON;
-
-    const newPetal = createPetal(petalIdCounter.current++, color, isRare, value);
-    setPetals((prev) => [...prev, newPetal]);
+          petal.style.setProperty('--petal-nudge-x', `${dx * influence * 0.08}px`);
+          petal.style.setProperty('--petal-nudge-y', `${dy * influence * 0.06}px`);
+          petal.dataset.pointerNear = influence > 0 ? 'true' : 'false';
+        });
+      pointerFrameRef.current = null;
+    });
   }, []);
 
-  // Spawn initial petals on mount
-  useEffect(() => {
-    if (prefersReducedMotion) return;
+  const collectPetal = useCallback(
+    (petal: CollectiblePetal, element: HTMLButtonElement) => {
+      if (collectingIds.has(petal.id)) return;
 
-    // Spawn 5 initial petals immediately
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        spawnPetal();
-      }, i * 200);
-    }
-  }, [prefersReducedMotion, spawnPetal]);
+      const bounds = element.getBoundingClientRect();
+      const origin = { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
+      const target = resolveCounterPosition();
 
-  // Main animation loop
-  useEffect(() => {
-    if (prefersReducedMotion || !canvasRef.current) return;
+      setCollectingIds((current) => new Set(current).add(petal.id));
+      onPetalCollect(petal.id, petal.value, origin.x, origin.y);
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let lastFrameTime = Date.now();
-
-    const animate = () => {
-      const now = Date.now();
-      const deltaTime = Math.min((now - lastFrameTime) / 16.67, 2); // Cap at 2x for lag
-      lastFrameTime = now;
-      const time = now - startTimeRef.current;
-
-      // Resize canvas to match window
-      if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Spawn new petals
-      if (
-        petals.length < SPAWN.MAX_PETALS &&
-        now - lastSpawnTimeRef.current > SPAWN.SPAWN_INTERVAL
-      ) {
-        spawnPetal();
-        lastSpawnTimeRef.current = now;
-      }
-
-      // Update and draw petals
-      setPetals((prevPetals) => {
-        const updatedPetals = prevPetals
-          .map((petal) => {
-            // Handle collection animation
-            if (petal.isCollecting && petal.collectionProgress !== undefined) {
-              const newProgress = Math.min(1, petal.collectionProgress + deltaTime / 36); // 600ms total
-
-              if (newProgress >= 1) {
-                return null; // Remove petal
-              }
-
-              const animationUpdate = calculateCollectionAnimation(
-                petal,
-                newProgress,
-                getCounterPosition(),
-              );
-
-              return {
-                ...petal,
-                ...animationUpdate,
-                collectionProgress: newProgress,
-              };
-            }
-
-            // Normal physics update
-            const updated = updatePetalPhysics(petal, time, deltaTime);
-
-            // Remove if off screen
-            if (shouldRemovePetal(updated)) {
-              return null;
-            }
-
-            return updated;
-          })
-          .filter((p): p is Petal => p !== null);
-
-        const petalSprite = petalSpriteRef.current;
-
-        // Draw petals
-        updatedPetals.forEach((petal) => {
-          ctx.save();
-          ctx.translate(petal.x, petal.y);
-          ctx.rotate((petal.rotation * Math.PI) / 180);
-          ctx.globalAlpha = petal.opacity;
-
-          if (petalSprite?.complete && petalSprite.naturalWidth > 0) {
-            const frameWidth = petalSprite.naturalWidth / PETAL_SPRITE_COLUMNS;
-            const frameHeight = petalSprite.naturalHeight / PETAL_SPRITE_ROWS;
-            const frame = petal.variant % (PETAL_SPRITE_COLUMNS * PETAL_SPRITE_ROWS);
-            const sx = (frame % PETAL_SPRITE_COLUMNS) * frameWidth;
-            const sy = Math.floor(frame / PETAL_SPRITE_COLUMNS) * frameHeight;
-            const width = 18 * petal.scale;
-            const height = 14 * petal.scale;
-
-            ctx.drawImage(
-              petalSprite,
-              sx,
-              sy,
-              frameWidth,
-              frameHeight,
-              -width / 2,
-              -height / 2,
-              width,
-              height,
-            );
-          } else {
-            drawFallbackPetal(ctx, petal);
-          }
-
-          // Add glow for rare petals
-          if (petal.isRare) {
-            ctx.strokeStyle = COLORS.RARE_GLOW;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-          }
-
-          ctx.restore();
+      const finishCollection = () => {
+        setCollectingIds((current) => {
+          const next = new Set(current);
+          next.delete(petal.id);
+          return next;
         });
+        nextIdRef.current += 1;
+        setGeneration(nextIdRef.current);
+      };
 
-        return updatedPetals;
-      });
-
-      // Update and draw sparkles
-      setSparkles((prevSparkles) => {
-        const updatedSparkles = prevSparkles
-          .map((sparkle) => ({
-            ...sparkle,
-            life: sparkle.life - 0.02 * deltaTime,
-            opacity: Math.max(0, sparkle.life),
-            y: sparkle.y - 1 * deltaTime,
-          }))
-          .filter((s) => s.life > 0);
-
-        // Draw sparkles
-        updatedSparkles.forEach((sparkle) => {
-          ctx.save();
-          ctx.globalAlpha = sparkle.opacity;
-          ctx.fillStyle = '#FFD700';
-          ctx.beginPath();
-          ctx.arc(sparkle.x, sparkle.y, 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        });
-
-        return updatedSparkles;
-      });
-
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (typeof element.animate !== 'function') {
+        window.setTimeout(finishCollection, reducedMotion ? 120 : 520);
+        return;
       }
-    };
-  }, [prefersReducedMotion, petals.length, spawnPetal, getCounterPosition]);
 
-  // Don't render if reduced motion is preferred
-  if (prefersReducedMotion) {
-    return null;
-  }
+      const animation = element.animate(
+        reducedMotion
+          ? [
+              { opacity: 1, transform: 'scale(1)' },
+              { opacity: 0, transform: 'scale(0.72)' },
+            ]
+          : [
+              { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+              {
+                opacity: 0.96,
+                transform: `translate3d(${(target.x - origin.x) * 0.45}px, ${(target.y - origin.y) * 0.45}px, 0) rotate(150deg) scale(1.12)`,
+                offset: 0.55,
+              },
+              {
+                opacity: 0,
+                transform: `translate3d(${target.x - origin.x}px, ${target.y - origin.y}px, 0) rotate(330deg) scale(0.38)`,
+              },
+            ],
+        {
+          duration: reducedMotion ? 120 : 520,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'forwards',
+        },
+      );
+
+      animation.finished.catch(() => undefined).finally(finishCollection);
+    },
+    [collectingIds, onPetalCollect, reducedMotion, resolveCounterPosition],
+  );
 
   return (
-    <canvas
-      ref={canvasRef}
-      onClick={handleCanvasClick}
-      className="fixed inset-0 pointer-events-auto cursor-pointer"
-      style={{ zIndex: 5 }}
-      aria-label="Falling cherry blossom petals - click to collect"
-    />
+    <div
+      ref={layerRef}
+      className={styles.layer}
+      data-active={isActive ? 'true' : 'false'}
+      data-reduced-motion={reducedMotion ? 'true' : 'false'}
+      data-testid="collectible-petal-layer"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={() => {
+        layerRef.current
+          ?.querySelectorAll<HTMLElement>('[data-collectible-petal]')
+          .forEach((petal) => {
+            petal.style.setProperty('--petal-nudge-x', '0px');
+            petal.style.setProperty('--petal-nudge-y', '0px');
+            petal.dataset.pointerNear = 'false';
+          });
+      }}
+    >
+      {petals.map((petal) => {
+        const artboard = HOME_SCENE_MANIFEST.world.artboard;
+        const anchor = artboard.anchors.canopy[petal.lane % artboard.anchors.canopy.length];
+        const scale = projection?.scale ?? 1;
+        const left = projection
+          ? projection.left + (anchor.x + petal.sourceNudgeX) * scale
+          : 9 + petal.lane * 15;
+        const top = projection
+          ? projection.top + (anchor.y + petal.sourceNudgeY) * scale
+          : 8 + petal.lane * 5;
+        const style: PetalStyle = {
+          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+          '--collectible-left': projection ? `${left}px` : `${left}%`,
+          '--collectible-top': projection ? `${top}px` : `${top}%`,
+          '--collectible-drift': projection ? `${petal.drift * scale}px` : `${petal.drift / 8}vw`,
+          '--collectible-fall': projection ? `${petal.fall * scale}px` : `${petal.fall / 7}vh`,
+          '--collectible-rotation': `${petal.rotation}deg`,
+          '--collectible-scale': String(petal.scale),
+          '--collectible-duration': `${petal.duration}s`,
+          '--collectible-delay': `${petal.delay}s`,
+          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
+          '--petal-nudge-x': '0px',
+          '--petal-nudge-y': '0px',
+        };
+
+        return (
+          <button
+            key={petal.id}
+            type="button"
+            className={styles.collectible}
+            style={style}
+            aria-label={`Collect sakura petal worth ${petal.value}`}
+            data-collectible-petal
+            data-source-x={Math.round(anchor.x + petal.sourceNudgeX)}
+            data-source-y={Math.round(anchor.y + petal.sourceNudgeY)}
+            data-petal-variant={petal.variant}
+            data-pointer-near="false"
+            disabled={collectingIds.has(petal.id)}
+            onClick={(event) => collectPetal(petal, event.currentTarget)}
+          />
+        );
+      })}
+    </div>
   );
-}
-
-function drawFallbackPetal(ctx: CanvasRenderingContext2D, petal: Petal) {
-  const width = 5 * petal.scale;
-  const height = 7 * petal.scale;
-  const gradient = ctx.createLinearGradient(0, -height, 0, height);
-
-  gradient.addColorStop(0, '#ffe1ec');
-  gradient.addColorStop(0.58, petal.color);
-  gradient.addColorStop(1, '#c96f8e');
-
-  ctx.fillStyle = gradient;
-  ctx.beginPath();
-  ctx.moveTo(0, -height);
-  ctx.bezierCurveTo(width, -height * 0.45, width * 0.92, height * 0.26, 0, height);
-  ctx.bezierCurveTo(-width * 0.86, height * 0.24, -width, -height * 0.45, 0, -height);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = 'rgba(120, 45, 72, 0.26)';
-  ctx.lineWidth = 0.55;
-  ctx.stroke();
 }

@@ -4,6 +4,7 @@ import { logger } from '@/app/lib/logger';
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { normalizeApiErrorMessage } from '@/app/lib/api-error-message';
+import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
 
 interface CartItem {
   id: string;
@@ -43,6 +44,11 @@ interface ServerCartItem {
     title?: string | null;
     priceCents?: number | null;
   };
+}
+
+interface CartAuthState {
+  isSignedIn: boolean;
+  userId: string | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -113,10 +119,43 @@ function normalizeServerCartItems(serverItems: ServerCartItem[]): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  if (isVisualQaAuthEnabled()) {
+    return (
+      <CartProviderInner
+        authState={{
+          isSignedIn: resolveVisualQaAuthState() === 'signed-in',
+          userId: null,
+        }}
+      >
+        {children}
+      </CartProviderInner>
+    );
+  }
+
+  return <ClerkCartProvider>{children}</ClerkCartProvider>;
+}
+
+function ClerkCartProvider({ children }: { children: React.ReactNode }) {
+  const { isSignedIn, userId } = useAuth();
+
+  return (
+    <CartProviderInner authState={{ isSignedIn: Boolean(isSignedIn), userId: userId ?? null }}>
+      {children}
+    </CartProviderInner>
+  );
+}
+
+function CartProviderInner({
+  children,
+  authState,
+}: {
+  children: React.ReactNode;
+  authState: CartAuthState;
+}) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hasLoadedLocal, setHasLoadedLocal] = useState(false);
   const [syncWarning, setSyncWarning] = useState<string | null>(null);
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn, userId } = authState;
   const hasHydratedServerRef = useRef(false);
   const lastSyncedSignatureRef = useRef<string>('');
 

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useMemo, memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
+import { HOME_SCENE_MANIFEST, resolvePetalSpritePosition } from '@/app/components/hero/homeScene';
 
 interface PetalCounterProps {
   count: number;
@@ -27,6 +28,7 @@ function PetalCounterComponent({
   const [displayCount, setDisplayCount] = useState(count);
   const animationFrameRef = useRef<number | null>(null);
   const { isSignedIn } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
 
   // Smooth number animation
   useEffect(() => {
@@ -90,11 +92,14 @@ function PetalCounterComponent({
   return (
     <motion.button
       type="button"
+      data-petal-counter
       aria-label={`Petals collected: ${displayCount}`}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 20 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      transition={
+        prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 25 }
+      }
       className="fixed z-50 cursor-default outline-none focus:ring-2 focus:ring-pink-400/50 focus:ring-offset-2 focus:ring-offset-black/50 rounded-full"
       style={{
         bottom: `${UI.COUNTER_BOTTOM_RIGHT_MARGIN}px`,
@@ -103,8 +108,8 @@ function PetalCounterComponent({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => e.preventDefault()}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
     >
       {/* Glow effect */}
       <motion.div
@@ -143,40 +148,19 @@ function PetalCounterComponent({
         }}
         transition={{ duration: 0.5 }}
       >
-        {/* Icon */}
-        <motion.svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          className="flex-shrink-0 text-pink-300"
-          animate={{
-            rotate: isPulsing ? [0, 15, -15, 0] : 0,
-            scale: isPulsing ? [1, 1.2, 1] : 1,
+        <motion.span
+          aria-hidden="true"
+          className="h-5 w-5 flex-shrink-0 bg-[length:400%_300%] bg-no-repeat"
+          style={{
+            backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+            backgroundPosition: resolvePetalSpritePosition(2),
           }}
-          transition={{ duration: 0.5 }}
-        >
-          <path
-            d="M12 2C12 2 10 6 10 8C10 10 11 11 12 11C13 11 14 10 14 8C14 6 12 2 12 2Z"
-            fill="currentColor"
-            opacity="0.9"
-          />
-          <path
-            d="M12 13C12 13 10 17 10 19C10 21 11 22 12 22C13 22 14 21 14 19C14 17 12 13 12 13Z"
-            fill="currentColor"
-            opacity="0.7"
-          />
-          <path
-            d="M2 12C2 12 6 10 8 10C10 10 11 11 11 12C11 13 10 14 8 14C6 14 2 12 2 12Z"
-            fill="currentColor"
-            opacity="0.8"
-          />
-          <path
-            d="M13 12C13 12 17 10 19 10C21 10 22 11 22 12C22 13 21 14 19 14C17 14 13 12 13 12Z"
-            fill="currentColor"
-            opacity="0.8"
-          />
-        </motion.svg>
+          animate={{
+            rotate: isPulsing && !prefersReducedMotion ? [0, 12, -12, 0] : 0,
+            scale: isPulsing && !prefersReducedMotion ? [1, 1.16, 1] : 1,
+          }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
+        />
 
         {/* Count */}
         <motion.span
@@ -247,12 +231,12 @@ function PetalCounterComponent({
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           >
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400/90 to-orange-400/90 backdrop-blur-sm border border-yellow-300/50 shadow-lg">
-              <span className="text-yellow-200 font-bold text-sm">+{lastValue}</span>
+            <div className="flex items-center gap-1 rounded-full border border-[#f4c4d3]/42 bg-[#341822]/92 px-3 py-1.5 shadow-lg backdrop-blur-sm">
+              <span className="text-sm font-bold text-[#ffe8e0]">+{lastValue}</span>
               <motion.span
-                animate={{ rotate: [0, 15, -15, 0] }}
+                animate={prefersReducedMotion ? undefined : { rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.5 }}
-                className="h-3 w-3 rounded-full bg-yellow-100 shadow-[0_0_12px_rgba(254,240,138,0.9)]"
+                className="h-3 w-3 rounded-full bg-[#f8cfda] shadow-[0_0_10px_rgba(248,207,218,0.64)]"
                 aria-hidden="true"
               />
             </div>

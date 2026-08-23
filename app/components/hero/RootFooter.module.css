@@ -1,62 +1,33 @@
 .rootFooter {
-  /*
-   * The approved root master intentionally contains a substantial duplicated
-   * surface band. Hide that band at runtime so the visible asset begins in
-   * the soil/root cutaway rather than showing a second shoreline/time state.
-   */
-  --root-art-surface-crop: 20.5vw;
-  --root-surface-overlap: clamp(0.75rem, 1.4vw, 1.75rem);
-  margin-top: calc(var(--root-surface-overlap) * -1);
-  padding-top: var(--root-surface-overlap);
-  min-height: clamp(42rem, 58vw, 52rem);
-  overflow: hidden;
-  isolation: isolate;
-  background: #070407;
-}
-
-.rootArt {
   position: absolute;
-  inset: 0;
-  z-index: -2;
-  background-color: #070407;
-  background-image: url('/assets/home/root-footer/root-underground-wide.png');
-  background-position: center calc(0px - var(--root-art-surface-crop));
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  pointer-events: none;
-}
-
-.rootArt::after {
-  content: '';
-  position: absolute;
-  inset: 72% 0 0;
-  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.58) 50%, #070407 86%);
-  pointer-events: none;
-}
-
-.surfaceSeam {
-  display: none;
+  z-index: 24;
+  top: max(62svh, calc(var(--mori-root-content-top, 54rem) - 6rem));
+  left: 0;
+  min-height: max(30rem, calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 54rem)));
+  overflow: visible;
+  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.18) 38%, rgba(7, 4, 7, 0.48));
 }
 
 .contentShell {
   position: relative;
   z-index: 1;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  padding-top: clamp(6rem, 11vw, 10rem);
+  padding-top: clamp(2.5rem, 8svh, 7rem);
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.86);
 }
 
 @media (max-width: 767px) {
   .rootFooter {
-    /* Keep mobile conservative until a dedicated portrait root master exists. */
-    --root-art-surface-crop: 18vw;
-    --root-surface-overlap: clamp(0.5rem, 2vw, 1rem);
-    min-height: 48rem;
+    top: max(58svh, calc(var(--mori-root-content-top, 42rem) - 8rem));
+    min-height: max(34rem, calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 42rem)));
   }
 
   .contentShell {
-    padding-top: clamp(7rem, 22vw, 11rem);
+    padding-top: clamp(3rem, 10svh, 8rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rootFooter {
+    transition: none;
   }
 }

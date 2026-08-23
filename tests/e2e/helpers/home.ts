@@ -33,8 +33,7 @@ export async function expectRootFooterContract(page: Page) {
   const footer = rootFooter(page);
 
   await expect(footer).toBeVisible();
-  await expect(footer).toHaveAttribute('data-root-footer-contract', 'wide-world-integrated');
-  await expect(footer.locator('[data-root-region="shared-underground-art"]')).toHaveCount(1);
+  await expect(footer).toHaveAttribute('data-root-footer-contract', 'combined-world-overlay');
   await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /^Cart$/i })).toHaveAttribute('href', '/shop/cart');
   await expect(page.getByRole('link', { name: /^Wishlist$/i })).toHaveAttribute(

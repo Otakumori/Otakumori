@@ -1,26 +1,18 @@
 .heroRoot {
-  --mori-surface-height: 100svh;
-  min-height: var(--mori-surface-height);
+  --mori-hero-viewport-height: 100svh;
+  --mori-world-scroll-height: var(--mori-scene-world-height, 142svh);
+  min-height: var(--mori-world-scroll-height);
 }
 
-.heroContent {
-  min-height: var(--mori-surface-height);
+.heroSurface {
+  position: relative;
+  height: var(--mori-world-scroll-height);
+  min-height: var(--mori-world-scroll-height);
+  overflow: hidden;
 }
 
+.heroContent,
 .surfaceContent {
-  min-height: var(--mori-surface-height);
-}
-
-@media (min-width: 1024px) {
-  .heroRoot {
-    --mori-surface-height: min(
-      100svh,
-      calc(clamp(4rem, 6svh, 5.5rem) + (100vw * 805 / 1954))
-    );
-  }
-
-  .heroContent,
-  .surfaceContent {
-    min-height: var(--mori-surface-height);
-  }
+  width: 100%;
+  min-height: var(--mori-hero-viewport-height);
 }

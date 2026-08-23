@@ -34,18 +34,9 @@ export default function RootFooter() {
       className={`${styles.rootFooter} relative w-full px-0 pb-8`}
       aria-labelledby="home-root-footer-title"
       data-testid="mori-root-footer"
-      data-root-footer-contract="wide-world-integrated"
+      data-root-footer-contract="combined-world-overlay"
+      data-portrait-root-master="missing"
     >
-      <div
-        className={styles.rootArt}
-        aria-hidden="true"
-        data-root-region="shared-underground-art"
-      />
-      <div
-        className={styles.surfaceSeam}
-        aria-hidden="true"
-        data-root-region="world-to-root-joint"
-      />
       <div className={`${styles.contentShell} mx-auto w-full max-w-7xl px-5 pb-8 sm:px-7 md:px-8`}>
         <div className="grid gap-8 md:grid-cols-[1.05fr_1.15fr] md:items-end">
           <div data-root-region="footer-voice">
@@ -67,7 +58,7 @@ export default function RootFooter() {
           <div className="grid gap-5" data-root-region="html-navigation-cavities">
             <nav
               aria-label="Rooted homepage navigation"
-              className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"
+              className="grid grid-cols-2 gap-x-5 gap-y-1 text-sm sm:grid-cols-3"
             >
               {primaryLinks.map((link) => (
                 <Link
@@ -75,7 +66,7 @@ export default function RootFooter() {
                   href={link.href}
                   prefetch={false}
                   data-root-region={link.region}
-                  className="rounded-full border border-[#f6dcc7]/14 bg-[#080509]/24 px-4 py-3 text-center text-[#fff4e8]/82 backdrop-blur-[2px] transition hover:border-[#f3b3c8]/42 hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
+                  className="border-b border-[#f6dcc7]/14 px-2 py-3 text-center text-[#fff4e8]/82 transition hover:border-[#f3b3c8]/46 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
                 >
                   {link.label}
                 </Link>

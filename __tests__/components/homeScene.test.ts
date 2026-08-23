@@ -2,18 +2,22 @@ import { describe, expect, it } from 'vitest';
 
 import {
   HOME_SCENE_ASSETS,
-  resolveHomeSceneImageSrc,
-  resolveNextHomeSceneBucket,
+  HOME_SCENE_MANIFEST,
+  HOME_SCENE_VIEWPORT_MATRIX,
   resolveBrowserTimeZone,
   resolveHomeScene,
   resolveHomeSceneBucket,
+  resolveHomeSceneImageSrc,
+  resolveHomeSceneProjection,
+  resolveHomeSceneSurfaceFamily,
+  resolveNextHomeSceneBucket,
 } from '@/app/components/hero/homeScene';
 
 function localDate(hour: number, day = 2) {
   return new Date(2026, 0, day, hour, 0, 0);
 }
 
-describe('homepage adaptive world scene mapping', () => {
+describe('homepage combined world scene mapping', () => {
   it('maps local hours to deterministic scene buckets', () => {
     expect(resolveHomeSceneBucket(localDate(5))).toBe('earlyMorning');
     expect(resolveHomeSceneBucket(localDate(8))).toBe('morning');
@@ -39,48 +43,59 @@ describe('homepage adaptive world scene mapping', () => {
     expect(scene.asset.src).toBe(HOME_SCENE_ASSETS.afternoon.src);
   });
 
-  it('uses the approved production asset paths', () => {
+  it('uses one approved combined world master per time bucket', () => {
     expect(HOME_SCENE_ASSETS.earlyMorning.src).toBe(
-      '/assets/home/world/mori-world-early-morning.png',
+      '/assets/home/world/combined/om-home-world-01-early-morning-wide.png',
     );
-    expect(HOME_SCENE_ASSETS.earlyMorning.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-early-morning-wide.png',
+    expect(HOME_SCENE_ASSETS.morning.src).toBe(
+      '/assets/home/world/combined/om-home-world-02-morning-wide.png',
     );
-    expect(HOME_SCENE_ASSETS.morning.src).toBe('/assets/home/world/mori-world-morning.png');
-    expect(HOME_SCENE_ASSETS.morning.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-morning-wide.png',
+    expect(HOME_SCENE_ASSETS.afternoon.src).toBe(
+      '/assets/home/world/combined/om-home-world-03-afternoon-wide.png',
     );
-    expect(HOME_SCENE_ASSETS.afternoon.src).toBe('/assets/home/world/mori-world-afternoon.png');
-    expect(HOME_SCENE_ASSETS.afternoon.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-afternoon-wide.png',
+    expect(HOME_SCENE_ASSETS.lateAfternoon.src).toBe(
+      '/assets/home/world/combined/om-home-world-04-late-afternoon-wide.png',
     );
-    expect(HOME_SCENE_ASSETS.lateAfternoon.src).toBe('/assets/home/world/mori-world-sunset.png');
-    expect(HOME_SCENE_ASSETS.lateAfternoon.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-sunset-wide.png',
-    );
-    expect(HOME_SCENE_ASSETS.night.src).toBe('/assets/home/world/mori-world-night.png');
-    expect(HOME_SCENE_ASSETS.night.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-night-wide.png',
+    expect(HOME_SCENE_ASSETS.night.src).toBe(
+      '/assets/home/world/combined/om-home-world-05-night-wide.png',
     );
     expect(HOME_SCENE_ASSETS.specialTwilight.src).toBe(
-      '/assets/home/world/mori-world-twilight.png',
-    );
-    expect(HOME_SCENE_ASSETS.specialTwilight.wideSrc).toBe(
-      '/assets/home/world/wide/mori-world-twilight-wide.png',
+      '/assets/home/world/combined/om-home-world-06-special-twilight-wide.png',
     );
   });
 
-  it('selects wide or canonical scene assets without changing the time bucket', () => {
+  it('represents the approved masters as one stable precomposed artboard', () => {
+    expect(HOME_SCENE_MANIFEST.world.sourceDirectory).toBe(
+      'docs/design/references/home-world-wide-approved',
+    );
+    expect(HOME_SCENE_MANIFEST.world.runtimeDirectory).toBe('/assets/home/world/combined');
+    expect(HOME_SCENE_MANIFEST.world.artboard.width).toBe(1325);
+    expect(HOME_SCENE_MANIFEST.world.artboard.height).toBe(1187);
+    expect(HOME_SCENE_MANIFEST.world.precomposedSurfaceAndUnderground).toBe(true);
+    expect(HOME_SCENE_MANIFEST.world.portraitMasterAvailable).toBe(false);
+    expect('root' in HOME_SCENE_MANIFEST).toBe(false);
+  });
+
+  it('selects a combined scene image without changing the time bucket', () => {
     const scene = resolveHomeScene(localDate(12), false);
 
-    expect(resolveHomeSceneImageSrc(scene.asset, 'canonical')).toEqual({
-      src: '/assets/home/world/mori-world-afternoon.png',
-      fallback: '/assets/home/world/mori-world-sunset.png',
+    expect(resolveHomeSceneImageSrc(scene.asset)).toEqual({
+      src: '/assets/home/world/combined/om-home-world-03-afternoon-wide.png',
+      fallback: '/assets/home/world/combined/om-home-world-04-late-afternoon-wide.png',
     });
-    expect(resolveHomeSceneImageSrc(scene.asset, 'wide')).toEqual({
-      src: '/assets/home/world/wide/mori-world-afternoon-wide.png',
-      fallback: '/assets/home/world/wide/mori-world-sunset-wide.png',
-    });
+    expect(resolveHomeSceneSurfaceFamily()).toBe('combined');
+  });
+
+  it('keeps the combined world tall enough for natural homepage scroll progression', () => {
+    for (const viewport of HOME_SCENE_VIEWPORT_MATRIX) {
+      const projection = resolveHomeSceneProjection(viewport);
+
+      expect(projection.family).toBe('combined');
+      expect(projection.width).toBeGreaterThanOrEqual(viewport.width - 0.01);
+      expect(projection.height).toBeGreaterThan(viewport.height);
+      expect(projection.scale).toBeCloseTo(projection.height / projection.artboard.height, 5);
+      expect(projection.footerContentTop).toBeGreaterThan(viewport.height * 0.6);
+    }
   });
 
   it('preloads only the next chronological scene candidate', () => {

@@ -1,5 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { HomeSceneProvider } from '@/app/components/hero/HomeSceneContext';
+import PetalSystem from '@/app/components/petals/PetalSystem';
 import {
   PetalCollectionProvider,
   usePetalCollectionContext,
@@ -10,6 +12,27 @@ vi.mock('@/app/lib/analytics/petals', () => ({
   trackPetalCollection: vi.fn(),
   trackPetalMilestone: vi.fn(),
 }));
+
+vi.mock('@clerk/nextjs', () => ({
+  useAuth: () => ({ isSignedIn: false }),
+}));
+
+class ImmediateIntersectionObserver {
+  constructor(private readonly callback: IntersectionObserverCallback) {}
+
+  observe(target: Element) {
+    this.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], this as never);
+  }
+
+  disconnect() {}
+  unobserve() {}
+  takeRecords() {
+    return [];
+  }
+  root = null;
+  rootMargin = '0px';
+  thresholds = [0];
+}
 
 function CollectionHarness() {
   const collection = usePetalCollectionContext();
@@ -32,6 +55,20 @@ describe('home petal collection contract', () => {
     localStorage.clear();
     sessionStorage.clear();
     vi.stubGlobal('fetch', vi.fn());
+    vi.stubGlobal('IntersectionObserver', ImmediateIntersectionObserver);
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({
+        matches: false,
+        media: '',
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
   });
 
   afterEach(() => {
@@ -61,5 +98,25 @@ describe('home petal collection contract', () => {
     );
     expect(screen.getByTestId('remaining')).toHaveTextContent('0');
     expect(screen.getByTestId('capped')).toHaveTextContent('yes');
+  });
+
+  it('surfaces collected value through the existing petal counter', () => {
+    render(
+      <HomeSceneProvider>
+        <PetalCollectionProvider>
+          <PetalSystem />
+        </PetalCollectionProvider>
+      </HomeSceneProvider>,
+    );
+
+    const petal = screen.getAllByRole('button', { name: /collect sakura petal worth/i })[0];
+    const collectedValue = petal.getAttribute('aria-label')?.match(/worth (\d+)/)?.[1];
+
+    fireEvent.click(petal);
+
+    expect(
+      screen.getByRole('button', { name: `Petals collected: ${collectedValue}` }),
+    ).toBeInTheDocument();
+    expect(localStorage.getItem('otm-has-collected-petal')).toBe('true');
   });
 });
