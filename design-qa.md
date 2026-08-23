@@ -2,14 +2,26 @@
 
 ## Result
 
-**combined-master implementation locally certified for homepage visual shell**
+**combined-master implementation certified locally and smoke-verified on Preview**
 
 This pass pivots the homepage from separately aligned surface/root artwork to six approved combined
 world masters. The new runtime model uses one precomposed environmental image per time period, with
 semantic hero/footer UI and Petal systems overlaid inside that authored world.
 
+Current app-source commit: `c6239b7f959fe3932abe38fb76e5271349a0c2ec`.
+
+Current Preview deployment:
+
+- Deployment: `dpl_AJhmc17ymFbvu4pFVkRxQuiYo8sB`
+- Generated URL: `https://otaku-mori-1x313slyf-otaku-mori-babe.vercel.app`
+- Branch alias:
+  `https://otaku-mori-git-codex-homepage-visual-foundation-otaku-mori-babe.vercel.app`
+- Target: Preview
+- Status: Ready
+- Vercel check: success
+
 The prior deployed Preview evidence remains historical only. It verified an older split-world Preview
-and does not certify the current local combined-master implementation.
+and does not certify the current combined-master implementation.
 
 ## Source Truth
 
@@ -89,9 +101,9 @@ Non-certified local browser boundaries:
   shows the bounded sign-in boundary; signed-in shows deterministic visual-QA owner content without a
   server/client auth mismatch.
 
-Implementation-level checks passed on the current uncommitted source:
+Implementation-level checks passed on commit `c6239b7f959fe3932abe38fb76e5271349a0c2ec`:
 
-- Focused Vitest: 9 files, 34 tests passed.
+- Focused Vitest: 10 files, 39 tests passed.
 - Typecheck: passed.
 - Lint: passed with the existing 181 warnings and 0 errors.
 - Security scan: passed with redacted findings only and 0 blocking findings.
@@ -103,6 +115,60 @@ Implementation-level checks passed on the current uncommitted source:
 
 The previous local screenshot evidence for the pre-combined implementation was intentionally excluded
 from the release diff; it remains historical context only and is not current certification evidence.
+
+## Preview QA Status
+
+Preview verification used the authenticated in-app browser session for protected Preview access. A
+fresh headless browser without that session was redirected to `/login`, so the automated 11-viewport
+Preview matrix could not be certified without transferring auth state. The local 11-viewport matrix
+above remains the viewport certification for the current source.
+
+Authenticated in-app Preview homepage evidence at 320 x 568:
+
+- Final path: `/`
+- Homepage scene shell rendered.
+- Projection contract: `combined-world-master`
+- Hero scene and scene surface rendered.
+- Root footer rendered.
+- Collectible petal controls rendered.
+- Horizontal overflow: no.
+- Next error overlay: no.
+- Visible raw Prisma, Clerk, database, stack-trace, or provisioning details: no.
+
+Authenticated Preview petal interaction:
+
+- Collectible controls before activation: 4.
+- Keyboard activation with `Enter`: passed.
+- Next error overlay after activation: no.
+- Visible raw internal error details after activation: no.
+
+Authenticated Preview route smoke matrix:
+
+| Route | Final path | Visual shell result | Error state |
+| --- | --- | --- | --- |
+| `/` | `/` | Homepage shell rendered | No overlay or raw internal error |
+| `/shop` | `/shop` | Interior shell rendered | No overlay or raw internal error |
+| `/shop/cart` | `/shop/cart` | Interior shell rendered | No overlay or raw internal error |
+| `/games` | `/games` | Interior shell rendered | No overlay or raw internal error |
+| `/shop/product/e2e-sakura-starter-tee` | same path | Interior shell rendered | No overlay or raw internal error |
+| `/not-a-real-visual-qa-route` | same path | Interior shell rendered | No overlay or raw internal error |
+| `/wishlist` | `/` | Authenticated account/home surface | No overlay or raw internal error |
+| `/profile` | `/` | Authenticated account/home surface | No overlay or raw internal error |
+| `/profile/petals` | `/` | Authenticated account/home surface | No overlay or raw internal error |
+| `/settings` | `/` | Authenticated account/home surface | No overlay or raw internal error |
+| `/settings/account` | `/` | Authenticated account/home surface | No overlay or raw internal error |
+
+Read-only Preview API probes through the authenticated browser were partially limited by the browser
+automation surface:
+
+- `/api/wishlist`: bounded non-error response, no raw internal detail detected.
+- `/api/cart`: bounded non-error response, no raw internal detail detected.
+- `/api/v1/petals/balance`, `/api/v1/petals/wallet`, and `/api/v1/petals/transactions`: direct
+  browser navigation was blocked by the browser client before response inspection.
+
+Vercel runtime logs for the acceptance window returned info-level requests for the probed routes and
+APIs. No HTTP 500, runtime exception, schema/provisioning failure, or secret-like output was observed
+in the returned window.
 
 ## Auth Continuity
 
@@ -121,7 +187,9 @@ from the release diff; it remains historical context only and is not current cer
 
 ## Remaining Not Certified Gates
 
-- Real Clerk signed-in/signed-out browser parity.
+- Full real-Clerk signed-in/signed-out 11-viewport Preview matrix. The authenticated in-app session
+  was available, but the viewport-controlled headless browser was not authenticated to the protected
+  Preview.
 - Database-backed settings/account routes in a local browser.
 - Hosted Clerk account flow inside visual-QA harness.
 - Normal non-forced pointer click on the small animated petal target.
