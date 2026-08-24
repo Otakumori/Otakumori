@@ -5,7 +5,7 @@
   left: 0;
   min-height: max(30rem, calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 54rem)));
   overflow: visible;
-  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.18) 38%, rgba(7, 4, 7, 0.48));
+  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.1) 42%, rgba(7, 4, 7, 0.24));
 }
 
 .contentShell {
@@ -13,6 +13,12 @@
   z-index: 1;
   padding-top: clamp(2.5rem, 8svh, 7rem);
   text-shadow: 0 3px 16px rgba(0, 0, 0, 0.86);
+}
+
+.linkGroup {
+  border-left: 1px solid rgba(246, 220, 199, 0.12);
+  padding-left: 0.85rem;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.74);
 }
 
 @media (max-width: 767px) {

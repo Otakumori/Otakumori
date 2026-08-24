@@ -11,6 +11,13 @@ function getBrowserHost() {
   return typeof window !== 'undefined' ? window.location.hostname : undefined;
 }
 
+function hasBrowserVisualQaShellMarker() {
+  return (
+    typeof document !== 'undefined' &&
+    document.body?.getAttribute('data-visual-qa-auth') === 'true'
+  );
+}
+
 export function isVisualQaHostAllowed(host: string | null | undefined) {
   if (!host) return true;
   const normalized = host.split(':')[0]?.trim().toLowerCase();
@@ -41,10 +48,15 @@ export function isVisualQaAuthEnabled(
         readBrowserVisualQaAuthStateCookie() ||
         normalizeVisualQaAuthState(window.sessionStorage.getItem('otm-visual-qa-auth-state')),
     );
+  const hasVisualQaShellMarker = hasBrowserVisualQaShellMarker();
   const nodeEnvName = env.NODE_ENV ?? nodeEnv.NODE_ENV;
   const vercel = env.VERCEL ?? nodeEnv.VERCEL;
 
-  return (enabled || hasBrowserVisualAuthState) && nodeEnvName !== 'production' && vercel !== '1';
+  return (
+    (enabled || hasBrowserVisualAuthState || hasVisualQaShellMarker) &&
+    nodeEnvName !== 'production' &&
+    vercel !== '1'
+  );
 }
 
 export function normalizeVisualQaAuthState(

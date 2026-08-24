@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
-import PetalWalletIcon from '@/app/components/icons/PetalWalletIcon';
+import PetalWalletBadge from './PetalWalletBadge';
 
 const PETAL_WALLET_HREF = '/profile/petals';
 
@@ -21,12 +21,6 @@ type BalanceState =
   | { status: 'ready'; balance: number }
   | { status: 'error'; balance: null };
 
-function formatPetalBalance(balance: number) {
-  if (balance > 9999) return '9K+';
-  if (balance >= 1000) return `${Math.floor(balance / 1000)}K+`;
-  return `${balance}`;
-}
-
 export default function PetalWalletNavLink({
   isLoaded,
   isSignedIn,
@@ -35,6 +29,7 @@ export default function PetalWalletNavLink({
   variant = 'desktop',
 }: PetalWalletNavLinkProps) {
   const [balanceState, setBalanceState] = useState<BalanceState>({ status: 'idle', balance: null });
+  const [isPulsing, setIsPulsing] = useState(false);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) {
@@ -66,6 +61,16 @@ export default function PetalWalletNavLink({
     return () => controller.abort();
   }, [isLoaded, isSignedIn]);
 
+  useEffect(() => {
+    const handlePulse = () => {
+      setIsPulsing(true);
+      window.setTimeout(() => setIsPulsing(false), 520);
+    };
+
+    window.addEventListener('otm:petal-collected', handlePulse);
+    return () => window.removeEventListener('otm:petal-collected', handlePulse);
+  }, []);
+
   const label = useMemo(() => {
     if (!isLoaded) return 'Loading Petal Wallet';
     if (!isSignedIn) return 'Sign in to view Petals';
@@ -92,23 +97,14 @@ export default function PetalWalletNavLink({
       data-testid="petal-wallet-nav"
       data-state={isSignedIn ? balanceState.status : 'signed-out'}
     >
-      <PetalWalletIcon
-        compact={!showBalance}
-        className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-[#f6b7c6] transition group-hover:text-[#ffd6df]`}
+      <PetalWalletBadge
+        balance={showBalance ? balanceState.balance : null}
+        isLoading={isSignedIn && balanceState.status === 'loading'}
+        pulsing={isPulsing}
+        showLabel={isMobile}
+        state={isSignedIn ? balanceState.status : 'signed-out'}
+        variant={variant}
       />
-      {isMobile && <span className="text-sm font-medium">Petals</span>}
-      {isSignedIn && balanceState.status === 'loading' && (
-        <span
-          className="h-3 w-7 rounded-full bg-[#ffe7ee]/18"
-          aria-hidden="true"
-          data-testid="petal-wallet-loading"
-        />
-      )}
-      {showBalance && (
-        <span className="min-w-[2ch] text-sm font-semibold tabular-nums text-[#fff4e8]">
-          {formatPetalBalance(balanceState.balance)}
-        </span>
-      )}
     </Link>
   );
 }

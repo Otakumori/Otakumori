@@ -714,6 +714,21 @@ html {
   }
 }
 
+@keyframes petalWalletPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(246, 183, 198, 0));
+  }
+  42% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 12px rgba(246, 183, 198, 0.42));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(246, 183, 198, 0));
+  }
+}
+
 /* Achievement Unlock Animation */
 .achievement-unlock {
   animation: achievementUnlock 250ms ease-out forwards;

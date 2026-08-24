@@ -54,10 +54,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   if (useVisualQaShell) {
     return (
       <html lang="en" className="font-body">
-        <body className="font-body">
+        <body className="font-body" data-visual-qa-auth="true">
           <VisualQaAuthProvider initialState={visualQaAuthState}>
             <AppQueryProvider>
-              <CartProvider>
+              <CartProvider visualQaAuth>
                 <StaticPublicNavbar />
                 <SiteVisualShell>{children}</SiteVisualShell>
               </CartProvider>

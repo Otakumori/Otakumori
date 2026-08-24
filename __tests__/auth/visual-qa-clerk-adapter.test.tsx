@@ -21,6 +21,7 @@ describe('visual QA Clerk adapter', () => {
     delete process.env.OTM_VISUAL_QA_AUTH;
     delete process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH;
     delete process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH_STATE;
+    document.body.removeAttribute('data-visual-qa-auth');
     window.sessionStorage.clear();
     document.cookie = `${VISUAL_QA_AUTH_STATE_COOKIE}=; Max-Age=0; Path=/`;
     window.history.replaceState({}, '', '/');
@@ -70,6 +71,26 @@ describe('visual QA Clerk adapter', () => {
         '127.0.0.1:3102',
       ),
     ).toBe(true);
+  });
+
+  it('honors the local visual QA shell marker without enabling Production or Vercel', () => {
+    document.body.setAttribute('data-visual-qa-auth', 'true');
+
+    expect(isVisualQaAuthEnabled({ NODE_ENV: 'development' } as NodeJS.ProcessEnv)).toBe(true);
+    expect(
+      isVisualQaAuthEnabled({
+        NODE_ENV: 'production',
+      } as NodeJS.ProcessEnv),
+    ).toBe(false);
+    expect(
+      isVisualQaAuthEnabled({
+        NODE_ENV: 'development',
+        VERCEL: '1',
+      } as NodeJS.ProcessEnv),
+    ).toBe(false);
+    expect(
+      isVisualQaAuthEnabled({ NODE_ENV: 'development' } as NodeJS.ProcessEnv, 'www.otaku-mori.com'),
+    ).toBe(false);
   });
 
   it('defaults to signed-out state', () => {

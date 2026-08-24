@@ -118,8 +118,14 @@ function normalizeServerCartItems(serverItems: ServerCartItem[]): CartItem[] {
   })));
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  if (isVisualQaAuthEnabled()) {
+export function CartProvider({
+  children,
+  visualQaAuth = false,
+}: {
+  children: React.ReactNode;
+  visualQaAuth?: boolean;
+}) {
+  if (visualQaAuth || isVisualQaAuthEnabled()) {
     return (
       <CartProviderInner
         authState={{

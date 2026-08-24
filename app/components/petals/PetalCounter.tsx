@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
 import { HOME_SCENE_MANIFEST, resolvePetalSpritePosition } from '@/app/components/hero/homeScene';
+import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
 
 interface PetalCounterProps {
   count: number;
@@ -14,20 +15,42 @@ interface PetalCounterProps {
   guestDailyCapReached?: boolean;
 }
 
-function PetalCounterComponent({
+type PetalCounterInnerProps = PetalCounterProps & {
+  isSignedIn: boolean;
+};
+
+function PetalCounterComponent(props: PetalCounterProps) {
+  if (isVisualQaAuthEnabled()) {
+    return (
+      <PetalCounterInner
+        {...props}
+        isSignedIn={resolveVisualQaAuthState() === 'signed-in'}
+      />
+    );
+  }
+
+  return <ClerkPetalCounter {...props} />;
+}
+
+function ClerkPetalCounter(props: PetalCounterProps) {
+  const { isSignedIn } = useAuth();
+  return <PetalCounterInner {...props} isSignedIn={Boolean(isSignedIn)} />;
+}
+
+function PetalCounterInner({
   count,
   lastValue = 1,
   guestDailyLimit = 50,
   guestDailyRemaining = 50,
   guestDailyCapReached = false,
-}: PetalCounterProps) {
+  isSignedIn,
+}: PetalCounterInnerProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
   const [showMultiplier, setShowMultiplier] = useState(false);
   const [prevCount, setPrevCount] = useState(count);
   const [displayCount, setDisplayCount] = useState(count);
   const animationFrameRef = useRef<number | null>(null);
-  const { isSignedIn } = useAuth();
   const prefersReducedMotion = useReducedMotion();
 
   // Smooth number animation

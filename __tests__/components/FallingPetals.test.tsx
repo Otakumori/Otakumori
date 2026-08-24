@@ -42,9 +42,11 @@ describe('homepage collectible petals', () => {
   beforeEach(() => {
     stubMatchMedia(false);
     vi.stubGlobal('IntersectionObserver', ImmediateIntersectionObserver);
+    window.localStorage.clear();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
@@ -61,7 +63,10 @@ describe('homepage collectible petals', () => {
 
     const petals = screen.getAllByRole('button', { name: /collect sakura petal worth/i });
     expect(petals.length).toBeGreaterThan(0);
-    expect(petals[0].style.backgroundImage).toContain(HOME_SCENE_MANIFEST.petals.src);
+    expect(petals[0]).toHaveAttribute('data-collectible-hit-target', '44');
+    expect(petals[0].querySelector('span')?.getAttribute('style')).toContain(
+      HOME_SCENE_MANIFEST.petals.src,
+    );
     expect(petals[0]).toHaveAttribute('data-petal-variant');
 
     petals[0].focus();
@@ -102,6 +107,52 @@ describe('homepage collectible petals', () => {
     });
 
     expect(onCollect).toHaveBeenCalledTimes(1);
+  });
+
+  it('announces a one-time non-modal hint and dismisses it from local UI storage', async () => {
+    vi.useFakeTimers();
+
+    render(
+      <HomeSceneProvider>
+        <FallingPetals onPetalCollect={vi.fn()} />
+      </HomeSceneProvider>,
+    );
+
+    expect(screen.queryByTestId('petal-discovery-hint')).not.toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(screen.getByTestId('petal-discovery-hint')).toHaveTextContent(
+      'A petal stirred. Try catching one.',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /dismiss petal hint/i }));
+
+    expect(screen.queryByTestId('petal-discovery-hint')).not.toBeInTheDocument();
+    expect(window.localStorage.getItem('otm:home:petalHint:v1')).toBe('dismissed');
+  });
+
+  it('dismisses the discovery hint after the first collection without adding another economy path', async () => {
+    vi.useFakeTimers();
+    const onCollect = vi.fn();
+
+    render(
+      <HomeSceneProvider>
+        <FallingPetals onPetalCollect={onCollect} />
+      </HomeSceneProvider>,
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    fireEvent.click(screen.getAllByRole('button', { name: /collect sakura petal worth/i })[0]);
+
+    expect(onCollect).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('petal-discovery-hint')).not.toBeInTheDocument();
+    expect(window.localStorage.getItem('otm:home:petalHint:v1')).toBe('dismissed');
   });
 
   it('does not intercept clicks outside the petal controls', () => {

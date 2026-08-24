@@ -27,31 +27,39 @@ type CollectiblePetal = {
   sourceNudgeY: number;
   drift: number;
   fall: number;
+  gust: number;
   duration: number;
   delay: number;
+  opacity: number;
   rotation: number;
   scale: number;
   variant: number;
   value: number;
 };
 
-type PetalStyle = CSSProperties & {
+type PetalHitboxStyle = CSSProperties & {
   '--collectible-left': string;
   '--collectible-top': string;
   '--collectible-drift': string;
   '--collectible-fall': string;
+  '--collectible-gust': string;
   '--collectible-rotation': string;
   '--collectible-scale': string;
   '--collectible-duration': string;
   '--collectible-delay': string;
-  '--petal-sprite-position': string;
+  '--collectible-opacity': string;
   '--petal-nudge-x': string;
   '--petal-nudge-y': string;
+};
+
+type PetalVisualStyle = CSSProperties & {
+  '--petal-sprite-position': string;
 };
 
 const DESKTOP_PETAL_COUNT = 6;
 const COMPACT_PETAL_COUNT = 4;
 const POINTER_INFLUENCE_RADIUS = 112;
+const PETAL_HINT_STORAGE_KEY = 'otm:home:petalHint:v1';
 
 function createCollectiblePetal(id: number): CollectiblePetal {
   const lane = id % 6;
@@ -64,8 +72,10 @@ function createCollectiblePetal(id: number): CollectiblePetal {
     sourceNudgeY: ((id * 13) % 38) + 20,
     drift: 150 + ((id * 11) % 170),
     fall: 320 + ((id * 9) % 190),
+    gust: (id % 2 === 0 ? 1 : -1) * (42 + (id % 5) * 12),
     duration: 13 + (id % 5) * 1.8,
     delay: -(id % 7) * 1.7,
+    opacity: 0.68 + (id % 4) * 0.06,
     rotation: (id % 2 === 0 ? 1 : -1) * (190 + (id % 4) * 48),
     scale: 0.74 + (id % 3) * 0.12,
     variant: id % HOME_SCENE_MANIFEST.petals.frameCount,
@@ -89,14 +99,43 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
   const [generation, setGeneration] = useState(0);
   const [collectingIds, setCollectingIds] = useState<Set<number>>(() => new Set());
   const [isActive, setIsActive] = useState(true);
+  const [showHint, setShowHint] = useState(false);
   const layerRef = useRef<HTMLDivElement>(null);
   const isIntersectingRef = useRef(true);
   const pointerFrameRef = useRef<number | null>(null);
   const nextIdRef = useRef(100);
+  const hintSeenRef = useRef(false);
 
   useEffect(() => {
     setPetalCount(getDevicePetalCount());
   }, []);
+
+  const markHintSeen = useCallback(() => {
+    hintSeenRef.current = true;
+    setShowHint(false);
+    try {
+      window.localStorage?.setItem(PETAL_HINT_STORAGE_KEY, 'dismissed');
+    } catch {
+      // UI-only preference; storage failures should not affect collection.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      hintSeenRef.current = window.localStorage?.getItem(PETAL_HINT_STORAGE_KEY) === 'dismissed';
+    } catch {
+      hintSeenRef.current = false;
+    }
+
+    if (hintSeenRef.current) return undefined;
+
+    const delay = reducedMotion ? 600 : 1500;
+    const timer = window.setTimeout(() => {
+      if (!hintSeenRef.current) setShowHint(true);
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [reducedMotion]);
 
   useEffect(() => {
     const layer = layerRef.current;
@@ -184,7 +223,13 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
       const target = resolveCounterPosition();
 
       setCollectingIds((current) => new Set(current).add(petal.id));
+      markHintSeen();
       onPetalCollect(petal.id, petal.value, origin.x, origin.y);
+      window.dispatchEvent(
+        new CustomEvent('otm:petal-collected', {
+          detail: { value: petal.value },
+        }),
+      );
 
       const finishCollection = () => {
         setCollectingIds((current) => {
@@ -228,7 +273,7 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
 
       animation.finished.catch(() => undefined).finally(finishCollection);
     },
-    [collectingIds, onPetalCollect, reducedMotion, resolveCounterPosition],
+    [collectingIds, markHintSeen, onPetalCollect, reducedMotion, resolveCounterPosition],
   );
 
   return (
@@ -259,38 +304,58 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
         const top = projection
           ? projection.top + (anchor.y + petal.sourceNudgeY) * scale
           : 8 + petal.lane * 5;
-        const style: PetalStyle = {
-          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+        const hitboxStyle: PetalHitboxStyle = {
           '--collectible-left': projection ? `${left}px` : `${left}%`,
           '--collectible-top': projection ? `${top}px` : `${top}%`,
           '--collectible-drift': projection ? `${petal.drift * scale}px` : `${petal.drift / 8}vw`,
           '--collectible-fall': projection ? `${petal.fall * scale}px` : `${petal.fall / 7}vh`,
+          '--collectible-gust': projection ? `${petal.gust * scale}px` : `${petal.gust / 10}vw`,
           '--collectible-rotation': `${petal.rotation}deg`,
           '--collectible-scale': String(petal.scale),
           '--collectible-duration': `${petal.duration}s`,
           '--collectible-delay': `${petal.delay}s`,
-          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
+          '--collectible-opacity': String(petal.opacity),
           '--petal-nudge-x': '0px',
           '--petal-nudge-y': '0px',
+        };
+        const visualStyle: PetalVisualStyle = {
+          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
         };
 
         return (
           <button
             key={petal.id}
             type="button"
-            className={styles.collectible}
-            style={style}
+            className={styles.collectibleHitbox}
+            style={hitboxStyle}
             aria-label={`Collect sakura petal worth ${petal.value}`}
             data-collectible-petal
+            data-collectible-hit-target="44"
             data-source-x={Math.round(anchor.x + petal.sourceNudgeX)}
             data-source-y={Math.round(anchor.y + petal.sourceNudgeY)}
             data-petal-variant={petal.variant}
             data-pointer-near="false"
             disabled={collectingIds.has(petal.id)}
             onClick={(event) => collectPetal(petal, event.currentTarget)}
-          />
+          >
+            <span className={styles.collectibleVisual} style={visualStyle} aria-hidden="true" />
+          </button>
         );
       })}
+      {showHint ? (
+        <aside
+          className={styles.hint}
+          aria-live="polite"
+          data-testid="petal-discovery-hint"
+          data-reduced-motion={reducedMotion ? 'true' : 'false'}
+        >
+          <span>A petal stirred. Try catching one.</span>
+          <button type="button" onClick={markHintSeen} aria-label="Dismiss petal hint">
+            Dismiss
+          </button>
+        </aside>
+      ) : null}
     </div>
   );
 }
