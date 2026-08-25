@@ -57,4 +57,6 @@ export const UI = {
 export const COLLECTION = {
   DEBOUNCE_MS: 1000,
   BATCH_SIZE: 10,
+  GUEST_DAILY_LIMIT: 50,
+  GUEST_DAILY_PROMPT_THRESHOLD: 40,
 } as const;

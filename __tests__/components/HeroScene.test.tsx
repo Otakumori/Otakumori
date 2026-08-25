@@ -23,6 +23,19 @@ function stubMatchMedia(matches: boolean) {
   );
 }
 
+async function renderHeroScene() {
+  const [{ default: HeroScene }, { HomeSceneProvider }] = await Promise.all([
+    import('@/app/components/hero/HeroScene'),
+    import('@/app/components/hero/HomeSceneContext'),
+  ]);
+
+  return render(
+    <HomeSceneProvider>
+      <HeroScene />
+    </HomeSceneProvider>,
+  );
+}
+
 describe('homepage hero scene client island', () => {
   afterEach(() => {
     cleanup();
@@ -48,17 +61,19 @@ describe('homepage hero scene client island', () => {
     vi.spyOn(Date.prototype, 'getDate').mockReturnValue(1);
     stubMatchMedia(false);
 
-    const { default: HeroScene } = await import('@/app/components/hero/HeroScene');
-    render(<HeroScene />);
+    await renderHeroScene();
 
     const scene = await screen.findByTestId('mori-hero-scene');
     await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'specialTwilight'));
     expect(screen.getByTestId('mori-world-extension')).toBeInTheDocument();
     expect(screen.getByTestId('mori-scene-plate')).toBeInTheDocument();
 
-    const images = screen.getAllByRole('img', { name: /Otakumori sakura tree scene/i });
+    const images = screen.getAllByRole('img', { name: /Otakumori sakura shoreline/i });
     expect(images).toHaveLength(1);
-    expect(images[0]).toHaveAttribute('src', '/assets/home/world/mori-world-twilight.png');
+    expect(images[0]).toHaveAttribute(
+      'src',
+      '/assets/home/world/combined/om-home-world-06-special-twilight-wide.png',
+    );
     expect(images[0].className).toContain('image');
     await waitFor(() => {
       const preloadHrefs = Array.from(
@@ -66,10 +81,14 @@ describe('homepage hero scene client island', () => {
       ).map((link) => link.href);
 
       expect(
-        preloadHrefs.some((href) => href.endsWith('/assets/home/world/mori-world-twilight.png')),
+        preloadHrefs.some((href) =>
+          href.endsWith('/assets/home/world/combined/om-home-world-06-special-twilight-wide.png'),
+        ),
       ).toBe(true);
       expect(
-        preloadHrefs.some((href) => href.endsWith('/assets/home/world/mori-world-night.png')),
+        preloadHrefs.some((href) =>
+          href.endsWith('/assets/home/world/combined/om-home-world-05-night-wide.png'),
+        ),
       ).toBe(true);
     });
   });
@@ -79,12 +98,32 @@ describe('homepage hero scene client island', () => {
     vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
     stubMatchMedia(true);
 
-    const { default: HeroScene } = await import('@/app/components/hero/HeroScene');
-    render(<HeroScene />);
+    await renderHeroScene();
 
     const scene = await screen.findByTestId('mori-hero-scene');
     await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'afternoon'));
 
     expect(screen.getAllByTestId('mori-petal')).toHaveLength(4);
+  });
+
+  it('renders decorative petals from the sprite atlas instead of text glyphs', async () => {
+    vi.spyOn(Date.prototype, 'getHours').mockReturnValue(12);
+    vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
+    stubMatchMedia(false);
+
+    await renderHeroScene();
+
+    const petalEmitter = await screen.findByTestId('mori-petal-emitter');
+    expect(petalEmitter).toHaveAttribute('aria-hidden', 'true');
+
+    const petals = screen.getAllByTestId('mori-petal');
+    expect(petals.length).toBeGreaterThan(0);
+    petals.forEach((petal) => {
+      expect(petal.textContent).toBe('');
+      expect(window.getComputedStyle(petal).backgroundImage).toContain(
+        '/assets/images/petal_sprite.png',
+      );
+      expect(petal).toHaveAttribute('data-petal-variant');
+    });
   });
 });
