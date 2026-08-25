@@ -32,6 +32,12 @@ export function GameStateMachine({
     onStateChange?.(state);
   }, [state, onStateChange]);
 
+  useEffect(() => {
+    if (state === 'loading' && !assets) {
+      setState('boot');
+    }
+  }, [assets, state]);
+
   const transitionTo = (newState: GameState) => {
     setState(newState);
   };

@@ -31,9 +31,9 @@
   },
   {
     "slug": "memory-match",
-    "name": "Memory Match",
+    "name": "Memory Card / Defrag",
     "icon": "grid_view",
-    "desc": "Flip cards and match pairs. Perfect recall earns bonuses."
+    "desc": "Restore paired relic fragments with clean recall and careful moves."
   },
   {
     "slug": "bubble-girl",

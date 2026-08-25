@@ -1,0 +1,524 @@
+.shell {
+  --memory-rose: #d99aaa;
+  --memory-ivory: #f4e6cf;
+  --memory-bronze: #b39163;
+  --memory-bark: #5d4436;
+  --memory-bg: #080606;
+  position: relative;
+  min-height: 100svh;
+  overflow: clip;
+  padding: clamp(0.75rem, 2.5vw, 2rem);
+  color: var(--memory-ivory);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(217, 154, 170, 0.16), transparent 34rem),
+    linear-gradient(180deg, #181111 0%, #080606 48%, #050404 100%);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(244, 230, 207, 0.035) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(244, 230, 207, 0.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at 50% 42%, black, transparent 78%);
+}
+
+.hud {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  width: min(74rem, 100%);
+  margin: 0 auto clamp(0.8rem, 2vw, 1.4rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--memory-bronze);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  max-width: 18ch;
+  color: #fff1e4;
+  font-size: clamp(1.7rem, 4vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(4.5rem, auto));
+  gap: 0.45rem;
+  justify-content: end;
+}
+
+.stats output,
+.controlButton,
+.segmented,
+.playerChip {
+  border: 1px solid rgba(244, 230, 207, 0.14);
+  background: rgba(18, 13, 12, 0.78);
+  box-shadow: inset 0 1px 0 rgba(244, 230, 207, 0.06);
+}
+
+.stats output {
+  display: grid;
+  min-width: 4.6rem;
+  min-height: 3.25rem;
+  align-content: center;
+  padding: 0.48rem 0.65rem;
+  border-radius: 0.45rem;
+  color: #fff1e4;
+  font-weight: 700;
+  text-align: right;
+}
+
+.stats span {
+  color: #b8aaa3;
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.controls {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.segmented {
+  display: inline-flex;
+  min-height: 2.55rem;
+  overflow: hidden;
+  border-radius: 0.45rem;
+}
+
+.segmented button,
+.controlButton,
+.overlayActions button {
+  min-height: 2.55rem;
+  padding: 0.55rem 0.78rem;
+  color: #ead8ca;
+  font-weight: 700;
+  font-size: 0.82rem;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.segmented button {
+  border-right: 1px solid rgba(244, 230, 207, 0.1);
+}
+
+.segmented button:last-child {
+  border-right: 0;
+}
+
+.segmented button[aria-pressed='true'],
+.controlButton:hover,
+.controlButton:focus-visible,
+.overlayActions button:hover,
+.overlayActions button:focus-visible {
+  background: rgba(179, 145, 99, 0.22);
+  color: #fff1e4;
+}
+
+.controlButton {
+  border-radius: 0.45rem;
+}
+
+.controlButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.table {
+  position: relative;
+  z-index: 1;
+  width: min(74rem, 100%);
+  margin: 0 auto;
+  padding: clamp(0.65rem, 1.8vw, 1.1rem);
+  border: 1px solid rgba(244, 230, 207, 0.13);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(244, 230, 207, 0.045), transparent 9rem),
+    rgba(14, 10, 9, 0.76);
+}
+
+.boardHeader {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.statusLine,
+.metaLine {
+  margin: 0;
+}
+
+.statusLine {
+  color: #fff1e4;
+  font-weight: 700;
+}
+
+.metaLine {
+  margin-top: 0.15rem;
+  color: #b8aaa3;
+  font-size: 0.85rem;
+}
+
+.playerChip {
+  display: grid;
+  min-width: 8rem;
+  padding: 0.48rem 0.65rem;
+  border-radius: 0.45rem;
+  text-align: right;
+}
+
+.playerChip span {
+  font-weight: 700;
+}
+
+.playerChip small {
+  color: #b8aaa3;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--memory-columns), minmax(0, 1fr));
+  gap: clamp(0.38rem, 1.1vw, 0.72rem);
+  width: min(100%, calc((100svh - 13.5rem) * var(--memory-columns) / var(--memory-rows) * 0.78));
+  min-width: min(100%, 18rem);
+  margin: 0 auto;
+}
+
+.card {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  min-height: 4.25rem;
+  border-radius: 0.45rem;
+  perspective: 900px;
+  outline: none;
+  touch-action: manipulation;
+}
+
+.card:focus-visible .cardInner {
+  outline: 2px solid rgba(244, 230, 207, 0.82);
+  outline-offset: 3px;
+}
+
+.card[aria-disabled='true'] {
+  cursor: default;
+}
+
+.cardInner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 220ms ease, filter 180ms ease;
+}
+
+.card:hover:not([aria-disabled='true']) .cardInner {
+  filter: brightness(1.08);
+}
+
+.card:active:not([aria-disabled='true']) .cardInner {
+  transform: translateY(1px) scale(0.985);
+}
+
+.card[data-state='revealed'] .cardInner,
+.card[data-state='matched'] .cardInner {
+  transform: rotateY(180deg);
+}
+
+.card[data-state='matched'] .cardInner {
+  filter: saturate(0.85) brightness(1.08);
+}
+
+.cardBack,
+.cardFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(244, 230, 207, 0.16);
+  border-radius: 0.45rem;
+  backface-visibility: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.34),
+    0 0.7rem 1.5rem rgba(0, 0, 0, 0.24);
+}
+
+.cardBack {
+  background:
+    linear-gradient(135deg, rgba(179, 145, 99, 0.16), transparent 42%),
+    radial-gradient(circle at 50% 38%, rgba(217, 154, 170, 0.15), transparent 48%),
+    #14100f;
+}
+
+.cardBack::before,
+.cardBack::after {
+  position: absolute;
+  content: '';
+  border: 1px solid rgba(244, 230, 207, 0.1);
+  transform: rotate(45deg);
+}
+
+.cardBack::before {
+  width: 48%;
+  aspect-ratio: 1;
+}
+
+.cardBack::after {
+  width: 26%;
+  aspect-ratio: 1;
+  background: rgba(217, 154, 170, 0.08);
+}
+
+.cardSigil {
+  position: relative;
+  z-index: 1;
+  color: rgba(244, 230, 207, 0.82);
+  font-size: clamp(0.78rem, 2vw, 1.1rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.cardFace {
+  grid-template-rows: 1fr auto auto;
+  gap: 0.22rem;
+  padding: clamp(0.35rem, 1vw, 0.65rem);
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 228, 0.11), transparent 52%),
+    #1b1512;
+}
+
+.card[data-tone='rose'] .cardFace {
+  border-color: rgba(217, 154, 170, 0.52);
+}
+
+.card[data-tone='bronze'] .cardFace {
+  border-color: rgba(179, 145, 99, 0.58);
+}
+
+.card[data-tone='ivory'] .cardFace {
+  border-color: rgba(244, 230, 207, 0.44);
+}
+
+.card[data-tone='bark'] .cardFace {
+  border-color: rgba(119, 86, 65, 0.64);
+}
+
+.card[data-tone='stone'] .cardFace {
+  border-color: rgba(141, 135, 128, 0.6);
+}
+
+.relicShape {
+  width: min(52%, 4.3rem);
+  aspect-ratio: 1;
+  align-self: end;
+  border: 1px solid currentColor;
+  color: rgba(244, 230, 207, 0.64);
+  background:
+    radial-gradient(circle at 45% 38%, rgba(244, 230, 207, 0.36), transparent 21%),
+    linear-gradient(135deg, rgba(217, 154, 170, 0.22), rgba(179, 145, 99, 0.14));
+  clip-path: polygon(50% 0, 92% 30%, 78% 86%, 22% 86%, 8% 30%);
+}
+
+.faceCode {
+  color: #fff1e4;
+  font-size: clamp(0.86rem, 2.6vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.faceLabel {
+  width: 100%;
+  min-height: 2.2em;
+  color: #cdbbb7;
+  font-size: clamp(0.62rem, 1.55vw, 0.78rem);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.progressWrap {
+  position: relative;
+  z-index: 2;
+  width: min(34rem, 100%);
+  margin: 0.85rem auto 0;
+}
+
+.progressTrack {
+  height: 0.42rem;
+  overflow: hidden;
+  border: 1px solid rgba(244, 230, 207, 0.12);
+  border-radius: 999px;
+  background: rgba(244, 230, 207, 0.08);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--memory-bronze), var(--memory-rose));
+  transition: width 220ms ease;
+}
+
+.pauseOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(5, 4, 4, 0.74);
+}
+
+.pauseOverlay > div {
+  width: min(22rem, 100%);
+  border: 1px solid rgba(244, 230, 207, 0.18);
+  border-radius: 0.5rem;
+  padding: 1.2rem;
+  background: rgba(18, 13, 12, 0.94);
+  text-align: center;
+}
+
+.pauseOverlay h2 {
+  margin: 0 0 0.45rem;
+  color: #fff1e4;
+  font-size: 1.35rem;
+}
+
+.pauseOverlay p {
+  margin: 0;
+  color: #cdbbb7;
+}
+
+.overlayActions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.overlayActions button {
+  border: 1px solid rgba(244, 230, 207, 0.15);
+  border-radius: 0.45rem;
+  background: rgba(244, 230, 207, 0.08);
+}
+
+@media (max-width: 760px) {
+  .shell {
+    padding: 0.65rem;
+  }
+
+  .hud {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .title {
+    max-width: none;
+    font-size: clamp(1.45rem, 8vw, 2.35rem);
+  }
+
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .stats output {
+    min-width: 0;
+    padding-inline: 0.42rem;
+    font-size: 0.9rem;
+  }
+
+  .controls {
+    justify-content: stretch;
+  }
+
+  .segmented {
+    flex: 1 1 100%;
+  }
+
+  .segmented button {
+    flex: 1 1 0;
+  }
+
+  .controlButton {
+    flex: 1 1 6rem;
+  }
+
+  .table {
+    padding: 0.55rem;
+  }
+
+  .boardHeader {
+    align-items: start;
+  }
+
+  .playerChip {
+    display: none;
+  }
+
+  .board {
+    width: 100%;
+    gap: clamp(0.28rem, 1.8vw, 0.5rem);
+  }
+
+  .card {
+    min-height: 3.65rem;
+  }
+
+  .faceLabel {
+    display: none;
+  }
+}
+
+@media (max-width: 340px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .board {
+    gap: 0.25rem;
+  }
+
+  .card {
+    min-height: 3.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardInner,
+  .progressFill,
+  .segmented button,
+  .controlButton,
+  .overlayActions button {
+    transition: none;
+  }
+
+  .card[data-state='revealed'] .cardInner,
+  .card[data-state='matched'] .cardInner {
+    transform: none;
+  }
+
+  .card:active:not([aria-disabled='true']) .cardInner {
+    transform: none;
+  }
+}
