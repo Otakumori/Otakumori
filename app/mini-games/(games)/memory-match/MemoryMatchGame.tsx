@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGameSave } from '../../_shared/SaveSystem';
 import styles from './MemoryMatchGame.module.css';
+import { MemoryRelicIcon, MemorySealIcon } from './MemoryRelicIcon';
 import {
   buildMemoryDefragAchievementIntent,
   buildMemoryDefragCompletionFacts,
@@ -46,6 +47,30 @@ interface MemoryMatchGameProps {
 
 const DIFFICULTIES: MemoryDefragDifficulty[] = ['initiate', 'keeper', 'warden'];
 
+const MEMORY_DEFRAG_AUDIO = {
+  reveal: '/assets/sounds/runic-reveal.mp3',
+  match: '/assets/sfx/success.ogg',
+  mismatch: '/assets/sfx/miss.ogg',
+  won: '/assets/sfx/pop.ogg',
+};
+
+type FeedbackKind = 'reveal' | 'match' | 'mismatch' | 'won' | 'reset';
+
+interface FeedbackState {
+  kind: FeedbackKind;
+  ids: string[];
+  nonce: number;
+}
+
+function playMemoryCue(kind: Exclude<FeedbackKind, 'reset'>) {
+  if (typeof window === 'undefined' || process.env.NODE_ENV === 'test') return;
+
+  const url = MEMORY_DEFRAG_AUDIO[kind];
+  void import('../../_shared/audio-bus')
+    .then(({ play }) => play(url, kind === 'mismatch' ? -18 : -14))
+    .catch(() => {});
+}
+
 function usePrefersReducedMotion() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -82,6 +107,11 @@ export default function MemoryMatchGame({
   );
   const [clockMs, setClockMs] = useState(() => performance.now());
   const [announcement, setAnnouncement] = useState('Memory defrag board ready.');
+  const [feedback, setFeedback] = useState<FeedbackState>({
+    kind: 'reset',
+    ids: [],
+    nonce: 0,
+  });
   const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const finishedSeedRef = useRef<string | null>(null);
   const autoPausedRef = useRef(false);
@@ -92,6 +122,12 @@ export default function MemoryMatchGame({
   const score = getMemoryDefragScore(game, clockMs);
   const progress = getMemoryDefragProgress(game);
   const inputLocked = game.phase === 'resolving' || game.phase === 'paused' || game.phase === 'won';
+  const feedbackIds = useMemo(() => new Set(feedback.ids), [feedback.ids]);
+  const mismatchIds = useMemo(
+    () => new Set(game.pendingMismatch?.ids ?? []),
+    [game.pendingMismatch?.ids],
+  );
+  const streakTier = game.streak >= 3 ? 'high' : game.streak >= 2 ? 'warm' : 'quiet';
 
   const startNewGame = useCallback(
     (nextDifficulty: MemoryDefragDifficulty = selectedDifficulty) => {
@@ -101,7 +137,10 @@ export default function MemoryMatchGame({
       setSelectedDifficulty(nextDifficulty);
       setClockMs(now);
       setGame(createMemoryDefragGame({ difficulty: nextDifficulty, seed: nextSeed, nowMs: now }));
-      setAnnouncement(`${MEMORY_DEFRAG_CONFIGS[nextDifficulty].label} board reset.`);
+      setFeedback((current) => ({ kind: 'reset', ids: [], nonce: current.nonce + 1 }));
+      setAnnouncement(
+        `${MEMORY_DEFRAG_CONFIGS[nextDifficulty].label} archive opened as a fresh board.`,
+      );
       requestAnimationFrame(() => cardRefs.current[0]?.focus());
     },
     [seed, selectedDifficulty],
@@ -113,14 +152,41 @@ export default function MemoryMatchGame({
     setGame((current) => {
       const next = revealMemoryCard(current, cardId, now);
       const card = next.cards.find((candidate) => candidate.id === cardId);
+      const pairIds = current.revealedIds.includes(cardId)
+        ? current.revealedIds
+        : [...current.revealedIds, cardId];
 
       if (next.lastEvent === 'first-reveal' && card) {
+        setFeedback((currentFeedback) => ({
+          kind: 'reveal',
+          ids: [cardId],
+          nonce: currentFeedback.nonce + 1,
+        }));
+        playMemoryCue('reveal');
         setAnnouncement(`${card.face.label} revealed.`);
       } else if (next.lastEvent === 'match' && card) {
+        setFeedback((currentFeedback) => ({
+          kind: 'match',
+          ids: pairIds,
+          nonce: currentFeedback.nonce + 1,
+        }));
+        playMemoryCue('match');
         setAnnouncement(`${card.face.label} pair restored. Streak ${next.streak}.`);
       } else if (next.lastEvent === 'mismatch') {
+        setFeedback((currentFeedback) => ({
+          kind: 'mismatch',
+          ids: next.pendingMismatch?.ids ?? pairIds,
+          nonce: currentFeedback.nonce + 1,
+        }));
+        playMemoryCue('mismatch');
         setAnnouncement('Fragments do not align. Rebinding.');
       } else if (next.lastEvent === 'won') {
+        setFeedback((currentFeedback) => ({
+          kind: 'won',
+          ids: pairIds,
+          nonce: currentFeedback.nonce + 1,
+        }));
+        playMemoryCue('won');
         setAnnouncement('Memory fully defragmented.');
       }
 
@@ -156,12 +222,15 @@ export default function MemoryMatchGame({
     if (!game.pendingMismatch || game.phase !== 'resolving') return;
 
     const remaining = Math.max(0, game.pendingMismatch.resolveAtMs - game.elapsedMs);
-    const timeout = window.setTimeout(() => {
-      const now = performance.now();
-      setClockMs(now);
-      setGame((current) => resolveMemoryMismatch(current, now));
-      setAnnouncement('Unmatched fragments concealed.');
-    }, reducedMotion ? Math.min(remaining, 120) : remaining);
+    const timeout = window.setTimeout(
+      () => {
+        const now = performance.now();
+        setClockMs(now);
+        setGame((current) => resolveMemoryMismatch(current, now));
+        setAnnouncement('Unmatched fragments concealed.');
+      },
+      reducedMotion ? Math.min(remaining, 120) : remaining,
+    );
 
     return () => window.clearTimeout(timeout);
   }, [game.elapsedMs, game.pendingMismatch, game.phase, reducedMotion]);
@@ -279,16 +348,7 @@ export default function MemoryMatchGame({
         playerDisplayName: player?.displayName,
       },
     }).catch(() => {});
-  }, [
-    clockMs,
-    config.pairs,
-    elapsedMs,
-    game,
-    onGameEnd,
-    player?.displayName,
-    saveOnExit,
-    score,
-  ]);
+  }, [clockMs, config.pairs, elapsedMs, game, onGameEnd, player?.displayName, saveOnExit, score]);
 
   const focusByOffset = useCallback(
     (index: number, offset: number) => {
@@ -337,6 +397,8 @@ export default function MemoryMatchGame({
       className={styles.shell}
       data-testid="memory-defrag-game"
       data-phase={game.phase}
+      data-feedback={feedback.kind}
+      data-streak-tier={streakTier}
       data-reduced-motion={reducedMotion ? 'true' : 'false'}
       aria-labelledby="memory-defrag-title"
     >
@@ -370,7 +432,11 @@ export default function MemoryMatchGame({
         </div>
 
         <div className={styles.controls} aria-label="Game controls">
-          <div className={styles.segmented} role="group" aria-label="Difficulty">
+          <div
+            className={styles.segmented}
+            role="group"
+            aria-label="Difficulty. Changing difficulty starts a fresh board."
+          >
             {DIFFICULTIES.map((item) => (
               <button
                 key={item}
@@ -382,6 +448,7 @@ export default function MemoryMatchGame({
               </button>
             ))}
           </div>
+          <p className={styles.controlHint}>Difficulty opens a fresh board.</p>
 
           <button
             type="button"
@@ -438,6 +505,8 @@ export default function MemoryMatchGame({
         >
           {game.cards.map((card, index) => {
             const isFaceUp = card.state !== 'hidden';
+            const hasFeedback = feedbackIds.has(card.id);
+            const isMismatched = mismatchIds.has(card.id);
             return (
               <button
                 key={card.id}
@@ -448,22 +517,27 @@ export default function MemoryMatchGame({
                 className={styles.card}
                 data-state={card.state}
                 data-tone={card.face.tone}
+                data-relic={card.face.id}
+                data-feedback={hasFeedback ? feedback.kind : undefined}
+                data-mismatch={isMismatched ? 'true' : undefined}
+                data-feedback-nonce={hasFeedback ? feedback.nonce : undefined}
                 onClick={() => activateCard(card.id)}
                 onKeyDown={(event) => handleCardKeyDown(event, index, card.id)}
                 aria-label={
-                  isFaceUp
-                    ? `${card.face.label}, ${card.state}`
-                    : `Hidden memory card ${index + 1}`
+                  isFaceUp ? `${card.face.label}, ${card.state}` : `Hidden memory card ${index + 1}`
                 }
                 aria-disabled={inputLocked || card.state === 'matched'}
                 role="gridcell"
               >
                 <span className={styles.cardInner}>
                   <span className={styles.cardBack} aria-hidden={isFaceUp}>
-                    <span className={styles.cardSigil}>OM</span>
+                    <MemorySealIcon className={styles.cardSeal} />
+                    <span className={styles.cardSigil}>MORI</span>
                   </span>
                   <span className={styles.cardFace} aria-hidden={!isFaceUp}>
-                    <span className={styles.relicShape} />
+                    <span className={styles.relicShape}>
+                      <MemoryRelicIcon faceId={card.face.id} className={styles.relicIcon} />
+                    </span>
                     <span className={styles.faceCode}>{card.face.shortLabel}</span>
                     <span className={styles.faceLabel}>{card.face.label}</span>
                   </span>
@@ -476,7 +550,10 @@ export default function MemoryMatchGame({
 
       <div className={styles.progressWrap} aria-hidden="true">
         <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${Math.round(progress * 100)}%` }} />
+          <div
+            className={styles.progressFill}
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
         </div>
       </div>
 
