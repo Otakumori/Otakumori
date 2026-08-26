@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "character": "Memory Keeper",
+  "visualStyle": "pencil/cross-hatched manga with restrained warm bronze and ivory",
+  "states": {
+    "idle": "/assets/mini-games/memory-defrag/keeper/idle.webp",
+    "reveal": "/assets/mini-games/memory-defrag/keeper/reveal.webp",
+    "mismatch": "/assets/mini-games/memory-defrag/keeper/mismatch.webp",
+    "match": "/assets/mini-games/memory-defrag/keeper/match.webp",
+    "streak": "/assets/mini-games/memory-defrag/keeper/streak.webp",
+    "clear": "/assets/mini-games/memory-defrag/keeper/clear.webp",
+    "fail": "/assets/mini-games/memory-defrag/keeper/fail.webp"
+  },
+  "layers": {
+    "background": "/assets/mini-games/memory-defrag/keeper/reliquary-background.webp",
+    "keeper": "/assets/mini-games/memory-defrag/keeper/keeper-layer.webp"
+  },
+  "recommendedRuntime": {
+    "base": "Render background + transparent keeper layer continuously; keep playable cards as real DOM/SVG elements.",
+    "idleMotion": "Finite CSS/parallax only: subtle 2-5px breathing/settle, slow hair/sleeve drift, book-light pulse. No gameplay authority.",
+    "reactionOverlays": "Use reveal/match/mismatch/streak illustrations as short cross-faded presentation overlays, then return to the layered base scene.",
+    "clearFail": "Use clear/fail as dedicated cinematic splash states before/with results handoff.",
+    "reducedMotion": "Disable drift/parallax and use direct opacity/state changes while retaining equivalent visual feedback."
+  }
+}

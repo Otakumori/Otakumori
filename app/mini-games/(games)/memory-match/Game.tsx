@@ -13,7 +13,12 @@ const MEMORY_DEFRAG_AUDIO = [
   '/assets/sfx/pop.ogg',
 ];
 
-const RESULT_HANDOFF_MS = 520;
+const MEMORY_KEEPER_CRITICAL_IMAGES = [
+  '/assets/mini-games/memory-defrag/keeper/reliquary-background.webp',
+  '/assets/mini-games/memory-defrag/keeper/keeper-layer.webp',
+];
+
+const RESULT_HANDOFF_MS = 1100;
 
 export default function MemoryMatchGameWrapper() {
   const [_gameState, setGameState] = useState<GameState>('loading');
@@ -29,7 +34,7 @@ export default function MemoryMatchGameWrapper() {
   const resultTimeoutRef = useRef<number | null>(null);
 
   const gameAssets: AssetManifest = {
-    images: [],
+    images: MEMORY_KEEPER_CRITICAL_IMAGES,
     audio: MEMORY_DEFRAG_AUDIO,
   };
 
