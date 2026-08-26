@@ -9,6 +9,8 @@
   --memory-moss: #89a66f;
   --memory-cyan: #80b8bb;
   --memory-ash: #aea79b;
+  --keeper-parallax-x: 0;
+  --keeper-parallax-y: 0;
   --relic-accent: var(--memory-bronze);
   --relic-ink: var(--memory-ivory);
   position: relative;
@@ -226,11 +228,22 @@
   opacity: 0.45;
 }
 
+.stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(32rem, 1fr) minmax(18rem, 30rem);
+  gap: 0.9rem;
+  align-items: stretch;
+  width: min(84rem, 100%);
+  margin: 0 auto;
+}
+
 .table {
   position: relative;
   z-index: 1;
-  width: min(76rem, 100%);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0.75rem;
   border: 1px solid rgba(246, 234, 212, 0.15);
   border-radius: 0.5rem;
@@ -267,6 +280,301 @@
 
 .shell[data-phase='paused'] .table::after {
   opacity: 1;
+}
+
+.keeperScene {
+  position: relative;
+  isolation: isolate;
+  min-height: min(36rem, calc(100svh - 17rem));
+  overflow: hidden;
+  border: 1px solid rgba(246, 234, 212, 0.13);
+  border-radius: 0.5rem;
+  background: #070606;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 1.25rem 3.5rem rgba(0, 0, 0, 0.3);
+}
+
+.keeperScene::before,
+.keeperScene::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: '';
+}
+
+.keeperScene::before {
+  opacity: 0.46;
+  background:
+    repeating-linear-gradient(105deg, rgba(255, 248, 237, 0.05) 0 1px, transparent 1px 8px),
+    radial-gradient(circle at 62% 42%, rgba(198, 155, 88, 0.18), transparent 29%);
+  mix-blend-mode: screen;
+}
+
+.keeperScene::after {
+  background:
+    linear-gradient(90deg, rgba(8, 6, 5, 0.24), transparent 30%),
+    linear-gradient(180deg, transparent 58%, rgba(7, 6, 6, 0.82));
+}
+
+.keeperDepth,
+.keeperPortrait,
+.keeperBookGlow,
+.keeperSealArc,
+.keeperCards,
+.keeperCinematic {
+  pointer-events: none;
+}
+
+.keeperDepth {
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
+  background-image: url('/assets/mini-games/memory-defrag/keeper/reliquary-background.webp');
+  background-position: 58% 50%;
+  background-size: cover;
+  filter: contrast(1.02) brightness(0.78);
+  transform: translate(
+    calc(var(--keeper-parallax-x) * -4px),
+    calc(var(--keeper-parallax-y) * -3px)
+  );
+  transition: transform 120ms ease-out;
+}
+
+.keeperPortrait {
+  position: absolute;
+  right: -10%;
+  bottom: -7%;
+  z-index: 1;
+  width: min(104%, 31rem);
+  height: 104%;
+  background-image: url('/assets/mini-games/memory-defrag/keeper/keeper-layer.webp');
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  filter: drop-shadow(-1.2rem 1.6rem 1.8rem rgba(0, 0, 0, 0.44));
+  transform: translate(calc(var(--keeper-parallax-x) * 5px), calc(var(--keeper-parallax-y) * 4px));
+  animation: keeperSettle 6.8s ease-in-out infinite;
+  transition:
+    filter 180ms ease,
+    transform 120ms ease-out;
+}
+
+.keeperBookGlow {
+  position: absolute;
+  right: 8%;
+  bottom: 22%;
+  z-index: 2;
+  width: 28%;
+  aspect-ratio: 1;
+  opacity: 0.38;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 180, 0.5),
+    rgba(198, 155, 88, 0.16) 42%,
+    transparent 70%
+  );
+  filter: blur(0.8rem);
+  transform: translate(calc(var(--keeper-parallax-x) * 7px), calc(var(--keeper-parallax-y) * 6px));
+  animation: keeperBookPulse 4.8s ease-in-out infinite;
+}
+
+.keeperSealArc {
+  position: absolute;
+  inset: 17% 6% 18% 10%;
+  z-index: 2;
+  opacity: calc(0.3 + (var(--keeper-progress) * 0.28));
+  border: 1px solid rgba(198, 155, 88, 0.24);
+  border-left-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-11deg);
+}
+
+.keeperSealArc::before,
+.keeperSealArc::after {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+}
+
+.keeperSealArc::before {
+  inset: 12%;
+  border: 1px solid rgba(246, 234, 212, 0.12);
+}
+
+.keeperSealArc::after {
+  inset: 29%;
+  border-block: 1px solid rgba(128, 184, 187, 0.14);
+}
+
+.keeperCards {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.keeperCard {
+  position: absolute;
+  display: grid;
+  width: clamp(2.4rem, 5vw, 3.8rem);
+  aspect-ratio: 3 / 4;
+  place-items: center;
+  border: 1px solid rgba(246, 234, 212, 0.22);
+  border-radius: 0.36rem;
+  background:
+    linear-gradient(135deg, rgba(198, 155, 88, 0.2), transparent 38%), rgba(12, 8, 7, 0.72);
+  box-shadow: 0 0.7rem 1.2rem rgba(0, 0, 0, 0.24);
+  transform: translate(
+      calc(var(--keeper-parallax-x) * var(--card-depth-x, 8px)),
+      calc(var(--keeper-parallax-y) * var(--card-depth-y, 6px))
+    )
+    rotate(var(--card-rotate));
+  animation: keeperCardFloat 7.6s ease-in-out infinite;
+}
+
+.keeperCard[data-card-index='0'] {
+  --card-rotate: -13deg;
+  --card-depth-x: 8px;
+  --card-depth-y: 5px;
+  top: 11%;
+  left: 8%;
+}
+
+.keeperCard[data-card-index='1'] {
+  --card-rotate: 9deg;
+  --card-depth-x: -7px;
+  --card-depth-y: 6px;
+  top: 8%;
+  left: 43%;
+  animation-delay: -1.8s;
+}
+
+.keeperCard[data-card-index='2'] {
+  --card-rotate: 15deg;
+  --card-depth-x: 10px;
+  --card-depth-y: -5px;
+  bottom: 18%;
+  left: 12%;
+  animation-delay: -3.2s;
+}
+
+.keeperCard[data-card-index='3'] {
+  --card-rotate: -8deg;
+  --card-depth-x: -9px;
+  --card-depth-y: -6px;
+  right: 7%;
+  bottom: 6%;
+  animation-delay: -4.4s;
+}
+
+.keeperCardBack,
+.keeperCardRelic {
+  grid-area: 1 / 1;
+  width: 68%;
+  height: 68%;
+}
+
+.keeperCardBack {
+  color: rgba(246, 234, 212, 0.34);
+}
+
+.keeperCardRelic {
+  color: rgba(246, 234, 212, 0.82);
+}
+
+.keeperCardBack path,
+.keeperCardRelic path,
+.keeperCardRelic circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.keeperCinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: end center;
+  padding: 1.2rem;
+  opacity: 0;
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.015);
+}
+
+.keeperCinematic span {
+  width: min(17rem, 82%);
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(246, 234, 212, 0.24);
+  border-radius: 0.42rem;
+  color: #fff8ed;
+  background: rgba(8, 6, 5, 0.72);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.keeperCinematic[data-cinematic='clear'] {
+  opacity: 1;
+  background-image:
+    linear-gradient(180deg, rgba(7, 6, 6, 0.04), rgba(7, 6, 6, 0.18)),
+    url('/assets/mini-games/memory-defrag/keeper/clear.webp');
+  animation: keeperClearSplash 1060ms ease both;
+}
+
+.keeperCinematic[data-cinematic='fail'] {
+  opacity: 1;
+  background-image:
+    linear-gradient(180deg, rgba(7, 6, 6, 0.08), rgba(7, 6, 6, 0.22)),
+    url('/assets/mini-games/memory-defrag/keeper/fail.webp');
+}
+
+.keeperScene[data-reaction='reveal'] .keeperBookGlow {
+  opacity: 0.58;
+}
+
+.keeperScene[data-reaction='match'] .keeperBookGlow,
+.keeperScene[data-reaction='streak'] .keeperBookGlow,
+.keeperScene[data-reaction='clear'] .keeperBookGlow {
+  opacity: 0.72;
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 190, 0.72),
+    rgba(198, 155, 88, 0.2) 44%,
+    transparent 72%
+  );
+}
+
+.keeperScene[data-reaction='mismatch'] .keeperBookGlow {
+  opacity: 0.5;
+  background: radial-gradient(
+    circle,
+    rgba(154, 206, 214, 0.46),
+    rgba(128, 184, 187, 0.14) 42%,
+    transparent 70%
+  );
+}
+
+.keeperScene[data-reaction='match'] .keeperCard,
+.keeperScene[data-reaction='streak'] .keeperCard {
+  animation-name: keeperCardAttract;
+}
+
+.keeperScene[data-reaction='mismatch'] .keeperCard {
+  animation-name: keeperCardRecoil;
+  border-color: rgba(128, 184, 187, 0.34);
+}
+
+.keeperScene[data-reaction='streak'] .keeperSealArc {
+  opacity: 0.72;
+  border-color: rgba(198, 155, 88, 0.42);
+  border-left-color: transparent;
 }
 
 .boardHeader {
@@ -581,9 +889,23 @@
   animation: revealPulse 360ms ease both;
 }
 
+.card[data-feedback='reveal'] {
+  --card-press: translateY(-3px);
+}
+
+.card[data-feedback='match'],
+.card[data-feedback='won'] {
+  --card-press: translateY(-5px) scale(1.018);
+}
+
 .card[data-feedback='match'] .cardFace,
 .card[data-feedback='won'] .cardFace {
   animation: matchSeal 520ms ease both;
+}
+
+.card[data-feedback='mismatch'],
+.card[data-mismatch='true'] {
+  --card-press: translateY(-2px);
 }
 
 .card[data-feedback='mismatch'] .cardFace,
@@ -772,6 +1094,77 @@
   }
 }
 
+@keyframes keeperSettle {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -4px;
+  }
+}
+
+@keyframes keeperBookPulse {
+  0%,
+  100% {
+    scale: 1;
+    opacity: 0.38;
+  }
+  50% {
+    scale: 1.04;
+    opacity: 0.5;
+  }
+}
+
+@keyframes keeperCardFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
+@keyframes keeperCardAttract {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 0.25rem -0.3rem;
+  }
+}
+
+@keyframes keeperCardRecoil {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  35% {
+    translate: -0.3rem 0.12rem;
+  }
+  70% {
+    translate: 0.22rem -0.08rem;
+  }
+}
+
+@keyframes keeperClearSplash {
+  0% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  18%,
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.12;
+    transform: scale(1);
+  }
+}
+
 @keyframes matchSeal {
   0% {
     box-shadow:
@@ -849,8 +1242,55 @@
     flex: 1 1 6rem;
   }
 
+  .stage {
+    display: block;
+  }
+
   .table {
+    position: relative;
+    z-index: 1;
     padding: 0.55rem;
+  }
+
+  .keeperScene {
+    position: absolute;
+    top: 0;
+    right: -0.65rem;
+    left: -0.65rem;
+    z-index: 0;
+    min-height: 28rem;
+    opacity: 0.46;
+  }
+
+  .keeperDepth {
+    background-position: 58% 44%;
+  }
+
+  .keeperPortrait {
+    right: -12%;
+    bottom: auto;
+    top: 0.5rem;
+    width: 78%;
+    height: 23rem;
+    opacity: 0.82;
+    background-position: right top;
+  }
+
+  .keeperBookGlow,
+  .keeperSealArc,
+  .keeperCards {
+    display: none;
+  }
+
+  .keeperCinematic {
+    opacity: 0;
+  }
+
+  .keeperCinematic[data-cinematic='clear'] {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    opacity: 1;
   }
 
   .boardHeader {
@@ -987,5 +1427,28 @@
 
   .card:active:not([aria-disabled='true']) {
     --card-press: translateY(0);
+  }
+
+  .keeperDepth,
+  .keeperPortrait,
+  .keeperBookGlow,
+  .keeperCard,
+  .keeperCinematic[data-cinematic='clear'] {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+
+  .keeperScene {
+    --keeper-parallax-x: 0;
+    --keeper-parallax-y: 0;
+  }
+
+  .keeperPortrait {
+    translate: 0;
+  }
+
+  .keeperCinematic[data-cinematic='clear'] {
+    opacity: 1;
   }
 }

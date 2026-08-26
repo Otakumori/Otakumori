@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryKeeperPresentation } from '@/app/mini-games/(games)/memory-match/MemoryKeeperPresentation';
 import MemoryMatchGame from '@/app/mini-games/(games)/memory-match/MemoryMatchGame';
 import { createMemoryDefragGame } from '@/app/mini-games/(games)/memory-match/memoryDefragEngine';
 
@@ -54,13 +55,19 @@ describe('memory defrag UI', () => {
 
     fireEvent.keyDown(cards[1], { key: 'Enter' });
     expect(screen.getByText(/revealed/i)).toBeInTheDocument();
+    expect(screen.getByTestId('memory-keeper-presentation')).toHaveAttribute(
+      'data-reaction',
+      'reveal',
+    );
   });
 
   it('prevents double activation during mismatch resolution', () => {
     const seed = 'mismatch-lock';
     const game = createMemoryDefragGame({ difficulty: 'initiate', seed, nowMs: 0 });
     const firstIndex = 0;
-    const secondIndex = game.cards.findIndex((card) => card.pairId !== game.cards[firstIndex].pairId);
+    const secondIndex = game.cards.findIndex(
+      (card) => card.pairId !== game.cards[firstIndex].pairId,
+    );
     const extraIndex = game.cards.findIndex(
       (_card, index) => index !== firstIndex && index !== secondIndex,
     );
@@ -86,7 +93,9 @@ describe('memory defrag UI', () => {
     const seed = 'reduced-motion';
     const game = createMemoryDefragGame({ difficulty: 'initiate', seed, nowMs: 0 });
     const firstIndex = 0;
-    const secondIndex = game.cards.findIndex((card) => card.pairId !== game.cards[firstIndex].pairId);
+    const secondIndex = game.cards.findIndex(
+      (card) => card.pairId !== game.cards[firstIndex].pairId,
+    );
 
     render(<MemoryMatchGame difficulty="initiate" seed={seed} />);
     expect(screen.getByTestId('memory-defrag-game')).toHaveAttribute('data-reduced-motion', 'true');
@@ -100,5 +109,74 @@ describe('memory defrag UI', () => {
     });
 
     expect(screen.getByTestId('memory-defrag-game')).not.toHaveAttribute('data-phase', 'resolving');
+  });
+
+  it('returns transient Keeper reactions to idle without changing the card grid', () => {
+    render(<MemoryMatchGame difficulty="initiate" seed="keeper-reaction" />);
+
+    const cards = screen.getAllByRole('gridcell');
+    fireEvent.click(cards[0]);
+
+    const keeper = screen.getByTestId('memory-keeper-presentation');
+    expect(keeper).toHaveAttribute('aria-hidden', 'true');
+    expect(keeper).toHaveAttribute('data-reaction', 'reveal');
+    expect(screen.getAllByRole('gridcell')).toHaveLength(12);
+
+    act(() => {
+      vi.advanceTimersByTime(560);
+    });
+
+    expect(keeper).toHaveAttribute('data-reaction', 'idle');
+    expect(screen.getAllByRole('gridcell')).toHaveLength(12);
+  });
+
+  it('emits completion immediately while clear presentation is still active', () => {
+    const seed = 'clear-handoff';
+    const fixture = createMemoryDefragGame({ difficulty: 'initiate', seed, nowMs: 0 });
+    const pairIds = new Map<string, string[]>();
+    fixture.cards.forEach((card) => {
+      pairIds.set(card.pairId, [...(pairIds.get(card.pairId) ?? []), card.id]);
+    });
+    const onGameEnd = vi.fn();
+
+    render(<MemoryMatchGame difficulty="initiate" seed={seed} onGameEnd={onGameEnd} />);
+
+    const cards = screen.getAllByRole('gridcell');
+    for (const ids of pairIds.values()) {
+      const firstIndex = fixture.cards.findIndex((card) => card.id === ids[0]);
+      const secondIndex = fixture.cards.findIndex((card) => card.id === ids[1]);
+      fireEvent.click(cards[firstIndex]);
+      fireEvent.click(cards[secondIndex]);
+    }
+
+    expect(onGameEnd).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('memory-keeper-presentation')).toHaveAttribute(
+      'data-reaction',
+      'clear',
+    );
+  });
+
+  it('keeps the fail cinematic out of production gameplay mapping', () => {
+    render(<MemoryMatchGame difficulty="initiate" seed="no-fail-path" />);
+
+    const keeper = screen.getByTestId('memory-keeper-presentation');
+    expect(keeper).not.toHaveAttribute('data-reaction', 'fail');
+
+    cleanup();
+
+    render(
+      <MemoryKeeperPresentation
+        reaction="fail"
+        nonce={1}
+        reducedMotion={false}
+        progress={0}
+        streakTier="quiet"
+      />,
+    );
+
+    expect(screen.getByTestId('memory-keeper-presentation')).toHaveAttribute(
+      'data-reaction',
+      'fail',
+    );
   });
 });

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGameSave } from '../../_shared/SaveSystem';
+import { MemoryKeeperPresentation, type MemoryKeeperReaction } from './MemoryKeeperPresentation';
 import styles from './MemoryMatchGame.module.css';
 import { MemoryRelicIcon, MemorySealIcon } from './MemoryRelicIcon';
 import {
@@ -62,6 +63,11 @@ interface FeedbackState {
   nonce: number;
 }
 
+interface KeeperReactionState {
+  kind: MemoryKeeperReaction;
+  nonce: number;
+}
+
 function playMemoryCue(kind: Exclude<FeedbackKind, 'reset'>) {
   if (typeof window === 'undefined' || process.env.NODE_ENV === 'test') return;
 
@@ -110,6 +116,10 @@ export default function MemoryMatchGame({
   const [feedback, setFeedback] = useState<FeedbackState>({
     kind: 'reset',
     ids: [],
+    nonce: 0,
+  });
+  const [keeperReaction, setKeeperReaction] = useState<KeeperReactionState>({
+    kind: 'idle',
     nonce: 0,
   });
   const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -234,6 +244,22 @@ export default function MemoryMatchGame({
 
     return () => window.clearTimeout(timeout);
   }, [game.elapsedMs, game.pendingMismatch, game.phase, reducedMotion]);
+
+  useEffect(() => {
+    const nextReaction = mapFeedbackToKeeperReaction(feedback.kind, game.streak);
+    setKeeperReaction({ kind: nextReaction, nonce: feedback.nonce });
+
+    if (nextReaction === 'idle' || nextReaction === 'clear' || nextReaction === 'fail') {
+      return;
+    }
+
+    const timeout = window.setTimeout(
+      () => setKeeperReaction({ kind: 'idle', nonce: feedback.nonce }),
+      reducedMotion ? 220 : getKeeperReactionDuration(nextReaction),
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [feedback.kind, feedback.nonce, game.streak, reducedMotion]);
 
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -475,76 +501,88 @@ export default function MemoryMatchGame({
         </div>
       </div>
 
-      <div className={styles.table}>
-        <div className={styles.boardHeader}>
-          <div>
-            <p className={styles.statusLine}>
-              {game.phase === 'paused'
-                ? 'Paused'
-                : inputLocked
-                  ? 'Resolving memory lock'
-                  : 'Select two fragments'}
-            </p>
-            <p className={styles.metaLine}>
-              Streak {game.streak} / Best {game.bestStreak}
-            </p>
-          </div>
-          {player?.displayName && (
-            <div className={styles.playerChip}>
-              <span>{player.displayName}</span>
-              {player.title && <small>{player.title}</small>}
-            </div>
-          )}
-        </div>
+      <div className={styles.stage}>
+        <MemoryKeeperPresentation
+          reaction={keeperReaction.kind}
+          nonce={keeperReaction.nonce}
+          reducedMotion={reducedMotion}
+          progress={progress}
+          streakTier={streakTier}
+        />
 
-        <div
-          className={styles.board}
-          style={boardStyle}
-          role="grid"
-          aria-label={`${config.label} memory defrag board`}
-        >
-          {game.cards.map((card, index) => {
-            const isFaceUp = card.state !== 'hidden';
-            const hasFeedback = feedbackIds.has(card.id);
-            const isMismatched = mismatchIds.has(card.id);
-            return (
-              <button
-                key={card.id}
-                ref={(node) => {
-                  cardRefs.current[index] = node;
-                }}
-                type="button"
-                className={styles.card}
-                data-state={card.state}
-                data-tone={card.face.tone}
-                data-relic={card.face.id}
-                data-feedback={hasFeedback ? feedback.kind : undefined}
-                data-mismatch={isMismatched ? 'true' : undefined}
-                data-feedback-nonce={hasFeedback ? feedback.nonce : undefined}
-                onClick={() => activateCard(card.id)}
-                onKeyDown={(event) => handleCardKeyDown(event, index, card.id)}
-                aria-label={
-                  isFaceUp ? `${card.face.label}, ${card.state}` : `Hidden memory card ${index + 1}`
-                }
-                aria-disabled={inputLocked || card.state === 'matched'}
-                role="gridcell"
-              >
-                <span className={styles.cardInner}>
-                  <span className={styles.cardBack} aria-hidden={isFaceUp}>
-                    <MemorySealIcon className={styles.cardSeal} />
-                    <span className={styles.cardSigil}>MORI</span>
-                  </span>
-                  <span className={styles.cardFace} aria-hidden={!isFaceUp}>
-                    <span className={styles.relicShape}>
-                      <MemoryRelicIcon faceId={card.face.id} className={styles.relicIcon} />
+        <div className={styles.table}>
+          <div className={styles.boardHeader}>
+            <div>
+              <p className={styles.statusLine}>
+                {game.phase === 'paused'
+                  ? 'Paused'
+                  : inputLocked
+                    ? 'Resolving memory lock'
+                    : 'Select two fragments'}
+              </p>
+              <p className={styles.metaLine}>
+                Streak {game.streak} / Best {game.bestStreak}
+              </p>
+            </div>
+            {player?.displayName && (
+              <div className={styles.playerChip}>
+                <span>{player.displayName}</span>
+                {player.title && <small>{player.title}</small>}
+              </div>
+            )}
+          </div>
+
+          <div
+            className={styles.board}
+            style={boardStyle}
+            role="grid"
+            aria-label={`${config.label} memory defrag board`}
+          >
+            {game.cards.map((card, index) => {
+              const isFaceUp = card.state !== 'hidden';
+              const hasFeedback = feedbackIds.has(card.id);
+              const isMismatched = mismatchIds.has(card.id);
+              return (
+                <button
+                  key={card.id}
+                  ref={(node) => {
+                    cardRefs.current[index] = node;
+                  }}
+                  type="button"
+                  className={styles.card}
+                  data-state={card.state}
+                  data-tone={card.face.tone}
+                  data-relic={card.face.id}
+                  data-feedback={hasFeedback ? feedback.kind : undefined}
+                  data-mismatch={isMismatched ? 'true' : undefined}
+                  data-feedback-nonce={hasFeedback ? feedback.nonce : undefined}
+                  onClick={() => activateCard(card.id)}
+                  onKeyDown={(event) => handleCardKeyDown(event, index, card.id)}
+                  aria-label={
+                    isFaceUp
+                      ? `${card.face.label}, ${card.state}`
+                      : `Hidden memory card ${index + 1}`
+                  }
+                  aria-disabled={inputLocked || card.state === 'matched'}
+                  role="gridcell"
+                >
+                  <span className={styles.cardInner}>
+                    <span className={styles.cardBack} aria-hidden={isFaceUp}>
+                      <MemorySealIcon className={styles.cardSeal} />
+                      <span className={styles.cardSigil}>MORI</span>
                     </span>
-                    <span className={styles.faceCode}>{card.face.shortLabel}</span>
-                    <span className={styles.faceLabel}>{card.face.label}</span>
+                    <span className={styles.cardFace} aria-hidden={!isFaceUp}>
+                      <span className={styles.relicShape}>
+                        <MemoryRelicIcon faceId={card.face.id} className={styles.relicIcon} />
+                      </span>
+                      <span className={styles.faceCode}>{card.face.shortLabel}</span>
+                      <span className={styles.faceLabel}>{card.face.label}</span>
+                    </span>
                   </span>
-                </span>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -584,4 +622,29 @@ export default function MemoryMatchGame({
       </p>
     </section>
   );
+}
+
+function mapFeedbackToKeeperReaction(
+  feedbackKind: FeedbackKind,
+  streak: number,
+): MemoryKeeperReaction {
+  if (feedbackKind === 'reset') return 'idle';
+  if (feedbackKind === 'won') return 'clear';
+  if (feedbackKind === 'match' && streak >= 2) return 'streak';
+  return feedbackKind;
+}
+
+function getKeeperReactionDuration(reaction: MemoryKeeperReaction) {
+  switch (reaction) {
+    case 'streak':
+      return 920;
+    case 'match':
+      return 760;
+    case 'mismatch':
+      return 680;
+    case 'reveal':
+      return 520;
+    default:
+      return 0;
+  }
 }
