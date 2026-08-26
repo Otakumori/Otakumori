@@ -26,17 +26,17 @@
     {
       "id": "memory-match",
       "slug": "memory-match",
-      "title": "Memory Match",
-      "description": "Flip cards and match pairs. Perfect recall earns bonuses.",
+      "title": "Memory Card / Defrag",
+      "description": "Restore paired relic fragments with clean recall and careful moves.",
       "category": "puzzle",
       "difficulty": "easy",
       "estimatedTime": "3-10 min",
       "ageRating": "E",
       "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
       "tooltips": {
-        "hint": "Remember card positions! Use modifiers like flipped board for extra challenge.",
-        "levels": "Progress through increasingly difficult layouts",
-        "scoring": "Petals earned on streaks. Perfect matches give bonus rewards!"
+        "hint": "Remember each relic fragment and restore matching pairs.",
+        "levels": "Progress through increasingly difficult board sizes.",
+        "scoring": "Score reflects matches, move efficiency, time, and streak control."
       },
       "image": "/games/memory-match/cover.jpg",
       "icon": "[]",

@@ -55,3 +55,32 @@ export async function currentUser() {
 export function clerkClient() {
   return {};
 }
+
+export function createRouteMatcher(patterns: string[]) {
+  return (req: { nextUrl?: { pathname?: string }; url?: string } | string) => {
+    const pathname =
+      typeof req === 'string'
+        ? req
+        : req.nextUrl?.pathname ?? (req.url ? new URL(req.url).pathname : '');
+
+    return patterns.some((pattern) => {
+      if (pattern.endsWith('(.*)')) {
+        const prefix = pattern.slice(0, -4);
+        return pathname === prefix || pathname.startsWith(`${prefix}/`);
+      }
+
+      return pathname === pattern;
+    });
+  };
+}
+
+export function clerkMiddleware(
+  handler: (
+    authFn: typeof auth,
+    req: Parameters<ReturnType<typeof createRouteMatcher>>[0],
+    event?: unknown,
+  ) => unknown,
+) {
+  return (req: Parameters<ReturnType<typeof createRouteMatcher>>[0], event?: unknown) =>
+    handler(auth, req, event);
+}

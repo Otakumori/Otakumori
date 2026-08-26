@@ -1,305 +1,510 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useGameSave } from '../../_shared/SaveSystem';
-import { GameAvatarIntegration } from '../../_shared/GameAvatarIntegration';
-import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../../_shared/PhysicsAvatarCanvas';
 
-interface Card {
-  id: number;
-  value: string;
-  isFlipped: boolean;
-  isMatched: boolean;
-}
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useGameSave } from '../../_shared/SaveSystem';
+import styles from './MemoryMatchGame.module.css';
+import {
+  buildMemoryDefragAchievementIntent,
+  buildMemoryDefragCompletionFacts,
+  buildMemoryDefragRewardIntent,
+  createMemoryDefragGame,
+  getMemoryDefragElapsedMs,
+  getMemoryDefragProgress,
+  getMemoryDefragScore,
+  MEMORY_DEFRAG_CONFIGS,
+  pauseMemoryDefrag,
+  resolveMemoryMismatch,
+  resumeMemoryDefrag,
+  revealMemoryCard,
+  settleTimedState,
+  type MemoryDefragAchievementIntent,
+  type MemoryDefragDifficulty,
+  type MemoryDefragPlayerPresentation,
+  type MemoryDefragRewardIntent,
+} from './memoryDefragEngine';
 
 interface MemoryMatchGameProps {
-  deck?: 'anime' | 'gaming' | 'runes';
-  pairs?: number;
-  timeLimit?: number; // seconds
-  onGameEnd?: (results: { score: number; matches: number; moves: number; timeElapsed: number; didWin: boolean }) => void;
-  onStatsUpdate?: (stats: { score: number; combo: number; timer?: number; progress: number }) => void;
+  difficulty?: MemoryDefragDifficulty;
+  seed?: string;
+  player?: MemoryDefragPlayerPresentation;
+  onGameEnd?: (results: {
+    score: number;
+    matches: number;
+    moves: number;
+    timeElapsed: number;
+    didWin: boolean;
+    rewardIntent?: MemoryDefragRewardIntent | null;
+    achievementIntent?: MemoryDefragAchievementIntent | null;
+  }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    combo: number;
+    timer?: number;
+    progress: number;
+  }) => void;
 }
 
-export default function MemoryMatchGame({ deck = 'anime', pairs = 8, timeLimit = 120, onGameEnd, onStatsUpdate }: MemoryMatchGameProps) {
-  const [cards, setCards] = useState<Card[]>([]);
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [moves, setMoves] = useState(0);
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
-  const [gameState, setGameState] = useState<'setup' | 'playing' | 'won' | 'lost'>('setup');
-  const [matchedPairs, setMatchedPairs] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
+const DIFFICULTIES: MemoryDefragDifficulty[] = ['initiate', 'keeper', 'warden'];
 
+function usePrefersReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(query.matches);
+
+    const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+
+  return reducedMotion;
+}
+
+function formatTime(ms: number) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+export default function MemoryMatchGame({
+  difficulty = 'keeper',
+  seed,
+  player,
+  onGameEnd,
+  onStatsUpdate,
+}: MemoryMatchGameProps) {
+  const reducedMotion = usePrefersReducedMotion();
+  const [selectedDifficulty, setSelectedDifficulty] = useState<MemoryDefragDifficulty>(difficulty);
+  const [game, setGame] = useState(() =>
+    createMemoryDefragGame({ difficulty, seed, nowMs: performance.now() }),
+  );
+  const [clockMs, setClockMs] = useState(() => performance.now());
+  const [announcement, setAnnouncement] = useState('Memory defrag board ready.');
+  const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const finishedSeedRef = useRef<string | null>(null);
+  const autoPausedRef = useRef(false);
   const { saveOnExit, autoSave } = useGameSave('memory-match');
 
-  // Card symbols for different decks
-  const deckSymbols = {
-    anime: ['‍', '‍', '‍', '', '', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '', '', ''],
-    gaming: ['', '<span role="img" aria-label="emoji">️</span>', '', '', '', '', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">�</span>�', ''],
-    runes: ['', '', '', '<span role="img" aria-label="emoji">️</span>', '', '', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '', '◆', '', ''],
-  };
+  const config = MEMORY_DEFRAG_CONFIGS[game.difficulty];
+  const elapsedMs = getMemoryDefragElapsedMs(game, clockMs);
+  const score = getMemoryDefragScore(game, clockMs);
+  const progress = getMemoryDefragProgress(game);
+  const inputLocked = game.phase === 'resolving' || game.phase === 'paused' || game.phase === 'won';
 
-  // Initialize game
-  const initializeGame = useCallback(() => {
-    const symbols = deckSymbols[deck].slice(0, pairs);
-    const gameCards: Card[] = [];
+  const startNewGame = useCallback(
+    (nextDifficulty: MemoryDefragDifficulty = selectedDifficulty) => {
+      const nextSeed = seed ?? `${nextDifficulty}-${Date.now()}`;
+      const now = performance.now();
+      finishedSeedRef.current = null;
+      setSelectedDifficulty(nextDifficulty);
+      setClockMs(now);
+      setGame(createMemoryDefragGame({ difficulty: nextDifficulty, seed: nextSeed, nowMs: now }));
+      setAnnouncement(`${MEMORY_DEFRAG_CONFIGS[nextDifficulty].label} board reset.`);
+      requestAnimationFrame(() => cardRefs.current[0]?.focus());
+    },
+    [seed, selectedDifficulty],
+  );
 
-    // Create pairs
-    symbols.forEach((symbol, index) => {
-      gameCards.push(
-        { id: index * 2, value: symbol, isFlipped: false, isMatched: false },
-        { id: index * 2 + 1, value: symbol, isFlipped: false, isMatched: false },
-      );
+  const activateCard = useCallback((cardId: string) => {
+    const now = performance.now();
+    setClockMs(now);
+    setGame((current) => {
+      const next = revealMemoryCard(current, cardId, now);
+      const card = next.cards.find((candidate) => candidate.id === cardId);
+
+      if (next.lastEvent === 'first-reveal' && card) {
+        setAnnouncement(`${card.face.label} revealed.`);
+      } else if (next.lastEvent === 'match' && card) {
+        setAnnouncement(`${card.face.label} pair restored. Streak ${next.streak}.`);
+      } else if (next.lastEvent === 'mismatch') {
+        setAnnouncement('Fragments do not align. Rebinding.');
+      } else if (next.lastEvent === 'won') {
+        setAnnouncement('Memory fully defragmented.');
+      }
+
+      return next;
+    });
+  }, []);
+
+  const pauseGame = useCallback(() => {
+    const now = performance.now();
+    setClockMs(now);
+    setGame((current) => pauseMemoryDefrag(current, now));
+    setAnnouncement('Memory defrag paused.');
+  }, []);
+
+  const resumeGame = useCallback(() => {
+    const now = performance.now();
+    setClockMs(now);
+    setGame((current) => resumeMemoryDefrag(current, now));
+    setAnnouncement('Memory defrag resumed.');
+  }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const now = performance.now();
+      setClockMs(now);
+      setGame((current) => settleTimedState(current, now));
+    }, 250);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!game.pendingMismatch || game.phase !== 'resolving') return;
+
+    const remaining = Math.max(0, game.pendingMismatch.resolveAtMs - game.elapsedMs);
+    const timeout = window.setTimeout(() => {
+      const now = performance.now();
+      setClockMs(now);
+      setGame((current) => resolveMemoryMismatch(current, now));
+      setAnnouncement('Unmatched fragments concealed.');
+    }, reducedMotion ? Math.min(remaining, 120) : remaining);
+
+    return () => window.clearTimeout(timeout);
+  }, [game.elapsedMs, game.pendingMismatch, game.phase, reducedMotion]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      const now = performance.now();
+      setClockMs(now);
+
+      if (document.hidden) {
+        setGame((current) => {
+          if (current.phase === 'playing' || current.phase === 'resolving') {
+            autoPausedRef.current = true;
+            return pauseMemoryDefrag(current, now);
+          }
+          return current;
+        });
+        return;
+      }
+
+      if (autoPausedRef.current) {
+        autoPausedRef.current = false;
+        setGame((current) => resumeMemoryDefrag(current, now));
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && (game.phase === 'playing' || game.phase === 'resolving')) {
+        event.preventDefault();
+        pauseGame();
+      }
+
+      if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        startNewGame(game.difficulty);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [game.difficulty, game.phase, pauseGame, startNewGame]);
+
+  useEffect(() => {
+    onStatsUpdate?.({
+      score,
+      combo: game.streak,
+      timer: Math.floor(elapsedMs / 1000),
+      progress,
+    });
+  }, [elapsedMs, game.streak, onStatsUpdate, progress, score]);
+
+  useEffect(() => {
+    if (game.phase !== 'playing' || game.matchedPairs === 0 || game.matchedPairs % 2 !== 0) {
+      return;
+    }
+
+    autoSave({
+      score,
+      level: config.pairs,
+      progress,
+      stats: {
+        difficulty: game.difficulty,
+        moves: game.moves,
+        elapsedMs,
+        rewardAuthority: 'external',
+      },
+    }).catch(() => {});
+  }, [
+    autoSave,
+    config.pairs,
+    elapsedMs,
+    game.difficulty,
+    game.matchedPairs,
+    game.moves,
+    game.phase,
+    progress,
+    score,
+  ]);
+
+  useEffect(() => {
+    if (game.phase !== 'won' || finishedSeedRef.current === game.seed) return;
+
+    finishedSeedRef.current = game.seed;
+    const facts = buildMemoryDefragCompletionFacts(game, clockMs);
+    const rewardIntent = buildMemoryDefragRewardIntent(game, clockMs);
+    const achievementIntent = buildMemoryDefragAchievementIntent(game, clockMs);
+
+    onGameEnd?.({
+      score,
+      matches: game.matchedPairs,
+      moves: game.moves,
+      timeElapsed: Math.floor(elapsedMs / 1000),
+      didWin: true,
+      rewardIntent,
+      achievementIntent,
     });
 
-    // Shuffle cards
-    for (let i = gameCards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [gameCards[i], gameCards[j]] = [gameCards[j], gameCards[i]];
-    }
+    saveOnExit({
+      score,
+      level: config.pairs,
+      progress: 1,
+      stats: {
+        difficulty: game.difficulty,
+        moves: game.moves,
+        elapsedMs,
+        perfectClear: facts?.perfectClear ?? false,
+        lowMoveClear: facts?.lowMoveClear ?? false,
+        rewardIntent,
+        achievementIntent,
+        playerDisplayName: player?.displayName,
+      },
+    }).catch(() => {});
+  }, [
+    clockMs,
+    config.pairs,
+    elapsedMs,
+    game,
+    onGameEnd,
+    player?.displayName,
+    saveOnExit,
+    score,
+  ]);
 
-    setCards(gameCards);
-    setFlippedCards([]);
-    setMoves(0);
-    setScore(0);
-    setTimeLeft(timeLimit);
-    setMatchedPairs(0);
-    setGameState('playing');
-  }, [deck, pairs, timeLimit]);
+  const focusByOffset = useCallback(
+    (index: number, offset: number) => {
+      const nextIndex = Math.max(0, Math.min(game.cards.length - 1, index + offset));
+      cardRefs.current[nextIndex]?.focus();
+    },
+    [game.cards.length],
+  );
 
-  // Start game
-  useEffect(() => {
-    if (gameState === 'setup') {
-      initializeGame();
-    }
-  }, [gameState, initializeGame]);
-
-  // Timer
-  useEffect(() => {
-    if (gameState !== 'playing') return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setGameState('lost');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState]);
-
-  // Check for matches
-  useEffect(() => {
-    if (flippedCards.length === 2) {
-      const [first, second] = flippedCards;
-      const firstCard = cards.find((c) => c.id === first);
-      const secondCard = cards.find((c) => c.id === second);
-
-      if (firstCard && secondCard && firstCard.value === secondCard.value) {
-        // Match found - apply physics impact
-        const newCombo = combo + 1;
-        setCombo(newCombo);
-        const impactForce = {
-          x: (Math.random() - 0.5) * 2,
-          y: -3 - Math.min(newCombo * 0.5, 2), // Stronger impact for combos
-        };
-        if (physicsAvatarRef.current) {
-          physicsAvatarRef.current.applyImpact(impactForce, 'chest');
-        }
-
-        setTimeout(() => {
-          setCards((prev) =>
-            prev.map((card) =>
-              card.id === first || card.id === second
-                ? { ...card, isMatched: true, isFlipped: true }
-                : card,
-            ),
-          );
-          setMatchedPairs((prev) => prev + 1);
-          setScore((prev) => prev + 100 + timeLeft * 5); // Bonus for remaining time
-          setFlippedCards([]);
-        }, 500);
-      } else {
-        // No match - reset combo and apply slight negative impact
-        setCombo(0);
-        if (physicsAvatarRef.current) {
-          physicsAvatarRef.current.applyImpact({ x: 0, y: 1 }, 'chest');
-        }
-        // No match
-        setTimeout(() => {
-          setCards((prev) =>
-            prev.map((card) =>
-              card.id === first || card.id === second ? { ...card, isFlipped: false } : card,
-            ),
-          );
-          setFlippedCards([]);
-        }, 1000);
-      }
-      setMoves((prev) => prev + 1);
-    }
-  }, [flippedCards, cards, timeLeft]);
-
-  // Update stats via callback
-  useEffect(() => {
-    if (gameState === 'playing' && onStatsUpdate) {
-      const progress = matchedPairs / pairs;
-      const timeElapsed = timeLimit - timeLeft;
-      onStatsUpdate({
-        score,
-        combo,
-        timer: timeLeft,
-        progress,
-      });
-    }
-  }, [gameState, score, combo, timeLeft, matchedPairs, pairs, timeLimit, onStatsUpdate]);
-
-  // Check win condition
-  useEffect(() => {
-    if (matchedPairs === pairs && gameState === 'playing') {
-      setGameState('won');
-
-      // Calculate final score with bonuses
-      const timeBonus = timeLeft * 10;
-      const moveBonus = Math.max(0, pairs * 2 - moves) * 50;
-      const perfectBonus = moves === pairs ? 500 : 0;
-      const finalScore = score + timeBonus + moveBonus + perfectBonus;
-
-      setScore(finalScore);
-
-      // Notify parent component
-      if (onGameEnd) {
-        const timeElapsed = timeLimit - timeLeft;
-        onGameEnd({
-          score: finalScore,
-          matches: matchedPairs,
-          moves,
-          timeElapsed,
-          didWin: true,
-        });
+  const handleCardKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>, index: number, cardId: string) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activateCard(cardId);
+        return;
       }
 
-      // Save game results
-      saveOnExit({
-        score: finalScore,
-        level: pairs,
-        progress: 1.0,
-        stats: {
-          deck,
-          pairs,
-          moves,
-          timeLeft,
-          perfectGame: moves === pairs,
-          lastPlayed: Date.now(),
-        },
-      }).catch(console.error);
-    }
-    
-    if (gameState === 'lost' && onGameEnd) {
-      const timeElapsed = timeLimit - timeLeft;
-      onGameEnd({
-        score,
-        matches: matchedPairs,
-        moves,
-        timeElapsed,
-        didWin: false,
-      });
-    }
-  }, [matchedPairs, pairs, gameState, timeLeft, moves, score, deck, saveOnExit, onGameEnd, timeLimit]);
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        focusByOffset(index, 1);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        focusByOffset(index, -1);
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        focusByOffset(index, config.columns);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        focusByOffset(index, -config.columns);
+      }
+    },
+    [activateCard, config.columns, focusByOffset],
+  );
 
-  // Auto-save progress
-  useEffect(() => {
-    if (gameState === 'playing' && matchedPairs > 0 && matchedPairs % 3 === 0) {
-      autoSave({
-        score,
-        level: pairs,
-        progress: matchedPairs / pairs,
-        stats: { deck, moves, timeLeft },
-      }).catch(() => {}); // Ignore save errors during gameplay
-    }
-  }, [matchedPairs, pairs, score, deck, moves, timeLeft, autoSave, gameState]);
-
-  const handleCardClick = (cardId: number) => {
-    if (gameState !== 'playing') return;
-    if (flippedCards.length >= 2) return;
-    if (flippedCards.includes(cardId)) return;
-
-    const card = cards.find((c) => c.id === cardId);
-    if (!card || card.isMatched) return;
-
-    setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, isFlipped: true } : c)));
-    setFlippedCards((prev) => [...prev, cardId]);
-  };
-
-  const getGridCols = () => {
-    if (pairs <= 6) return 'grid-cols-3'; // 3x4
-    if (pairs <= 8) return 'grid-cols-4'; // 4x4
-    return 'grid-cols-4'; // 4x6 for 12 pairs
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Results screen removed - handled by GameStateMachine wrapper
-  if (gameState === 'won' || gameState === 'lost') {
-    return null;
-  }
+  const boardStyle = useMemo(
+    () =>
+      ({
+        '--memory-columns': config.columns,
+        '--memory-rows': config.rows,
+      }) as React.CSSProperties,
+    [config.columns, config.rows],
+  );
 
   return (
-    <div className="h-full flex flex-col p-4 relative">
-      {/* Physics Avatar Integration */}
-      <div className="absolute top-4 right-4 z-10">
-        <PhysicsAvatarCanvas
-          ref={physicsAvatarRef}
-          characterType="player"
-          quality="high"
-          width={120}
-          height={160}
-          className="rounded-lg"
-        />
-      </div>
-      {/* Fallback Avatar Integration */}
-      <div className="absolute top-4 left-4 z-10 opacity-0 pointer-events-none">
-        <GameAvatarIntegration gameId="memory-match" gameMode="puzzle" position={[0, 0, 0]} />
+    <section
+      className={styles.shell}
+      data-testid="memory-defrag-game"
+      data-phase={game.phase}
+      data-reduced-motion={reducedMotion ? 'true' : 'false'}
+      aria-labelledby="memory-defrag-title"
+    >
+      <div className={styles.backdrop} aria-hidden="true" />
+
+      <div className={styles.hud}>
+        <div>
+          <p className={styles.eyebrow}>Memory Card / Defrag</p>
+          <h1 id="memory-defrag-title" className={styles.title}>
+            Restore the fractured relics
+          </h1>
+        </div>
+
+        <div className={styles.stats} aria-label="Run stats">
+          <output>
+            <span>Score</span>
+            {score.toLocaleString()}
+          </output>
+          <output>
+            <span>Moves</span>
+            {game.moves}
+          </output>
+          <output>
+            <span>Time</span>
+            {formatTime(elapsedMs)}
+          </output>
+          <output>
+            <span>Pairs</span>
+            {game.matchedPairs}/{config.pairs}
+          </output>
+        </div>
+
+        <div className={styles.controls} aria-label="Game controls">
+          <div className={styles.segmented} role="group" aria-label="Difficulty">
+            {DIFFICULTIES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                aria-pressed={game.difficulty === item}
+                onClick={() => startNewGame(item)}
+              >
+                {MEMORY_DEFRAG_CONFIGS[item].label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className={styles.controlButton}
+            onClick={() => startNewGame(game.difficulty)}
+          >
+            Restart
+          </button>
+
+          {game.phase === 'paused' ? (
+            <button type="button" className={styles.controlButton} onClick={resumeGame}>
+              Resume
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.controlButton}
+              onClick={pauseGame}
+              disabled={game.phase === 'ready' || game.phase === 'won'}
+            >
+              Pause
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Card Grid */}
-      <div className={`grid ${getGridCols()} gap-3 flex-1 max-h-full place-items-center`}>
-        {cards.map((card) => (
-          <div
-            key={card.id}
-            onClick={() => handleCardClick(card.id)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(card.id)}
-            role="button"
-            tabIndex={0}
-            aria-label={`Flip card ${card.id}`}
-            className={`
-              w-16 h-20 rounded-lg border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-2xl
-              ${
-                card.isFlipped || card.isMatched
-                  ? 'bg-white border-pink-300 transform rotate-y-180'
-                  : 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600 hover:border-pink-500'
-              }
-              ${card.isMatched ? 'opacity-60' : ''}
-            `}
-            style={{
-              backfaceVisibility: 'hidden',
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            {card.isFlipped || card.isMatched ? (
-              card.value
-            ) : (
-              <div className="text-pink-400 text-lg font-bold"></div>
-            )}
+      <div className={styles.table}>
+        <div className={styles.boardHeader}>
+          <div>
+            <p className={styles.statusLine}>
+              {game.phase === 'paused'
+                ? 'Paused'
+                : inputLocked
+                  ? 'Resolving memory lock'
+                  : 'Select two fragments'}
+            </p>
+            <p className={styles.metaLine}>
+              Streak {game.streak} / Best {game.bestStreak}
+            </p>
           </div>
-        ))}
+          {player?.displayName && (
+            <div className={styles.playerChip}>
+              <span>{player.displayName}</span>
+              {player.title && <small>{player.title}</small>}
+            </div>
+          )}
+        </div>
+
+        <div
+          className={styles.board}
+          style={boardStyle}
+          role="grid"
+          aria-label={`${config.label} memory defrag board`}
+        >
+          {game.cards.map((card, index) => {
+            const isFaceUp = card.state !== 'hidden';
+            return (
+              <button
+                key={card.id}
+                ref={(node) => {
+                  cardRefs.current[index] = node;
+                }}
+                type="button"
+                className={styles.card}
+                data-state={card.state}
+                data-tone={card.face.tone}
+                onClick={() => activateCard(card.id)}
+                onKeyDown={(event) => handleCardKeyDown(event, index, card.id)}
+                aria-label={
+                  isFaceUp
+                    ? `${card.face.label}, ${card.state}`
+                    : `Hidden memory card ${index + 1}`
+                }
+                aria-disabled={inputLocked || card.state === 'matched'}
+                role="gridcell"
+              >
+                <span className={styles.cardInner}>
+                  <span className={styles.cardBack} aria-hidden={isFaceUp}>
+                    <span className={styles.cardSigil}>OM</span>
+                  </span>
+                  <span className={styles.cardFace} aria-hidden={!isFaceUp}>
+                    <span className={styles.relicShape} />
+                    <span className={styles.faceCode}>{card.face.shortLabel}</span>
+                    <span className={styles.faceLabel}>{card.face.label}</span>
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      <div className={styles.progressWrap} aria-hidden="true">
+        <div className={styles.progressTrack}>
+          <div className={styles.progressFill} style={{ width: `${Math.round(progress * 100)}%` }} />
+        </div>
+      </div>
+
+      {game.phase === 'paused' && (
+        <div
+          className={styles.pauseOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="memory-pause-title"
+        >
+          <div>
+            <h2 id="memory-pause-title">Run paused</h2>
+            <p>The board is held in place until you resume.</p>
+            <div className={styles.overlayActions}>
+              <button type="button" onClick={resumeGame}>
+                Resume
+              </button>
+              <button type="button" onClick={() => startNewGame(game.difficulty)}>
+                Restart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <p className="sr-only" aria-live="polite">
+        {announcement}
+      </p>
+    </section>
   );
 }

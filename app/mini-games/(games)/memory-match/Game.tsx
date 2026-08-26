@@ -10,13 +10,15 @@ import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 
 export default function MemoryMatchGameWrapper() {
-  const [gameState, setGameState] = useState<GameState>('loading');
+  const [_gameState, setGameState] = useState<GameState>('loading');
   const [gameResults, setGameResults] = useState<{
     score: number;
     matches: number;
     moves: number;
     timeElapsed: number;
     didWin: boolean;
+    perfectClear?: boolean;
+    lowMoveClear?: boolean;
   } | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
@@ -37,8 +39,19 @@ export default function MemoryMatchGameWrapper() {
     ].filter(Boolean),
   };
 
-  const handleGameEnd = useCallback((results: { score: number; matches: number; moves: number; timeElapsed: number; didWin: boolean }) => {
-    setGameResults(results);
+  const handleGameEnd = useCallback((results: {
+    score: number;
+    matches: number;
+    moves: number;
+    timeElapsed: number;
+    didWin: boolean;
+    rewardIntent?: { facts?: { perfectClear?: boolean; lowMoveClear?: boolean } } | null;
+  }) => {
+    setGameResults({
+      ...results,
+      perfectClear: results.rewardIntent?.facts?.perfectClear,
+      lowMoveClear: results.rewardIntent?.facts?.lowMoveClear,
+    });
     setGameState('results');
   }, []);
 
@@ -54,7 +67,7 @@ export default function MemoryMatchGameWrapper() {
   return (
     <GameStateMachine
       gameId="memory-match"
-      gameTitle="Memory Match"
+      gameTitle="Memory Card / Defrag"
       assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
       onStateChange={setGameState}
     >
@@ -62,13 +75,13 @@ export default function MemoryMatchGameWrapper() {
         if (state === 'title') {
           return (
             <GameTitleScreen
-              title="Memory Match"
-              description="Recall the faces bound by fate."
+              title="Memory Card / Defrag"
+              description="Restore paired relic fragments before the archive cools."
               instructions={[
-                'Flip cards to find matching pairs',
-                'Remember card positions',
-                'Match all pairs to win',
-                'Fewer moves = higher score',
+                'Reveal two memory cards to find a matching relic pair',
+                'Arrow keys move across the board, Enter or Space reveals',
+                'Mismatches briefly lock input before concealing again',
+                'Fewer moves, faster clears, and clean streaks improve score',
               ]}
               onStart={() => transitionTo('playing')}
             />
@@ -78,7 +91,7 @@ export default function MemoryMatchGameWrapper() {
         if (state === 'results' && gameResults) {
           return (
             <GameResultsScreen
-              title="Memory Match"
+              title="Memory Card / Defrag"
               score={gameResults.score}
               isWin={gameResults.didWin}
               stats={[
@@ -86,6 +99,8 @@ export default function MemoryMatchGameWrapper() {
                 { label: 'Matches', value: gameResults.matches },
                 { label: 'Moves', value: gameResults.moves },
                 { label: 'Time', value: `${Math.floor(gameResults.timeElapsed / 60)}:${(gameResults.timeElapsed % 60).toString().padStart(2, '0')}` },
+                { label: 'Perfect', value: gameResults.perfectClear ? 'Yes' : 'No' },
+                { label: 'Low Move', value: gameResults.lowMoveClear ? 'Yes' : 'No' },
               ]}
               onRestart={() => {
                 setGameResults(null);
@@ -110,7 +125,10 @@ export default function MemoryMatchGameWrapper() {
                 milestone="Match those pairs!"
               />
               <MemoryMatchGame
-                onGameEnd={handleGameEnd}
+                onGameEnd={(results) => {
+                  handleGameEnd(results);
+                  transitionTo('results');
+                }}
                 onStatsUpdate={handleGameStatsUpdate}
               />
             </>
