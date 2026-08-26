@@ -117,7 +117,7 @@ export default async function ProfilePage() {
       <div className="mori-shell space-y-8 py-10">
         <ProfileHeader displayName={displayName} />
 
-        <OneTapGamertag initial={gamertag} />
+        {gamertag && <OneTapGamertag initial={gamertag} />}
 
         <ProfileLayout
           left={
