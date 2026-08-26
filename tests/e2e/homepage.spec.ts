@@ -40,12 +40,16 @@ test.describe('Homepage', () => {
     expect(maxCssDurationMs(style.transitionDuration)).toBeLessThanOrEqual(0.01);
   });
 
-  test('should render canopy-origin petals as decorative weather, not grant controls', async ({
+  test('should keep ambient petals decorative and collectible petals semantic', async ({
     page,
   }) => {
     const petalEmitter = page.getByTestId('mori-petal-emitter');
     await expect(petalEmitter).toBeVisible();
-    await expect(page.getByRole('button', { name: /collect.*petal/i })).toHaveCount(0);
+    await expect(petalEmitter).toHaveAttribute('aria-hidden', 'true');
+
+    const collectiblePetals = page.getByRole('button', { name: /collect sakura petal worth/i });
+    await expect(collectiblePetals.first()).toBeVisible();
+    expect(await collectiblePetals.count()).toBeGreaterThan(0);
   });
 
   test('should not intercept clicks on content cards', async ({ page }) => {

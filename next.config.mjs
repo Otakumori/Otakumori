@@ -1,9 +1,13 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { env } from './env.mjs';
 
+const require = createRequire(import.meta.url);
 const isVercelPreview = process.env.VERCEL_ENV === 'preview';
 const isVercelBuild = process.env.VERCEL === '1';
+const useVisualQaClerk =
+  process.env.OTM_VISUAL_QA_AUTH === '1' && process.env.NODE_ENV !== 'production' && !isVercelBuild;
 
 if (isVercelPreview) {
   for (const key of [
@@ -31,6 +35,52 @@ const previewClerkPublicEnv = isVercelPreview
       NEXT_PUBLIC_CLERK_IS_SATELLITE: '',
     }
   : undefined;
+const visualQaPublicEnv = useVisualQaClerk
+  ? {
+      NEXT_PUBLIC_OTM_VISUAL_QA_AUTH: '1',
+    }
+  : undefined;
+const publicEnv = {
+  ...(previewClerkPublicEnv ?? {}),
+  ...(visualQaPublicEnv ?? {}),
+};
+const visualQaClerkClientAdapter = path.resolve(
+  process.cwd(),
+  'app/lib/visual-qa/clerk-nextjs.tsx',
+);
+const visualQaClerkServerAdapter = path.resolve(
+  process.cwd(),
+  'app/lib/visual-qa/clerk-server.ts',
+);
+const clerkNextjsDistRoot = path.resolve(path.dirname(require.resolve('@clerk/nextjs')), '..');
+const clerkNextjsEsmRoot = path.join(clerkNextjsDistRoot, 'esm');
+const clerkNextjsEsmRootPosix = clerkNextjsEsmRoot.replaceAll(path.sep, '/');
+const visualQaClerkAliases = useVisualQaClerk
+  ? {
+      '@clerk/nextjs/server$': visualQaClerkServerAdapter,
+      '@clerk/nextjs$': visualQaClerkClientAdapter,
+      '@clerk/nextjs/server': visualQaClerkServerAdapter,
+      '@clerk/nextjs': visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/PromisifiedAuthProvider':
+        visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/ClerkProvider': visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/hooks': visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/PromisifiedAuthProvider.js':
+        visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/ClerkProvider.js': visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/hooks.js': visualQaClerkClientAdapter,
+      [path.join(clerkNextjsEsmRoot, 'client-boundary/PromisifiedAuthProvider.js')]:
+        visualQaClerkClientAdapter,
+      [path.join(clerkNextjsEsmRoot, 'client-boundary/ClerkProvider.js')]:
+        visualQaClerkClientAdapter,
+      [path.join(clerkNextjsEsmRoot, 'client-boundary/hooks.js')]: visualQaClerkClientAdapter,
+      [`${clerkNextjsEsmRootPosix}/client-boundary/PromisifiedAuthProvider.js`]:
+        visualQaClerkClientAdapter,
+      [`${clerkNextjsEsmRootPosix}/client-boundary/ClerkProvider.js`]:
+        visualQaClerkClientAdapter,
+      [`${clerkNextjsEsmRootPosix}/client-boundary/hooks.js`]: visualQaClerkClientAdapter,
+    }
+  : undefined;
 
 // Bundle analyzer disabled for now - @next/bundle-analyzer is a dev dependency
 // To enable: move @next/bundle-analyzer to dependencies and uncomment the import
@@ -38,7 +88,7 @@ const withBundleAnalyzer = (config) => config;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: previewClerkPublicEnv,
+  env: Object.keys(publicEnv).length ? publicEnv : undefined,
   // safety net during build; real fix is dynamic rendering
   staticPageGenerationTimeout: 300,
   // Enable source maps for Edge Tools debugging
@@ -59,6 +109,11 @@ const nextConfig = {
     // tsconfigPaths removed - deprecated in Next.js 15
     // Alias resolution now handled in webpack config below
   },
+  turbopack: visualQaClerkAliases
+    ? {
+        resolveAlias: visualQaClerkAliases,
+      }
+    : undefined,
 
   // Image optimization for Printify and CDN assets
   images: {
@@ -279,6 +334,13 @@ const nextConfig = {
       // @/lib points to root lib (for shared utilities)
       '@/lib': path.resolve(process.cwd(), 'lib'),
     };
+
+    if (visualQaClerkAliases) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        ...visualQaClerkAliases,
+      };
+    }
 
     if (!isServer) {
       // Alias server-only modules to false for client builds

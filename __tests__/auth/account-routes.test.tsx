@@ -324,6 +324,21 @@ describe('account and local auth route redirects', () => {
     expect(url.searchParams.get('redirect_url')).toBe('http://localhost:3000/profile');
   });
 
+  it('preserves the exact active local port in the local sign-in shim', async () => {
+    mockRequestHeaders({ host: 'localhost:3102', 'x-forwarded-proto': 'http' });
+
+    const target = await expectRedirect(() =>
+      SignInPage({ searchParams: Promise.resolve({ redirect_url: '/' }) }),
+    );
+    const url = new URL(target);
+
+    expect(url.origin).toBe('https://accounts.otaku-mori.com');
+    expect(url.pathname).toBe('/sign-in');
+    expect(url.searchParams.get('redirect_url')).toBe('http://localhost:3102/');
+    expect(url.searchParams.get('redirect_url')).not.toBe('http://localhost:3100/');
+    expect(url.searchParams.get('redirect_url')).not.toBe('https://www.otaku-mori.com/');
+  });
+
   it('preserves the staging host in the local sign-up shim', async () => {
     vi.stubEnv('VERCEL_ENV', 'preview');
     vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');

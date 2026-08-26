@@ -1,18 +1,23 @@
 import type { SVGProps } from 'react';
+import MoriIconFrame from './MoriIconFrame';
 
 type PetalWalletIconProps = SVGProps<SVGSVGElement> & {
   compact?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 };
 
 export default function PetalWalletIcon({
   compact = false,
   className = 'h-5 w-5',
+  size = 'md',
   ...props
 }: PetalWalletIconProps) {
+  // Structural placeholder until the final Petal Wallet glyph artwork is approved.
   return (
+    <MoriIconFrame size={size} className={className}>
     <svg
+      className="h-full w-full"
       viewBox="0 0 32 32"
-      className={className}
       fill="none"
       aria-hidden="true"
       focusable="false"
@@ -82,5 +87,6 @@ export default function PetalWalletIcon({
         opacity="0.86"
       />
     </svg>
+    </MoriIconFrame>
   );
 }

@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
 import HeroSearch from './HeroSearch';
-import RootFooter from './RootFooter';
 import layoutStyles from './HeroLayout.module.css';
 
 export default function HeroContent() {
   return (
-    <div className={`${layoutStyles.heroContent} relative z-20 flex flex-col text-[#fff4e8]`}>
+    <div className={`${layoutStyles.heroContent} relative z-20 flex text-[#fff4e8]`}>
       <div
         className={`${layoutStyles.surfaceContent} mx-auto flex w-full max-w-7xl items-end px-4 pb-[7svh] pt-24 sm:px-6 md:items-center md:justify-end md:px-10 md:pb-0 md:pt-[12svh]`}
       >
@@ -30,8 +29,6 @@ export default function HeroContent() {
           </div>
         </div>
       </div>
-
-      <RootFooter />
     </div>
   );
 }

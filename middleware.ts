@@ -2,6 +2,13 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
+import {
+  VISUAL_QA_AUTH_STATE_COOKIE,
+  VISUAL_QA_AUTH_STATE_HEADER,
+  isVisualQaAuthEnabled,
+  normalizeVisualQaAuthState,
+  resolveVisualQaAuthStateFromCookieHeader,
+} from '@/app/lib/visual-qa/mode';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 const AGE_GATE_COOKIE = 'om_age_ok';
@@ -130,6 +137,36 @@ function addPublicSecurityHeaders(res: NextResponse, reqId: string) {
   return res;
 }
 
+function handleLocalVisualQaRequest(req: NextRequest) {
+  const host = req.headers.get('host');
+  if (!isVisualQaAuthEnabled(undefined, host)) return null;
+
+  const queryState = normalizeVisualQaAuthState(req.nextUrl.searchParams.get('visualAuth'));
+  const cookieState = resolveVisualQaAuthStateFromCookieHeader(req.headers.get('cookie'));
+  const state = queryState ?? cookieState ?? 'signed-out';
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set(VISUAL_QA_AUTH_STATE_HEADER, state);
+
+  const response = addPublicSecurityHeaders(
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    }),
+    createRequestId(req),
+  );
+
+  if (queryState) {
+    response.cookies.set(VISUAL_QA_AUTH_STATE_COOKIE, queryState, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
+
+  return response;
+}
+
 function apiAuthError(status: 401 | 403, message: string, reqId: string) {
   return addPublicSecurityHeaders(
     NextResponse.json({ ok: false, error: message }, { status }),
@@ -256,6 +293,11 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
 });
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  const localVisualQaResponse = handleLocalVisualQaRequest(req);
+  if (localVisualQaResponse) {
+    return localVisualQaResponse;
+  }
+
   if (isLighthousePublicRoute(req)) {
     return handleLighthousePublicRoute(req);
   }
