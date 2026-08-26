@@ -1,0 +1,302 @@
+/* Otaku-mori 2026 visual constitution.
+ * Loaded after globals.css so legacy neon/glass recipes resolve into one restrained world language.
+ */
+
+:root {
+  --mori-ink: #080611;
+  --mori-ink-deep: #050405;
+  --mori-ink-soft: #100b12;
+  --mori-bark: #2b1d1c;
+  --mori-bark-soft: #3b2926;
+  --mori-rose: #dca0b3;
+  --mori-rose-soft: #efc7d2;
+  --mori-ivory: #fff1e4;
+  --mori-muted: #cdbbb7;
+  --mori-dim: #8f7f7d;
+  --mori-bronze: #a9855f;
+  --mori-bronze-soft: #c7a97f;
+  --mori-border: rgba(255, 241, 228, 0.12);
+  --mori-border-strong: rgba(255, 241, 228, 0.2);
+  --mori-surface: rgba(12, 8, 12, 0.76);
+  --mori-surface-soft: rgba(16, 11, 15, 0.58);
+  --mori-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+  --mori-focus: rgba(239, 199, 210, 0.7);
+}
+
+body {
+  background: var(--mori-ink);
+  color: var(--mori-ivory);
+}
+
+::selection {
+  background: rgba(220, 160, 179, 0.28);
+  color: var(--mori-ivory);
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--mori-focus);
+  outline-offset: 3px;
+}
+
+/* Legacy glass resolves to smoky lacquer, not neon acrylic. */
+.glass-panel,
+.glass-card,
+.glass-button {
+  background: linear-gradient(180deg, rgba(18, 12, 17, 0.84), rgba(7, 5, 8, 0.78));
+  border-color: var(--mori-border);
+  box-shadow: var(--mori-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-panel:hover,
+.glass-card:hover {
+  background: linear-gradient(180deg, rgba(22, 15, 19, 0.9), rgba(8, 6, 9, 0.84));
+  border-color: rgba(239, 199, 210, 0.22);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.44);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, rgba(176, 109, 131, 0.92), rgba(116, 66, 82, 0.92));
+  border: 1px solid rgba(255, 241, 228, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, rgba(190, 124, 145, 0.96), rgba(126, 74, 91, 0.96));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.36);
+}
+
+.btn-secondary {
+  background: rgba(10, 7, 10, 0.72);
+  border: 1px solid var(--mori-border);
+  box-shadow: none;
+}
+
+.hover-glow:hover,
+.focus-glow:focus,
+.animate-pulse-glow {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.36) !important;
+}
+
+.game-card:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.44);
+}
+
+.form-input,
+.mori-field {
+  background: rgba(5, 4, 7, 0.78);
+  border: 1px solid var(--mori-border);
+  color: var(--mori-ivory);
+  border-radius: 0.75rem;
+}
+
+.form-input:focus,
+.mori-field:focus {
+  border-color: rgba(239, 199, 210, 0.42);
+  box-shadow: 0 0 0 3px rgba(220, 160, 179, 0.09);
+  outline: none;
+}
+
+.mori-page {
+  min-height: 100svh;
+  color: var(--mori-ivory);
+  background:
+    radial-gradient(circle at 16% 0%, rgba(79, 46, 55, 0.18), transparent 32rem),
+    radial-gradient(circle at 90% 18%, rgba(45, 39, 57, 0.13), transparent 34rem),
+    linear-gradient(180deg, #0a0710 0%, #080611 48%, #050405 100%);
+}
+
+.mori-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.32), transparent 72%);
+  opacity: 0.22;
+}
+
+.mori-shell {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}
+
+.mori-panel {
+  border: 1px solid var(--mori-border);
+  background: linear-gradient(180deg, rgba(16, 11, 15, 0.88), rgba(7, 5, 8, 0.8));
+  box-shadow: var(--mori-shadow);
+  border-radius: 1rem;
+}
+
+.mori-panel-soft {
+  border: 1px solid rgba(255, 241, 228, 0.08);
+  background: rgba(10, 7, 10, 0.54);
+  border-radius: 0.9rem;
+}
+
+.mori-rule {
+  border-color: rgba(255, 241, 228, 0.1);
+}
+
+.mori-muted {
+  color: var(--mori-muted);
+}
+
+.mori-dim {
+  color: var(--mori-dim);
+}
+
+.mori-button-primary,
+.mori-button-secondary,
+.mori-button-danger {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  font-weight: 650;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.mori-button-primary {
+  color: var(--mori-ivory);
+  border: 1px solid rgba(255, 241, 228, 0.18);
+  background: rgba(150, 88, 108, 0.78);
+}
+
+.mori-button-primary:hover {
+  background: rgba(166, 101, 121, 0.88);
+  transform: translateY(-1px);
+}
+
+.mori-button-secondary {
+  color: rgba(255, 241, 228, 0.84);
+  border: 1px solid var(--mori-border);
+  background: rgba(8, 6, 9, 0.56);
+}
+
+.mori-button-secondary:hover {
+  border-color: rgba(239, 199, 210, 0.28);
+  color: var(--mori-ivory);
+  background: rgba(22, 14, 18, 0.7);
+}
+
+.mori-button-danger {
+  color: #f7d7d4;
+  border: 1px solid rgba(190, 91, 87, 0.3);
+  background: rgba(91, 34, 33, 0.34);
+}
+
+.mori-button-danger:hover {
+  border-color: rgba(211, 112, 106, 0.42);
+  background: rgba(111, 44, 42, 0.42);
+}
+
+.mori-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--mori-border);
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.mori-status[data-tone='ready'] {
+  color: #d8e7d7;
+  border-color: rgba(137, 174, 130, 0.24);
+  background: rgba(59, 82, 55, 0.2);
+}
+
+.mori-status[data-tone='draft'] {
+  color: #d4c8c3;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mori-status[data-tone='warning'] {
+  color: #ead7b9;
+  border-color: rgba(169, 133, 95, 0.3);
+  background: rgba(84, 61, 35, 0.2);
+}
+
+.mori-game-shell {
+  min-height: 100svh;
+  color: var(--mori-ivory);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(95, 56, 70, 0.2), transparent 42rem),
+    linear-gradient(180deg, #0b0810 0%, #080611 48%, #040304 100%);
+}
+
+.mori-game-card {
+  border: 1px solid rgba(255, 241, 228, 0.1);
+  background: linear-gradient(180deg, rgba(15, 10, 14, 0.8), rgba(7, 5, 8, 0.78));
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
+  border-radius: 0.9rem;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.mori-game-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(220, 160, 179, 0.25);
+  background: linear-gradient(180deg, rgba(20, 13, 18, 0.86), rgba(8, 6, 9, 0.82));
+}
+
+.mori-admin-shell {
+  min-height: 100svh;
+  background: #070608;
+  color: #efe8e3;
+}
+
+.mori-admin-panel {
+  border: 1px solid rgba(239, 232, 227, 0.1);
+  background: #0d0b0d;
+  border-radius: 0.8rem;
+}
+
+.mori-achievement {
+  --achievement-metal: #7f766f;
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--achievement-metal) 34%, transparent);
+  background:
+    radial-gradient(circle at 32% 12%, color-mix(in srgb, var(--achievement-metal) 12%, transparent), transparent 34%),
+    linear-gradient(155deg, rgba(19, 14, 16, 0.94), rgba(7, 5, 7, 0.9));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035), 0 16px 36px rgba(0, 0, 0, 0.32);
+  border-radius: 0.8rem;
+}
+
+.mori-achievement[data-rarity='uncommon'] { --achievement-metal: #7f8d74; }
+.mori-achievement[data-rarity='rare'] { --achievement-metal: #778695; }
+.mori-achievement[data-rarity='epic'] { --achievement-metal: #826f89; }
+.mori-achievement[data-rarity='legendary'] { --achievement-metal: #aa8b61; }
+
+.mori-achievement[data-locked='true'] {
+  filter: saturate(0.45);
+  opacity: 0.64;
+}
+
+.mori-achievement-medallion {
+  border: 1px solid color-mix(in srgb, var(--achievement-metal) 42%, transparent);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255,255,255,0.08), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--achievement-metal) 28%, #171214), #0a0809 66%);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28), inset 0 0 18px rgba(255,255,255,0.025);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mori-button-primary,
+  .mori-button-secondary,
+  .mori-button-danger,
+  .mori-game-card,
+  .mori-achievement {
+    transition: none !important;
+    transform: none !important;
+  }
+}

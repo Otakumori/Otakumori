@@ -77,4 +77,20 @@ describe('profile authenticated state boundary', () => {
     expect(html).toContain('Profile data is being prepared');
     expect(html).not.toContain('Sign in to view your Otaku-mori profile');
   });
+
+  it('omits the gamertag forge when a signed-in profile has no gamertag', async () => {
+    vi.mocked(getProfileData).mockResolvedValue({
+      viewer: { localUserId: 'user_local' },
+      user: { fullName: 'Mori Wanderer' },
+      achievements: [],
+      ownedCodes: new Set(),
+      gamertag: null,
+      canRenameAt: null,
+    } as any);
+
+    const html = renderToStaticMarkup(await ProfilePage());
+
+    expect(html).toContain('Mori Wanderer');
+    expect(html).not.toContain('Gamertag');
+  });
 });

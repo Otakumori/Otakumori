@@ -5,15 +5,15 @@ export default async function AchievementsPanel() {
   const { catalog, ownedSet, earnedPoints, totalPoints } = await loadAchievementsForProfile();
 
   return (
-    <section
-      aria-labelledby="achievements"
-      className="rounded-2xl border border-white/10 bg-black/50 p-5"
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <h2 id="achievements" className="text-lg font-semibold text-white">
-          Achievements
-        </h2>
-        <div className="text-sm text-zinc-300">
+    <section aria-labelledby="achievements" className="mori-panel p-5">
+      <div className="mb-5 flex items-end justify-between gap-4 border-b border-white/[0.08] pb-4">
+        <div>
+          <h2 id="achievements" className="font-display text-lg font-semibold text-[#fff1e4]">
+            Achievements
+          </h2>
+          <p className="mt-1 text-sm text-[#8f7f7d]">Relics earned across the world.</p>
+        </div>
+        <div className="text-sm text-[#c7a97f]">
           {earnedPoints}/{totalPoints} pts
         </div>
       </div>
@@ -32,29 +32,28 @@ export default async function AchievementsPanel() {
             return (
               <div
                 key={a.code}
-                className={`group relative flex items-center gap-3 rounded-xl border p-3 transition
-                ${owned ? 'border-white/12 bg-black/60' : 'border-white/5 bg-black/40 opacity-70'}`}
+                className="mori-achievement group relative flex items-center gap-3 p-3"
+                data-locked={owned ? 'false' : 'true'}
               >
-                <div className="relative h-12 w-12 overflow-hidden rounded-lg ring-1 ring-white/10">
+                <div className="mori-achievement-medallion relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
                   <Image
                     src={a.icon || '/placeholder-achievement.png'}
                     alt=""
                     fill
-                    className={`object-contain ${owned ? '' : 'grayscale'}`}
+                    className={`object-contain p-2 ${owned ? '' : 'grayscale'}`}
                   />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-white">
+                  <div className="truncate text-sm font-semibold text-[#fff1e4]">
                     {a.title || a.name}
                   </div>
-                  <div className="truncate text-xs text-zinc-300">{a.points} pts</div>
+                  <div className="mt-0.5 text-xs text-[#a9855f]">{a.points} pts</div>
                 </div>
-                <div className="ml-auto rounded-full bg-zinc-800 px-2.5 py-1 text-[11px] font-semibold text-zinc-200">
-                  {owned ? 'Unlocked' : 'Locked'}
+                <div className="ml-auto text-[10px] uppercase tracking-[0.12em] text-[#8f7f7d]">
+                  {owned ? 'Found' : 'Hidden'}
                 </div>
-                {/* lore */}
                 {a.lore && (
-                  <div className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-80 -translate-x-1/2 rounded-lg border border-white/10 bg-black/90 p-3 text-xs text-zinc-300 shadow-2xl group-hover:block">
+                  <div className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-72 -translate-x-1/2 rounded-lg border border-white/10 bg-[#090709]/95 p-3 text-xs leading-5 text-[#cdbbb7] shadow-2xl group-hover:block group-focus-within:block">
                     {a.lore}
                   </div>
                 )}
