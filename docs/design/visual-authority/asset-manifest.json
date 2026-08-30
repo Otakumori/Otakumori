@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 1,
+  "package": "otakumori-mori-visual-assets-v1",
+  "created": "2026-08-29",
+  "repository": "Otakumori/Otakumori",
+  "intendedBase": {
+    "pullRequest": 84,
+    "branch": "codex/memory-keeper-reactive-presentation",
+    "verifiedHead": "36a49993e7d8a1dfa361f7f631b3646e3041c6c9",
+    "rule": "Verify live state again before branching; do not modify PR #84 directly."
+  },
+  "visualAuthority": {
+    "primary": "docs/design/references/site-visual-authority/approved-user-references/mori-site-iconography-reference.png",
+    "avatarSakura": "docs/design/references/site-visual-authority/approved-user-references/mori-avatar-family-sakura-reference.png",
+    "avatarTealEgyptian": "docs/design/references/site-visual-authority/approved-user-references/mori-avatar-family-teal-egyptian-reference.png",
+    "profileUi": "docs/design/references/site-visual-authority/approved-user-references/mori-avatar-profile-ui-reference.png",
+    "soapstone": "docs/design/references/site-visual-authority/approved-user-references/mori-soapstone-components-reference.png",
+    "badges": "docs/design/references/site-visual-authority/approved-user-references/mori-badges-reference.png",
+    "rules": [
+      "Muted charcoal/bark, dusty sakura, warm cream and restrained aged bronze.",
+      "Anime/cel character with tactile stone, leather, cloth and metal.",
+      "Small navigation glyphs follow the approved thin line-art icon sheet, not the large feature illustrations.",
+      "Large feature art may be ornate where the surface supports it.",
+      "Do not use rejected pastel-cartoon icons or earlier rejected inventory-item experiments as authority.",
+      "Different games may use different art styles and POVs while retaining Mori identity."
+    ]
+  },
+  "assets": [
+    {
+      "id": "mori-home-shrine",
+      "role": "destination-feature",
+      "area": "home/hub",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-home-shrine-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-home-shrine.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [583, 640],
+      "runtimeBytes": 91990,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-shop-market-stall",
+      "role": "destination-feature",
+      "area": "shop",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-shop-market-stall-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-shop-market-stall.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [567, 640],
+      "runtimeBytes": 99026,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-apparel-kimono",
+      "role": "category-feature",
+      "area": "shop/apparel",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-apparel-kimono-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-apparel-kimono.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [640, 638],
+      "runtimeBytes": 81422,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-accessories-charm-wreath",
+      "role": "category-feature/profile-frame",
+      "area": "shop/accessories/profile",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-accessories-charm-wreath-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-accessories-charm-wreath.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [624, 640],
+      "runtimeBytes": 80882,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-collection-journal",
+      "role": "destination-feature",
+      "area": "collection",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-collection-journal-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-collection-journal.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [607, 640],
+      "runtimeBytes": 77118,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-quests-katana",
+      "role": "destination-feature",
+      "area": "quests/mini-games",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-quests-katana-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-quests-katana.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [609, 640],
+      "runtimeBytes": 85306,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-blog-scroll",
+      "role": "destination-feature",
+      "area": "blog/story",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-blog-scroll-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-blog-scroll.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [622, 640],
+      "runtimeBytes": 74296,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-search-magnifier",
+      "role": "feature-illustration",
+      "area": "search",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-search-magnifier-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-search-magnifier.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [474, 512],
+      "runtimeBytes": 38566,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-messages-envelope",
+      "role": "feature-illustration",
+      "area": "messages/community",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-messages-envelope-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-messages-envelope.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [512, 500],
+      "runtimeBytes": 55104,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-notifications-bell",
+      "role": "feature-illustration",
+      "area": "notifications",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-notifications-bell-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-notifications-bell.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [512, 510],
+      "runtimeBytes": 55588,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-sakura-primary-medallion",
+      "role": "badge/crest",
+      "area": "profile/achievements",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-sakura-primary-medallion-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-sakura-primary-medallion.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [492, 512],
+      "runtimeBytes": 75136,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-sakura-growth-crest",
+      "role": "badge/crest",
+      "area": "rank/achievement",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-sakura-growth-crest-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-sakura-growth-crest.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [477, 512],
+      "runtimeBytes": 73288,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-sakura-tassel-seal",
+      "role": "badge/crest",
+      "area": "profile/achievement",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-sakura-tassel-seal-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-sakura-tassel-seal.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [483, 512],
+      "runtimeBytes": 37830,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-sakura-diamond-crest",
+      "role": "badge/crest",
+      "area": "rank/verified",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-sakura-diamond-crest-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-sakura-diamond-crest.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [460, 512],
+      "runtimeBytes": 54242,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-avatar-frame-sakura",
+      "role": "avatar-frame",
+      "area": "profile/avatar",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-avatar-frame-sakura-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-avatar-frame-sakura.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [640, 625],
+      "runtimeBytes": 114890,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    },
+    {
+      "id": "mori-soapstone-monument",
+      "role": "soapstone-panel/feature",
+      "area": "community/soapstone",
+      "status": "integrated-home-soapstone-dialog-requires-owner-acceptance",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-soapstone-monument-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-soapstone-monument.webp",
+      "sourceDimensions": [1086, 1448],
+      "runtimeDimensions": [579, 768],
+      "runtimeBytes": 165432,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      },
+      "integration": {
+        "component": "app/components/home/HomeSoapstoneDialog.tsx",
+        "surface": "Homepage Soapstone invitation dialog",
+        "usage": "Decorative monument frame behind semantic dialog copy and controls; no raster animation."
+      }
+    },
+    {
+      "id": "mori-sakura-bloom-crest",
+      "role": "badge/crest",
+      "area": "profile/achievements",
+      "status": "production-candidate-requires-in-context-owner-QA",
+      "source": "docs/design/references/site-visual-authority/produced-source/mori-sakura-bloom-crest-source.png",
+      "runtime": "public/assets/ui/mori/feature/mori-sakura-bloom-crest.webp",
+      "sourceDimensions": [1254, 1254],
+      "runtimeDimensions": [507, 512],
+      "runtimeBytes": 87180,
+      "alpha": true,
+      "runtimePolicy": {
+        "selfHosted": true,
+        "preload": false,
+        "loading": "lazy",
+        "decoding": "async",
+        "accessibility": "Decorative: empty alt/aria-hidden. Interactive: wrapper owns accessible name.",
+        "motion": "Animate wrapper transforms/opacity only; no raster-frame loops.",
+        "reducedMotion": "Disable optional drift/parallax while preserving semantics."
+      }
+    }
+  ],
+  "avatarOutfitReferences": [
+    {
+      "path": "docs/design/references/avatar/outfits/om-humanoid-v1-masculine-sakura-nightwarden-concept.png",
+      "status": "reference-only",
+      "runtimeRule": "Translate into rigged geometry/materials; never ship as a fake 3D avatar."
+    },
+    {
+      "path": "docs/design/references/avatar/outfits/om-humanoid-v1-feminine-sakura-nightwarden-concept.png",
+      "status": "reference-only",
+      "runtimeRule": "Preserve fitted silhouette and physical allure through real mesh tailoring/body fit; cross-hatching belongs in controlled materials/shading."
+    }
+  ],
+  "missingRegister": "docs/design/visual-authority/missing-assets.json"
+}

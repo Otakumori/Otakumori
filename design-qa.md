@@ -1,3 +1,52 @@
+# Mori visual asset integration QA
+
+## Visual truth
+
+- Approved component authority: `docs/design/references/site-visual-authority/approved-user-references/mori-soapstone-components-reference.png`
+- Authored production source: `docs/design/references/site-visual-authority/produced-source/mori-soapstone-monument-source.png`
+- Runtime asset: `public/assets/ui/mori/feature/mori-soapstone-monument.webp`
+- Implemented surface: homepage `HomeSoapstoneDialog`, open state
+
+## Evidence
+
+- Full-view desktop: `C:/Users/ap190/.codex/visualizations/2026/08/29/01a04dba-ee13-77b3-a664-4c4f0a77eadf/soapstone-integrated-1280x900-final-v3.png`
+- Full-view mobile: `C:/Users/ap190/.codex/visualizations/2026/08/29/01a04dba-ee13-77b3-a664-4c4f0a77eadf/soapstone-integrated-390x844-final-v3.png`
+- Focused source comparison: `C:/Users/ap190/.codex/visualizations/2026/08/29/01a04dba-ee13-77b3-a664-4c4f0a77eadf/soapstone-source-vs-implementation-final.png`
+- Reduced-motion capture: `C:/Users/ap190/.codex/visualizations/2026/08/29/01a04dba-ee13-77b3-a664-4c4f0a77eadf/soapstone-reduced-motion-1280x900-final-v2.png`
+- Reflow captures: `soapstone-reflow-200-final-v2.png` and `soapstone-reflow-400-final.png` in the same evidence directory
+- Browser capture scale: CSS pixels, device pixel ratio 1
+
+## Responsive matrix
+
+| Viewport    | Runtime asset bounds | Horizontal overflow |
+| ----------- | -------------------- | ------------------- |
+| 390 x 844   | 350 x 464            | No                  |
+| 430 x 932   | 390 x 517            | No                  |
+| 768 x 1024  | 432 x 573            | No                  |
+| 1024 x 768  | 432 x 573            | No                  |
+| 1280 x 900  | 432 x 573            | No                  |
+| 1440 x 900  | 432 x 573            | No                  |
+| 1920 x 1080 | 432 x 573            | No                  |
+
+At simulated 200% reflow the dialog scroll container measured 624 x 450 with 624 x 528 scroll content and no horizontal overflow. At simulated 400% reflow it measured 304 x 225 with 304 x 309 scroll content and no horizontal overflow; focusing the route CTA scrolled it into view.
+
+## Findings and resolution
+
+- P2, resolved: the first integration pass allowed the heading and horizontal button row to crowd the monument's inner bronze frame. The final pass reduced heading width and stacks the actions inside the authored plaque area.
+- P2, resolved: the mobile petal discovery hint could overlap the dialog content. The dialog now owns the higher modal layer while the hint remains undisturbed beneath it.
+- Typography, spacing, composition, color, hierarchy, border treatment, imagery, surface styling, and responsive behavior were compared side by side with the authored source.
+- The transparent asset edges remain clean; no black-box or edge artifact was observed.
+- Keyboard focus wraps within the dialog, Escape closes it, and focus returns to the trigger.
+- Reduced-motion media emulation reported no dialog or image animation.
+
+## Final result
+
+Passed. No unresolved P0, P1, or P2 fidelity issue remains on the integrated surface.
+
+---
+
+## Preserved prior homepage certification
+
 # Homepage Design QA
 
 ## Result
