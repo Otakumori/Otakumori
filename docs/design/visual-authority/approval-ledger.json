@@ -1,0 +1,54 @@
+{
+  "approved": [
+    "mori-empty-cart-kinchaku",
+    "mori-empty-wishlist",
+    "mori-empty-messages",
+    "mori-empty-collection",
+    "mori-empty-search-results",
+    "mori-destination-orders",
+    "mori-destination-admin",
+    "mori-destination-achievements",
+    "mori-destination-trade-center",
+    "mori-destination-music-player",
+    "avatar-creator-stage-plinth",
+    "avatar-creator-backplate-arch",
+    "avatar-creator-equipment-slot-frame",
+    "avatar-creator-cosmetic-token",
+    "avatar-creator-grounding-ring",
+    "avatar-creator-preset-reliquary",
+    "avatar-category-hair",
+    "avatar-category-face",
+    "avatar-category-eyes",
+    "avatar-category-body",
+    "avatar-category-outfit",
+    "avatar-category-accessories",
+    "avatar-category-weapon-prop",
+    "avatar-action-color-material",
+    "avatar-action-presets",
+    "avatar-action-randomize",
+    "avatar-action-undo-reset",
+    "avatar-action-save",
+    "avatar-action-preview",
+    "game-bubble-ragdoll-cover",
+    "game-bubble-ragdoll-hub",
+    "game-maid-cafe-manager-cover",
+    "game-maid-cafe-manager-hub",
+    "game-puzzle-reveal-cover",
+    "game-puzzle-reveal-hub",
+    "game-dungeon-of-desire-cover",
+    "game-dungeon-of-desire-hub",
+    "game-thigh-colosseum-cover",
+    "game-thigh-colosseum-hub"
+  ],
+  "deferred": [
+    {
+      "asset": "gilded_sakura_petal_relic",
+      "reason": "Liked visually, but role not yet authoritative. Do not map to Petal Wallet/currency automatically."
+    }
+  ],
+  "explicitlyRejectedFamilies": [
+    "shopping-cart empty-state variants",
+    "generation-drift sheets/collages/mockups",
+    "superseded Thigh Colosseum variants"
+  ]
+}

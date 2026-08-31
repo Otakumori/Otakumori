@@ -1,8 +1,9 @@
 'use client';
 
-import { EmptySearchIcon } from './icons';
 import { paths } from '@/lib/paths';
 import Link from 'next/link';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 interface EmptySearchProps {
   query?: string;
@@ -11,9 +12,7 @@ interface EmptySearchProps {
 export function EmptySearch({ query }: EmptySearchProps) {
   return (
     <section className="flex flex-col items-center gap-3 rounded-3xl border border-white/20 bg-white/5 backdrop-blur-lg px-6 py-8 text-center shadow-[0_26px_80px_rgba(15,23,42,0.96)]">
-      <div className="mb-2">
-        <EmptySearchIcon />
-      </div>
+      <MoriArtwork src={approvedVisualAssets.emptyStates.search} />
       <h2 className="text-sm font-semibold tracking-[0.28em] uppercase text-white/80">
         No results found
       </h2>

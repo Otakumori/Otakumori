@@ -6,6 +6,8 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import AvatarControlGlyph from './AvatarControlGlyph';
 
 interface ColorPickerProps {
   label: string;
@@ -17,7 +19,10 @@ interface ColorPickerProps {
 export default function ColorPicker({ label, value, onChange, className }: ColorPickerProps) {
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <label className="text-sm font-medium text-white/90">{label}</label>
+      <label className="flex items-center gap-2 text-sm font-medium text-white/90">
+        <AvatarControlGlyph src={approvedVisualAssets.avatar.actions.colorMaterial} size={32} />
+        {label}
+      </label>
       <div className="flex items-center gap-3">
         <input
           type="color"
@@ -36,4 +41,3 @@ export default function ColorPicker({ label, value, onChange, className }: Color
     </div>
   );
 }
-

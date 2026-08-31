@@ -1,304 +1,435 @@
 OTAKU-MORI CODEX CHECKPOINT
-MORI VISUAL ASSET AUTHORITY + SAFE SITE INTEGRATION
+APPROVED VISUAL ASSETS BATCH 2
+EMPTY STATES + DESTINATIONS + AVATAR CREATOR + GAME CATALOG ART
 
 Repository:
 Otakumori/Otakumori
 
 Attachment:
-otakumori-mori-visual-assets-v1.zip
+otakumori-approved-visual-assets-batch-2.zip
 
-PURPOSE
+==================================================
+0. CHECKPOINT OBJECTIVE
+==================================================
 
-Integrate the new reference-grounded Mori visual package without flattening the project into one art style or forcing every supplied image into a UI slot.
+Ingest and selectively integrate the owner-approved visual assets in this package.
 
-The package separates:
-- user-approved references
-- generated source masters
-- optimized runtime feature art
-- avatar outfit reference art
-- explicit missing assets
+This package is a VISUAL + CATALOG-PRESENTATION checkpoint.
 
-Do not treat those categories as interchangeable.
+It is NOT authorization to:
+- rewrite game mechanics
+- change reward/economy authority
+- rebuild the avatar renderer
+- merge/deploy
+- mutate providers or databases
+- invent new application state merely to display artwork
 
-1. PREFLIGHT / STACK
+The package intentionally includes only artwork approved after the prior
+`otakumori-mori-status-ornaments-v1.zip` handoff.
 
-Expected current parent:
+Rejected and superseded generations are intentionally excluded.
 
-PR #84
-title: feat: bring the Memory Keeper into the Reliquary
-branch: codex/memory-keeper-reactive-presentation
-expected head:
-36a49993e7d8a1dfa361f7f631b3646e3041c6c9
+==================================================
+1. PREFLIGHT: CURRENT REPOSITORY IS TRUTH
+==================================================
 
-At prompt creation PR #84 was open, Draft and unmerged.
+Before touching files:
 
-VERIFY live GitHub state again before editing.
+1. Inspect GitHub PR stack and current Draft PRs.
+2. Identify the current approved visual parent branch.
+3. Verify all relevant PRs are open/Draft/unmerged as expected.
+4. Record current branch/head/worktree.
+5. Audit dirty state.
+6. Do not modify any existing Draft visual PR directly unless it is explicitly
+   the intended base and remains unchanged.
 
-Do not modify PR #84 directly.
+Create a new isolated stacked branch from the CURRENT approved visual parent.
 
-Create an isolated stacked branch:
+Suggested branch:
+`codex/approved-visual-assets-batch-2`
 
-codex/mori-visual-asset-integration
+Do NOT rely on historical SHAs embedded in old conversation handoffs.
 
-Base:
-codex/memory-keeper-reactive-presentation
+STOP if:
+- unexplained dirty state appears
+- current stack ancestry cannot be reconciled without destructive history editing
+- a credential is rendered
+- provider/DB mutation becomes necessary
+- a force push would be required to preserve the stack
+- the package checksum fails
 
-Suggested worktree:
-C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori-mori-visual-asset-integration
-
-Record worktree, branch, starting HEAD, PR #84 current head/base/state and dirty state.
-
-STOP for unexplained dirt or unexpected stack movement.
-
+==================================================
 2. PACKAGE INTAKE
+==================================================
 
-Before copying, inspect:
-
-README-CODEX.md
-docs/design/visual-authority/asset-manifest.json
-docs/design/visual-authority/missing-assets.json
-docs/design/visual-authority/avatar-outfit-brief.md
-
-Then inspect:
-docs/design/references/site-visual-authority/approved-user-references/
-
-These are visual authority.
-
-Copy the CONTENTS of the ZIP to the repository root.
-Do not nest the ZIP wrapper.
-
-Reconcile existing paths instead of blindly overwriting.
-
-3. VISUAL AUTHORITY
-
-Default site language:
-- charcoal / bark / near-black
-- dusty sakura / muted blush
-- warm cream
-- restrained aged bronze
-- delicate Japanese ornamental geometry
-- anime/cel line character
-- tactile stone, leather, cloth and metal
-- Souls-like restraint without copying third-party assets
-- no broad neon wash
-- no generic SaaS glassmorphism
-
-SMALL ICONS:
-Follow `mori-site-iconography-reference.png`.
-
-LARGE FEATURE ART:
-Use runtime assets from `public/assets/ui/mori/feature/`.
-
-A 512px illustrated shrine, stall, monument, journal or katana is NOT a finished 16–24px navigation glyph.
-
-Do not downscale feature art into tiny navbar controls merely to remove Lucide icons.
-
-4. CURRENT PACKAGE ASSETS
-
-Use `asset-manifest.json` as source of truth.
-
-High-confidence candidates:
-- mori-avatar-frame-sakura.webp
-- mori-soapstone-monument.webp
-- mori-collection-journal.webp
-- mori-quests-katana.webp
-- mori-blog-scroll.webp
-- mori-search-magnifier.webp
-- mori-messages-envelope.webp
-- mori-notifications-bell.webp
-- mori-shop-market-stall.webp
-- mori-apparel-kimono.webp
-- mori-accessories-charm-wreath.webp
-- mori-home-shrine.webp
-
-Badge/crest candidates:
-- mori-sakura-primary-medallion.webp
-- mori-sakura-growth-crest.webp
-- mori-sakura-tassel-seal.webp
-- mori-sakura-diamond-crest.webp
-- mori-sakura-bloom-crest.webp
-
-Every candidate still requires in-context browser QA.
-
-If an asset makes a surface worse, defer it and report why.
-
-5. TARGET SURFACES
-
-Profile/avatar:
-- profile frame option/presentation
-- badge/crest surfaces that already have legitimate semantics
-
-Soapstone/community:
-- use monument/panel art only if it improves the current generic modal while preserving accessible dialog behavior
-- compare against `mori-soapstone-components-reference.png`
-
-Shop:
-- market stall as destination/header/empty-state art if it does not compete with merchandise
-- kimono for Apparel category
-- charm wreath for Accessories category
-
-Collection / Quests / Blog:
-- journal
-- katana
-- scroll
-
-Search / Messages / Notifications:
-- magnifier, envelope and bell as feature/empty-state art
-- do NOT use them as tiny controls by default
-
-Home:
-- `mori-home-shrine.webp` is an internal destination motif only
-- do NOT replace/repaint the canonical Home world
-
-6. PR #84 IS ALREADY IMPLEMENTED
-
-Memory Defrag's Keeper reactive presentation is already in PR #84.
-
-Do not duplicate or broadly modify it.
-
-No engine rewrite, deterministic-state changes, fake failure condition, reward/achievement authority change or duplicated Keeper asset import.
-
-7. EXPLICIT SMALL-ICON GAP
+Verify:
+`ASSET-SHA256.txt`
 
 Read:
-docs/design/visual-authority/missing-assets.json
+- README-CODEX.md
+- docs/design/visual-authority/asset-manifest.json
+- docs/design/visual-authority/approval-ledger.json
+- docs/design/visual-authority/game-catalog-authority.json
 
-The approved reference covers many small icons, but this ZIP does not contain faithful isolated production glyphs for all of them.
+Copy the CONTENTS of the package into repository root.
+Do not create a nested wrapper directory.
 
-For missing small icons:
+Reconcile existing files by semantic role.
+Do not blindly overwrite newer authoritative assets.
 
-A. Keep the current functional icon if no approved replacement exists.
-B. Record exact remaining generic icon + file/surface.
-C. Author a simple SVG only when you can faithfully reproduce the approved reference without reinterpretive drift.
-D. Otherwise defer and write an exact asset brief.
+==================================================
+3. APPROVAL BOUNDARY
+==================================================
 
-Do not substitute rejected earlier icon experiments.
-Do not mark an item complete because a large feature illustration exists.
+Every asset listed as `approved: true` in `asset-manifest.json` is owner approved.
 
-8. AVATAR OUTFITS
+Do not redraw, restyle, or replace these assets in this checkpoint.
+
+Explicit exclusions matter:
+
+- Do not resurrect rejected cart illustrations.
+- Empty Cart uses `mori-empty-cart-kinchaku`.
+- Do not map `gilded_sakura_petal_relic` to Petal Wallet, currency, or another
+  semantic role. It remains deferred.
+- Do not add any generated contact sheet, collage, montage, mockup, or approval
+  sheet as runtime art.
+- Do not use superseded Thigh Colosseum art.
+
+==================================================
+4. EMPTY STATES
+==================================================
+
+Approved mappings:
+
+`mori-empty-cart-kinchaku`
+-> Empty Cart state
+-> IMPORTANT: this is NOT Petal Wallet
+
+`mori-empty-wishlist`
+-> Wishlist/Favorites empty state
+
+`mori-empty-messages`
+-> Messages/community empty state
+
+`mori-empty-collection`
+-> Collection/library empty state
+
+`mori-empty-search-results`
+-> No search results
+
+Integration requirements:
+
+- preserve existing empty-state semantics and copy
+- artwork is decorative/supportive, not the only explanation
+- do not alter route/auth/data behavior
+- do not fabricate "empty" state for visual QA
+- use current visual-QA mechanisms where necessary
+
+==================================================
+5. DESTINATION / FEATURE ART
+==================================================
+
+Approved:
+
+`mori-destination-orders`
+`mori-destination-admin`
+`mori-destination-achievements`
+`mori-destination-trade-center`
+`mori-destination-music-player`
+
+Audit each target route/component before use.
+
+High-level rule:
+feature imagery belongs in destination headers, cards, empty/intro states, or
+medium/large presentation surfaces.
+
+Do NOT turn these into 16px navbar icons.
+
+Do not imply admin access, achievements, orders, or account state that does not exist.
+
+==================================================
+6. AVATAR CREATOR PRESENTATION
+==================================================
+
+Approved stage/presentation assets:
+
+`avatar-creator-stage-plinth`
+`avatar-creator-backplate-arch`
+`avatar-creator-equipment-slot-frame`
+`avatar-creator-cosmetic-token`
+`avatar-creator-grounding-ring`
+`avatar-creator-preset-reliquary`
+
+Before integration, inspect the actual avatar architecture and current 3D/runtime
+ownership.
+
+Presentation is allowed to wrap the live avatar.
+Presentation must NOT become a competing avatar runtime.
+
+Specific boundaries:
+
+PLINTH
+- under live model
+- neutral enough not to recolor model
+- no fake character sprite
+
+BACKPLATE ARCH
+- behind live model
+- preserve open center
+- must not block camera/avatar pointer interactions
+
+EQUIPMENT SLOT FRAME
+- UI thumbnail chrome only
+- preserve semantic selection/focus on actual controls
+
+COSMETIC TOKEN
+- neutral presentation base
+- rarity color/meaning stays programmatic
+- art cannot invent rarity
+
+GROUNDING RING
+- presentation/selection ground layer
+- optional subtle transform/opacity motion only
+- reduced-motion static equivalent
+
+PRESET RELIQUARY
+- saved-look/preset visual or empty state
+- does not replace actual saved preset data
+
+==================================================
+7. AVATAR CREATOR CATEGORY GLYPHS
+==================================================
+
+Approved:
+
+`avatar-category-hair`
+`avatar-category-face`
+`avatar-category-eyes`
+`avatar-category-body`
+`avatar-category-outfit`
+`avatar-category-accessories`
+`avatar-category-weapon-prop`
+
+Weapon/Prop is intentionally a combined SWORD/GUN category symbol.
+
+Do not split it into two icons in this checkpoint unless the current information
+architecture already has separate canonical categories.
+
+Test each glyph at:
+48px
+64px
+80px
+96px
+
+If visual legibility is poor at the smallest supported target:
+retain accessible text and/or current compact functional icon rather than
+over-sharpening the raster.
+
+==================================================
+8. AVATAR CREATOR ACTION GLYPHS
+==================================================
+
+Approved:
+
+`avatar-action-color-material`
+`avatar-action-presets`
+`avatar-action-randomize`
+`avatar-action-undo-reset`
+`avatar-action-save`
+`avatar-action-preview`
+
+Artwork does not create action authority.
+
+Examples:
+- Save only executes the existing valid save path.
+- Randomize must use existing canonical randomization rules.
+- Undo/reset must use current reversible state ownership.
+- Preview must not create a second avatar.
+- Presets must reflect real persisted/local preset state.
+- Color/material art does not define allowed palettes.
+
+==================================================
+9. GAME CATALOG: CANONICAL PRESENTATION UPDATE
+==================================================
 
 Read:
-docs/design/visual-authority/avatar-outfit-brief.md
+`game-catalog-authority.json`
 
-The two Sakura Nightwarden PNGs are REFERENCE ONLY.
+This package establishes updated VISUAL/CATALOG direction for:
 
-Never use them as a fake runtime avatar.
+BUBBLE RAGDOLL
+- renamed/reframed from Bubble Girl direction
+- contained front/slight-3/4 physics room
+- waifu/husbando avatar options
+- polished ragdoll/interaction focus
+- mature-theme capability remains a separate art/content concern
 
-Preserve for future canonical 3D implementation:
+MAID CAFÉ MANAGER
+- re-integrated prior concept
+- third-person management/life-sim
+- Diner-Dash-like service loop
+- shift outcomes affect next-day scenarios
+- tied to avatar identity
+- DO NOT implement the whole game here
 
-Shared:
-- dark tailored layers
-- dusty rose/sakura
-- restrained bronze
-- fur/feather mantle
-- cords/tassels/botanical hardware
-- anime-realistic dark-fantasy silhouette
+THIGH COLOSSEUM
+- side-scrolling / Metroid-like
+- comedy action
+- thigh-crush gimmick
+- escalating stages
+- unlockable skins/maps
+- final approved art contains no enemy dialogue/callouts
 
-Feminine:
-- preserve fitted bust/waist/hip silhouette and physical allure through actual mesh tailoring/body fit
-- intentional thigh exposure via asymmetric skirt/cape openings
-- rig-safe thigh/garter hardware
-- tall armored footwear
-- no painted fake anatomy
-- no clipping at bust/waist/hips/thighs
+PUZZLE REVEAL
+- top-down/archive-table presentation
+- categories: Lore, Career, Anime, Gaming, Random
+- dynamic puzzles
+- avatar identity can inform presentation
+- DO NOT build new puzzle-generation logic here unless it already exists and
+  only needs non-behavioral metadata wiring
 
-Masculine:
-- fitted high collar
-- lean athletic silhouette
-- mantle
-- asymmetric long coat
-- belts/chains/armor accents
-- tall boots
+DUNGEON OF DESIRE
+- first-person RPG
+- customizable protagonist
+- succubus antagonist
+- inventory management
+- dungeon/lore ties
+- public-safe visual layer and mature-theme layer must remain architecturally separable
+- DO NOT implement mature content or the RPG mechanics in this visual checkpoint
 
-Cross-hatching:
-- material/shader/texture feature
-- strongest on cloth/leather midtones/shadows
-- avoid mobile moire
-- keep skin cleaner
-- preserve cel silhouette
-- game-specific intensity may vary without forking saved avatar identity
+==================================================
+10. GAME ART MAPPINGS
+==================================================
 
-Do not create another competing avatar renderer in this checkpoint.
+Approved case + hub pairs:
 
-Return exact dependencies needed to translate these outfits into the canonical skeletal GLB/glTF runtime.
+Bubble Ragdoll:
+`game-bubble-ragdoll-cover`
+`game-bubble-ragdoll-hub`
 
-9. ENTERPRISE ASSET PARAMETERS
+Maid Café Manager:
+`game-maid-cafe-manager-cover`
+`game-maid-cafe-manager-hub`
 
-Runtime assets are already self-hosted transparent WebP and bounded/compressed.
+Thigh Colosseum:
+`game-thigh-colosseum-cover`
+`game-thigh-colosseum-hub`
+
+Puzzle Reveal:
+`game-puzzle-reveal-cover`
+`game-puzzle-reveal-hub`
+
+Dungeon of Desire:
+`game-dungeon-of-desire-cover`
+`game-dungeon-of-desire-hub`
+
+COVER:
+- physical Otaku-mori case presentation
+- use in showcase/catalog contexts only
+- not the default tiny card image
+
+HUB:
+- near-square key art
+- use for mini-game hub/game-selection presentation
+- preserve important focal point during responsive crops
+
+Do not:
+- fake console branding
+- add ESRB/third-party platform marks
+- auto-generate a new cover family
+- rewrite titles inside the images
+- use old Bubble Girl/Thigh art when the new catalog art exists
+
+==================================================
+11. CURRENT MINI-GAME METADATA RECONCILIATION
+==================================================
+
+Audit:
+- `app/mini-games/**`
+- game metadata JSON files
+- route mapping
+- current GameCube-style hub or current equivalent
+- tests asserting game names/routes
+- any saved game identifiers
+
+Do NOT casually rename stable internal IDs if doing so would break URLs, saves,
+analytics, tests, or persisted state.
+
+Preferred strategy:
+
+DISPLAY NAME may become canonical new presentation name.
+
+STABLE INTERNAL ID / ROUTE may remain historical if changing it is unsafe.
+
+If Bubble Girl currently exists as a stable route/ID:
+- update display/catalog presentation to Bubble Ragdoll
+- preserve stable route unless there is a proven safe migration plan
+- document alias/migration need
+
+If Maid Café Manager has no current route:
+- add catalog metadata / visually disabled "planned" surface only if the current
+  architecture already supports planned/coming-soon entries cleanly
+- otherwise DO NOT invent a dead route
+- report the required implementation checkpoint
+
+This checkpoint must not turn a visual/catalog addition into a half-built game.
+
+==================================================
+12. PERFORMANCE / ENTERPRISE PARAMETERS
+==================================================
+
+Runtime assets are already supplied as WebP.
+
+Do not serve source PNG masters to browsers.
 
 Requirements:
-- no remote image dependencies
-- no base64/data-URI duplication
-- fixed width/height or aspect ratio
-- no layout shift
+- self-hosted assets only
+- explicit width/height or stable aspect ratio
+- prevent CLS
 - lazy loading by default
-- async decode by default
-- no global preload
-- `priority` only for demonstrated above-the-fold critical art
-- never preload avatar reference art
+- async decoding by default
+- only priority-load demonstrated above-fold LCP candidates
+- do not preload the whole game catalog
+- no base64/data URI duplication
 - preserve alpha
-- no raster animation loops
-- wrapper transform/opacity animation only
-- pause optional motion offscreen
+- no new animation library for these assets
+- no raster frame-loop animation
+- use transform/opacity on wrappers where motion is appropriate
 - honor prefers-reduced-motion
-- no large JS animation package
-- inspect transferred bytes in browser
-- use `next/image` when it materially improves sizing/loading
-- avoid filter-heavy effects around large transparent images
+- do not add filter-heavy glow/blur stacks to large art
 
-10. ACCESSIBILITY
+For game-hub images:
+- test actual responsive crops
+- use `object-position` or equivalent focal placement
+- no faces/action focal points cut at standard viewports
 
-Raster art is never the semantic label.
+==================================================
+13. ACCESSIBILITY
+==================================================
 
-Interactive wrappers:
-- accessible name on button/link
-- keyboard focus remains obvious
-- image cannot intercept pointer events unnecessarily
+All game and avatar actions retain semantic labels independent of artwork.
 
-Decorative art:
-- alt=""
-- aria-hidden as appropriate
-- pointer-events:none when layered
+Decorative images:
+alt=""
+aria-hidden where appropriate
 
-Test zoom/reflow.
-No horizontal overflow caused by feature art.
+Meaningful cover/key art:
+use concise appropriate alt text when it communicates content beyond adjacent text.
 
-11. SECURITY / SCOPE
+No raster icon is the sole accessible name of a control.
 
-No DB mutation/migration/seed/reset.
-No provider mutation.
-No Stripe/Printify/Merchize action.
-No Vercel env mutation.
-No Production deploy.
-No env-file creation.
-No secrets.
-No permanent Petal grants.
-No achievement writes.
-No auth weakening.
-No arbitrary external downloads.
+At 200%/400% zoom:
+- controls remain usable
+- art does not force horizontal scroll
+- hub tiles remain readable
 
-Do not introduce third-party franchise logos/assets.
+==================================================
+14. VISUAL QA MATRIX
+==================================================
 
-12. REPO HYGIENE
+Capture baseline before modifying every affected surface.
 
-Before committing all source/reference PNGs, inspect existing `docs/design/references` conventions and repository-size impact.
-
-Runtime WebP files actually used by the site are intended to be committed.
-
-For source/reference PNGs:
-- commit when consistent with established design-reference policy
-- otherwise retain only minimum authority files needed
-- report omitted source files
-- do not add Git LFS unless already established
-- do not duplicate identical images
-
-Keep manifest and missing register accurate.
-
-13. VISUAL QA
-
-Capture baseline before changing each target surface.
-
-Required viewport matrix:
+Minimum final QA:
 390x844
 430x932
 768x1024
@@ -308,106 +439,122 @@ Required viewport matrix:
 1920x1080
 
 Also:
-- prefers-reduced-motion
+- reduced motion
 - keyboard-only
 - 200% zoom
 - 400% reflow where practical
+- signed-in/out where affected
+- avatar creator pointer/camera interaction
+- game hub responsive crop checks
 
-Check:
-- alpha transparency / no black rectangles
-- no clipping
-- no fuzzy scaling
-- no pointer interception
-- no false affordances
-- no excess ornament
-- correct contrast
-- no significant CLS
-- no art competing with page content
+Audit:
+- no alpha matte
+- no fuzzy icon scaling
+- no over-decoration
+- no image intercepting pointer input
+- no art hiding semantic labels
+- no stale old game cover still visible
+- no wrong Bubble Girl display naming after intended catalog reconciliation
+- no dead Maid Café link
+- no old/superseded Thigh art
 
-For auth-gated surfaces use existing visual-QA/auth mechanisms only.
+==================================================
+15. TEST / BUILD / SECURITY
+==================================================
 
-14. VALIDATION
-
-Run appropriate focused tests plus:
+Run appropriate focused tests, plus:
 
 pnpm type-check
 pnpm lint
 git diff --check
 pnpm security:scan
 pnpm docs:security:check
-
-Attempt:
 pnpm build
 
 Use only established process-scoped safe placeholder env values if necessary.
+
 Do not create env files.
 
-Classify inherited repo-wide warnings separately.
+Do not "fix" unrelated baseline Prettier/lint/security warnings unless directly
+caused by this checkpoint.
 
-15. IMPLEMENTATION ORDER
+==================================================
+16. SECURITY + MUTATION BOUNDARIES
+==================================================
 
-1. ingest authority docs/manifests
-2. audit intended surfaces
-3. integrate 1–2 highest-confidence assets
-4. render/critique
-5. continue only where result is demonstrably better
-6. profile/avatar-frame integration if architecture fits
-7. Soapstone integration
-8. audit remaining small-icon gaps
-9. update missing register
-10. final responsive/accessibility/performance QA
+NO:
+- Production deploy
+- merge
+- Ready transition
+- DB mutation
+- migrations
+- seeds/resets
+- provider mutation
+- Stripe/Printify/Merchize action
+- Vercel env change
+- Petal grants
+- achievement writes
+- secret output
+- auth weakening
 
-Do not force every supplied image into the first PR.
+Mature-theme game direction must not weaken public-route or age/content boundaries.
+This checkpoint is visual/catalog only.
 
-16. COMMIT / PR
+==================================================
+17. COMMIT + DRAFT PR
+==================================================
 
-When validated:
+After successful validation:
 
-Push:
-codex/mori-visual-asset-integration
+Push the isolated branch.
 
-Open a Draft PR against:
-codex/memory-keeper-reactive-presentation
+Open a Draft PR against the current approved visual parent.
 
 Suggested title:
-feat: establish Mori visual asset authority
+`feat: integrate approved Mori visual assets batch 2`
 
-Keep Draft.
+Do not merge.
+Do not mark Ready.
+Do not deploy.
 
-No merge.
-No Ready transition.
-No Production deploy.
-
-17. FINAL REPORT
+==================================================
+18. FINAL REPORT
+==================================================
 
 Return:
-1. preflight worktree/branch/starting HEAD
-2. verified PR #84 state
-3. package files ingested
-4. references/source masters committed vs omitted and why
-5. exact runtime assets committed
-6. exact target surface for each used asset
-7. deferred assets and why
-8. remaining small-navigation glyphs
-9. remaining generic icon locations
-10. Soapstone result
-11. profile/avatar-frame result
-12. shop/category result
-13. collection/quest/blog/search/messages/notifications result
-14. badge/achievement result or reason deferred
-15. avatar outfit 3D dependency report
-16. runtime transferred bytes/performance observations
-17. responsive QA matrix
-18. reduced-motion result
-19. accessibility result
-20. test/typecheck/lint/build result
-21. security result
-22. exact files changed
-23. final commit SHA
-24. Draft PR number/base/head
-25. worktree cleanliness
-26. confirmation of no merge/deploy/provider/DB/economy mutation
-27. updated missing-asset register
 
-STOP after this checkpoint.
-Do not begin Petal Samurai art integration or full avatar-runtime consolidation in the same PR.
+1. worktree
+2. branch
+3. starting HEAD
+4. verified parent PR/branch/head
+5. package checksum result
+6. exact approved source masters ingested
+7. exact runtime WebPs committed
+8. exact empty-state placements
+9. exact destination-art placements
+10. avatar creator presentation integration
+11. avatar category/action glyph integration
+12. glyph legibility matrix
+13. game cover/hub mappings
+14. game metadata/display-name reconciliation
+15. Bubble Ragdoll internal ID/route decision
+16. Maid Café Manager catalog/route decision
+17. Thigh Colosseum old-art cleanup result
+18. Puzzle Reveal presentation result
+19. Dungeon public-safe separation result
+20. intentionally deferred assets
+21. transferred bytes/performance observations
+22. accessibility/reduced-motion results
+23. responsive QA matrix
+24. focused tests
+25. typecheck/lint/build/security results
+26. exact files changed
+27. final commit SHA
+28. Draft PR number/base/head
+29. worktree cleanliness
+30. explicit no-merge/no-deploy/no-provider/no-DB/no-economy-mutation confirmation
+31. next recommended implementation checkpoint
+
+STOP.
+
+Do not begin the game-runtime implementation packs in this PR.
