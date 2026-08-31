@@ -20,6 +20,7 @@ import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
 import StarfieldBackground from '@/app/components/backgrounds/StarfieldBackground';
 import { GameCubeMenu } from '@/app/components/mini-games/GameCubeMenu';
+import { getApprovedGamePresentation } from '@/lib/approved-visual-assets';
 
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
@@ -31,7 +32,7 @@ const transformGames = (games: typeof gamesRegistry.games) => {
     .sort((a, b) => a.order - b.order)
     .map((game) => ({
       id: game.id,
-      label: game.title,
+      label: getApprovedGamePresentation(game.slug)?.displayName ?? game.title,
       desc: game.description,
       href: `/mini-games/${game.slug}`,
       icon: game.icon,
@@ -47,6 +48,9 @@ const transformGames = (games: typeof gamesRegistry.games) => {
 
 // Function to get thumbnail path for a game
 const getGameThumbnail = (gameSlug: string): string => {
+  const approvedPresentation = getApprovedGamePresentation(gameSlug);
+  if (approvedPresentation) return approvedPresentation.hub;
+
   // Map game slugs to their thumbnail files
   const thumbnailMap: Record<string, string> = {
     'petal-samurai': '/assets/games/petal-samurai.svg',
@@ -182,7 +186,12 @@ export default function GameCubeHubV2() {
         await router.push(game.href);
       } catch (error) {
         getLogger().then((logger) => {
-          logger.error('Failed to navigate to game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+          logger.error(
+            'Failed to navigate to game:',
+            undefined,
+            undefined,
+            error instanceof Error ? error : new Error(String(error)),
+          );
         });
         setLoadingGame(null);
       }
@@ -274,9 +283,7 @@ export default function GameCubeHubV2() {
       <StarfieldBackground density={0.72} speed={0.62} zIndex={-10} />
 
       {/* Subtle ambient glow overlay (optional, can be removed if starfield is enough) */}
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none -z-[9]"
-      />
+      <div className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none -z-[9]" />
 
       {/* Main Layout */}
       <div className="relative z-10 flex min-h-screen">
@@ -324,12 +331,8 @@ export default function GameCubeHubV2() {
                     }}
                   >
                     {/* Chrome highlights */}
-                    <div
-                      className="absolute inset-0 pointer-events-none cube-chrome-overlay"
-                    />
-                    <div
-                      className="absolute top-1 left-1 right-1 h-px pointer-events-none cube-chrome-highlight"
-                    />
+                    <div className="absolute inset-0 pointer-events-none cube-chrome-overlay" />
+                    <div className="absolute top-1 left-1 right-1 h-px pointer-events-none cube-chrome-highlight" />
                   </div>
                 ))}
               </div>
@@ -575,6 +578,8 @@ export default function GameCubeHubV2() {
                   id: game.id,
                   title: game.label,
                   thumbnail: getGameThumbnail(game.slug),
+                  thumbnailContainsTitle:
+                    getApprovedGamePresentation(game.slug)?.hubContainsTitle ?? false,
                   slug: game.slug,
                   href: game.href,
                 }))}
@@ -712,7 +717,10 @@ export default function GameCubeHubV2() {
                       >
                         <div className="text-lg mb-1">
                           <span role="img" aria-label="Community">
-                            <span role="img" aria-label="emoji">�</span>�
+                            <span role="img" aria-label="emoji">
+                              �
+                            </span>
+                            �
                           </span>
                         </div>
                         <div className="text-sm font-medium">Community</div>

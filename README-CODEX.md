@@ -1,32 +1,32 @@
-# Otaku-mori Mori Visual Assets v1
+# Otaku-mori Approved Visual Assets: Batch 2
 
-This package contains only the post-reference visual work grounded in the user's approved Otaku-mori references.
+This package contains only owner-approved artwork produced after the previous
+`otakumori-mori-status-ornaments-v1.zip` handoff.
 
-Earlier rejected pastel/cartoon icons and the first rejected over-ornate inventory-object experiments are intentionally excluded.
+Included:
+- 5 empty-state illustrations
+- 5 destination/support illustrations
+- 6 avatar creator presentation assets
+- 13 avatar creator category/action glyphs
+- 5 approved game case-cover masters
+- 5 approved game hub-thumbnail masters
 
-## Extract
-Attach the ZIP to a fresh Codex session. Copy the CONTENTS of the ZIP to the repository root. Do not create a nested package directory.
+Rejected generation sheets, rejected cart art, unresolved petal-relic art, and
+superseded Thigh Colosseum variants are intentionally excluded.
 
-## Contents
-- `public/assets/ui/mori/feature/`: optimized transparent WebP feature assets for runtime use after in-context QA.
-- `docs/design/references/site-visual-authority/approved-user-references/`: authoritative user-supplied visual references.
-- `docs/design/references/site-visual-authority/produced-source/`: lossless PNG masters for generated candidates.
-- `docs/design/references/avatar/outfits/`: Sakura Nightwarden masculine/feminine outfit concepts, reference only.
-- `docs/design/visual-authority/asset-manifest.json`: placement and runtime policies.
-- `docs/design/visual-authority/missing-assets.json`: explicit remaining gaps.
-- `docs/design/visual-authority/avatar-outfit-brief.md`: 3D outfit translation rules.
-- `codex/IMPLEMENTATION_PROMPT.md`: copy-ready implementation checkpoint.
+## Runtime
+Use optimized WebPs under `public/assets/`.
 
-## Runtime standards
-- self-host assets only
-- preserve alpha
-- WebP runtime copies are bounded/compressed
-- lazy load by default
-- no global preloading
-- fixed dimensions/aspect ratio to prevent CLS
-- semantic text must not depend on raster art
-- decorative images use empty alt/aria-hidden where appropriate
-- animate wrappers, not raster frame sequences
-- no unbounded requestAnimationFrame loops
-- respect `prefers-reduced-motion`
-- do not use large feature illustrations as 16–24px navbar glyphs
+## Source authority
+Approved PNG masters live under:
+`docs/design/references/approved/batch-2/`
+
+## Before implementation
+Read:
+- `docs/design/visual-authority/asset-manifest.json`
+- `docs/design/visual-authority/approval-ledger.json`
+- `docs/design/visual-authority/game-catalog-authority.json`
+- `codex/IMPLEMENTATION_PROMPT.md`
+
+Game catalog files define presentation direction only. They do not authorize
+mechanics rewrites in this checkpoint.

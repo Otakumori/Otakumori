@@ -21,6 +21,20 @@ import {
   generateFilename,
 } from '../lib/export';
 import type * as THREE from 'three';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import AvatarControlGlyph from './AvatarControlGlyph';
+
+const AVATAR_TABS = [
+  { id: 'body', label: 'Body', icon: approvedVisualAssets.avatar.categories.body },
+  { id: 'face', label: 'Face', icon: approvedVisualAssets.avatar.categories.face },
+  { id: 'hair', label: 'Hair', icon: approvedVisualAssets.avatar.categories.hair },
+  { id: 'outfit', label: 'Outfit', icon: approvedVisualAssets.avatar.categories.outfit },
+  {
+    id: 'accessories',
+    label: 'Accessories',
+    icon: approvedVisualAssets.avatar.categories.accessories,
+  },
+] as const;
 
 interface UIControlsProps {
   config: CharacterConfig;
@@ -71,7 +85,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       exportJSON(config, exportFilename.json);
     } catch (error) {
-      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Export failed:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       alert('Failed to export JSON. Check console for details.');
     }
   };
@@ -86,7 +105,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       await exportGLB(sceneRef.current, exportFilename.glb);
     } catch (error) {
-      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Export failed:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       alert('Failed to export GLB. Check console for details.');
     } finally {
       setIsExporting(false);
@@ -103,7 +127,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       await exportZIP(config, sceneRef.current, exportFilename.zip);
     } catch (error) {
-      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Export failed:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       alert('Failed to export ZIP. Check console for details.');
     } finally {
       setIsExporting(false);
@@ -129,24 +158,19 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
       {/* Tabs */}
       <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-        <Tabs.List className="flex border-b border-white/10">
-          {[
-            { id: 'body', label: 'Body' },
-            { id: 'face', label: 'Face' },
-            { id: 'hair', label: 'Hair' },
-            { id: 'outfit', label: 'Outfit' },
-            { id: 'accessories', label: 'Accessories' },
-          ].map((tab) => (
+        <Tabs.List className="grid grid-cols-5 border-b border-white/10">
+          {AVATAR_TABS.map((tab) => (
             <Tabs.Trigger
               key={tab.id}
               value={tab.id}
               className={cn(
-                'flex-1 border-b-2 border-transparent px-4 py-3 text-sm font-medium text-white/70 transition-colors',
-                'hover:text-white focus:outline-none',
+                'flex min-w-0 flex-col items-center gap-1 border-b-2 border-transparent px-1 py-2 text-[10px] font-medium text-white/70 transition-colors sm:text-xs',
+                'hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-inset',
                 activeTab === tab.id && 'border-pink-500 text-white',
               )}
             >
-              {tab.label}
+              <AvatarControlGlyph src={tab.icon} />
+              <span className="max-w-full truncate">{tab.label}</span>
             </Tabs.Trigger>
           ))}
         </Tabs.List>
@@ -193,7 +217,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
               {/* Body Presets */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-white/90">Body Preset</label>
+                <div className="mb-2 text-sm font-medium text-white/90">Body Preset</div>
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => {
@@ -321,7 +345,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           <Tabs.Content value="face" className="space-y-4">
             {/* Face Presets */}
             <div>
-              <label htmlFor="face-preset-select" className="mb-2 block text-sm font-medium text-white/90">Face Preset</label>
+              <label
+                htmlFor="face-preset-select"
+                className="mb-2 block text-sm font-medium text-white/90"
+              >
+                Face Preset
+              </label>
               <select
                 id="face-preset-select"
                 value={config.faceId}
@@ -339,7 +368,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
             {/* Eyes Section */}
             <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
               <h3 className="text-sm font-semibold text-white/90">Eyes</h3>
-              
+
               <SliderControl
                 label="Eye Size"
                 value={config.eyes.irisShape}
@@ -353,7 +382,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
               />
 
               <div>
-                <label htmlFor="left-eye-color" className="mb-2 block text-sm font-medium text-white/90">Left Eye Color</label>
+                <label
+                  htmlFor="left-eye-color"
+                  className="mb-2 block text-sm font-medium text-white/90"
+                >
+                  Left Eye Color
+                </label>
                 <ColorPicker
                   value={config.eyes.colorLeft}
                   onChange={(color) =>
@@ -366,7 +400,10 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
               </div>
 
               <div>
-                <label htmlFor="right-eye-color" className="mb-2 block text-sm font-medium text-white/90">
+                <label
+                  htmlFor="right-eye-color"
+                  className="mb-2 block text-sm font-medium text-white/90"
+                >
                   Right Eye Color
                 </label>
                 <ColorPicker
@@ -403,7 +440,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           {/* Hair Tab */}
           <Tabs.Content value="hair" className="space-y-4">
             <div>
-              <label htmlFor="hair-style-select" className="mb-2 block text-sm font-medium text-white/90">Hair Style</label>
+              <label
+                htmlFor="hair-style-select"
+                className="mb-2 block text-sm font-medium text-white/90"
+              >
+                Hair Style
+              </label>
               <select
                 id="hair-style-select"
                 value={config.hair.style}
@@ -456,7 +498,12 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           {/* Outfit Tab */}
           <Tabs.Content value="outfit" className="space-y-4">
             <div>
-              <label htmlFor="outfit-style-select" className="mb-2 block text-sm font-medium text-white/90">Outfit Style</label>
+              <label
+                htmlFor="outfit-style-select"
+                className="mb-2 block text-sm font-medium text-white/90"
+              >
+                Outfit Style
+              </label>
               <select
                 id="outfit-style-select"
                 value={config.outfit.id}
@@ -500,10 +547,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           <Tabs.Content value="accessories" className="space-y-4">
             <div className="space-y-3">
               {config.accessories.map((accessory, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-white/20 bg-white/5 p-3"
-                >
+                <div key={index} className="rounded-lg border border-white/20 bg-white/5 p-3">
                   <div className="mb-2 flex items-center justify-between">
                     <select
                       value={accessory.id}
@@ -576,14 +620,16 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handleRandomize}
-            className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            className="flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
           >
+            <AvatarControlGlyph src={approvedVisualAssets.avatar.actions.randomize} size={32} />
             Randomize
           </button>
           <button
             onClick={handleReset}
-            className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            className="flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
           >
+            <AvatarControlGlyph src={approvedVisualAssets.avatar.actions.reset} size={32} />
             Reset
           </button>
         </div>
@@ -622,4 +668,3 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     </div>
   );
 }
-

@@ -68,7 +68,7 @@
     {
       "id": "bubble-girl",
       "slug": "bubble-girl",
-      "title": "Bubble Girl",
+      "title": "Bubble Ragdoll",
       "description": "Spawn bubbles, float and score. Sandbox or challenge mode.",
       "category": "physics",
       "difficulty": "medium",
@@ -80,7 +80,7 @@
         "chains": "Build combo chains for massive petal rewards",
         "modes": "Sandbox for creativity or challenge mode for high scores"
       },
-      "image": "/games/bubble-girl/cover.jpg",
+      "image": "/assets/games/covers/game-bubble-ragdoll-cover.webp",
       "icon": "(.)",
       "enabled": true,
       "order": 4
@@ -141,7 +141,7 @@
         "references": "Spot the anime and gaming easter eggs throughout",
         "gating": "Adult content - age verification required"
       },
-      "image": "/games/dungeon-of-desire/cover.jpg",
+      "image": "/assets/games/covers/game-dungeon-of-desire-cover.webp",
       "icon": "x",
       "enabled": true,
       "order": 7
@@ -162,7 +162,7 @@
         "physics": "Survive against giant thigh-crushers with humor-driven gameplay",
         "gating": "Adult content - age verification required"
       },
-      "image": "/games/thigh-coliseum/cover.jpg",
+      "image": "/assets/games/covers/game-thigh-colosseum-cover.webp",
       "icon": "()",
       "enabled": true,
       "order": 8
@@ -182,7 +182,7 @@
         "energy": "Manage your energy as you clear fog to reveal beautiful art",
         "packs": "Unlock new image packs and difficulty levels with petals"
       },
-      "image": "/games/puzzle-reveal/cover.jpg",
+      "image": "/assets/games/covers/game-puzzle-reveal-cover.webp",
       "icon": "+",
       "enabled": true,
       "order": 9

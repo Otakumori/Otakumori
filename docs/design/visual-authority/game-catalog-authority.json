@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "status": "visual/catalog authority for this asset checkpoint; mechanics require separate implementation review",
+  "games": {
+    "bubble-ragdoll": {
+      "displayName": "Bubble Ragdoll",
+      "catalogStatus": "renamed from Bubble Girl direction",
+      "camera": "front or slight 3/4 contained physics room",
+      "concept": "Physics-driven interactive character sandbox/fighter with waifu and husbando avatar options, modernized presentation, mature-theme capability, and polished ragdoll interactions.",
+      "mechanicsMutationAllowedInThisCheckpoint": false,
+      "coverAsset": "game-bubble-ragdoll-cover",
+      "hubAsset": "game-bubble-ragdoll-hub"
+    },
+    "maid-cafe-manager": {
+      "displayName": "Maid Café Manager",
+      "catalogStatus": "re-integrated prior concept / new canonical catalog addition",
+      "camera": "third-person management/life-sim presentation",
+      "concept": "Diner-Dash-like service and management loop tied into avatar identity. Shift results influence next-day scenarios, with a subtle life-sim layer.",
+      "mechanicsMutationAllowedInThisCheckpoint": false,
+      "coverAsset": "game-maid-cafe-manager-cover",
+      "hubAsset": "game-maid-cafe-manager-hub"
+    },
+    "thigh-colosseum": {
+      "displayName": "Thigh Colosseum",
+      "catalogStatus": "canonical revised direction",
+      "camera": "side-scrolling / Metroid-like traversal",
+      "concept": "Comedy action platformer with thigh-crush gimmick, escalating stages, unlockable skins and maps.",
+      "mechanicsMutationAllowedInThisCheckpoint": false,
+      "coverAsset": "game-thigh-colosseum-cover",
+      "hubAsset": "game-thigh-colosseum-hub"
+    },
+    "puzzle-reveal": {
+      "displayName": "Puzzle Reveal",
+      "catalogStatus": "canonical revised direction",
+      "camera": "top-down / archive-table puzzle presentation",
+      "concept": "Dynamic puzzles spanning Lore, Career, Anime, Gaming and Random categories, with avatar identity integrated into presentation.",
+      "mechanicsMutationAllowedInThisCheckpoint": false,
+      "coverAsset": "game-puzzle-reveal-cover",
+      "hubAsset": "game-puzzle-reveal-hub"
+    },
+    "dungeon-of-desire": {
+      "displayName": "Dungeon of Desire",
+      "catalogStatus": "canonical revised direction",
+      "camera": "first-person RPG",
+      "concept": "Dungeon-crawl RPG with a customizable protagonist, succubus antagonist, inventory management, lore ties, and a mature-theme art track kept separate from public-safe presentation.",
+      "mechanicsMutationAllowedInThisCheckpoint": false,
+      "coverAsset": "game-dungeon-of-desire-cover",
+      "hubAsset": "game-dungeon-of-desire-hub"
+    }
+  },
+  "otherCanonicalGamesUnaffectedByThisBatch": [
+    "Memory Defrag",
+    "Petal Samurai",
+    "Petal Storm Rhythm",
+    "Otaku Beat-Em-Up",
+    "Blossomware"
+  ]
+}

@@ -409,7 +409,7 @@ export const achievements: Achievement[] = [
   {
     id: 'bubble_girl_oops',
     name: 'Oops...I Clicked Again',
-    description: 'Play Bubble Girl 10+ times in one day.',
+    description: 'Play Bubble Ragdoll 10+ times in one day.',
     category: 'Mystery and Chaos',
     icon: '/assets/achievements/bubble_girl_oops.png',
     petals: 1000,
@@ -1429,7 +1429,7 @@ export const achievements: Achievement[] = [
   {
     id: 'oops_i_clicked_again',
     name: 'Oops...I Clicked Again',
-    description: 'Play Bubble Girl 10+ times in one day',
+    description: 'Play Bubble Ragdoll 10+ times in one day',
     category: 'Mystery and Chaos',
     icon: '',
     target: 10,

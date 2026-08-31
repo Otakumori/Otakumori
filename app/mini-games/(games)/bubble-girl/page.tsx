@@ -1,5 +1,5 @@
 /**
- * Bubble Girl - Physics-Based Interactive Character Game
+ * Bubble Ragdoll - Physics-Based Interactive Character Game
  *
  * Core Fantasy: Spawn bubbles, float and score. Sandbox or challenge mode.
  *
@@ -102,24 +102,24 @@ export default function InteractiveBuddyPage() {
       // Award petals using hook
       if (!hasAwardedPetals) {
         setHasAwardedPetals(true);
-        
+
         // Calculate petal rewards based on various factors
         let petalMultiplier = 1;
         const timeSpent = finalScoreValue > 0 ? Math.floor(finalScoreValue / 100) : 0; // Rough estimate
         const interactionStreak = Math.floor(finalScoreValue / 50); // Estimate from score
-        
+
         // Bonus for time spent (1 petal per 30 seconds of interaction)
         const timeBonus = Math.floor(timeSpent / 30);
-        
+
         // Bonus for interaction streaks (1 petal per 10 streak)
         const streakBonus = Math.floor(interactionStreak / 10);
-        
+
         // Base reward
         const baseReward = Math.floor(finalScoreValue / 100);
-        
+
         // Total reward
         const totalReward = Math.max(1, baseReward + timeBonus + streakBonus);
-        
+
         const result = await earnPetals({
           gameId: 'bubble-girl',
           score: totalReward * 10, // Convert to score for calculation
@@ -153,7 +153,12 @@ export default function InteractiveBuddyPage() {
           }),
         });
       } catch (error) {
-        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        logger.error(
+          'Failed to submit score:',
+          undefined,
+          undefined,
+          error instanceof Error ? error : new Error(String(error)),
+        );
       }
     },
     [mode, earnPetals, hasAwardedPetals],
@@ -224,7 +229,12 @@ export default function InteractiveBuddyPage() {
                         idempotencyKey: `bubble-boy-${Date.now()}-${Math.random()}`,
                       }),
                     }).catch((error) => {
-                      logger.error('Failed to unlock Bubble Boy achievement:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+                      logger.error(
+                        'Failed to unlock Bubble Boy achievement:',
+                        undefined,
+                        undefined,
+                        error instanceof Error ? error : new Error(String(error)),
+                      );
                     });
                   }
                 }}
@@ -234,7 +244,7 @@ export default function InteractiveBuddyPage() {
                     : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
                 }`}
               >
-                {characterVariant === 'girl' ? 'Bubble Girl' : 'Bubble Boy'}
+                Bubble Ragdoll
               </button>
             </div>
           </header>
@@ -262,21 +272,21 @@ export default function InteractiveBuddyPage() {
 
           {/* Game Overlay */}
           <GameOverlay
-              state={gameState}
-              instructions={[
-                'Click to use selected tool on character',
-                'Click + drag to grab and throw character parts',
-                'Select tools from the panel on the right',
-                'Build combos with rapid successive hits',
-                'Earn money to unlock better tools (Challenge mode)',
-              ]}
-              winMessage="Great job! You've mastered the Interactive Buddy!"
-              loseMessage="Try again! Keep practicing to improve your score!"
-              score={finalScore || score}
-              petalReward={petalReward}
-              onRestart={handleRestart}
-              onResume={handleStart}
-            />
+            state={gameState}
+            instructions={[
+              'Click to use selected tool on character',
+              'Click + drag to grab and throw character parts',
+              'Select tools from the panel on the right',
+              'Build combos with rapid successive hits',
+              'Earn money to unlock better tools (Challenge mode)',
+            ]}
+            winMessage="Great job! You've mastered the Interactive Buddy!"
+            loseMessage="Try again! Keep practicing to improve your score!"
+            score={finalScore || score}
+            petalReward={petalReward}
+            onRestart={handleRestart}
+            onResume={handleStart}
+          />
 
           {/* Game Instructions */}
           <GlassCard className="mt-6 p-6">

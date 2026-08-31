@@ -12,7 +12,7 @@ export interface SaveData {
   updatedAt: Date;
   data: Record<string, any>;
   metadata: SaveMetadata;
-  }
+}
 
 export interface SaveMetadata {
   level: number;
@@ -21,7 +21,7 @@ export interface SaveMetadata {
   achievements: string[];
   settings: Record<string, any>;
   checksum: string;
-  }
+}
 
 export interface SaveSlot {
   id: string;
@@ -36,7 +36,7 @@ export interface SaveSlot {
   isAutoSave: boolean;
   isCloudSave: boolean;
   size: number;
-  }
+}
 
 export interface SaveSystemConfig {
   maxSlots: number;
@@ -261,7 +261,12 @@ export class SaveSystem {
         const save = await this.createSave(slotId, data, {});
         this.onAutoSave?.(save);
       } catch (error) {
-        logger.error('Auto-save failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        logger.error(
+          'Auto-save failed:',
+          undefined,
+          undefined,
+          error instanceof Error ? error : new Error(String(error)),
+        );
       }
     }, this.config.autoSaveInterval);
   }
@@ -335,7 +340,12 @@ export class SaveSystem {
       this.onSaveCreated?.(save);
       return save;
     } catch (error) {
-      logger.error('Failed to import save data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to import save data:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw error;
     }
   }
@@ -378,7 +388,12 @@ export class SaveSystem {
       // Save to localStorage
       this.saveToLocalStorage();
     } catch (error) {
-      logger.error('Failed to restore from backup:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to restore from backup:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       throw error;
     }
   }
@@ -426,7 +441,7 @@ export class SaveSystem {
     const gameNames: Record<string, string> = {
       'petal-samurai': 'Petal Samurai',
       'memory-match': 'Memory Match',
-      'bubble-girl': 'Bubble Girl',
+      'bubble-girl': 'Bubble Ragdoll',
       'petal-storm-rhythm': 'Petal Storm Rhythm',
       blossomware: 'Blossom-ware',
       'dungeon-of-desire': 'Dungeon of Desire',
@@ -479,7 +494,12 @@ export class SaveSystem {
       };
       localStorage.setItem('otaku_mori_saves', JSON.stringify(data));
     } catch (error) {
-      logger.error('Failed to save to localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to save to localStorage:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
     }
   }
 
@@ -507,7 +527,12 @@ export class SaveSystem {
         Object.assign(this.config, parsed.config);
       }
     } catch (error) {
-      logger.error('Failed to load from localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to load from localStorage:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
     }
   }
 

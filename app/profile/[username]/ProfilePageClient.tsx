@@ -8,6 +8,8 @@ import { useUser } from '@clerk/nextjs';
 import GlassButton from '../../components/ui/GlassButton';
 import CommentsSection from '../../components/CommentsSection';
 import { type ProfileView, type ProfileSection } from '@/app/lib/contracts';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 export default function ProfilePageClient() {
   const { username } = useParams();
@@ -119,8 +121,12 @@ export default function ProfilePageClient() {
       <main className="mori-page pt-24">
         <div className="mori-shell py-16">
           <div className="mori-panel mx-auto max-w-xl p-8 text-center">
-            <h1 className="font-display text-2xl font-semibold text-[#fff1e4]">Profile not found</h1>
-            <p className="mt-3 text-sm leading-6 text-[#cdbbb7]">This profile does not exist or is private.</p>
+            <h1 className="font-display text-2xl font-semibold text-[#fff1e4]">
+              Profile not found
+            </h1>
+            <p className="mt-3 text-sm leading-6 text-[#cdbbb7]">
+              This profile does not exist or is private.
+            </p>
             <GlassButton href="/" variant="secondary" className="mt-6">
               Back to Home
             </GlassButton>
@@ -144,7 +150,10 @@ export default function ProfilePageClient() {
           {profile.bannerUrl && (
             <div className="relative h-44 overflow-hidden border-b border-white/[0.08] sm:h-56">
               <img src={profile.bannerUrl} alt="" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#09070a]/75 via-transparent to-transparent" aria-hidden="true" />
+              <div
+                className="absolute inset-0 bg-gradient-to-t from-[#09070a]/75 via-transparent to-transparent"
+                aria-hidden="true"
+              />
             </div>
           )}
 
@@ -171,15 +180,31 @@ export default function ProfilePageClient() {
                   <h1 className="font-display text-3xl font-semibold text-[#fff1e4]">
                     {profile.display_name || profile.username}
                   </h1>
-                  {profile.presence && <span className="text-xs text-[#8f7f7d]">{getStatusText(profile.presence.status)}</span>}
+                  {profile.presence && (
+                    <span className="text-xs text-[#8f7f7d]">
+                      {getStatusText(profile.presence.status)}
+                    </span>
+                  )}
                 </div>
                 <p className="mt-1 text-sm text-[#a9855f]">@{profile.username}</p>
 
-                {profile.bio && <p className="mt-4 max-w-2xl text-sm leading-7 text-[#cdbbb7] sm:text-base">{profile.bio}</p>}
+                {profile.bio && (
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-[#cdbbb7] sm:text-base">
+                    {profile.bio}
+                  </p>
+                )}
 
                 <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#8f7f7d]">
-                  <span><strong className="font-semibold text-[#d9ccc7]">{followerCount}</strong> followers</span>
-                  <span><strong className="font-semibold text-[#d9ccc7]">{profile.followingCount}</strong> following</span>
+                  <span>
+                    <strong className="font-semibold text-[#d9ccc7]">{followerCount}</strong>{' '}
+                    followers
+                  </span>
+                  <span>
+                    <strong className="font-semibold text-[#d9ccc7]">
+                      {profile.followingCount}
+                    </strong>{' '}
+                    following
+                  </span>
                   {profile.location && <span>{profile.location}</span>}
                 </div>
 
@@ -201,7 +226,10 @@ export default function ProfilePageClient() {
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   {!isOwnProfile && (
-                    <GlassButton onClick={handleFollow} variant={isFollowing ? 'secondary' : 'primary'}>
+                    <GlassButton
+                      onClick={handleFollow}
+                      variant={isFollowing ? 'secondary' : 'primary'}
+                    >
                       {isFollowing ? 'Unfollow' : 'Follow'}
                     </GlassButton>
                   )}
@@ -256,7 +284,11 @@ function ProfileSectionComponent({ section, profile }: ProfileSectionComponentPr
       return (
         <section className="mori-panel p-5 sm:p-6">
           <h2 className="font-display text-xl font-semibold text-[#fff1e4]">About</h2>
-          {profile.bio ? <p className="mt-4 leading-7 text-[#cdbbb7]">{profile.bio}</p> : <p className="mt-4 text-sm italic text-[#8f7f7d]">No bio yet.</p>}
+          {profile.bio ? (
+            <p className="mt-4 leading-7 text-[#cdbbb7]">{profile.bio}</p>
+          ) : (
+            <p className="mt-4 text-sm italic text-[#8f7f7d]">No bio yet.</p>
+          )}
         </section>
       );
 
@@ -292,7 +324,14 @@ function ProfileSectionComponent({ section, profile }: ProfileSectionComponentPr
       return (
         <section className="mori-panel p-5 sm:p-6">
           <h2 className="font-display text-xl font-semibold text-[#fff1e4]">Collections</h2>
-          <p className="mt-6 text-sm italic text-[#8f7f7d]">No public collections yet.</p>
+          <MoriArtwork
+            src={approvedVisualAssets.emptyStates.collection}
+            className="mx-auto mt-4 w-40"
+            sizes="10rem"
+          />
+          <p className="mt-4 text-center text-sm italic text-[#8f7f7d]">
+            No public collections yet.
+          </p>
         </section>
       );
 

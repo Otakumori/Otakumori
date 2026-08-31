@@ -1,10 +1,11 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Music, Play, Pause, SkipBack, SkipForward, Heart, List } from 'lucide-react';
 import Link from 'next/link';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 export default function MusicPanel() {
   const { user: _user } = useUser();
@@ -148,6 +149,11 @@ export default function MusicPanel() {
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
+          <MoriArtwork
+            src={approvedVisualAssets.destinations.music}
+            className="mx-auto mb-4 w-36 sm:w-44"
+            sizes="(max-width: 640px) 9rem, 11rem"
+          />
           <div className="flex items-center justify-center gap-3 mb-4">
             <Music className="h-12 w-12 text-purple-400" />
             <h1 className="text-4xl font-bold">

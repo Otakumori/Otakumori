@@ -4,6 +4,8 @@ import { logger } from '@/app/lib/logger';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import GlassPanel from '../GlassPanel';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 type Soapstone = {
   id: string;
@@ -72,7 +74,12 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
         setCharacterCount(0);
       }
     } catch (error) {
-      logger.error('Failed to post soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to post soapstone:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -107,7 +114,12 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
         }, 2000);
       }
     } catch (error) {
-      logger.error('Failed to reply to soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to reply to soapstone:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
     }
   };
 
@@ -226,6 +238,11 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
       {soapstones.length === 0 && (
         <div className="text-center py-12">
           <GlassPanel className="p-8">
+            <MoriArtwork
+              src={approvedVisualAssets.emptyStates.messages}
+              className="mx-auto mb-4 w-40"
+              sizes="10rem"
+            />
             <h3 className="text-xl font-semibold text-white mb-4">No messages yet</h3>
             <p className="text-zinc-400">Be the first to leave a message for other travelers!</p>
           </GlassPanel>

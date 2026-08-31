@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "doNotMarkCompleteWithoutOwnerAcceptance": true,
+  "smallNavigationGlyphsStillNeeded": [
+    "home",
+    "shop",
+    "apparel",
+    "accessories",
+    "petal-wallet",
+    "collection",
+    "quests",
+    "blog",
+    "cart",
+    "search",
+    "filter",
+    "favorites/wishlist",
+    "messages",
+    "notifications",
+    "settings",
+    "save",
+    "share",
+    "close",
+    "back"
+  ],
+  "statusGlyphsStillNeeded": [
+    "online",
+    "offline",
+    "loading",
+    "success",
+    "warning",
+    "error",
+    "new",
+    "verified"
+  ],
+  "remainingGenericIconLocations": [
+    {
+      "file": "app/components/layout/Header.tsx",
+      "surface": "Header search and cart actions",
+      "current": ["Lucide Search", "Lucide ShoppingCart"],
+      "decision": "Keep until faithful isolated small glyphs exist."
+    },
+    {
+      "file": "app/components/layout/EnhancedNavbar.tsx",
+      "surface": "Enhanced navbar search, cart and mobile menu controls",
+      "current": ["Lucide Search", "Lucide ShoppingCart", "Lucide Menu", "Lucide X"],
+      "decision": "Keep until faithful isolated small glyphs exist."
+    },
+    {
+      "file": "app/components/layout/Navbar.tsx",
+      "surface": "Primary navbar wishlist, messages, cart and mobile menu controls",
+      "current": [
+        "Lucide Heart",
+        "Lucide MessageCircle",
+        "Lucide ShoppingCart",
+        "Lucide Menu",
+        "Lucide X"
+      ],
+      "decision": "Keep until faithful isolated small glyphs exist."
+    },
+    {
+      "file": "app/components/ui/QuickSearch.tsx",
+      "surface": "Quick Search input and close action",
+      "current": ["Lucide Search", "Lucide X"],
+      "decision": "Keep; the supplied feature magnifier is not a 16-24px control glyph."
+    },
+    {
+      "file": "app/components/SearchBar.tsx",
+      "surface": "Search field and clear action",
+      "current": ["Lucide Search", "Lucide X"],
+      "decision": "Keep; the supplied feature magnifier is not a 16-24px control glyph."
+    },
+    {
+      "file": "app/components/search/GlobalSearch.tsx",
+      "surface": "Global search trigger, field and close action",
+      "current": ["Lucide Search", "Lucide X"],
+      "decision": "Keep; the supplied feature magnifier is not a 16-24px control glyph."
+    },
+    {
+      "file": "app/components/search/SearchAutocomplete.tsx",
+      "surface": "Search autocomplete result glyph",
+      "current": ["Lucide Search"],
+      "decision": "Keep until a faithful isolated small search glyph exists."
+    },
+    {
+      "file": "app/components/search/SearchInterface.tsx",
+      "surface": "Search input and result fallback glyphs",
+      "current": ["Lucide Search"],
+      "decision": "Keep; the supplied feature magnifier is reserved for feature or empty-state art."
+    },
+    {
+      "file": "app/components/shop/ShareButtons.tsx",
+      "surface": "Product share controls",
+      "current": ["Lucide Share2", "Lucide MessageCircle", "Lucide Link"],
+      "decision": "Keep until faithful isolated share and message glyphs exist."
+    },
+    {
+      "file": "app/wishlist/page.tsx",
+      "surface": "Wishlist empty state",
+      "current": ["Lucide Heart"],
+      "decision": "Keep until a faithful isolated favorites glyph exists."
+    }
+  ],
+  "additionalSiteSymbolsStillNeeded": [
+    "profile/avatar",
+    "soapstone/community",
+    "trade-center",
+    "music-player",
+    "orders",
+    "admin",
+    "achievements",
+    "leaderboard"
+  ],
+  "gameArtStillNeeded": {
+    "memory-defrag": "Keeper reactive presentation is already implemented in Draft PR #84. Do not duplicate it. Final hub/key art remains optional future work.",
+    "petal-samurai": "First-person shrine environment layers, blade/hand, petals/hazards, slash FX, HUD ornaments, cover/results.",
+    "petal-storm-rhythm": "Ritual-lane environment, timing petals, gates, judgement sigils, hands/blade, cover/results.",
+    "otaku-beat-em-up": "2.5D street layers, enemies, props, impact FX, HUD, cover/results.",
+    "bubble-girl": "2.5D playground, bubble atlas, chibi presentation, landing/combo FX, cover.",
+    "puzzle-reveal": "Archive-table/altar frame, ink/fog masks, reveal FX, pack frames, cover.",
+    "blossomware": "Host/companion states, transition cards, instruction/win/fail stamps, reusable prop/background families.",
+    "dungeon-of-desire": "Public-safe hub art plus separately gated mature environment/character/combat assets.",
+    "thigh-coliseum": "Public-safe hub art plus separately gated arena/hazard/character assets."
+  },
+  "avatarRuntimeStillNeeded": [
+    "canonical skeletal GLB/glTF contract",
+    "rigged outfit mesh topology",
+    "body-fit/morph compatibility",
+    "material slots and cross-hatch shader/texture system",
+    "LOD meshes",
+    "attachment points",
+    "spring-bone groups for hair/cloth/jewelry",
+    "cloth/body clipping validation",
+    "game representation adapters"
+  ]
+}

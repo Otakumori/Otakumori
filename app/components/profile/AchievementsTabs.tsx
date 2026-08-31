@@ -75,13 +75,17 @@ export default function AchievementsTabs({ achievements }: { achievements: Achie
     { id: 'petal', label: 'Petal Samurai' },
     { id: 'memory', label: 'Memory Match' },
     { id: 'rhythm', label: 'Rhythm Beat' },
-    { id: 'bubble', label: 'Bubble Girl' },
+    { id: 'bubble', label: 'Bubble Ragdoll' },
     { id: 'puzzle', label: 'Puzzle Reveal' },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 overflow-x-auto border-b border-white/10 pb-3" role="tablist" aria-label="Achievement collection filters">
+      <div
+        className="flex gap-1 overflow-x-auto border-b border-white/10 pb-3"
+        role="tablist"
+        aria-label="Achievement collection filters"
+      >
         {tabs.map((item) => (
           <button
             key={item.id}
