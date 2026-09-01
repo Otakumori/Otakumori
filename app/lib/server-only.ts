@@ -1,21 +1,22 @@
 import 'server-only';
 
 /**
- * Server-only utility to prevent accidental client imports
- * Usage: import { assertServer } from '@/lib/server-only'; assertServer();
+ * Server-only utility to prevent accidental client imports.
+ * Usage: import { assertServer } from '@/app/lib/server-only'; assertServer();
  */
 export function assertServer() {
-  // No-op marker function to ensure this code only runs on the server
   if (typeof window !== 'undefined') {
     throw new Error('This function can only be called on the server');
   }
 }
 
 /**
- * Server-only exception capture utility
+ * Server-only exception capture utility.
+ *
+ * Keep this helper dependency-light. Importing Sentry here pulls server-side
+ * OpenTelemetry instrumentation into every route that imports this shared file.
  */
 export async function captureServerException(err: unknown) {
   assertServer();
-  const Sentry = await import('@sentry/nextjs'); // Dynamic import to avoid client bundling
-  Sentry.captureException(err);
+  console.error('Server exception captured:', err);
 }
