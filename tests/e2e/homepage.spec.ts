@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+import { expectCurrentHomeHero, expectRootFooterContract } from './helpers/home';
+
 test.describe('Homepage', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -7,7 +9,7 @@ test.describe('Homepage', () => {
 
   test('should load homepage with hero section', async ({ page }) => {
     // Check that the hero section is visible
-    await expectHeroHeading(page);
+    await expectCurrentHomeHero(page);
 
     // Check that the cherry tree is present
     await expect(page.getByRole('img', { name: /Otakumori sakura tree scene/i })).toBeVisible();
@@ -24,7 +26,6 @@ test.describe('Homepage', () => {
     const cherryTree = page.getByRole('img', { name: /Otakumori sakura tree scene/i });
     await expect(cherryTree).toBeVisible();
 
-    // The app collapses motion to near-zero durations for reduced motion.
     const style = await cherryTree.evaluate((el) => {
       const computedStyle = window.getComputedStyle(el);
       return {
@@ -39,22 +40,16 @@ test.describe('Homepage', () => {
     expect(maxCssDurationMs(style.transitionDuration)).toBeLessThanOrEqual(0.01);
   });
 
-  test('should collect interactive petals in hero section', async ({ page }) => {
-    // Wait for petals to load
-    await page.waitForTimeout(2000);
+  test('should keep ambient petals decorative and collectible petals semantic', async ({
+    page,
+  }) => {
+    const petalEmitter = page.getByTestId('mori-petal-emitter');
+    await expect(petalEmitter).toBeVisible();
+    await expect(petalEmitter).toHaveAttribute('aria-hidden', 'true');
 
-    // Find interactive petals
-    const petals = page.locator('[data-petal-id]');
-    const petalCount = await petals.count();
-
-    if (petalCount > 0) {
-      // Click on the first petal
-      await petals.first().click();
-
-      // Verify petal was collected (opacity should be 0)
-      const firstPetal = petals.first();
-      await expect(firstPetal).toHaveCSS('opacity', '0');
-    }
+    const collectiblePetals = page.getByRole('button', { name: /collect sakura petal worth/i });
+    await expect(collectiblePetals.first()).toBeVisible();
+    expect(await collectiblePetals.count()).toBeGreaterThan(0);
   });
 
   test('should not intercept clicks on content cards', async ({ page }) => {
@@ -81,7 +76,8 @@ test.describe('Homepage', () => {
   test('should render resilient home sections when live data is unavailable', async ({ page }) => {
     await expect(page.getByText('Shop').first()).toBeVisible();
     await expect(page.getByText('Mini-Games').first()).toBeVisible();
-    await expect(page.getByText(/Leave a sign for fellow travelers/i)).toBeVisible();
+    await expectCurrentHomeHero(page);
+    await expectRootFooterContract(page);
   });
 
   test('should handle soapstone submission when enabled', async ({ page }) => {
@@ -126,16 +122,21 @@ test.describe('Homepage', () => {
 
   test('should have proper accessibility attributes', async ({ page }) => {
     // Check for proper heading structure
-    await expectHeroHeading(page);
+    await expectCurrentHomeHero(page);
 
-    // Check for proper alt text on images
+    // Every image must explicitly declare alt. Decorative crossfade layers may correctly use alt="".
     const images = page.locator('img');
     const imageCount = await images.count();
 
     for (let i = 0; i < imageCount; i++) {
       const img = images.nth(i);
       const alt = await img.getAttribute('alt');
-      expect(alt).toBeTruthy();
+      expect(alt).not.toBeNull();
+
+      if (alt === '') {
+        const ariaHidden = await img.getAttribute('aria-hidden');
+        expect(ariaHidden === 'true' || ariaHidden === null).toBeTruthy();
+      }
     }
 
     // Check for proper button labels
@@ -159,7 +160,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
 
     // Wait for hero section to be visible
-    await expectHeroHeading(page);
+    await expectCurrentHomeHero(page);
 
     const loadTime = Date.now() - startTime;
 
@@ -183,16 +184,6 @@ test.describe('Homepage', () => {
     await expect(focusedElement).toBeVisible();
   });
 });
-
-async function expectHeroHeading(page: import('@playwright/test').Page) {
-  const heroHeading = page.getByRole('heading', {
-    level: 1,
-    name: /Rest beneath the sakura tree/i,
-  });
-
-  await expect(heroHeading).toHaveCount(1);
-  await expect(heroHeading).toBeVisible();
-}
 
 function maxCssDurationMs(value: string) {
   return Math.max(

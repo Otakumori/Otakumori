@@ -11,6 +11,7 @@ import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
+import PetalWalletNavLink from '@/app/components/nav/PetalWalletNavLink';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -106,6 +107,7 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [_scrollY, setScrollY] = useState(0);
+  const isHome = pathname === paths.home();
 
   const userMenuAriaExpanded = useMemo(() => showUserMenu, [showUserMenu]);
   const mobileMenuAriaExpanded = useMemo(() => isMenuOpen, [isMenuOpen]);
@@ -179,11 +181,15 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : 'border-b border-white/5'}`}
+      className={`navbar-scroll z-50 w-full font-ui transition-all duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : isHome ? 'border-b border-white/0' : 'border-b border-white/5'}`}
       style={{
-        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.95)' : 'rgba(26, 24, 22, 0.7)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        backgroundColor: isScrolled
+          ? 'rgba(0, 0, 0, 0.95)'
+          : isHome
+            ? 'rgba(7, 4, 7, 0.08)'
+            : 'rgba(26, 24, 22, 0.7)',
+        backdropFilter: isHome && !isScrolled ? 'none' : 'blur(8px)',
+        WebkitBackdropFilter: isHome && !isScrolled ? 'none' : 'blur(8px)',
       }}
     >
       <a
@@ -192,15 +198,20 @@ export default function Navbar() {
       >
         Skip to main content
       </a>
-      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
+      <nav
+        aria-label="Primary navigation"
+        className="container mx-auto flex items-center justify-between px-4 py-3"
+      >
         <Link href={paths.home()} className="flex items-center group py-1">
-          <div className="relative w-32 h-32 md:w-36 md:h-36">
+          <div
+            className={`relative ${isHome ? 'h-20 w-20 md:h-24 md:w-24' : 'h-32 w-32 md:h-36 md:w-36'}`}
+          >
             <Image
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
               fill
               priority
-              sizes="(min-width: 768px) 144px, 128px"
+              sizes={isHome ? '(min-width: 768px) 96px, 80px' : '(min-width: 768px) 144px, 128px'}
               className="object-contain"
             />
           </div>
@@ -387,7 +398,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <GlobalSearch className="hidden xl:block" />
+          {!isHome && <GlobalSearch className="hidden xl:block" />}
+          <PetalWalletNavLink
+            isLoaded={isLoaded}
+            isSignedIn={isSignedIn}
+            signInHref={signInHref}
+          />
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
@@ -557,7 +573,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 p-4 space-y-1">
+              <nav aria-label="Mobile menu navigation" className="flex-1 p-4 space-y-1">
                 <Link
                   href={paths.home()}
                   onClick={() => setIsMenuOpen(false)}
@@ -689,6 +705,13 @@ export default function Navbar() {
                   <MessageCircle className="w-5 h-5" aria-hidden="true" />
                   <span>Community</span>
                 </button>
+                <PetalWalletNavLink
+                  isLoaded={isLoaded}
+                  isSignedIn={isSignedIn}
+                  signInHref={signInHref}
+                  variant="mobile"
+                  onNavigate={() => setIsMenuOpen(false)}
+                />
                 <Link
                   href={paths.cart()}
                   onClick={() => setIsMenuOpen(false)}

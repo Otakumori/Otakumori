@@ -1,0 +1,18 @@
+.heroRoot {
+  --mori-hero-viewport-height: 100svh;
+  --mori-world-scroll-height: var(--mori-scene-world-height, 142svh);
+  min-height: var(--mori-world-scroll-height);
+}
+
+.heroSurface {
+  position: relative;
+  height: var(--mori-world-scroll-height);
+  min-height: var(--mori-world-scroll-height);
+  overflow: hidden;
+}
+
+.heroContent,
+.surfaceContent {
+  width: 100%;
+  min-height: var(--mori-hero-viewport-height);
+}

@@ -2,104 +2,118 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { resolveHomeScene, type HomeSceneState } from './homeScene';
+import { useHomeSceneContext } from './HomeSceneContext';
+import {
+  HOME_SCENE_ASSETS,
+  HOME_SCENE_CROSSFADE_MS,
+  HOME_SCENE_MANIFEST,
+  HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS,
+  resolveHomeSceneImageSrc,
+  resolveNextHomeSceneBucket,
+  resolvePetalSpritePosition,
+  type HomeSceneProjection,
+  type HomeSceneState,
+} from './homeScene';
+import styles from './HeroScene.module.css';
 
 type PetalStyle = CSSProperties & {
   '--petal-drift': string;
   '--petal-fall': string;
   '--petal-rotate': string;
   '--petal-gust': string;
+  '--petal-sprite-position': string;
 };
 
-const CANOPY_ANCHORS = [
-  { x: 26, y: 26 },
-  { x: 38, y: 18 },
-  { x: 51, y: 22 },
-  { x: 64, y: 19 },
-  { x: 73, y: 30 },
-  { x: 45, y: 34 },
-];
+type SceneLayer = {
+  key: string;
+  src: string;
+  fallback: string;
+  alt: string;
+};
 
-function usePrefersReducedMotion() {
-  const [reducedMotion, setReducedMotion] = useState(false);
+function createSceneLayer(scene: HomeSceneState): SceneLayer {
+  const image = resolveHomeSceneImageSrc(scene.asset);
 
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(query.matches);
-
-    update();
-    query.addEventListener('change', update);
-
-    return () => query.removeEventListener('change', update);
-  }, []);
-
-  return reducedMotion;
+  return {
+    key: `${scene.bucket}-${image.src}`,
+    src: image.src,
+    fallback: image.fallback,
+    alt: scene.asset.alt,
+  };
 }
 
-function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
-  const [collected, setCollected] = useState<number | null>(null);
-  const petals = useMemo(() => {
-    return Array.from({ length: scene.motion.petalDensity }, (_, index) => {
-      const anchor = CANOPY_ANCHORS[index % CANOPY_ANCHORS.length];
-      const spread = (index % 5) * 3;
-      const drift = 32 + scene.motion.windStrength * 54;
+function preloadImage(src: string) {
+  const alreadyPreloaded = Array.from(
+    document.head.querySelectorAll<HTMLLinkElement>('link[rel="preload"]'),
+  ).some((link) => link.href.endsWith(src));
 
-      return {
-        id: index,
-        left: anchor.x + ((index * 7) % 13) - 6,
-        top: anchor.y + spread,
-        delay: (index % 8) * 0.65,
-        duration: scene.motion.reducedMotion ? 22 : 12 + (index % 6) * 1.4,
-        drift,
-        fall: 52 + (index % 7) * 7,
-        rotate: (index % 2 === 0 ? 1 : -1) * (70 + index * 9),
-        scale: 0.72 + (index % 4) * 0.1,
-      };
-    });
-  }, [scene.bucket, scene.motion.petalDensity, scene.motion.reducedMotion, scene.motion.windStrength]);
+  if (alreadyPreloaded) return;
 
-  function collectPreview(id: number) {
-    setCollected(id);
-    window.dispatchEvent(
-      new CustomEvent('petal:collect-preview', {
-        detail: { id, source: 'homepage-tree', bucket: scene.bucket },
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = src;
+  document.head.appendChild(link);
+}
+
+function TreePetalEmitter({
+  projection,
+  scene,
+}: {
+  projection: HomeSceneProjection | null;
+  scene: HomeSceneState;
+}) {
+  const artboard = HOME_SCENE_MANIFEST.world.artboard;
+  const scale = projection?.scale ?? 1;
+  const petals = useMemo(
+    () =>
+      Array.from({ length: scene.motion.petalDensity }, (_, index) => {
+        const anchor = artboard.anchors.canopy[index % artboard.anchors.canopy.length];
+        const drift = 180 + scene.motion.windStrength * 260;
+
+        return {
+          id: index,
+          sourceX: anchor.x + (((index * 5) % 9) - 4) * 8,
+          sourceY: anchor.y + (index % 4) * 14,
+          delay: (index % 8) * 0.65,
+          duration: 12 + (index % 6) * 1.4,
+          drift: drift * 0.72,
+          fall: 300 + (index % 7) * 42,
+          rotate: (index % 2 === 0 ? 1 : -1) * (70 + index * 9),
+          scale: 0.48 + (index % 4) * 0.08,
+          variant: index % HOME_SCENE_MANIFEST.petals.frameCount,
+        };
       }),
-    );
-
-    window.setTimeout(() => setCollected((current) => (current === id ? null : current)), 650);
-  }
+    [artboard.anchors.canopy, scene.motion.petalDensity, scene.motion.windStrength],
+  );
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-[6] overflow-hidden">
+    <div className={styles.petalEmitter} aria-hidden="true" data-testid="mori-petal-emitter">
       {petals.map((petal) => {
         const petalStyle: PetalStyle = {
-          left: `${petal.left}%`,
-          top: `${petal.top}%`,
+          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+          left: `${petal.sourceX * scale}px`,
+          top: `${petal.sourceY * scale}px`,
           transform: `scale(${petal.scale})`,
-          animation: scene.motion.reducedMotion
-            ? undefined
-            : `treePetalDrift ${petal.duration}s linear ${petal.delay}s infinite`,
-          '--petal-drift': `${petal.drift}vw`,
-          '--petal-fall': `${petal.fall}vh`,
+          animationDuration: scene.motion.reducedMotion ? undefined : `${petal.duration}s`,
+          animationDelay: scene.motion.reducedMotion ? undefined : `${petal.delay}s`,
+          '--petal-drift': `${petal.drift * scale}px`,
+          '--petal-fall': `${petal.fall * scale}px`,
           '--petal-rotate': `${petal.rotate}deg`,
-          '--petal-gust': `${scene.motion.gustStrength * 24}vw`,
+          '--petal-gust': `${scene.motion.gustStrength * 160 * scale}px`,
+          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
         };
 
         return (
-          <button
+          <span
             key={`${scene.bucket}-${petal.id}`}
-            type="button"
-            tabIndex={-1}
-            aria-label="Collect preview sakura petal"
-            onClick={() => collectPreview(petal.id)}
-            className="pointer-events-auto absolute h-8 w-8 rounded-full text-pink-100/80 drop-shadow-[0_0_8px_rgba(255,170,210,0.45)] transition-transform duration-300 hover:scale-125 focus:outline-none"
+            data-testid="mori-petal"
+            data-source-x={Math.round(petal.sourceX)}
+            data-source-y={Math.round(petal.sourceY)}
+            data-petal-variant={petal.variant}
+            className={styles.petal}
             style={petalStyle}
-          >
-            <span className="block rotate-45 text-lg leading-none">❀</span>
-            {collected === petal.id ? (
-              <span className="absolute inset-0 rounded-full border border-pink-100/70 animate-ping" />
-            ) : null}
-          </button>
+          />
         );
       })}
     </div>
@@ -107,76 +121,108 @@ function TreePetalEmitter({ scene }: { scene: HomeSceneState }) {
 }
 
 export default function HeroScene() {
-  const reducedMotion = usePrefersReducedMotion();
-  const [scene, setScene] = useState(() => resolveHomeScene(new Date(), reducedMotion));
-  const [imageSrc, setImageSrc] = useState(scene.asset.src);
+  const { projection, reducedMotion, scene } = useHomeSceneContext();
+  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() =>
+    createSceneLayer(scene),
+  );
+  const [incomingLayer, setIncomingLayer] = useState<SceneLayer | null>(null);
 
   useEffect(() => {
-    setScene(resolveHomeScene(new Date(), reducedMotion));
+    const nextLayer = createSceneLayer(scene);
+    if (nextLayer.key === displayedLayer.key) return;
 
-    const interval = window.setInterval(() => {
-      setScene(resolveHomeScene(new Date(), reducedMotion));
-    }, 60_000);
+    if (reducedMotion) {
+      setIncomingLayer(null);
+      setDisplayedLayer(nextLayer);
+      return;
+    }
 
-    return () => window.clearInterval(interval);
-  }, [reducedMotion]);
+    setIncomingLayer(nextLayer);
+    const timeout = window.setTimeout(() => {
+      setDisplayedLayer(nextLayer);
+      setIncomingLayer(null);
+    }, HOME_SCENE_CROSSFADE_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [displayedLayer.key, reducedMotion, scene]);
 
   useEffect(() => {
-    setImageSrc(scene.asset.src);
-  }, [scene.asset.src]);
+    const nextBucket = resolveNextHomeSceneBucket(scene.bucket);
+    const currentImage = resolveHomeSceneImageSrc(scene.asset);
+    const nextImage = resolveHomeSceneImageSrc(HOME_SCENE_ASSETS[nextBucket]);
+
+    preloadImage(currentImage.src);
+    preloadImage(nextImage.src);
+  }, [scene.asset, scene.bucket]);
+
+  const ambientTransitionClass = reducedMotion
+    ? 'transition-none'
+    : 'transition-opacity duration-[2200ms]';
 
   return (
-    <div className="absolute inset-0 z-0 bg-[#080611]">
-      <Image
-        src={encodeURI(imageSrc)}
-        alt={scene.asset.alt}
-        fill
-        priority
-        unoptimized
-        sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover opacity-95 transition-[opacity,filter,transform] duration-[1600ms] ease-out"
-        onError={() => {
-          if (imageSrc !== scene.asset.fallback) setImageSrc(scene.asset.fallback);
-        }}
-      />
+    <div
+      className={styles.scene}
+      data-scene-bucket={scene.bucket}
+      data-scene-timezone={scene.timezone}
+      data-scene-surface-family={projection?.family ?? 'combined'}
+      data-scene-art-source="combined-world-master"
+      data-testid="mori-hero-scene"
+    >
+      <div className={styles.worldExtension} data-testid="mori-world-extension">
+        <div className={styles.scenePlate} data-testid="mori-scene-plate">
+          <Image
+            key={displayedLayer.key}
+            src={displayedLayer.src}
+            alt={incomingLayer ? '' : displayedLayer.alt}
+            aria-hidden={incomingLayer ? 'true' : undefined}
+            fill
+            priority
+            sizes="100vw"
+            className={`${styles.image} ${styles.imageLayer} ${
+              incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
+            }`}
+            style={{
+              transitionDuration: `${
+                reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS
+              }ms`,
+            }}
+            onError={() => {
+              if (displayedLayer.src !== displayedLayer.fallback) {
+                setDisplayedLayer({ ...displayedLayer, src: displayedLayer.fallback });
+              }
+            }}
+          />
+          {incomingLayer ? (
+            <Image
+              key={incomingLayer.key}
+              src={incomingLayer.src}
+              alt={incomingLayer.alt}
+              fill
+              sizes="100vw"
+              className={`${styles.image} ${styles.imageLayer} ${styles.imageLayerEntering}`}
+              style={{ animationDuration: `${HOME_SCENE_CROSSFADE_MS}ms` }}
+              onError={() => {
+                if (incomingLayer.src !== incomingLayer.fallback) {
+                  setIncomingLayer({ ...incomingLayer, src: incomingLayer.fallback });
+                }
+              }}
+            />
+          ) : null}
+          <TreePetalEmitter projection={projection} scene={scene} />
+        </div>
+      </div>
 
       <div
-        className="absolute inset-0 z-[3] transition-opacity duration-[2200ms]"
-        style={{
-          opacity: scene.motion.mistOpacity,
-          background:
-            'radial-gradient(circle at 30% 26%, rgba(255,214,235,0.34), transparent 34%), radial-gradient(circle at 78% 22%, rgba(184,152,255,0.28), transparent 30%), linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 42%)',
-        }}
+        className={`${styles.mist} ${ambientTransitionClass}`}
+        style={{ opacity: scene.motion.mistOpacity }}
+        aria-hidden="true"
       />
       <div
-        className="absolute inset-0 z-[4] transition-opacity duration-[2200ms]"
-        style={{
-          opacity: scene.motion.glowOpacity,
-          background:
-            'radial-gradient(circle at 50% 38%, rgba(255,127,190,0.54), transparent 36%), radial-gradient(circle at 52% 62%, rgba(125,90,255,0.4), transparent 48%)',
-        }}
+        className={`${styles.dappledLight} ${ambientTransitionClass}`}
+        style={{ opacity: scene.motion.glowOpacity }}
+        aria-hidden="true"
       />
-      <TreePetalEmitter scene={scene} />
-      <div className="absolute inset-0 z-[7] bg-[radial-gradient(circle_at_center,transparent_36%,rgba(3,2,8,0.44)_78%),linear-gradient(to_bottom,rgba(5,3,10,0.12),rgba(5,3,10,0.46))]" />
-
-      <style>{`
-        @keyframes treePetalDrift {
-          0% {
-            opacity: 0;
-            transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
-          }
-          8% {
-            opacity: 0.9;
-          }
-          45% {
-            transform: translate3d(calc(var(--petal-drift) * 0.45 + var(--petal-gust)), calc(var(--petal-fall) * 0.48), 0) rotate(calc(var(--petal-rotate) * 0.5)) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translate3d(var(--petal-drift), var(--petal-fall), 0) rotate(var(--petal-rotate)) scale(0.76);
-          }
-        }
-      `}</style>
+      <div className={styles.vignette} aria-hidden="true" />
     </div>
   );
 }

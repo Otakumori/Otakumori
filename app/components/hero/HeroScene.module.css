@@ -1,0 +1,167 @@
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #080611;
+}
+
+.worldExtension {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #080611;
+}
+
+.scenePlate {
+  position: absolute;
+  z-index: 2;
+  left: var(--mori-scene-world-left, 0);
+  top: var(--mori-scene-world-top, 0);
+  width: var(--mori-scene-world-width, 100%);
+  height: var(--mori-scene-world-height, 100%);
+}
+
+.image {
+  object-fit: cover;
+}
+
+.imageLayer {
+  filter: saturate(1.01);
+  transition-property: opacity, filter;
+  transition-timing-function: ease-out;
+}
+
+.imageLayerActive,
+.imageLayerUnder {
+  opacity: 0.98;
+}
+
+.imageLayerUnder {
+  filter: saturate(1.01) brightness(0.99);
+}
+
+.imageLayerEntering {
+  animation-name: moriWorldCrossfadeIn;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+
+.petalEmitter {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.petal {
+  position: absolute;
+  width: clamp(1rem, 1.45vw, 1.85rem);
+  aspect-ratio: 1.3;
+  animation-name: treePetalDrift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  background-position: var(--petal-sprite-position);
+  background-repeat: no-repeat;
+  background-size: 400% 300%;
+  filter: drop-shadow(0 4px 5px rgba(40, 15, 28, 0.32));
+  opacity: 0.62;
+}
+
+.mist,
+.dappledLight,
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mist {
+  z-index: 3;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 214, 235, 0.18), transparent 34%),
+    radial-gradient(circle at 78% 22%, rgba(184, 152, 255, 0.12), transparent 30%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035), transparent 42%);
+  animation: moriMistBreathe 28s ease-in-out infinite alternate;
+}
+
+.dappledLight {
+  z-index: 4;
+  background:
+    radial-gradient(circle at 43% 27%, rgba(255, 223, 218, 0.17), transparent 24%),
+    radial-gradient(circle at 56% 58%, rgba(150, 111, 196, 0.11), transparent 37%);
+  animation: moriDappleShift 34s ease-in-out infinite alternate;
+}
+
+.vignette {
+  z-index: 7;
+  background:
+    radial-gradient(circle at 70% 42%, rgba(3, 2, 8, 0.08), transparent 54%),
+    linear-gradient(to bottom, rgba(5, 3, 10, 0.05), rgba(5, 3, 10, 0.16) 62%, rgba(7, 4, 7, 0.58));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petal,
+  .mist,
+  .dappledLight,
+  .imageLayerEntering {
+    animation: none !important;
+  }
+
+  .imageLayer {
+    transition: none !important;
+  }
+}
+
+@keyframes moriWorldCrossfadeIn {
+  from {
+    opacity: 0;
+    filter: saturate(1.01) brightness(0.94);
+  }
+  to {
+    opacity: 0.98;
+    filter: saturate(1.01) brightness(1);
+  }
+}
+
+@keyframes moriMistBreathe {
+  from {
+    transform: translate3d(-0.8%, 0, 0) scale(1.01);
+  }
+  to {
+    transform: translate3d(0.8%, 0.4%, 0) scale(1.025);
+  }
+}
+
+@keyframes moriDappleShift {
+  from {
+    transform: translate3d(0, -0.4%, 0);
+  }
+  to {
+    transform: translate3d(0.7%, 0.5%, 0);
+  }
+}
+
+@keyframes treePetalDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+  }
+  8% {
+    opacity: 0.88;
+  }
+  45% {
+    transform: translate3d(
+        calc(var(--petal-drift) * 0.45 + var(--petal-gust)),
+        calc(var(--petal-fall) * 0.48),
+        0
+      )
+      rotate(calc(var(--petal-rotate) * 0.5)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--petal-drift), var(--petal-fall), 0) rotate(var(--petal-rotate))
+      scale(0.76);
+  }
+}

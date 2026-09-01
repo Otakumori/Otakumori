@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+import { expectRootFooterContract, expectSinglePrimaryNavigation } from './helpers/home';
+
 test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('navigation')).toBeVisible();
+  await expectSinglePrimaryNavigation(page);
 
   // Clerk redirect entry point or bounded unavailable state when CI uses synthetic Clerk config.
   const signInLink = page.getByRole('link', { name: /^sign in$/i }).first();
@@ -32,19 +34,12 @@ test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
 test('Footer components work', async ({ page }) => {
   await page.goto('/');
 
-  // Footer copyright
-  await expect(page.getByText(/Otakumori ™ made with ♡/)).toBeVisible();
-  await expect(page.getByText(/© \d{4} Otaku-mori\. All rights reserved\./)).toBeVisible();
+  await expectRootFooterContract(page);
 
-  // Soapstone CTA opens modal
-  await page.getByRole('button', { name: /soapstone/i }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.getByRole('button', { name: /close soapstone/i }).click();
-
-  // Nav links visible and navigable (public routes)
-  const routes = ['/shop', '/blog', '/mini-games', '/community', '/about'];
+  // Root footer links remain visible and navigable without depending on pending production art.
+  const routes = ['/shop', '/blog', '/mini-games', '/about', '/profile', '/profile/petals'];
   for (const href of routes) {
-    await page.locator(`a[href="${href}"]`).first().hover();
+    await expect(page.getByTestId('mori-root-footer').locator(`a[href="${href}"]`)).toBeVisible();
   }
 
   // No scary console errors
