@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, memo, useRef } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
@@ -53,63 +53,36 @@ function PetalCounterInner({
   const [isPulsing, setIsPulsing] = useState(false);
   const [showMultiplier, setShowMultiplier] = useState(false);
   const [prevCount, setPrevCount] = useState(count);
-  const [displayCount, setDisplayCount] = useState(count);
-  const animationFrameRef = useRef<number | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Smooth number animation
   useEffect(() => {
-    if (count !== displayCount) {
-      const diff = count - displayCount;
-      const duration = 300; // ms
-      const startTime = Date.now();
-      const startValue = displayCount;
+    if (count === prevCount) return undefined;
 
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Ease-out function
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(startValue + diff * easeOut);
-
-        setDisplayCount(current);
-
-        if (progress < 1) {
-          animationFrameRef.current = requestAnimationFrame(animate);
-        } else {
-          setDisplayCount(count); // Ensure final value is exact
-        }
-      };
-
-      animationFrameRef.current = requestAnimationFrame(animate);
-
-      return () => {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-      };
-    }
-  }, [count, displayCount]);
-
-  // Trigger pulse on count change
-  useEffect(() => {
     if (count > prevCount) {
       setIsPulsing(true);
 
       if (lastValue === 5) {
         setShowMultiplier(true);
-        setTimeout(() => setShowMultiplier(false), 1500);
       }
 
-      setTimeout(() => setIsPulsing(false), ANIMATION.COUNTER_PULSE);
+      const pulseTimer = window.setTimeout(() => setIsPulsing(false), ANIMATION.COUNTER_PULSE);
+      const multiplierTimer =
+        lastValue === 5 ? window.setTimeout(() => setShowMultiplier(false), 1500) : undefined;
+
       setPrevCount(count);
+      return () => {
+        window.clearTimeout(pulseTimer);
+        if (multiplierTimer) window.clearTimeout(multiplierTimer);
+      };
     }
+
+    setPrevCount(count);
+    return undefined;
   }, [count, prevCount, lastValue]);
 
   const formattedCount = useMemo(() => {
-    return displayCount.toLocaleString();
-  }, [displayCount]);
+    return count.toLocaleString();
+  }, [count]);
   const shouldShowGuestPrompt =
     !isSignedIn &&
     (guestDailyCapReached ||
@@ -120,7 +93,7 @@ function PetalCounterInner({
     <motion.button
       type="button"
       data-petal-counter
-      aria-label={`Petals collected: ${displayCount}`}
+      aria-label={`Petals collected: ${count}`}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -138,42 +111,26 @@ function PetalCounterInner({
       whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
       whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
     >
-      {/* Glow effect */}
-      <motion.div
-        className="absolute inset-0 rounded-full blur-xl opacity-60"
-        style={{
-          background: 'radial-gradient(circle, rgba(236,72,153,0.4) 0%, transparent 70%)',
-        }}
-        animate={{
-          scale: isPulsing ? [1, 1.3, 1] : 1,
-          opacity: isPulsing ? [0.6, 0.9, 0.6] : 0.6,
-        }}
-        transition={{ duration: 0.5 }}
-      />
-
-      {/* Main container */}
       <motion.div
         className={`
           relative flex items-center gap-2.5 px-4 py-2.5
-          bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-pink-500/20
-          backdrop-blur-xl backdrop-saturate-150
-          border border-pink-400/40 rounded-full
-          shadow-2xl shadow-pink-500/20
+          rounded-full border border-[#f6dcc7]/30 bg-[#160d12]/72
+          shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-md
           transition-all duration-300
-          ${isHovered ? 'w-auto border-pink-400/60' : 'w-[70px]'}
-          ${isPulsing ? 'ring-4 ring-pink-400/50 ring-offset-2 ring-offset-black/50' : ''}
+          ${isHovered ? 'w-auto border-[#ffe2d0]/54' : 'w-[70px]'}
+          ${isPulsing ? 'ring-1 ring-[#f6c9bc]/55 ring-offset-1 ring-offset-[#160d12]/60' : ''}
         `}
         animate={{
-          scale: isPulsing ? [1, 1.08, 1] : 1,
+          scale: isPulsing && !prefersReducedMotion ? [1, 1.035, 1] : 1,
           boxShadow: isPulsing
             ? [
-                '0 0 20px rgba(236,72,153,0.3)',
-                '0 0 40px rgba(236,72,153,0.6)',
-                '0 0 20px rgba(236,72,153,0.3)',
+                '0 10px 28px rgba(0,0,0,0.32)',
+                '0 12px 30px rgba(76,39,42,0.38)',
+                '0 10px 28px rgba(0,0,0,0.32)',
               ]
-            : '0 10px 40px rgba(236,72,153,0.2)',
+            : '0 10px 28px rgba(0,0,0,0.32)',
         }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.34 }}
       >
         <motion.span
           aria-hidden="true"
@@ -183,18 +140,18 @@ function PetalCounterInner({
             backgroundPosition: PETAL_WALLET_ICON_POSITION,
           }}
           animate={{
-            rotate: isPulsing && !prefersReducedMotion ? [0, 12, -12, 0] : 0,
-            scale: isPulsing && !prefersReducedMotion ? [1, 1.16, 1] : 1,
+            rotate: isPulsing && !prefersReducedMotion ? [0, 5, -4, 0] : 0,
+            scale: isPulsing && !prefersReducedMotion ? [1, 1.07, 1] : 1,
           }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         />
 
         {/* Count */}
         <motion.span
-          key={displayCount}
+          key={count}
           className="text-base font-bold text-white tabular-nums min-w-[30px] text-right"
           style={{
-            textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(236,72,153,0.4)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.56)',
           }}
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -212,21 +169,18 @@ function PetalCounterInner({
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.2 }}
-              className="text-xs text-pink-200/80 whitespace-nowrap overflow-hidden font-medium"
+              className="text-xs text-[#f8d8d1]/80 whitespace-nowrap overflow-hidden font-medium"
             >
               Petals
             </motion.span>
           )}
         </AnimatePresence>
 
-        {/* Subtle shimmer effect */}
         <motion.div
           className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"
           initial={{ x: '-100%' }}
-          animate={{
-            x: isPulsing ? ['100%', '200%'] : '-100%',
-          }}
-          transition={{ duration: 1, repeat: Infinity, repeatDelay: 3 }}
+          animate={isPulsing && !prefersReducedMotion ? { x: ['-100%', '120%'] } : { x: '-100%' }}
+          transition={{ duration: 0.38 }}
         >
           <div className="w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </motion.div>
@@ -261,9 +215,9 @@ function PetalCounterInner({
             <div className="flex items-center gap-1 rounded-full border border-[#f4c4d3]/42 bg-[#341822]/92 px-3 py-1.5 shadow-lg backdrop-blur-sm">
               <span className="text-sm font-bold text-[#ffe8e0]">+{lastValue}</span>
               <motion.span
-                animate={prefersReducedMotion ? undefined : { rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.5 }}
-                className="h-3 w-3 rounded-full bg-[#f8cfda] shadow-[0_0_10px_rgba(248,207,218,0.64)]"
+                animate={prefersReducedMotion ? undefined : { rotate: [0, 7, -6, 0] }}
+                transition={{ duration: 0.42 }}
+                className="h-3 w-3 rounded-full border border-[#ffe8df]/52 bg-[#f8cfda]"
                 aria-hidden="true"
               />
             </div>

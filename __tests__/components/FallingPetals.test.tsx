@@ -109,6 +109,28 @@ describe('homepage collectible petals', () => {
     expect(onCollect).toHaveBeenCalledTimes(1);
   });
 
+  it('uses a bounded CSS catch state without a wallet-travel animation', () => {
+    vi.useFakeTimers();
+    const onCollect = vi.fn();
+
+    render(
+      <HomeSceneProvider>
+        <FallingPetals onPetalCollect={onCollect} />
+      </HomeSceneProvider>,
+    );
+
+    const petal = screen.getAllByRole('button', { name: /collect sakura petal worth/i })[0];
+    fireEvent.click(petal);
+
+    expect(petal).toHaveAttribute('data-collecting', 'true');
+    expect(petal).toBeDisabled();
+    expect(onCollect).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(360);
+    });
+  });
+
   it('announces a one-time non-modal hint and dismisses it from local UI storage', async () => {
     vi.useFakeTimers();
 

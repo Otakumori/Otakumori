@@ -11,13 +11,11 @@ import {
 } from 'react';
 import { useHomeSceneContext } from '@/app/components/hero/HomeSceneContext';
 import { HOME_SCENE_MANIFEST, resolveHomePetalVariant } from '@/app/components/hero/homeScene';
-import { PETAL_VALUES, SPAWN, UI } from '@/app/lib/petals/constants';
-import type { Position } from '@/app/lib/petals/physics';
+import { PETAL_VALUES, SPAWN } from '@/app/lib/petals/constants';
 import styles from './FallingPetals.module.css';
 
 interface FallingPetalsProps {
   onPetalCollect: (petalId: number, value: number, x: number, y: number) => void;
-  counterPosition?: Position;
 }
 
 type CollectiblePetal = {
@@ -89,7 +87,7 @@ function getDevicePetalCount() {
   return constrained ? COMPACT_PETAL_COUNT : DESKTOP_PETAL_COUNT;
 }
 
-export default function FallingPetals({ onPetalCollect, counterPosition }: FallingPetalsProps) {
+export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
   const { projection, reducedMotion } = useHomeSceneContext();
   const [petalCount, setPetalCount] = useState(COMPACT_PETAL_COUNT);
   const [generation, setGeneration] = useState(0);
@@ -171,21 +169,6 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
     [generation, petalCount],
   );
 
-  const resolveCounterPosition = useCallback((): Position => {
-    if (counterPosition) return counterPosition;
-
-    const counter = document.querySelector<HTMLElement>('[data-petal-counter]');
-    if (counter) {
-      const bounds = counter.getBoundingClientRect();
-      return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
-    }
-
-    return {
-      x: window.innerWidth - UI.COUNTER_BOTTOM_RIGHT_MARGIN - 30,
-      y: window.innerHeight - UI.COUNTER_BOTTOM_RIGHT_MARGIN - 20,
-    };
-  }, [counterPosition]);
-
   const handlePointerMove = useCallback((event: PointerEvent<HTMLDivElement>) => {
     const { clientX, clientY } = event;
     if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
@@ -216,7 +199,6 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
 
       const bounds = element.getBoundingClientRect();
       const origin = { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
-      const target = resolveCounterPosition();
 
       setCollectingIds((current) => new Set(current).add(petal.id));
       markHintSeen();
@@ -237,39 +219,9 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
         setGeneration(nextIdRef.current);
       };
 
-      if (typeof element.animate !== 'function') {
-        window.setTimeout(finishCollection, reducedMotion ? 120 : 520);
-        return;
-      }
-
-      const animation = element.animate(
-        reducedMotion
-          ? [
-              { opacity: 1, transform: 'scale(1)' },
-              { opacity: 0, transform: 'scale(0.72)' },
-            ]
-          : [
-              { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-              {
-                opacity: 0.96,
-                transform: `translate3d(${(target.x - origin.x) * 0.45}px, ${(target.y - origin.y) * 0.45}px, 0) rotate(150deg) scale(1.12)`,
-                offset: 0.55,
-              },
-              {
-                opacity: 0,
-                transform: `translate3d(${target.x - origin.x}px, ${target.y - origin.y}px, 0) rotate(330deg) scale(0.38)`,
-              },
-            ],
-        {
-          duration: reducedMotion ? 120 : 520,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          fill: 'forwards',
-        },
-      );
-
-      animation.finished.catch(() => undefined).finally(finishCollection);
+      window.setTimeout(finishCollection, reducedMotion ? 120 : 360);
     },
-    [collectingIds, markHintSeen, onPetalCollect, reducedMotion, resolveCounterPosition],
+    [collectingIds, markHintSeen, onPetalCollect, reducedMotion],
   );
 
   return (
@@ -331,6 +283,7 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
             data-source-y={Math.round(anchor.y + petal.sourceNudgeY)}
             data-petal-variant={petal.variant}
             data-pointer-near="false"
+            data-collecting={collectingIds.has(petal.id) ? 'true' : 'false'}
             disabled={collectingIds.has(petal.id)}
             onClick={(event) => collectPetal(petal, event.currentTarget)}
           >
