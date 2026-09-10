@@ -4,8 +4,12 @@ import { useState, useEffect, useMemo, memo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
-import { HOME_SCENE_MANIFEST, resolvePetalSpritePosition } from '@/app/components/hero/homeScene';
 import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
+
+// Wallet art is intentionally deferred; keep the existing small functional icon
+// independent from the approved Home collectible-petal family.
+const PETAL_WALLET_ICON_SOURCE = '/assets/images/petal_sprite.png';
+const PETAL_WALLET_ICON_POSITION = '66.66666666666666% 0%';
 
 interface PetalCounterProps {
   count: number;
@@ -175,8 +179,8 @@ function PetalCounterInner({
           aria-hidden="true"
           className="h-5 w-5 flex-shrink-0 bg-[length:400%_300%] bg-no-repeat"
           style={{
-            backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
-            backgroundPosition: resolvePetalSpritePosition(2),
+            backgroundImage: `url(${PETAL_WALLET_ICON_SOURCE})`,
+            backgroundPosition: PETAL_WALLET_ICON_POSITION,
           }}
           animate={{
             rotate: isPulsing && !prefersReducedMotion ? [0, 12, -12, 0] : 0,

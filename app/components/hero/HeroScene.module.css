@@ -58,14 +58,14 @@
 .petal {
   position: absolute;
   width: clamp(1rem, 1.45vw, 1.85rem);
-  aspect-ratio: 1.3;
+  aspect-ratio: 1;
   animation-name: treePetalDrift;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-  background-position: var(--petal-sprite-position);
+  background-position: center;
   background-repeat: no-repeat;
-  background-size: 400% 300%;
-  filter: drop-shadow(0 4px 5px rgba(40, 15, 28, 0.32));
+  background-size: contain;
+  filter: drop-shadow(0 3px 4px rgba(40, 15, 28, 0.28));
   opacity: 0.62;
 }
 

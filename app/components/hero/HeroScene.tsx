@@ -9,8 +9,8 @@ import {
   HOME_SCENE_MANIFEST,
   HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS,
   resolveHomeSceneImageSrc,
+  resolveHomePetalVariant,
   resolveNextHomeSceneBucket,
-  resolvePetalSpritePosition,
   type HomeSceneProjection,
   type HomeSceneState,
 } from './homeScene';
@@ -21,7 +21,6 @@ type PetalStyle = CSSProperties & {
   '--petal-fall': string;
   '--petal-rotate': string;
   '--petal-gust': string;
-  '--petal-sprite-position': string;
 };
 
 type SceneLayer = {
@@ -81,7 +80,7 @@ function TreePetalEmitter({
           fall: 300 + (index % 7) * 42,
           rotate: (index % 2 === 0 ? 1 : -1) * (70 + index * 9),
           scale: 0.48 + (index % 4) * 0.08,
-          variant: index % HOME_SCENE_MANIFEST.petals.frameCount,
+          variant: index % HOME_SCENE_MANIFEST.petals.variants.length,
         };
       }),
     [artboard.anchors.canopy, scene.motion.petalDensity, scene.motion.windStrength],
@@ -91,7 +90,7 @@ function TreePetalEmitter({
     <div className={styles.petalEmitter} aria-hidden="true" data-testid="mori-petal-emitter">
       {petals.map((petal) => {
         const petalStyle: PetalStyle = {
-          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
+          backgroundImage: `url(${resolveHomePetalVariant(petal.variant).src})`,
           left: `${petal.sourceX * scale}px`,
           top: `${petal.sourceY * scale}px`,
           transform: `scale(${petal.scale})`,
@@ -101,7 +100,6 @@ function TreePetalEmitter({
           '--petal-fall': `${petal.fall * scale}px`,
           '--petal-rotate': `${petal.rotate}deg`,
           '--petal-gust': `${scene.motion.gustStrength * 160 * scale}px`,
-          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
         };
 
         return (

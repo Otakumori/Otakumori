@@ -157,12 +157,22 @@ export const HOME_SCENE_MANIFEST = {
     precomposedSurfaceAndUnderground: true,
   },
   petals: {
-    src: '/assets/images/petal_sprite.png',
-    width: 874,
-    height: 668,
-    columns: 4,
-    rows: 3,
-    frameCount: 12,
+    sourceDirectory: 'docs/design/references/home-petals',
+    runtimeDirectory: '/assets/home/petals',
+    variants: [
+      {
+        id: 'master',
+        src: '/assets/home/petals/home-sakura-petal-master.webp',
+        width: 256,
+        height: 256,
+      },
+      {
+        id: 'folded',
+        src: '/assets/home/petals/home-sakura-petal-folded.webp',
+        width: 256,
+        height: 256,
+      },
+    ],
   },
   atmosphere: {
     authoredMist: null,
@@ -352,13 +362,10 @@ export function resolveHomeSceneProjection(viewport: {
   };
 }
 
-export function resolvePetalSpritePosition(variant: number) {
-  const { columns, rows, frameCount } = HOME_SCENE_MANIFEST.petals;
-  const frame = Math.abs(Math.floor(variant)) % frameCount;
-  const column = frame % columns;
-  const row = Math.floor(frame / columns);
-
-  return `${(column / (columns - 1)) * 100}% ${(row / (rows - 1)) * 100}%`;
+export function resolveHomePetalVariant(variant: number) {
+  const { variants } = HOME_SCENE_MANIFEST.petals;
+  const index = Math.abs(Math.floor(variant)) % variants.length;
+  return variants[index] ?? variants[0];
 }
 
 export function resolveNextHomeSceneBucket(bucket: HomeSceneBucket): HomeSceneBucket {

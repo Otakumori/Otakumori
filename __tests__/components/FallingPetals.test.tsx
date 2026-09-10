@@ -52,7 +52,7 @@ describe('homepage collectible petals', () => {
     vi.restoreAllMocks();
   });
 
-  it('uses semantic controls from the same sprite family and collects through the existing callback', () => {
+  it('uses semantic controls from the approved Home petal family and collects through the existing callback', () => {
     const onCollect = vi.fn();
 
     render(
@@ -65,7 +65,7 @@ describe('homepage collectible petals', () => {
     expect(petals.length).toBeGreaterThan(0);
     expect(petals[0]).toHaveAttribute('data-collectible-hit-target', '44');
     expect(petals[0].querySelector('span')?.getAttribute('style')).toContain(
-      HOME_SCENE_MANIFEST.petals.src,
+      HOME_SCENE_MANIFEST.petals.variants[0].src,
     );
     expect(petals[0]).toHaveAttribute('data-petal-variant');
 

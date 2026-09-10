@@ -106,7 +106,7 @@ describe('homepage hero scene client island', () => {
     expect(screen.getAllByTestId('mori-petal')).toHaveLength(4);
   });
 
-  it('renders decorative petals from the sprite atlas instead of text glyphs', async () => {
+  it('renders decorative petals from the approved Home petal family instead of text glyphs', async () => {
     vi.spyOn(Date.prototype, 'getHours').mockReturnValue(12);
     vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
     stubMatchMedia(false);
@@ -121,7 +121,7 @@ describe('homepage hero scene client island', () => {
     petals.forEach((petal) => {
       expect(petal.textContent).toBe('');
       expect(window.getComputedStyle(petal).backgroundImage).toContain(
-        '/assets/images/petal_sprite.png',
+        '/assets/home/petals/home-sakura-petal-',
       );
       expect(petal).toHaveAttribute('data-petal-variant');
     });

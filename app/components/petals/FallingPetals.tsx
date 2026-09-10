@@ -10,7 +10,7 @@ import {
   type PointerEvent,
 } from 'react';
 import { useHomeSceneContext } from '@/app/components/hero/HomeSceneContext';
-import { HOME_SCENE_MANIFEST, resolvePetalSpritePosition } from '@/app/components/hero/homeScene';
+import { HOME_SCENE_MANIFEST, resolveHomePetalVariant } from '@/app/components/hero/homeScene';
 import { PETAL_VALUES, SPAWN, UI } from '@/app/lib/petals/constants';
 import type { Position } from '@/app/lib/petals/physics';
 import styles from './FallingPetals.module.css';
@@ -52,10 +52,6 @@ type PetalHitboxStyle = CSSProperties & {
   '--petal-nudge-y': string;
 };
 
-type PetalVisualStyle = CSSProperties & {
-  '--petal-sprite-position': string;
-};
-
 const DESKTOP_PETAL_COUNT = 6;
 const COMPACT_PETAL_COUNT = 4;
 const POINTER_INFLUENCE_RADIUS = 112;
@@ -78,7 +74,7 @@ function createCollectiblePetal(id: number): CollectiblePetal {
     opacity: 0.68 + (id % 4) * 0.06,
     rotation: (id % 2 === 0 ? 1 : -1) * (190 + (id % 4) * 48),
     scale: 0.74 + (id % 3) * 0.12,
-    variant: id % HOME_SCENE_MANIFEST.petals.frameCount,
+    variant: id % HOME_SCENE_MANIFEST.petals.variants.length,
     value: isRare ? PETAL_VALUES.RARE : PETAL_VALUES.COMMON,
   };
 }
@@ -318,9 +314,8 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
           '--petal-nudge-x': '0px',
           '--petal-nudge-y': '0px',
         };
-        const visualStyle: PetalVisualStyle = {
-          backgroundImage: `url(${HOME_SCENE_MANIFEST.petals.src})`,
-          '--petal-sprite-position': resolvePetalSpritePosition(petal.variant),
+        const visualStyle: CSSProperties = {
+          backgroundImage: `url(${resolveHomePetalVariant(petal.variant).src})`,
         };
 
         return (
