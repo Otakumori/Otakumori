@@ -6,10 +6,7 @@ import { useAuth } from '@clerk/nextjs';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
 import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
 
-// Wallet art is intentionally deferred; keep the existing small functional icon
-// independent from the approved Home collectible-petal family.
-const PETAL_WALLET_ICON_SOURCE = '/assets/images/petal_sprite.png';
-const PETAL_WALLET_ICON_POSITION = '66.66666666666666% 0%';
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/sakura-petal-wallet-emblem.webp';
 
 interface PetalCounterProps {
   count: number;
@@ -113,11 +110,10 @@ function PetalCounterInner({
     >
       <motion.div
         className={`
-          relative flex items-center gap-2.5 px-4 py-2.5
-          rounded-full border border-[#f6dcc7]/30 bg-[#160d12]/72
-          shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-md
+          relative flex min-w-[12rem] items-center gap-3 rounded-[1.1rem] border border-[#f6dcc7]/30 bg-[#160d12]/76 p-2 pr-4
+          shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-[5px]
           transition-all duration-300
-          ${isHovered ? 'w-auto border-[#ffe2d0]/54' : 'w-[70px]'}
+          ${isHovered ? 'border-[#ffe2d0]/54' : ''}
           ${isPulsing ? 'ring-1 ring-[#f6c9bc]/55 ring-offset-1 ring-offset-[#160d12]/60' : ''}
         `}
         animate={{
@@ -134,47 +130,40 @@ function PetalCounterInner({
       >
         <motion.span
           aria-hidden="true"
-          className="h-5 w-5 flex-shrink-0 bg-[length:400%_300%] bg-no-repeat"
-          style={{
-            backgroundImage: `url(${PETAL_WALLET_ICON_SOURCE})`,
-            backgroundPosition: PETAL_WALLET_ICON_POSITION,
-          }}
+          className="grid h-14 w-14 flex-shrink-0 place-items-center overflow-hidden rounded-[0.85rem] border border-[#f7dec8]/20 bg-[#10090d]/44"
+          data-petal-wallet-source="approved-home-ui-v1"
           animate={{
             rotate: isPulsing && !prefersReducedMotion ? [0, 5, -4, 0] : 0,
             scale: isPulsing && !prefersReducedMotion ? [1, 1.07, 1] : 1,
           }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
-        />
-
-        {/* Count */}
-        <motion.span
-          key={count}
-          className="text-base font-bold text-white tabular-nums min-w-[30px] text-right"
-          style={{
-            textShadow: '0 2px 8px rgba(0,0,0,0.56)',
-          }}
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 10, opacity: 0 }}
-          transition={{ duration: 0.2 }}
         >
-          {formattedCount}
+          <img
+            src={PETAL_WALLET_EMBLEM_SOURCE}
+            alt=""
+            width={56}
+            height={56}
+            decoding="async"
+            className="h-full w-full object-contain p-0.5"
+          />
         </motion.span>
 
-        {/* Label */}
-        <AnimatePresence>
-          {isHovered && (
-            <motion.span
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 'auto' }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-xs text-[#f8d8d1]/80 whitespace-nowrap overflow-hidden font-medium"
-            >
-              Petals
-            </motion.span>
-          )}
-        </AnimatePresence>
+        <span className="min-w-0 text-left">
+          <span className="font-ui block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#f7d8cb]/72">
+            Petal Wallet
+          </span>
+          <motion.span
+            key={count}
+            className="mt-0.5 block min-w-[30px] text-lg font-semibold tabular-nums text-[#fff4e8]"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.56)' }}
+            initial={{ y: -8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 8, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {formattedCount}
+          </motion.span>
+        </span>
 
         <motion.div
           className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"

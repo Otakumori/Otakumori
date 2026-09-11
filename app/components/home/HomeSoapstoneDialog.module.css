@@ -1,0 +1,65 @@
+.soapstoneTrigger {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(196, 157, 127, 0.56);
+  border-radius: 0.72rem;
+  background:
+    linear-gradient(135deg, rgba(110, 87, 77, 0.7), rgba(42, 29, 29, 0.86) 58%, rgba(20, 13, 16, 0.9)),
+    #2c2020;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 231, 214, 0.16),
+    inset 0 -1px 0 rgba(5, 3, 4, 0.64),
+    0 10px 24px rgba(0, 0, 0, 0.24);
+  letter-spacing: 0.025em;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.62);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.soapstoneTrigger::before {
+  position: absolute;
+  inset: 1px;
+  border: 1px solid rgba(250, 220, 199, 0.08);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+.soapstoneTrigger:hover {
+  border-color: rgba(236, 193, 159, 0.76);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 231, 214, 0.22),
+    inset 0 -1px 0 rgba(5, 3, 4, 0.64),
+    0 13px 28px rgba(52, 27, 24, 0.32);
+  transform: translateY(-1px);
+}
+
+.soapstoneTrigger:focus-visible {
+  outline: 2px solid rgba(255, 238, 222, 0.94);
+  outline-offset: 3px;
+}
+
+.runeMark {
+  display: inline-grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  border: 1px solid rgba(223, 183, 149, 0.4);
+  border-radius: 0.35rem;
+  color: rgba(255, 225, 203, 0.86);
+  font-family: serif;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soapstoneTrigger {
+    transition: none;
+  }
+
+  .soapstoneTrigger:hover {
+    transform: none;
+  }
+}

@@ -35,6 +35,12 @@ async function useFixedHomeTime(page: Page, value: string) {
 }
 
 async function openSettledHome(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.removeItem('otm-guest-petals-background-v1');
+    window.localStorage.removeItem('otm-has-collected-petal');
+    window.localStorage.removeItem('otm:home:petalHint:v1');
+    window.sessionStorage.removeItem('otm-session-petals-v1');
+  });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('mori-hero-scene')).toBeVisible();
   await page.addStyleTag({
@@ -80,6 +86,14 @@ test.describe('Home petal owner acceptance', () => {
 
         const scene = page.getByTestId('mori-hero-scene');
         await expect(scene).toHaveAttribute('data-scene-bucket', bucket);
+        const header = page.locator('header[data-home-navbar-state]');
+        await expect(header).toHaveAttribute('data-home-navbar-state', 'top');
+        const [sceneBox, headerPosition] = await Promise.all([
+          scene.boundingBox(),
+          header.evaluate((element) => window.getComputedStyle(element).position),
+        ]);
+        expect(sceneBox?.y).toBe(0);
+        expect(headerPosition).toBe('absolute');
 
         const petals = page.getByRole('button', { name: /collect sakura petal worth/i });
         await expect(petals.first()).toBeVisible();
@@ -110,6 +124,13 @@ test.describe('Home petal owner acceptance', () => {
     await pointerPetal.click({ force: true });
     await expect(pointerPetal).toHaveAttribute('data-collecting', 'true');
     await expect(pointerPetal).toBeDisabled();
+    await expect(pointerPage.locator('[data-reward-token-state="visual-qa-placeholder"]')).toBeVisible();
+    const wallet = pointerPage.locator('[data-petal-wallet-source="approved-home-ui-v1"]');
+    await expect(wallet).toBeVisible();
+    await expect(wallet.locator('img')).toHaveAttribute(
+      'src',
+      '/assets/home/ui/sakura-petal-wallet-emblem.webp',
+    );
 
     const keyboardPage = await browser.newPage({ viewport: VIEWPORTS[1] });
     await useFixedHomeTime(keyboardPage, '2026-01-02T12:00:00');
@@ -150,5 +171,18 @@ test.describe('Home petal owner acceptance', () => {
       touchContext.close(),
       reducedPage.close(),
     ]);
+  });
+
+  test('keeps the Home header full-bleed while changing to its ink scroll material', async ({
+    page,
+  }) => {
+    await page.setViewportSize(VIEWPORTS[2]);
+    await useFixedHomeTime(page, '2026-01-02T12:00:00');
+    await openSettledHome(page);
+
+    const header = page.locator('header[data-home-navbar-state]');
+    await expect(header).toHaveAttribute('data-home-navbar-state', 'top');
+    await page.evaluate(() => window.scrollTo(0, 120));
+    await expect(header).toHaveAttribute('data-home-navbar-state', 'scrolled');
   });
 });

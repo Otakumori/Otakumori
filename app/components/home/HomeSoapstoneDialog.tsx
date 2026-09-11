@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
+import styles from './HomeSoapstoneDialog.module.css';
 
 export default function HomeSoapstoneDialog() {
   const [open, setOpen] = useState(false);
@@ -54,9 +55,13 @@ export default function HomeSoapstoneDialog() {
         ref={triggerButtonRef}
         type="button"
         onClick={() => setOpen(true)}
-        className="font-ui focus-ring mt-5 inline-flex items-center rounded-full border border-sakura-300/25 bg-sakura-300/10 px-4 py-2 text-sm font-medium text-sakura-50 transition hover:border-sakura-50/50 hover:bg-sakura-300/18"
+        className={`${styles.soapstoneTrigger} font-ui focus-ring mt-5 inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm font-medium text-sakura-50`}
+        data-home-soapstone-control="material-prototype"
       >
-        Read a soapstone
+        <span className={styles.runeMark} aria-hidden="true">
+          ᚱ
+        </span>
+        <span>Read a soapstone</span>
       </button>
 
       {open ? (

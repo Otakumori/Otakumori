@@ -106,7 +106,6 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [_scrollY, setScrollY] = useState(0);
   const isHome = pathname === paths.home();
 
   const userMenuAriaExpanded = useMemo(() => showUserMenu, [showUserMenu]);
@@ -134,9 +133,8 @@ export default function Navbar() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrollTop = window.scrollY;
-          setScrollY(scrollTop);
-          setIsScrolled(scrollTop > 50);
+          const nextScrolled = window.scrollY > 50;
+          setIsScrolled((current) => (current === nextScrolled ? current : nextScrolled));
           ticking = false;
         });
         ticking = true;
@@ -181,15 +179,17 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll z-50 w-full font-ui transition-all duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : isHome ? 'border-b border-white/0' : 'border-b border-white/5'}`}
+      className={`navbar-scroll z-50 w-full font-ui transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? isHome ? 'scrolled border-b border-[#efd0bc]/24 shadow-[0_8px_30px_rgba(4,2,5,0.28)]' : 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : isHome ? 'border-b border-[#f4d5c4]/12' : 'border-b border-white/5'}`}
       style={{
         backgroundColor: isScrolled
-          ? 'rgba(0, 0, 0, 0.95)'
+          ? isHome
+            ? 'rgba(23, 16, 23, 0.78)'
+            : 'rgba(0, 0, 0, 0.95)'
           : isHome
             ? 'rgba(7, 4, 7, 0.08)'
             : 'rgba(26, 24, 22, 0.7)',
-        backdropFilter: isHome && !isScrolled ? 'none' : 'blur(8px)',
-        WebkitBackdropFilter: isHome && !isScrolled ? 'none' : 'blur(8px)',
+        backdropFilter: isHome ? (isScrolled ? 'saturate(1.04) blur(5px)' : 'none') : 'blur(8px)',
+        WebkitBackdropFilter: isHome ? (isScrolled ? 'saturate(1.04) blur(5px)' : 'none') : 'blur(8px)',
       }}
     >
       <a

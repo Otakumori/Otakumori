@@ -8,6 +8,10 @@
   background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.05) 42%, rgba(7, 4, 7, 0.12));
 }
 
+.rootFooter::before {
+  display: none;
+}
+
 .contentShell {
   position: relative;
   z-index: 1;
