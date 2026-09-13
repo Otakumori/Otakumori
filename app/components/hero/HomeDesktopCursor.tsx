@@ -67,7 +67,10 @@ export default function HomeDesktopCursor() {
       const tilt = Math.max(-10, Math.min(10, velocity.x * 0.9));
       tassel.style.transform = `translate3d(${tail.x + 26}px, ${tail.y + 23}px, 0) rotate(${tilt}deg)`;
 
-      if (Math.abs(offsetX) + Math.abs(offsetY) + Math.abs(velocity.x) + Math.abs(velocity.y) > 0.35) {
+      if (
+        Math.abs(offsetX) + Math.abs(offsetY) + Math.abs(velocity.x) + Math.abs(velocity.y) >
+        0.35
+      ) {
         frameRef.current = window.requestAnimationFrame(settleTassel);
       } else {
         frameRef.current = null;

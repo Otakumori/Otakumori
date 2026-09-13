@@ -28,11 +28,7 @@ export default function HeroSearch() {
   const isMobile = useMobileSearchCopy();
 
   return (
-    <form
-      action="/search"
-      className="mt-4 w-full max-w-[31rem]"
-      role="search"
-    >
+    <form action="/search" className="mt-4 w-full max-w-[31rem]" role="search">
       <label htmlFor="home-world-search" className="sr-only">
         Search Otaku-mori products, games, and stories
       </label>

@@ -3,9 +3,17 @@
   z-index: 24;
   top: max(62svh, calc(var(--mori-root-content-top, 54rem) - 6rem));
   left: 0;
-  min-height: max(30rem, calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 54rem)));
+  min-height: max(
+    30rem,
+    calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 54rem))
+  );
   overflow: visible;
-  background: linear-gradient(180deg, rgba(7, 4, 7, 0), rgba(7, 4, 7, 0.05) 42%, rgba(7, 4, 7, 0.12));
+  background: linear-gradient(
+    180deg,
+    rgba(7, 4, 7, 0),
+    rgba(7, 4, 7, 0.05) 42%,
+    rgba(7, 4, 7, 0.12)
+  );
 }
 
 .rootFooter::before {
@@ -40,7 +48,10 @@
 @media (max-width: 767px) {
   .rootFooter {
     top: max(58svh, calc(var(--mori-root-content-top, 42rem) - 8rem));
-    min-height: max(34rem, calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 42rem)));
+    min-height: max(
+      34rem,
+      calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 42rem))
+    );
   }
 
   .contentShell {

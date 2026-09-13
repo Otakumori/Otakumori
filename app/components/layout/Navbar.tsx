@@ -179,7 +179,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll z-50 w-full font-ui transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? isHome ? 'scrolled border-b border-[#efd0bc]/24 shadow-[0_8px_30px_rgba(4,2,5,0.28)]' : 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : isHome ? 'border-b border-[#f4d5c4]/12' : 'border-b border-white/5'}`}
+      className={`navbar-scroll z-50 w-full font-ui transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? (isHome ? 'scrolled border-b border-[#efd0bc]/24 shadow-[0_8px_30px_rgba(4,2,5,0.28)]' : 'scrolled shadow-lg shadow-black/80 border-b border-white/10') : isHome ? 'border-b border-[#f4d5c4]/12' : 'border-b border-white/5'}`}
       style={{
         backgroundColor: isScrolled
           ? isHome
@@ -189,7 +189,11 @@ export default function Navbar() {
             ? 'rgba(7, 4, 7, 0.08)'
             : 'rgba(26, 24, 22, 0.7)',
         backdropFilter: isHome ? (isScrolled ? 'saturate(1.04) blur(5px)' : 'none') : 'blur(8px)',
-        WebkitBackdropFilter: isHome ? (isScrolled ? 'saturate(1.04) blur(5px)' : 'none') : 'blur(8px)',
+        WebkitBackdropFilter: isHome
+          ? isScrolled
+            ? 'saturate(1.04) blur(5px)'
+            : 'none'
+          : 'blur(8px)',
       }}
     >
       <a
@@ -413,11 +417,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           {!isHome && <GlobalSearch className="hidden xl:block" />}
-          <PetalWalletNavLink
-            isLoaded={isLoaded}
-            isSignedIn={isSignedIn}
-            signInHref={signInHref}
-          />
+          <PetalWalletNavLink isLoaded={isLoaded} isSignedIn={isSignedIn} signInHref={signInHref} />
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"

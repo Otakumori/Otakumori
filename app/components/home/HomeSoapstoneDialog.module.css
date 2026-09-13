@@ -122,13 +122,17 @@
   font-family: serif;
   font-size: clamp(0.72rem, 2vw, 0.9rem);
   letter-spacing: 0.18em;
-  transition: opacity 240ms ease, transform 380ms ease;
+  transition:
+    opacity 240ms ease,
+    transform 380ms ease;
 }
 
 .decodedCopy {
   opacity: 0;
   transform: translateY(0.5rem);
-  transition: opacity 220ms ease 190ms, transform 220ms ease 190ms;
+  transition:
+    opacity 220ms ease 190ms,
+    transform 220ms ease 190ms;
 }
 
 .soapstonePanel[data-soapstone-decode-state='decoded'] .dormantRunes {

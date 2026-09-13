@@ -1029,16 +1029,16 @@ html {
   .animate-spin-slow {
     animation: spin 3s linear infinite;
   }
-  
+
   /* Text color utilities for header links */
   .text-text-link {
     color: var(--color-text-link);
   }
-  
+
   .text-text-link-hover:hover {
     color: var(--color-text-link-hover);
   }
-  
+
   .hover\:text-text-link-hover:hover {
     color: var(--color-text-link-hover);
   }
@@ -1263,7 +1263,13 @@ body::before {
 
 /* Tree gradient overlay for blending with content */
 .tree-gradient-overlay {
-  background: linear-gradient(to right, rgba(26,24,22,0) 0%, rgba(26,24,22,0) 40%, rgba(26,24,22,0.3) 70%, rgba(26,24,22,0.8) 100%);
+  background: linear-gradient(
+    to right,
+    rgba(26, 24, 22, 0) 0%,
+    rgba(26, 24, 22, 0) 40%,
+    rgba(26, 24, 22, 0.3) 70%,
+    rgba(26, 24, 22, 0.8) 100%
+  );
 }
 
 /* Tree is now handled by the Canopy component */
@@ -2243,7 +2249,7 @@ textarea,
     transform: none !important;
     perspective: none !important;
   }
-  
+
   .snap-y {
     scroll-snap-type: none;
   }

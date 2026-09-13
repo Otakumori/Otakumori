@@ -222,10 +222,13 @@ export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
         setGeneration(nextIdRef.current);
       };
 
-      const timer = window.setTimeout(() => {
-        collectionTimersRef.current.delete(timer);
-        finishCollection();
-      }, reducedMotion ? 120 : 360);
+      const timer = window.setTimeout(
+        () => {
+          collectionTimersRef.current.delete(timer);
+          finishCollection();
+        },
+        reducedMotion ? 120 : 360,
+      );
       collectionTimersRef.current.add(timer);
     },
     [collectingIds, markHintSeen, onPetalCollect, reducedMotion],

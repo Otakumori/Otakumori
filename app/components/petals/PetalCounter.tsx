@@ -23,12 +23,7 @@ type PetalCounterInnerProps = PetalCounterProps & {
 
 function PetalCounterComponent(props: PetalCounterProps) {
   if (isVisualQaAuthEnabled()) {
-    return (
-      <PetalCounterInner
-        {...props}
-        isSignedIn={resolveVisualQaAuthState() === 'signed-in'}
-      />
-    );
+    return <PetalCounterInner {...props} isSignedIn={resolveVisualQaAuthState() === 'signed-in'} />;
   }
 
   return <ClerkPetalCounter {...props} />;
