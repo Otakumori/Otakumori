@@ -3,10 +3,11 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
+import Image from 'next/image';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
 import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
 
-const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/sakura-petal-wallet-emblem.webp';
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/petal-wallet-satchel.png';
 
 interface PetalCounterProps {
   count: number;
@@ -138,12 +139,12 @@ function PetalCounterInner({
           }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         >
-          <img
+          <Image
             src={PETAL_WALLET_EMBLEM_SOURCE}
             alt=""
             width={56}
             height={56}
-            decoding="async"
+            sizes="56px"
             className="h-full w-full object-contain p-0.5"
           />
         </motion.span>

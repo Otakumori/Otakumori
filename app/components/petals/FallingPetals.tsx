@@ -97,6 +97,7 @@ export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
   const layerRef = useRef<HTMLDivElement>(null);
   const isIntersectingRef = useRef(true);
   const pointerFrameRef = useRef<number | null>(null);
+  const collectionTimersRef = useRef<Set<number>>(new Set());
   const nextIdRef = useRef(100);
   const hintSeenRef = useRef(false);
 
@@ -157,6 +158,8 @@ export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
   useEffect(
     () => () => {
       if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
+      collectionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      collectionTimersRef.current.clear();
     },
     [],
   );
@@ -219,7 +222,11 @@ export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
         setGeneration(nextIdRef.current);
       };
 
-      window.setTimeout(finishCollection, reducedMotion ? 120 : 360);
+      const timer = window.setTimeout(() => {
+        collectionTimersRef.current.delete(timer);
+        finishCollection();
+      }, reducedMotion ? 120 : 360);
+      collectionTimersRef.current.add(timer);
     },
     [collectingIds, markHintSeen, onPetalCollect, reducedMotion],
   );

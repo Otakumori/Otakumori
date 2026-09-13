@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { paths } from '@/lib/paths';
 import HeroSearch from './HeroSearch';
 import layoutStyles from './HeroLayout.module.css';
@@ -24,7 +25,15 @@ export default function HeroContent() {
               href={paths.shop()}
               className={`${layoutStyles.primaryAction} inline-flex min-h-[48px] items-center justify-center rounded-full px-6 text-sm font-semibold text-[#fff3e6] focus:outline-none`}
             >
-              Gear up &rarr;
+              <span>Gear up</span>
+              <Image
+                src="/assets/home/ui/arrow-forward.png"
+                alt=""
+                width={32}
+                height={22}
+                sizes="32px"
+                className="ml-2 h-[18px] w-[27px] object-contain"
+              />
             </Link>
           </div>
         </div>

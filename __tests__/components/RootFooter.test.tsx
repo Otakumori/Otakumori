@@ -1,5 +1,10 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import type { ImgHTMLAttributes } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('next/image', () => ({
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+}));
 
 import RootFooter from '@/app/components/hero/RootFooter';
 

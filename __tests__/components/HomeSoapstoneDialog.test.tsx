@@ -18,13 +18,12 @@ describe('HomeSoapstoneDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: /a message beneath the roots/i });
     expect(dialog).toHaveTextContent('Soapstones are little traces left for other travelers.');
-    const monument = dialog.querySelector(
-      'img[src*="mori-soapstone-monument"]',
+    const plaque = dialog.querySelector(
+      'img[src*="soapstone-plaque-embedded"]',
     ) as HTMLImageElement | null;
-    expect(monument).not.toBeNull();
-    expect(monument).toHaveAttribute('alt', '');
-    expect(monument).toHaveAttribute('aria-hidden', 'true');
-    expect(monument).toHaveClass('pointer-events-none');
+    expect(plaque).not.toBeNull();
+    expect(plaque).toHaveAttribute('alt', '');
+    expect(plaque).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('link', { name: /visit soapstones/i })).toHaveAttribute(
       'href',
       '/community/soapstones',

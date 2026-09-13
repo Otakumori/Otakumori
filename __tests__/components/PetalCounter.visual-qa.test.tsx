@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react';
+import type { ImgHTMLAttributes } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('next/image', () => ({
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+}));
 
 import PetalCounter from '@/app/components/petals/PetalCounter';
 
@@ -19,6 +24,7 @@ describe('PetalCounter visual QA provider boundary', () => {
     render(<PetalCounter count={3} guestDailyRemaining={47} />);
 
     expect(screen.getByRole('button', { name: /petals collected: 3/i })).toBeInTheDocument();
+    expect(screen.getByAltText('')).toHaveAttribute('src', '/assets/home/ui/petal-wallet-satchel.png');
     expect(useAuth).not.toHaveBeenCalled();
   });
 });

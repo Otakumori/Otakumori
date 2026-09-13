@@ -5,6 +5,7 @@ import { PetalCollectionProvider } from '@/app/contexts/PetalCollectionContext';
 import PetalSystem from '@/app/components/petals/PetalSystem';
 import HeroOverlay from './HeroOverlay';
 import HeroScene from './HeroScene';
+import HomeDesktopCursor from './HomeDesktopCursor';
 import RootFooter from './RootFooter';
 import { HomeSceneProvider, useHomeSceneContext } from './HomeSceneContext';
 import layoutStyles from './HeroLayout.module.css';
@@ -50,6 +51,7 @@ function HomeSceneShellInner({ children }: { children: ReactNode }) {
       <PetalCollectionProvider>
         <div ref={surfaceRef} className={layoutStyles.heroSurface} data-testid="mori-scene-surface">
           <HeroScene />
+          <HomeDesktopCursor />
           <PetalSystem />
           <HeroOverlay />
           {children}

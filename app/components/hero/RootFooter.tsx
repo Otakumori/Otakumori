@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { paths } from '@/lib/paths';
 import HomeSoapstoneDialog from '@/app/components/home/HomeSoapstoneDialog';
 import styles from './RootFooter.module.css';
@@ -8,24 +9,54 @@ const footerGroups = [
     title: 'Shop',
     links: [
       { label: 'Storefront', href: paths.shop(), region: 'root-cavity-shop' },
-      { label: 'Cart', href: paths.cart(), region: 'root-cavity-cart' },
-      { label: 'Wishlist', href: '/wishlist', region: 'root-cavity-wishlist' },
+      {
+        label: 'Cart',
+        href: paths.cart(),
+        region: 'root-cavity-cart',
+        art: '/assets/home/ui/cart-japanese-merchant.png',
+      },
+      {
+        label: 'Wishlist',
+        href: '/wishlist',
+        region: 'root-cavity-wishlist',
+        art: '/assets/home/ui/wishlist-heart-charm.png',
+      },
     ],
   },
   {
     title: 'Account',
     links: [
-      { label: 'Profile', href: paths.profile(), region: 'root-cavity-profile' },
+      {
+        label: 'Profile',
+        href: paths.profile(),
+        region: 'root-cavity-profile',
+        art: '/assets/home/ui/profile-avatar-frame.png',
+      },
       { label: 'Account', href: paths.account(), region: 'root-cavity-account' },
-      { label: 'Petal Wallet', href: '/profile/petals', region: 'root-cavity-petals' },
+      {
+        label: 'Petal Wallet',
+        href: '/profile/petals',
+        region: 'root-cavity-petals',
+        art: '/assets/home/ui/petal-wallet-satchel.png',
+      },
     ],
   },
   {
     title: 'World',
     links: [
       { label: 'Mini-Games', href: paths.games(), region: 'root-cavity-games' },
-      { label: 'Blog', href: paths.blogIndex(), region: 'root-cavity-blog' },
-      { label: 'Soapstones', href: paths.soapstones(), region: 'root-cavity-soapstones' },
+      {
+        label: 'Blog',
+        href: paths.blogIndex(),
+        region: 'root-cavity-blog',
+        art: '/assets/home/ui/blog-journal.png',
+      },
+      {
+        label: 'Soapstones',
+        href: paths.soapstones(),
+        region: 'root-cavity-soapstones',
+        art: '/assets/home/ui/messages-sealed-letter.png',
+      },
     ],
   },
   {
@@ -89,8 +120,18 @@ export default function RootFooter() {
                           href={link.href}
                           prefetch={false}
                           data-root-region={link.region}
-                          className="inline-flex rounded-full px-2 py-1.5 text-[#fff4e8]/78 transition hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26"
+                          className={`${styles.rootLink} inline-flex items-center rounded-full px-2 py-1.5 text-[#fff4e8]/78 transition hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26`}
                         >
+                          {link.art ? (
+                            <Image
+                              src={link.art}
+                              alt=""
+                              width={36}
+                              height={36}
+                              sizes="36px"
+                              className={styles.rootLinkArt}
+                            />
+                          ) : null}
                           {link.label}
                         </Link>
                       </li>

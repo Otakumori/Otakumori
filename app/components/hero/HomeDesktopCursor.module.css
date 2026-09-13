@@ -1,0 +1,35 @@
+.cursor {
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  pointer-events: none;
+}
+
+.body,
+.tassel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.body {
+  width: 72px;
+  height: 48px;
+  transform: translate3d(-160px, -160px, 0);
+}
+
+.bodyArt {
+  display: block;
+  width: 72px;
+  height: 48px;
+  object-fit: contain;
+  transform: translate(-16px, -2px);
+}
+
+.tassel {
+  width: 25px;
+  height: 29px;
+  transform: translate3d(-160px, -160px, 0);
+  transform-origin: 7px 2px;
+}

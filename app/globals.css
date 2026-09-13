@@ -2384,3 +2384,9 @@ textarea,
     transform: none;
   }
 }
+@media (hover: hover) and (pointer: fine) {
+  body[data-home-cursor='ready'],
+  body[data-home-cursor='ready'] * {
+    cursor: none !important;
+  }
+}

@@ -25,6 +25,18 @@
   text-shadow: 0 3px 12px rgba(0, 0, 0, 0.74);
 }
 
+.rootLink {
+  gap: 0.38rem;
+}
+
+.rootLinkArt {
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.42));
+}
+
 @media (max-width: 767px) {
   .rootFooter {
     top: max(58svh, calc(var(--mori-root-content-top, 42rem) - 8rem));
