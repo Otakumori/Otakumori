@@ -5,8 +5,8 @@ import styles from './HomeDesktopCursor.module.css';
 
 type Point = { x: number; y: number };
 
-const CURSOR_BODY_SOURCE = '/assets/home/ui/cursor-body-helper.png';
-const CURSOR_TASSEL_SOURCE = '/assets/home/ui/cursor-tassel-helper.png';
+const CURSOR_BODY_SOURCE = '/assets/home/ui/runtime/cursor-body-helper.webp';
+const CURSOR_TASSEL_SOURCE = '/assets/home/ui/runtime/cursor-tassel-helper.webp';
 
 /**
  * A Home-only fine-pointer treatment. The cursor body is positioned at the
@@ -116,8 +116,8 @@ export default function HomeDesktopCursor() {
         <img
           src={CURSOR_BODY_SOURCE}
           alt=""
-          width={1536}
-          height={1024}
+          width={256}
+          height={171}
           onLoad={() => setIsArtReady(true)}
           className={styles.bodyArt}
         />
@@ -126,8 +126,8 @@ export default function HomeDesktopCursor() {
         ref={tasselRef}
         src={CURSOR_TASSEL_SOURCE}
         alt=""
-        width={480}
-        height={554}
+        width={128}
+        height={148}
         className={styles.tassel}
       />
     </div>

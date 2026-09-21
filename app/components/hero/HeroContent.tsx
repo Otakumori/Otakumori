@@ -29,7 +29,7 @@ export default function HeroContent() {
             >
               <span>Gear up</span>
               <Image
-                src="/assets/home/ui/arrow-forward.png"
+                src="/assets/home/ui/runtime/arrow-forward.webp"
                 alt=""
                 width={32}
                 height={22}

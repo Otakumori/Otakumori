@@ -1,8 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "status": "visual/catalog authority for this asset checkpoint; mechanics require separate implementation review",
   "games": {
     "bubble-ragdoll": {
+      "canonicalId": "bubble-ragdoll",
+      "canonicalSlug": "bubble-ragdoll",
+      "legacyAliases": ["bubble-girl"],
+      "compatibilityRoutes": ["/mini-games/bubble-girl"],
       "displayName": "Bubble Ragdoll",
       "catalogStatus": "renamed from Bubble Girl direction",
       "camera": "front or slight 3/4 contained physics room",
@@ -12,6 +16,10 @@
       "hubAsset": "game-bubble-ragdoll-hub"
     },
     "maid-cafe-manager": {
+      "canonicalId": "maid-cafe-manager",
+      "canonicalSlug": "maid-cafe-manager",
+      "legacyAliases": [],
+      "compatibilityRoutes": ["/mini-games/maid-cafe-manager"],
       "displayName": "Maid Café Manager",
       "catalogStatus": "re-integrated prior concept / new canonical catalog addition",
       "camera": "third-person management/life-sim presentation",
@@ -21,6 +29,11 @@
       "hubAsset": "game-maid-cafe-manager-hub"
     },
     "thigh-colosseum": {
+      "canonicalDisplayIdentity": "Thigh Colosseum",
+      "currentRuntimeSlug": "thigh-coliseum",
+      "currentRuntimeRoute": "/mini-games/thigh-coliseum",
+      "spellingNormalizedRoute": "/mini-games/thigh-colosseum",
+      "spellingNormalizedRouteStatus": "Future routing-convergence consideration; this route is not functional in this checkpoint.",
       "displayName": "Thigh Colosseum",
       "catalogStatus": "canonical revised direction",
       "camera": "side-scrolling / Metroid-like traversal",
@@ -30,6 +43,10 @@
       "hubAsset": "game-thigh-colosseum-hub"
     },
     "puzzle-reveal": {
+      "canonicalId": "puzzle-reveal",
+      "canonicalSlug": "puzzle-reveal",
+      "legacyAliases": [],
+      "compatibilityRoutes": ["/mini-games/puzzle-reveal"],
       "displayName": "Puzzle Reveal",
       "catalogStatus": "canonical revised direction",
       "camera": "top-down / archive-table puzzle presentation",
@@ -39,6 +56,10 @@
       "hubAsset": "game-puzzle-reveal-hub"
     },
     "dungeon-of-desire": {
+      "canonicalId": "dungeon-of-desire",
+      "canonicalSlug": "dungeon-of-desire",
+      "legacyAliases": [],
+      "compatibilityRoutes": ["/mini-games/dungeon-of-desire"],
       "displayName": "Dungeon of Desire",
       "catalogStatus": "canonical revised direction",
       "camera": "first-person RPG",

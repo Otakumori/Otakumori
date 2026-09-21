@@ -29,7 +29,7 @@ describe('approved visual assets batch 2', () => {
       id: 'bubble-girl',
       slug: 'bubble-girl',
       title: 'Bubble Ragdoll',
-      image: approvedVisualAssets.games['bubble-girl'].cover,
+      image: approvedVisualAssets.games['bubble-ragdoll'].cover,
     });
     expect(getApprovedGamePresentation('bubble-girl')).toMatchObject({
       displayName: 'Bubble Ragdoll',
@@ -37,8 +37,15 @@ describe('approved visual assets batch 2', () => {
     });
   });
 
-  it('does not introduce a dead Maid Cafe Manager route into the active registry', () => {
-    expect(gamesRegistry.games.some((game) => game.id === 'maid-cafe-manager')).toBe(false);
+  it('exposes the existing Maid Café Manager route with its approved presentation', () => {
+    expect(gamesRegistry.games.find((game) => game.id === 'maid-cafe-manager')).toMatchObject({
+      slug: 'maid-cafe-manager',
+      title: 'Maid Café Manager',
+      image: approvedVisualAssets.games['maid-cafe-manager'].cover,
+    });
+    expect(getApprovedGamePresentation('maid-cafe-manager')).toMatchObject({
+      hub: '/assets/games/hub/game-maid-cafe-manager-hub.webp',
+    });
   });
 
   it.each([

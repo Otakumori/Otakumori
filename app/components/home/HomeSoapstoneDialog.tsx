@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { paths } from '@/lib/paths';
 import styles from './HomeSoapstoneDialog.module.css';
 
-const SOAPSTONE_PLAQUE_SOURCE = '/assets/home/ui/soapstone-plaque-embedded.png';
+const SOAPSTONE_PLAQUE_SOURCE = '/assets/home/ui/runtime/soapstone-plaque-embedded.webp';
 const DORMANT_RUNES = 'ᚱ ᚢ ᚾ · ᛋ ᛏ ᛟ ᚾ ᛖ';
 
 export default function HomeSoapstoneDialog() {
@@ -75,8 +75,8 @@ export default function HomeSoapstoneDialog() {
         <img
           src={SOAPSTONE_PLAQUE_SOURCE}
           alt=""
-          width={1254}
-          height={1254}
+          width={1024}
+          height={1024}
           loading="lazy"
           decoding="async"
           className={styles.triggerPlaque}
@@ -111,8 +111,8 @@ export default function HomeSoapstoneDialog() {
               src={SOAPSTONE_PLAQUE_SOURCE}
               alt=""
               aria-hidden="true"
-              width={1254}
-              height={1254}
+              width={1024}
+              height={1024}
               decoding="async"
               className={styles.panelPlaque}
             />

@@ -46,7 +46,7 @@ export default function HeroSearch() {
           className="absolute right-1 top-1/2 inline-flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-full border border-[#ffe3ca]/18 bg-[#120b0e]/34 text-[#fff4e8] backdrop-blur-sm transition hover:border-[#fff0d9]/54 hover:bg-[#f0b2bf]/16 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/35"
         >
           <Image
-            src="/assets/home/ui/search-magnifier.png"
+            src="/assets/home/ui/runtime/search-magnifier.webp"
             alt=""
             width={28}
             height={28}

@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
 import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
 
-const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/petal-wallet-satchel.png';
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/runtime/petal-wallet-satchel.webp';
 
 interface PetalCounterProps {
   count: number;

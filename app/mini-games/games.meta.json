@@ -67,13 +67,13 @@
   },
   {
     "slug": "maid-cafe-manager",
-    "name": "Maid Cafe Manager",
+    "name": "Maid Café Manager",
     "icon": "local_cafe",
     "desc": "Manage shifts and keep guests smiling."
   },
   {
     "slug": "thigh-coliseum",
-    "name": "Thigh Coliseum",
+    "name": "Thigh Colosseum",
     "icon": "stadium",
     "desc": "Enter the arena. Win rounds and advance the bracket."
   },

@@ -86,6 +86,26 @@
       "order": 4
     },
     {
+      "id": "maid-cafe-manager",
+      "slug": "maid-cafe-manager",
+      "title": "Maid Café Manager",
+      "description": "Manage shifts and keep guests smiling.",
+      "category": "simulation",
+      "difficulty": "medium",
+      "estimatedTime": "10-20 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Balance orders, guest moods, and a busy café floor.",
+        "shifts": "Good shifts unlock the next day’s scenarios.",
+        "identity": "Your avatar remains part of the café’s presentation."
+      },
+      "image": "/assets/games/covers/game-maid-cafe-manager-cover.webp",
+      "icon": "◇",
+      "enabled": true,
+      "order": 4.5
+    },
+    {
       "id": "petal-storm-rhythm",
       "slug": "petal-storm-rhythm",
       "title": "Petal Storm Rhythm",

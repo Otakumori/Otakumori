@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { ChevronDown, Heart, Menu, MessageCircle, ShoppingCart, X } from 'lucide-react';
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
@@ -390,28 +390,14 @@ export default function Navbar() {
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/wishlist' ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
           >
-            <Image
-              src="/assets/home/ui/wishlist-heart-charm.png"
-              alt=""
-              width={30}
-              height={30}
-              sizes="30px"
-              className="h-7 w-7 object-contain"
-            />
+            <Heart className="h-5 w-5" aria-hidden="true" />
           </button>
           <button
             onClick={handleSoapstoneClick}
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
           >
-            <Image
-              src="/assets/home/ui/messages-sealed-letter.png"
-              alt=""
-              width={30}
-              height={30}
-              sizes="30px"
-              className="h-7 w-7 object-contain"
-            />
+            <MessageCircle className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -423,14 +409,7 @@ export default function Navbar() {
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
             aria-label={`Shopping cart with ${itemCount} items`}
           >
-            <Image
-              src="/assets/home/ui/cart-japanese-merchant.png"
-              alt=""
-              width={32}
-              height={32}
-              sizes="32px"
-              className="h-7 w-7 object-contain"
-            />
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center font-semibold">
                 {itemCount > 99 ? '99+' : itemCount}
@@ -712,14 +691,7 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
                 >
-                  <Image
-                    src="/assets/home/ui/wishlist-heart-charm.png"
-                    alt=""
-                    width={30}
-                    height={30}
-                    sizes="30px"
-                    className="h-7 w-7 object-contain"
-                  />
+                  <Heart className="h-5 w-5" aria-hidden="true" />
                   <span>Wishlist</span>
                 </button>
                 <button
@@ -730,14 +702,7 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
                 >
-                  <Image
-                    src="/assets/home/ui/messages-sealed-letter.png"
-                    alt=""
-                    width={30}
-                    height={30}
-                    sizes="30px"
-                    className="h-7 w-7 object-contain"
-                  />
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
                   <span>Community</span>
                 </button>
                 <PetalWalletNavLink
@@ -753,14 +718,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={`Shopping cart with ${itemCount} items`}
                 >
-                  <Image
-                    src="/assets/home/ui/cart-japanese-merchant.png"
-                    alt=""
-                    width={30}
-                    height={30}
-                    sizes="30px"
-                    className="h-7 w-7 object-contain"
-                  />
+                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                   <span>Cart</span>
                   {itemCount > 0 && (
                     <span className="ml-auto bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-2 flex items-center justify-center font-semibold">

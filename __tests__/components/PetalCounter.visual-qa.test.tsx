@@ -26,7 +26,7 @@ describe('PetalCounter visual QA provider boundary', () => {
     expect(screen.getByRole('button', { name: /petals collected: 3/i })).toBeInTheDocument();
     expect(screen.getByAltText('')).toHaveAttribute(
       'src',
-      '/assets/home/ui/petal-wallet-satchel.png',
+      '/assets/home/ui/runtime/petal-wallet-satchel.webp',
     );
     expect(useAuth).not.toHaveBeenCalled();
   });
