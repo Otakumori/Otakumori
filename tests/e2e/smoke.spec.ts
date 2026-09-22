@@ -37,7 +37,21 @@ test('Footer components work', async ({ page }) => {
   await expectRootFooterContract(page);
 
   // Root footer links remain visible and navigable without depending on pending production art.
-  const routes = ['/shop', '/blog', '/mini-games', '/about', '/profile', '/profile/petals'];
+  const routes = [
+    '/shop',
+    '/shop/cart',
+    '/wishlist',
+    '/profile',
+    '/account',
+    '/profile/petals',
+    '/mini-games',
+    '/blog',
+    '/community/soapstones',
+    '/help',
+    '/privacy',
+    '/terms',
+    '/cookies',
+  ];
   for (const href of routes) {
     await expect(page.getByTestId('mori-root-footer').locator(`a[href="${href}"]`)).toBeVisible();
   }

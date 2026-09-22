@@ -12,7 +12,6 @@ test.describe('Navbar Single Rendering', () => {
     await expectSinglePrimaryNavigation(page);
     await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
     await expect(page.getByRole('navigation', { name: /otakumori social links/i })).toBeVisible();
-    await expect(page.getByRole('navigation', { name: /homepage utility navigation/i })).toBeVisible();
   });
 
   test('should render exactly one navbar on mini-games page', async ({ page }) => {
@@ -33,10 +32,9 @@ test.describe('Navbar Single Rendering', () => {
     await expectSinglePrimaryNavigation(page);
     await expect(page.locator('header')).toHaveCount(1);
 
-    // Home intentionally contains one primary nav plus three distinct semantic footer navs.
-    await expect(page.getByRole('navigation')).toHaveCount(4);
+    // Home contains one global Navbar and the two canonical footer navigation landmarks.
+    await expect(page.getByRole('navigation')).toHaveCount(3);
     await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
     await expect(page.getByRole('navigation', { name: /otakumori social links/i })).toBeVisible();
-    await expect(page.getByRole('navigation', { name: /homepage utility navigation/i })).toBeVisible();
   });
 });

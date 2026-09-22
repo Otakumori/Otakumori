@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { expectHomeNavbarState, homeNavbar } from './helpers/home';
+
 const SCENES = [
   ['earlyMorning', '2026-01-02T05:00:00'],
   ['morning', '2026-01-02T08:00:00'],
@@ -72,6 +74,33 @@ async function visiblePetal(page: Page) {
   return petals.nth(index);
 }
 
+async function expectPetalCollection(page: Page, collect: () => Promise<void>) {
+  const collectionMarker = 'data-e2e-petal-collection';
+  await page.evaluate((marker) => {
+    document.documentElement.removeAttribute(marker);
+    window.addEventListener(
+      'otm:petal-collected',
+      (event) => {
+        const { value } = (event as CustomEvent<{ value: number }>).detail;
+        document.documentElement.setAttribute(marker, String(value));
+      },
+      { once: true },
+    );
+  }, collectionMarker);
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    await collect();
+    try {
+      await expect(page.locator('html')).toHaveAttribute(collectionMarker, /\d+/, { timeout: 1_000 });
+      return;
+    } catch {
+      await page.waitForTimeout(150);
+    }
+  }
+
+  await expect(page.locator('html')).toHaveAttribute(collectionMarker, /\d+/);
+}
+
 test.describe('Home petal owner acceptance', () => {
   test.setTimeout(90_000);
 
@@ -86,8 +115,8 @@ test.describe('Home petal owner acceptance', () => {
 
         const scene = page.getByTestId('mori-hero-scene');
         await expect(scene).toHaveAttribute('data-scene-bucket', bucket);
-        const header = page.locator('header[data-home-navbar-state]');
-        await expect(header).toHaveAttribute('data-home-navbar-state', 'top');
+        const header = homeNavbar(page);
+        await expectHomeNavbarState(page, 'top');
         const [sceneBox, headerPosition] = await Promise.all([
           scene.boundingBox(),
           header.evaluate((element) => window.getComputedStyle(element).position),
@@ -121,15 +150,13 @@ test.describe('Home petal owner acceptance', () => {
     await useFixedHomeTime(pointerPage, '2026-01-02T12:00:00');
     await openSettledHome(pointerPage);
     const pointerPetal = await visiblePetal(pointerPage);
-    await pointerPetal.click({ force: true });
-    await expect(pointerPetal).toHaveAttribute('data-collecting', 'true');
-    await expect(pointerPetal).toBeDisabled();
+    await expectPetalCollection(pointerPage, () => pointerPetal.click({ force: true }));
     await expect(pointerPage.locator('[data-reward-token-state="visual-qa-placeholder"]')).toBeVisible();
     const wallet = pointerPage.locator('[data-petal-wallet-source="approved-home-ui-v1"]');
     await expect(wallet).toBeVisible();
     await expect(wallet.locator('img')).toHaveAttribute(
       'src',
-      '/assets/home/ui/sakura-petal-wallet-emblem.webp',
+      /petal-wallet-satchel\.webp/,
     );
 
     const keyboardPage = await browser.newPage({ viewport: VIEWPORTS[1] });
@@ -137,8 +164,7 @@ test.describe('Home petal owner acceptance', () => {
     await openSettledHome(keyboardPage);
     const keyboardPetal = await visiblePetal(keyboardPage);
     await keyboardPetal.focus();
-    await keyboardPage.keyboard.press('Enter');
-    await expect(keyboardPetal).toHaveAttribute('data-collecting', 'true');
+    await expectPetalCollection(keyboardPage, () => keyboardPage.keyboard.press('Enter'));
 
     const touchContext = await browser.newContext({
       hasTouch: true,
@@ -150,8 +176,9 @@ test.describe('Home petal owner acceptance', () => {
     await openSettledHome(touchPage);
     const touchPetal = await visiblePetal(touchPage);
     expect(await touchPage.evaluate(() => navigator.maxTouchPoints)).toBeGreaterThan(0);
-    await touchPetal.evaluate((element: HTMLButtonElement) => element.click());
-    await expect(touchPetal).toHaveAttribute('data-collecting', 'true');
+    await expectPetalCollection(touchPage, () =>
+      touchPetal.evaluate((element: HTMLButtonElement) => element.click()),
+    );
 
     const reducedPage = await browser.newPage({ viewport: VIEWPORTS[0] });
     await reducedPage.emulateMedia({ reducedMotion: 'reduce' });
@@ -162,8 +189,7 @@ test.describe('Home petal owner acceptance', () => {
       'true',
     );
     const reducedPetal = await visiblePetal(reducedPage);
-    await reducedPetal.click({ force: true });
-    await expect(reducedPetal).toHaveAttribute('data-collecting', 'true');
+    await expectPetalCollection(reducedPage, () => reducedPetal.click({ force: true }));
 
     await Promise.all([
       pointerPage.close(),
@@ -180,9 +206,8 @@ test.describe('Home petal owner acceptance', () => {
     await useFixedHomeTime(page, '2026-01-02T12:00:00');
     await openSettledHome(page);
 
-    const header = page.locator('header[data-home-navbar-state]');
-    await expect(header).toHaveAttribute('data-home-navbar-state', 'top');
+    await expectHomeNavbarState(page, 'top');
     await page.evaluate(() => window.scrollTo(0, 120));
-    await expect(header).toHaveAttribute('data-home-navbar-state', 'scrolled');
+    await expectHomeNavbarState(page, 'scrolled');
   });
 });

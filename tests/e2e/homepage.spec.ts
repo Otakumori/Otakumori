@@ -11,8 +11,10 @@ test.describe('Homepage', () => {
     // Check that the hero section is visible
     await expectCurrentHomeHero(page);
 
-    // Check that the cherry tree is present
-    await expect(page.getByRole('img', { name: /Otakumori sakura tree scene/i })).toBeVisible();
+    // The canonical combined-world scene remains the page's descriptive image.
+    await expect(
+      page.getByRole('img', { name: /Otakumori sakura shoreline and root cavern/i }),
+    ).toBeVisible();
   });
 
   test('should respect reduced motion preference', async ({ page }) => {
@@ -23,10 +25,12 @@ test.describe('Homepage', () => {
     await page.reload();
 
     // Check that animations are disabled
-    const cherryTree = page.getByRole('img', { name: /Otakumori sakura tree scene/i });
-    await expect(cherryTree).toBeVisible();
+    const sceneImage = page.getByRole('img', {
+      name: /Otakumori sakura shoreline and root cavern/i,
+    });
+    await expect(sceneImage).toBeVisible();
 
-    const style = await cherryTree.evaluate((el) => {
+    const style = await sceneImage.evaluate((el) => {
       const computedStyle = window.getComputedStyle(el);
       return {
         transform: computedStyle.transform,

@@ -25,6 +25,22 @@ export async function expectSinglePrimaryNavigation(page: Page) {
   await expect(nav).toBeVisible();
 }
 
+export function homeNavbar(page: Page) {
+  return page.locator('header.navbar-scroll');
+}
+
+export async function expectHomeNavbarState(page: Page, state: 'top' | 'scrolled') {
+  const navbar = homeNavbar(page);
+
+  await expect(navbar).toHaveCount(1);
+  await expect(navbar).toBeVisible();
+  if (state === 'scrolled') {
+    await expect(navbar).toHaveClass(/\bscrolled\b/);
+  } else {
+    await expect(navbar).not.toHaveClass(/\bscrolled\b/);
+  }
+}
+
 export function rootFooter(page: Page) {
   return page.getByTestId('mori-root-footer');
 }
@@ -44,9 +60,6 @@ export async function expectRootFooterContract(page: Page) {
     'href',
     '/profile/petals',
   );
-  await expect(page.getByRole('button', { name: /open soapstone note/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /read a soapstone/i })).toBeVisible();
   await expect(page.getByRole('navigation', { name: /otakumori social links/i })).toBeVisible();
-  await expect(
-    page.getByRole('navigation', { name: /homepage utility navigation/i }),
-  ).toBeVisible();
 }
