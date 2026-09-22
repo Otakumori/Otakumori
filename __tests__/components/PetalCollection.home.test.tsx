@@ -8,6 +8,12 @@ import {
 } from '@/app/contexts/PetalCollectionContext';
 import { COLLECTION } from '@/app/lib/petals/constants';
 
+vi.mock('next/image', () => ({
+  default: ({ alt = '', fill: _fill, priority: _priority, sizes: _sizes, ...props }: any) => (
+    <img alt={alt} {...props} />
+  ),
+}));
+
 vi.mock('@/app/lib/analytics/petals', () => ({
   trackPetalCollection: vi.fn(),
   trackPetalMilestone: vi.fn(),

@@ -2,6 +2,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { pathToFileURL } from 'url';
 
 interface AssetRole {
   [key: string]: string | undefined;
@@ -231,25 +232,31 @@ function validateAssets() {
   // Validate manifest paths
   // '\n Validating manifest paths...'
 
-  function validateManifestPaths(obj: any, prefix: string = '') {
+  function validateManifestPaths(obj: unknown, prefix: string = '') {
+    if (typeof obj !== 'object' || obj === null) return;
+
     for (const [key, value] of Object.entries(obj)) {
       const currentPath = prefix ? `${prefix}.${key}` : key;
 
-      if (typeof value === 'string') {
-        // Ensure all paths start with /assets/
-        if (!value.startsWith('/assets/')) {
+      if (typeof value === 'object' && value !== null && typeof value.path === 'string') {
+        const assetPath = value.path;
+        const publicPath = assetPath.startsWith('public/') ? assetPath.slice('public'.length) : assetPath;
+
+        // Manifests may use either /assets/* runtime URLs or public/assets/* source paths.
+        if (!publicPath.startsWith('/assets/')) {
           console.error(
-            `   Asset for ${currentPath} must live under /public/assets/* (got: ${value})`,
+            `   Asset for ${currentPath} must live under /public/assets/* (got: ${assetPath})`,
           );
           hasErrors = true;
         }
 
-        const fullPath = join(process.cwd(), 'public', value);
-        if (!existsSync(fullPath)) {
-          console.warn(`    Asset not found: ${value}`);
+        if (!assetPath.includes('*')) {
+          const fullPath = join(process.cwd(), 'public', publicPath);
+          if (!existsSync(fullPath)) {
+            console.warn(`    Asset not found: ${assetPath}`);
+          }
         }
       } else if (typeof value === 'object' && value !== null) {
-        // Recursively validate nested objects
         validateManifestPaths(value, currentPath);
       }
     }
@@ -266,8 +273,8 @@ function validateAssets() {
   }
 }
 
-// Run validation
-if (require.main === module) {
+// Run only when invoked as the script entrypoint (the repository is ESM).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const success = validateAssets();
   process.exit(success ? 0 : 1);
 }

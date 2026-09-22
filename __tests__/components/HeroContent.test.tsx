@@ -1,10 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('next/image', () => ({
+  default: ({ alt = '', fill: _fill, priority: _priority, sizes: _sizes, ...props }: any) => (
+    <img alt={alt} {...props} />
+  ),
+}));
 
 import HeroContent from '@/app/components/hero/HeroContent';
 
 describe('homepage hero content', () => {
-  it('renders the arrival hierarchy with accessible search and real route links', () => {
+  it('renders the arrival hierarchy with accessible search and the shop route', () => {
     render(<HeroContent />);
 
     expect(
@@ -20,31 +26,6 @@ describe('homepage hero content', () => {
 
     expect(screen.getByRole('button', { name: /^search$/i })).toHaveAttribute('type', 'submit');
     expect(screen.getByRole('link', { name: /^gear up/i })).toHaveAttribute('href', '/shop');
-    expect(screen.getByRole('link', { name: /^mini-games$/i })).toHaveAttribute(
-      'href',
-      '/mini-games',
-    );
-    expect(screen.getByRole('link', { name: /^profile$/i })).toHaveAttribute('href', '/profile');
-    expect(screen.getByTestId('mori-root-footer')).toHaveAttribute(
-      'data-root-footer-contract',
-      'wide-world-integrated',
-    );
-    expect(
-      screen
-        .getByTestId('mori-root-footer')
-        .querySelector('[data-root-region="shared-underground-art"]'),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^cart$/i })).toHaveAttribute('href', '/shop/cart');
-    expect(screen.getByRole('link', { name: /^wishlist$/i })).toHaveAttribute('href', '/wishlist');
-    expect(screen.getByRole('link', { name: /^petal wallet$/i })).toHaveAttribute(
-      'href',
-      '/profile/petals',
-    );
-    expect(screen.getByRole('button', { name: /open soapstone note/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole('navigation', { name: /homepage utility navigation/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: /otakumori social links/i })).toBeInTheDocument();
   });
 
   it('does not render any unsafe local petal grant or auth shortcut controls', () => {

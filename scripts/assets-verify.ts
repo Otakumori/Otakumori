@@ -6,6 +6,7 @@
 
 import { readFileSync, statSync } from 'fs';
 import { join } from 'path';
+import { pathToFileURL } from 'url';
 import { glob } from 'glob';
 
 interface AssetEntry {
@@ -260,8 +261,8 @@ async function main() {
   }
 }
 
-// Run if called directly
-if (require.main === module) {
+// Run only when invoked as the script entrypoint (the repository is ESM).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main();
 }
 
