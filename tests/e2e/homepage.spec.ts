@@ -143,17 +143,14 @@ test.describe('Homepage', () => {
       }
     }
 
-    // Check for proper button labels
-    const buttons = page.locator('button');
+    // Exercise the browser accessibility tree rather than a partial approximation
+    // of the accessible-name algorithm. This intentionally excludes hidden controls.
+    const buttons = page.getByRole('button');
     const buttonCount = await buttons.count();
+    expect(buttonCount).toBeGreaterThan(0);
 
     for (let i = 0; i < buttonCount; i++) {
-      const button = buttons.nth(i);
-      const ariaLabel = await button.getAttribute('aria-label');
-      const textContent = await button.textContent();
-
-      // Should have either aria-label or text content
-      expect(ariaLabel || textContent).toBeTruthy();
+      await expect(buttons.nth(i)).toHaveAccessibleName(/\S+/);
     }
   });
 
