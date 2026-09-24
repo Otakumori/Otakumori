@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "status": "Reconciled register. Approval status is authoritative; presence in public/ is not approval.",
+  "doNotMarkCompleteWithoutOwnerAcceptance": true,
+  "approvedAssetExists": [
+    {
+      "area": "empty states",
+      "assets": ["cart", "wishlist", "messages", "collection", "search"],
+      "decision": "Cart, wishlist, search, and orders are wired. Messages and collection remain approved but under-integrated."
+    },
+    {
+      "area": "destination presentation",
+      "assets": ["orders", "admin", "achievements", "trade-center", "music-player"],
+      "decision": "Approved art exists; only orders is wired. Do not call these missing or create duplicate destination art."
+    },
+    {
+      "area": "avatar creator UI",
+      "assets": ["six presentation assets", "seven category controls", "six action controls"],
+      "decision": "The runtime helper exposes all 19 approved assets. The generic avatar editor still needs a bounded presentation-only integration."
+    },
+    {
+      "area": "game catalog",
+      "assets": ["Bubble Ragdoll", "Maid Café Manager", "Puzzle Reveal", "Dungeon of Desire", "Thigh Colosseum"],
+      "decision": "Approved cover and hub art exists. Maid Café Manager is now present in the active registry."
+    }
+  ],
+  "productionCandidateExistsOwnerQa": [
+    {
+      "area": "Mori feature family",
+      "assets": ["home shrine", "shop market stall", "apparel kimono", "accessories charm wreath", "collection journal", "quests katana", "blog scroll", "search magnifier", "messages envelope", "notifications bell", "avatar frame", "Sakura crest/medallion variants"],
+      "decision": "Candidate assets require in-context owner acceptance. They are neither approved runtime authority nor missing art."
+    },
+    {
+      "area": "first-petal reward",
+      "assets": ["primary medallion", "growth crest", "diamond crest", "bloom crest"],
+      "decision": "Existing non-tassel Sakura candidates available for owner QA. Evaluate at reward scale before commissioning new art; never select the tassel seal by default."
+    },
+    {
+      "area": "Home Soapstone",
+      "assets": ["mori-soapstone-monument"],
+      "decision": "Semantic interaction exists and the candidate visual is integrated for owner acceptance; do not rebuild the interaction."
+    }
+  ],
+  "wiringProblems": [
+    "Approved avatar creator art was only partially exposed by lib/approved-visual-assets.ts; the helper is now complete.",
+    "Maid Café Manager had an approved route and art but was absent from lib/games.meta.json; it is now cataloged without mechanics changes.",
+    "Navbar used large Home feature illustrations as 30px controls; it now uses semantic vectors and retains accessible labels.",
+    "Home runtime used source-like PNG copies at display sizes between 18px and 432px; it now uses documented WebP derivatives while source masters remain protected."
+  ],
+  "codeOrVectorPreferred": [
+    "close, back, menu, search, and share controls",
+    "online, offline, loading, success, warning, error, new, and verified state treatment",
+    "small badge counts, form affordances, and conventional navigation semantics"
+  ],
+  "genuinelyMissing": [
+    {
+      "area": "small Mori control glyph family",
+      "roles": ["home", "shop", "apparel", "accessories", "Petal Wallet", "collection", "quests", "blog", "cart", "filter", "wishlist", "messages", "notifications", "settings", "save"],
+      "displaySizes": [16, 20, 24, 32],
+      "constraint": "Build a coherent vector-first family; the cart must read as a cart, settings as a cog, Petal Wallet as a satchel, and arrows as directions."
+    },
+    {
+      "area": "avatar production content",
+      "roles": ["body morphs", "faces", "hairstyles", "outfits", "accessories", "thumbnail/render previews", "compatibility metadata"],
+      "constraint": "This is not solved by category controls."
+    },
+    {
+      "area": "gameplay art",
+      "roles": ["Petal Samurai", "Petal Storm Rhythm", "Otaku Beat-Em-Up", "Blossomware"],
+      "constraint": "Catalog presentation and gameplay visual families are separate requirements."
+    }
+  ],
+  "legacyOrObsolete": [
+    "/games is a legacy iframe entry surface; /mini-games is the current application hub. Preserve both until a separately approved convergence.",
+    "bubble-girl is a compatibility identifier. thigh-coliseum remains the current age-gated runtime/compatibility slug for the Thigh Colosseum product identity; /mini-games/thigh-colosseum is a future routing-convergence consideration, not a current route.",
+    "Large feature illustrations are not a final small-control glyph strategy."
+  ],
+  "avatarRuntimeStillNeeded": [
+    "canonical skeletal GLB/glTF contract",
+    "rigged outfit mesh topology",
+    "body-fit and morph compatibility",
+    "material slots and cross-hatch shader/texture contract",
+    "LOD meshes and mobile budgets",
+    "attachment points and spring-bone groups",
+    "cloth/body clipping validation",
+    "game representation adapters"
+  ]
+}

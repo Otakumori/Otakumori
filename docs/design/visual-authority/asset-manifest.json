@@ -1,0 +1,821 @@
+{
+  "schemaVersion": 2,
+  "package": "otakumori-approved-visual-assets-batch-2",
+  "created": "2026-08-31",
+  "repo": "Otakumori/Otakumori",
+  "cutoff": "Contains only owner-approved artwork produced after otakumori-mori-status-ornaments-v1.zip",
+  "approvedAssetCount": 39,
+  "assets": [
+    {
+      "id": "mori-empty-cart-kinchaku",
+      "family": "empty-state",
+      "role": "cart-empty",
+      "approved": true,
+      "sourceOriginalFilename": "japanese_sakura_kinchaku_pouch.png",
+      "source": "docs/design/references/approved/batch-2/empty-states/mori-empty-cart-kinchaku-source.png",
+      "runtime": "public/assets/ui/mori/empty-states/mori-empty-cart-kinchaku.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        768,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 409796,
+      "notes": "Approved replacement for the rejected cart illustration. This is an empty-cart state, not the Petal Wallet."
+    },
+    {
+      "id": "mori-empty-wishlist",
+      "family": "empty-state",
+      "role": "wishlist-empty",
+      "approved": true,
+      "sourceOriginalFilename": "empty_heart_keepsake_box_with_sakura.png",
+      "source": "docs/design/references/approved/batch-2/empty-states/mori-empty-wishlist-source.png",
+      "runtime": "public/assets/ui/mori/empty-states/mori-empty-wishlist.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        757,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 465774,
+      "notes": ""
+    },
+    {
+      "id": "mori-empty-messages",
+      "family": "empty-state",
+      "role": "messages-empty",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_message_stone_charm.png",
+      "source": "docs/design/references/approved/batch-2/empty-states/mori-empty-messages-source.png",
+      "runtime": "public/assets/ui/mori/empty-states/mori-empty-messages.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        757,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 123014,
+      "notes": ""
+    },
+    {
+      "id": "mori-empty-collection",
+      "family": "empty-state",
+      "role": "collection-empty",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_collection_tome.png",
+      "source": "docs/design/references/approved/batch-2/empty-states/mori-empty-collection-source.png",
+      "runtime": "public/assets/ui/mori/empty-states/mori-empty-collection.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        768,
+        745
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 644588,
+      "notes": ""
+    },
+    {
+      "id": "mori-empty-search-results",
+      "family": "empty-state",
+      "role": "search-no-results",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_magnifying_glass_still_life.png",
+      "source": "docs/design/references/approved/batch-2/empty-states/mori-empty-search-results-source.png",
+      "runtime": "public/assets/ui/mori/empty-states/mori-empty-search-results.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        768,
+        767
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 631380,
+      "notes": ""
+    },
+    {
+      "id": "mori-destination-orders",
+      "family": "destination",
+      "role": "orders",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_parcel_orders_still_life.png",
+      "source": "docs/design/references/approved/batch-2/destinations/mori-destination-orders-source.png",
+      "runtime": "public/assets/ui/mori/destinations/mori-destination-orders.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1021,
+        1024
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 1041682,
+      "notes": ""
+    },
+    {
+      "id": "mori-destination-admin",
+      "family": "destination",
+      "role": "admin",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_shrine_admin_emblem.png",
+      "source": "docs/design/references/approved/batch-2/destinations/mori-destination-admin-source.png",
+      "runtime": "public/assets/ui/mori/destinations/mori-destination-admin.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        734,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 654788,
+      "notes": ""
+    },
+    {
+      "id": "mori-destination-achievements",
+      "family": "destination",
+      "role": "achievements",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_achievement_medal.png",
+      "source": "docs/design/references/approved/batch-2/destinations/mori-destination-achievements-source.png",
+      "runtime": "public/assets/ui/mori/destinations/mori-destination-achievements.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        718,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 468030,
+      "notes": ""
+    },
+    {
+      "id": "mori-destination-trade-center",
+      "family": "destination",
+      "role": "trade-center",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_trade_shrine_altar.png",
+      "source": "docs/design/references/approved/batch-2/destinations/mori-destination-trade-center-source.png",
+      "runtime": "public/assets/ui/mori/destinations/mori-destination-trade-center.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 1193792,
+      "notes": ""
+    },
+    {
+      "id": "mori-destination-music-player",
+      "family": "destination",
+      "role": "music-player",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_shrine_gramophone_relic.png",
+      "source": "docs/design/references/approved/batch-2/destinations/mori-destination-music-player-source.png",
+      "runtime": "public/assets/ui/mori/destinations/mori-destination-music-player.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 1218604,
+      "notes": ""
+    },
+    {
+      "id": "avatar-creator-stage-plinth",
+      "family": "avatar-presentation",
+      "role": "stage-plinth",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_bronze_stone_pedestal.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-stage-plinth-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-stage-plinth.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1219,
+        1188
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 808572,
+      "notes": ""
+    },
+    {
+      "id": "avatar-creator-backplate-arch",
+      "family": "avatar-presentation",
+      "role": "backplate-arch",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_shrine_avatar_frame.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-backplate-arch-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-backplate-arch.webp",
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "runtimeDimensions": [
+        1122,
+        1402
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 1189340,
+      "notes": ""
+    },
+    {
+      "id": "avatar-creator-equipment-slot-frame",
+      "family": "avatar-presentation",
+      "role": "equipment-slot-frame",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_avatar_frame.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-equipment-slot-frame-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-equipment-slot-frame.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        759,
+        768
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 209046,
+      "notes": ""
+    },
+    {
+      "id": "avatar-creator-cosmetic-token",
+      "family": "avatar-presentation",
+      "role": "cosmetic-rarity-token",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_bronze_medallion.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-cosmetic-token-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-cosmetic-token.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        768,
+        767
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 418386,
+      "notes": "Presentation base only. Rarity semantics/colors must remain programmatic."
+    },
+    {
+      "id": "avatar-creator-grounding-ring",
+      "family": "avatar-presentation",
+      "role": "grounding-ring",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_stone_ring_frame.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-grounding-ring-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-grounding-ring.webp",
+      "sourceDimensions": [
+        1448,
+        1086
+      ],
+      "runtimeDimensions": [
+        1280,
+        960
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 364072,
+      "notes": ""
+    },
+    {
+      "id": "avatar-creator-preset-reliquary",
+      "family": "avatar-presentation",
+      "role": "preset-reliquary",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_lacquer_keepsake_box.png",
+      "source": "docs/design/references/approved/batch-2/avatar/presentation/avatar-creator-preset-reliquary-source.png",
+      "runtime": "public/assets/avatar/creator/presentation/avatar-creator-preset-reliquary.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 890862,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-hair",
+      "family": "avatar-control",
+      "role": "hair",
+      "approved": true,
+      "sourceOriginalFilename": "mori_style_sakura_hair_ornament.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-hair-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-hair.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        511,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 204370,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-face",
+      "family": "avatar-control",
+      "role": "face",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_mask_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-face-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-face.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        505,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 209718,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-eyes",
+      "family": "avatar-control",
+      "role": "eyes",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_eye_medallion.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-eyes-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-eyes.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        492,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 288624,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-body",
+      "family": "avatar-control",
+      "role": "body",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_bronze_mannequin_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-body-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-body.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        483,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 228262,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-outfit",
+      "family": "avatar-control",
+      "role": "outfit",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_kimono_icon.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-outfit-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-outfit.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        504,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 241030,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-accessories",
+      "family": "avatar-control",
+      "role": "accessories",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_accessories_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-accessories-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-accessories.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        492,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 200946,
+      "notes": ""
+    },
+    {
+      "id": "avatar-category-weapon-prop",
+      "family": "avatar-control",
+      "role": "weapon-prop",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_crossed_wapons_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-category-weapon-prop-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-category-weapon-prop.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        512,
+        510
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 219294,
+      "notes": "Approved sword/gun paired category glyph. Runtime filename fixes the source typo."
+    },
+    {
+      "id": "avatar-action-color-material",
+      "family": "avatar-control",
+      "role": "color-material",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_artisan_palette_crest.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-color-material-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-color-material.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        512,
+        494
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 228576,
+      "notes": ""
+    },
+    {
+      "id": "avatar-action-presets",
+      "family": "avatar-control",
+      "role": "presets",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_preset_card_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-presets-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-presets.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        512,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 213358,
+      "notes": ""
+    },
+    {
+      "id": "avatar-action-randomize",
+      "family": "avatar-control",
+      "role": "randomize",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_shuffle_die_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-randomize-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-randomize.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        509,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 230124,
+      "notes": ""
+    },
+    {
+      "id": "avatar-action-undo-reset",
+      "family": "avatar-control",
+      "role": "undo-reset",
+      "approved": true,
+      "sourceOriginalFilename": "sakura_undo_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-undo-reset-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-undo-reset.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        505,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 225514,
+      "notes": ""
+    },
+    {
+      "id": "avatar-action-save",
+      "family": "avatar-control",
+      "role": "save",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_save_talisman.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-save-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-save.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        512,
+        477
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 198108,
+      "notes": ""
+    },
+    {
+      "id": "avatar-action-preview",
+      "family": "avatar-control",
+      "role": "preview",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_preview_mirror_emblem.png",
+      "source": "docs/design/references/approved/batch-2/avatar/controls/avatar-action-preview-source.png",
+      "runtime": "public/assets/avatar/creator/controls/avatar-action-preview.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        427,
+        512
+      ],
+      "sourceHasAlpha": true,
+      "runtimeBytes": 106174,
+      "notes": ""
+    },
+    {
+      "id": "game-bubble-ragdoll-cover",
+      "family": "game-cover",
+      "role": "bubble-ragdoll",
+      "approved": true,
+      "sourceOriginalFilename": "bubble_ragdoll_physics_lab.png",
+      "source": "docs/design/references/approved/batch-2/games/covers/game-bubble-ragdoll-cover-source.png",
+      "runtime": "public/assets/games/covers/game-bubble-ragdoll-cover.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "runtimeDimensions": [
+        1024,
+        1536
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 352038,
+      "notes": ""
+    },
+    {
+      "id": "game-bubble-ragdoll-hub",
+      "family": "game-hub",
+      "role": "bubble-ragdoll",
+      "approved": true,
+      "sourceOriginalFilename": "bubble_ragdoll_otaku_mori_physics_lab.png",
+      "source": "docs/design/references/approved/batch-2/games/hub/game-bubble-ragdoll-hub-source.png",
+      "runtime": "public/assets/games/hub/game-bubble-ragdoll-hub.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 327274,
+      "notes": ""
+    },
+    {
+      "id": "game-maid-cafe-manager-cover",
+      "family": "game-cover",
+      "role": "maid-cafe-manager",
+      "approved": true,
+      "sourceOriginalFilename": "maid_café_manager_collector_s_edition.png",
+      "source": "docs/design/references/approved/batch-2/games/covers/game-maid-cafe-manager-cover-source.png",
+      "runtime": "public/assets/games/covers/game-maid-cafe-manager-cover.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "runtimeDimensions": [
+        1024,
+        1536
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 428348,
+      "notes": ""
+    },
+    {
+      "id": "game-maid-cafe-manager-hub",
+      "family": "game-hub",
+      "role": "maid-cafe-manager",
+      "approved": true,
+      "sourceOriginalFilename": "otaku_mori_maid_café_manager.png",
+      "source": "docs/design/references/approved/batch-2/games/hub/game-maid-cafe-manager-hub-source.png",
+      "runtime": "public/assets/games/hub/game-maid-cafe-manager-hub.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 331384,
+      "notes": ""
+    },
+    {
+      "id": "game-puzzle-reveal-cover",
+      "family": "game-cover",
+      "role": "puzzle-reveal",
+      "approved": true,
+      "sourceOriginalFilename": "puzzle_reveal_sakura_puzzle_collection.png",
+      "source": "docs/design/references/approved/batch-2/games/covers/game-puzzle-reveal-cover-source.png",
+      "runtime": "public/assets/games/covers/game-puzzle-reveal-cover.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "runtimeDimensions": [
+        1024,
+        1536
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 429192,
+      "notes": ""
+    },
+    {
+      "id": "game-puzzle-reveal-hub",
+      "family": "game-hub",
+      "role": "puzzle-reveal",
+      "approved": true,
+      "sourceOriginalFilename": "otaku_mori_puzzle_reveal.png",
+      "source": "docs/design/references/approved/batch-2/games/hub/game-puzzle-reveal-hub-source.png",
+      "runtime": "public/assets/games/hub/game-puzzle-reveal-hub.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 354084,
+      "notes": ""
+    },
+    {
+      "id": "game-dungeon-of-desire-cover",
+      "family": "game-cover",
+      "role": "dungeon-of-desire",
+      "approved": true,
+      "sourceOriginalFilename": "gothic_dungeon_of_desire_rpg_cover.png",
+      "source": "docs/design/references/approved/batch-2/games/covers/game-dungeon-of-desire-cover-source.png",
+      "runtime": "public/assets/games/covers/game-dungeon-of-desire-cover.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "runtimeDimensions": [
+        1024,
+        1536
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 372328,
+      "notes": ""
+    },
+    {
+      "id": "game-dungeon-of-desire-hub",
+      "family": "game-hub",
+      "role": "dungeon-of-desire",
+      "approved": true,
+      "sourceOriginalFilename": "dungeon_of_desire_sakura_shadows.png",
+      "source": "docs/design/references/approved/batch-2/games/hub/game-dungeon-of-desire-hub-source.png",
+      "runtime": "public/assets/games/hub/game-dungeon-of-desire-hub.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 313826,
+      "notes": ""
+    },
+    {
+      "id": "game-thigh-colosseum-cover",
+      "family": "game-cover",
+      "role": "thigh-colosseum",
+      "approved": true,
+      "sourceOriginalFilename": "ornate_sakura_colosseum_game_cover.png",
+      "source": "docs/design/references/approved/batch-2/games/covers/game-thigh-colosseum-cover-source.png",
+      "runtime": "public/assets/games/covers/game-thigh-colosseum-cover.webp",
+      "sourceDimensions": [
+        1024,
+        1536
+      ],
+      "runtimeDimensions": [
+        1024,
+        1536
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 405484,
+      "notes": "Final approved correction. Supersedes all prior Thigh Colosseum covers."
+    },
+    {
+      "id": "game-thigh-colosseum-hub",
+      "family": "game-hub",
+      "role": "thigh-colosseum",
+      "approved": true,
+      "sourceOriginalFilename": "giant_sakura_warlord_in_a_ruined_fortress.png",
+      "source": "docs/design/references/approved/batch-2/games/hub/game-thigh-colosseum-hub-source.png",
+      "runtime": "public/assets/games/hub/game-thigh-colosseum-hub.webp",
+      "sourceDimensions": [
+        1254,
+        1254
+      ],
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "sourceHasAlpha": false,
+      "runtimeBytes": 360886,
+      "notes": "Final approved text-free hub master. Supersedes all prior Thigh Colosseum hub attempts."
+    }
+  ],
+  "excluded": [
+    {
+      "pattern": "kawaii_sakura_shopping_cart.png / sakura_antique_empty_cart.png / ornate_sakura_fantasy_shopping_cart.png",
+      "reason": "Cart empty-state direction rejected. Approved kinchaku replacement is included instead."
+    },
+    {
+      "pattern": "gilded_sakura_petal_relic.png",
+      "reason": "User liked the artwork but runtime role was unresolved. Deferred rather than misclassifying it as Petal Wallet or currency art."
+    },
+    {
+      "pattern": "all *asset_sheet*, *collage*, *montage*, *mockup*, *approval_sheet* outputs after the prior ZIP",
+      "reason": "Generation drift / review artifacts, explicitly rejected as production deliverables."
+    },
+    {
+      "pattern": "thigh_colosseum_sakura_arena_showdown.png / thigh_colosseum_sakura_arena_chase.png / thigh_colosseum_sakura_arena_clash.png / thigh_colosseum_game_box_art.png",
+      "reason": "Superseded by final approved corrected case + hub masters."
+    }
+  ],
+  "runtimePolicy": {
+    "selfHosted": true,
+    "sourceMastersAreRuntimeForbidden": true,
+    "runtimeFormat": "WebP",
+    "uiAndAvatarTransparency": "preserve when source contains alpha",
+    "gameCoverAndHubComposition": "preserve full approved composition; do not auto-trim",
+    "defaultDecoding": "async",
+    "defaultLoading": "lazy unless proven above-fold critical",
+    "noGlobalPreload": true,
+    "noRasterAnimationLoops": true,
+    "reducedMotion": true,
+    "accessibility": "visual art is never the sole semantic label"
+  }
+}

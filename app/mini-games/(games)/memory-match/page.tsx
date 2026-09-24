@@ -3,8 +3,8 @@ import MemoryMatchClient from './MemoryMatchClient';
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Memory Match | Otaku-mori',
-    description: 'Recall the faces bound by fate.',
+    title: 'Memory Card / Defrag | Otaku-mori',
+    description: 'Restore paired relic fragments in the Otaku-mori memory archive.',
     url: '/mini-games/memory-match',
   });
 }

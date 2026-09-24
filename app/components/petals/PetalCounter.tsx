@@ -1,84 +1,98 @@
 'use client';
 
-import { useState, useEffect, useMemo, memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ANIMATION, UI } from '@/app/lib/petals/constants';
+import { useState, useEffect, useMemo, memo } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useAuth } from '@clerk/nextjs';
+import Image from 'next/image';
+import { ANIMATION, COLLECTION, UI } from '@/app/lib/petals/constants';
+import { isVisualQaAuthEnabled, resolveVisualQaAuthState } from '@/app/lib/visual-qa/mode';
+
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/runtime/petal-wallet-satchel.webp';
 
 interface PetalCounterProps {
   count: number;
   lastValue?: number;
+  guestDailyLimit?: number;
+  guestDailyRemaining?: number;
+  guestDailyCapReached?: boolean;
 }
 
-function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
+type PetalCounterInnerProps = PetalCounterProps & {
+  isSignedIn: boolean;
+};
+
+function PetalCounterComponent(props: PetalCounterProps) {
+  if (isVisualQaAuthEnabled()) {
+    return <PetalCounterInner {...props} isSignedIn={resolveVisualQaAuthState() === 'signed-in'} />;
+  }
+
+  return <ClerkPetalCounter {...props} />;
+}
+
+function ClerkPetalCounter(props: PetalCounterProps) {
+  const { isSignedIn } = useAuth();
+  return <PetalCounterInner {...props} isSignedIn={Boolean(isSignedIn)} />;
+}
+
+function PetalCounterInner({
+  count,
+  lastValue = 1,
+  guestDailyLimit = 50,
+  guestDailyRemaining = 50,
+  guestDailyCapReached = false,
+  isSignedIn,
+}: PetalCounterInnerProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
   const [showMultiplier, setShowMultiplier] = useState(false);
   const [prevCount, setPrevCount] = useState(count);
-  const [displayCount, setDisplayCount] = useState(count);
-  const animationFrameRef = useRef<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
-  // Smooth number animation
   useEffect(() => {
-    if (count !== displayCount) {
-      const diff = count - displayCount;
-      const duration = 300; // ms
-      const startTime = Date.now();
-      const startValue = displayCount;
+    if (count === prevCount) return undefined;
 
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Ease-out function
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(startValue + diff * easeOut);
-
-        setDisplayCount(current);
-
-        if (progress < 1) {
-          animationFrameRef.current = requestAnimationFrame(animate);
-        } else {
-          setDisplayCount(count); // Ensure final value is exact
-        }
-      };
-
-      animationFrameRef.current = requestAnimationFrame(animate);
-
-      return () => {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-      };
-    }
-  }, [count, displayCount]);
-
-  // Trigger pulse on count change
-  useEffect(() => {
     if (count > prevCount) {
       setIsPulsing(true);
 
       if (lastValue === 5) {
         setShowMultiplier(true);
-        setTimeout(() => setShowMultiplier(false), 1500);
       }
 
-      setTimeout(() => setIsPulsing(false), ANIMATION.COUNTER_PULSE);
+      const pulseTimer = window.setTimeout(() => setIsPulsing(false), ANIMATION.COUNTER_PULSE);
+      const multiplierTimer =
+        lastValue === 5 ? window.setTimeout(() => setShowMultiplier(false), 1500) : undefined;
+
       setPrevCount(count);
+      return () => {
+        window.clearTimeout(pulseTimer);
+        if (multiplierTimer) window.clearTimeout(multiplierTimer);
+      };
     }
+
+    setPrevCount(count);
+    return undefined;
   }, [count, prevCount, lastValue]);
 
   const formattedCount = useMemo(() => {
-    return displayCount.toLocaleString();
-  }, [displayCount]);
+    return count.toLocaleString();
+  }, [count]);
+  const shouldShowGuestPrompt =
+    !isSignedIn &&
+    (guestDailyCapReached ||
+      count >= COLLECTION.GUEST_DAILY_PROMPT_THRESHOLD ||
+      guestDailyRemaining <= guestDailyLimit - COLLECTION.GUEST_DAILY_PROMPT_THRESHOLD);
 
   return (
     <motion.button
       type="button"
-      aria-label={`Petals collected: ${displayCount}`}
+      data-petal-counter
+      aria-label={`Petals collected: ${count}`}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 20 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      transition={
+        prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 25 }
+      }
       className="fixed z-50 cursor-default outline-none focus:ring-2 focus:ring-pink-400/50 focus:ring-offset-2 focus:ring-offset-black/50 rounded-full"
       style={{
         bottom: `${UI.COUNTER_BOTTOM_RIGHT_MARGIN}px`,
@@ -87,122 +101,90 @@ function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => e.preventDefault()}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
     >
-      {/* Glow effect */}
-      <motion.div
-        className="absolute inset-0 rounded-full blur-xl opacity-60"
-        style={{
-          background: 'radial-gradient(circle, rgba(236,72,153,0.4) 0%, transparent 70%)',
-        }}
-        animate={{
-          scale: isPulsing ? [1, 1.3, 1] : 1,
-          opacity: isPulsing ? [0.6, 0.9, 0.6] : 0.6,
-        }}
-        transition={{ duration: 0.5 }}
-      />
-
-      {/* Main container */}
       <motion.div
         className={`
-          relative flex items-center gap-2.5 px-4 py-2.5
-          bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-pink-500/20
-          backdrop-blur-xl backdrop-saturate-150
-          border border-pink-400/40 rounded-full
-          shadow-2xl shadow-pink-500/20
+          relative flex min-w-[12rem] items-center gap-3 rounded-[1.1rem] border border-[#f6dcc7]/30 bg-[#160d12]/76 p-2 pr-4
+          shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur-[5px]
           transition-all duration-300
-          ${isHovered ? 'w-auto border-pink-400/60' : 'w-[70px]'}
-          ${isPulsing ? 'ring-4 ring-pink-400/50 ring-offset-2 ring-offset-black/50' : ''}
+          ${isHovered ? 'border-[#ffe2d0]/54' : ''}
+          ${isPulsing ? 'ring-1 ring-[#f6c9bc]/55 ring-offset-1 ring-offset-[#160d12]/60' : ''}
         `}
         animate={{
-          scale: isPulsing ? [1, 1.08, 1] : 1,
+          scale: isPulsing && !prefersReducedMotion ? [1, 1.035, 1] : 1,
           boxShadow: isPulsing
             ? [
-                '0 0 20px rgba(236,72,153,0.3)',
-                '0 0 40px rgba(236,72,153,0.6)',
-                '0 0 20px rgba(236,72,153,0.3)',
+                '0 10px 28px rgba(0,0,0,0.32)',
+                '0 12px 30px rgba(76,39,42,0.38)',
+                '0 10px 28px rgba(0,0,0,0.32)',
               ]
-            : '0 10px 40px rgba(236,72,153,0.2)',
+            : '0 10px 28px rgba(0,0,0,0.32)',
         }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.34 }}
       >
-        {/* Icon */}
-        <motion.svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          className="flex-shrink-0 text-pink-300"
-          animate={{
-            rotate: isPulsing ? [0, 15, -15, 0] : 0,
-            scale: isPulsing ? [1, 1.2, 1] : 1,
-          }}
-          transition={{ duration: 0.5 }}
-        >
-          <path
-            d="M12 2C12 2 10 6 10 8C10 10 11 11 12 11C13 11 14 10 14 8C14 6 12 2 12 2Z"
-            fill="currentColor"
-            opacity="0.9"
-          />
-          <path
-            d="M12 13C12 13 10 17 10 19C10 21 11 22 12 22C13 22 14 21 14 19C14 17 12 13 12 13Z"
-            fill="currentColor"
-            opacity="0.7"
-          />
-          <path
-            d="M2 12C2 12 6 10 8 10C10 10 11 11 11 12C11 13 10 14 8 14C6 14 2 12 2 12Z"
-            fill="currentColor"
-            opacity="0.8"
-          />
-          <path
-            d="M13 12C13 12 17 10 19 10C21 10 22 11 22 12C22 13 21 14 19 14C17 14 13 12 13 12Z"
-            fill="currentColor"
-            opacity="0.8"
-          />
-        </motion.svg>
-
-        {/* Count */}
         <motion.span
-          key={displayCount}
-          className="text-base font-bold text-white tabular-nums min-w-[30px] text-right"
-          style={{
-            textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(236,72,153,0.4)',
+          aria-hidden="true"
+          className="grid h-14 w-14 flex-shrink-0 place-items-center overflow-hidden rounded-[0.85rem] border border-[#f7dec8]/20 bg-[#10090d]/44"
+          data-petal-wallet-source="approved-home-ui-v1"
+          animate={{
+            rotate: isPulsing && !prefersReducedMotion ? [0, 5, -4, 0] : 0,
+            scale: isPulsing && !prefersReducedMotion ? [1, 1.07, 1] : 1,
           }}
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 10, opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
         >
-          {formattedCount}
+          <Image
+            src={PETAL_WALLET_EMBLEM_SOURCE}
+            alt=""
+            width={56}
+            height={56}
+            sizes="56px"
+            className="h-full w-full object-contain p-0.5"
+          />
         </motion.span>
 
-        {/* Label */}
-        <AnimatePresence>
-          {isHovered && (
-            <motion.span
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 'auto' }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-xs text-pink-200/80 whitespace-nowrap overflow-hidden font-medium"
-            >
-              Petals
-            </motion.span>
-          )}
-        </AnimatePresence>
+        <span className="min-w-0 text-left">
+          <span className="font-ui block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#f7d8cb]/72">
+            Petal Wallet
+          </span>
+          <motion.span
+            key={count}
+            className="mt-0.5 block min-w-[30px] text-lg font-semibold tabular-nums text-[#fff4e8]"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.56)' }}
+            initial={{ y: -8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 8, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {formattedCount}
+          </motion.span>
+        </span>
 
-        {/* Subtle shimmer effect */}
         <motion.div
           className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"
           initial={{ x: '-100%' }}
-          animate={{
-            x: isPulsing ? ['100%', '200%'] : '-100%',
-          }}
-          transition={{ duration: 1, repeat: Infinity, repeatDelay: 3 }}
+          animate={isPulsing && !prefersReducedMotion ? { x: ['-100%', '120%'] } : { x: '-100%' }}
+          transition={{ duration: 0.38 }}
         >
           <div className="w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </motion.div>
+
+        <AnimatePresence>
+          {shouldShowGuestPrompt && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.18 }}
+              className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-[#f6dcc7]/16 bg-[#12090d]/88 px-3 py-2 text-left text-[11px] leading-4 text-[#ffe8df]/78 shadow-[0_12px_28px_rgba(0,0,0,0.34)]"
+            >
+              {guestDailyCapReached
+                ? 'Guest petals are full for today. Sign in to keep future blooms.'
+                : "Almost at today's guest bloom limit. Sign in to keep collecting."}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Rare multiplier indicator */}
@@ -215,17 +197,14 @@ function PetalCounterComponent({ count, lastValue = 1 }: PetalCounterProps) {
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           >
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400/90 to-orange-400/90 backdrop-blur-sm border border-yellow-300/50 shadow-lg">
-              <span className="text-yellow-200 font-bold text-sm">+{lastValue}</span>
+            <div className="flex items-center gap-1 rounded-full border border-[#f4c4d3]/42 bg-[#341822]/92 px-3 py-1.5 shadow-lg backdrop-blur-sm">
+              <span className="text-sm font-bold text-[#ffe8e0]">+{lastValue}</span>
               <motion.span
-                animate={{ rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.5 }}
-                className="text-lg"
-                role="img"
-                aria-label="Star"
-              >
-                <span>⭐</span>
-              </motion.span>
+                animate={prefersReducedMotion ? undefined : { rotate: [0, 7, -6, 0] }}
+                transition={{ duration: 0.42 }}
+                className="h-3 w-3 rounded-full border border-[#ffe8df]/52 bg-[#f8cfda]"
+                aria-hidden="true"
+              />
             </div>
           </motion.div>
         )}

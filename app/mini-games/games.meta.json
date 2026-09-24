@@ -31,13 +31,13 @@
   },
   {
     "slug": "memory-match",
-    "name": "Memory Match",
+    "name": "Memory Card / Defrag",
     "icon": "grid_view",
-    "desc": "Flip cards and match pairs. Perfect recall earns bonuses."
+    "desc": "Restore paired relic fragments with clean recall and careful moves."
   },
   {
     "slug": "bubble-girl",
-    "name": "Bubble Girl",
+    "name": "Bubble Ragdoll",
     "icon": "bubble_chart",
     "desc": "Spawn bubbles, float and score. Sandbox or challenge mode."
   },
@@ -67,13 +67,13 @@
   },
   {
     "slug": "maid-cafe-manager",
-    "name": "Maid Cafe Manager",
+    "name": "Maid Café Manager",
     "icon": "local_cafe",
     "desc": "Manage shifts and keep guests smiling."
   },
   {
     "slug": "thigh-coliseum",
-    "name": "Thigh Coliseum",
+    "name": "Thigh Colosseum",
     "icon": "stadium",
     "desc": "Enter the arena. Win rounds and advance the bracket."
   },

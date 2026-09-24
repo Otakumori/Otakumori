@@ -222,13 +222,13 @@ describe('Inngest health and diagnostics containment', () => {
         createFunction: vi.fn((config, trigger, handler) => ({ config, trigger, handler })),
       },
     }));
-    vi.doMock('../../../inngest/client', () => ({
+    vi.doMock('../../inngest/client', () => ({
       inngest: {
         send: sendSpy,
         createFunction: vi.fn((config, trigger, handler) => ({ config, trigger, handler })),
       },
     }));
-    vi.doMock('../../../inngest/functions', () => ({
+    vi.doMock('../../inngest/functions', () => ({
       syncUserToSupabase: { id: 'sync-user-to-supabase' },
       updatePrintifyProducts: { id: 'update-printify-products' },
       processOrder: { id: 'process-order' },
@@ -243,7 +243,7 @@ describe('Inngest health and diagnostics containment', () => {
       cleanupOldGLBFiles: { id: 'cleanup-old-glb-files' },
       fulfillOrder: { id: 'fulfill-order' },
     }));
-    vi.doMock('../../../inngest/glb-generation', () => ({
+    vi.doMock('../../inngest/glb-generation', () => ({
       generateGLBBackground: { id: 'generate-glb-background' },
     }));
     vi.doMock('inngest/next', () => ({

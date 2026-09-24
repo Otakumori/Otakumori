@@ -1,7 +1,7 @@
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
-import { clientEnv } from '@/env/client';
+import { isVisualQaAuthEnabled } from '@/app/lib/visual-qa/mode';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -31,7 +31,11 @@ export default function ClerkProviderWrapper({
   nonce,
   requestHost,
 }: ClerkProviderWrapperProps) {
-  const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (isVisualQaAuthEnabled()) {
+    return <>{children}</>;
+  }
+
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
     getLogger()
@@ -44,13 +48,13 @@ export default function ClerkProviderWrapper({
     return <div>Authentication configuration error</div>;
   }
 
-  const configuredDomain = clientEnv.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
-  const configuredProxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
+  const configuredDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
+  const configuredProxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
   const useProductionClerkOrigin = isProductionClerkHost(requestHost);
   const clerkProps: any = {
     publishableKey,
-    signInUrl: `${ACCOUNTS_BASE_URL}/sign-in`,
-    signUpUrl: `${ACCOUNTS_BASE_URL}/sign-up`,
+    signInUrl: useProductionClerkOrigin ? `${ACCOUNTS_BASE_URL}/sign-in` : '/sign-in',
+    signUpUrl: useProductionClerkOrigin ? `${ACCOUNTS_BASE_URL}/sign-up` : '/sign-up',
     fallbackRedirectUrl: '/',
     nonce,
   };

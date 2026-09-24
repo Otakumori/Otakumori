@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminNav';
-// Date formatting helper
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -19,15 +19,30 @@ interface BlogPost {
   updatedAt: string;
 }
 
+function blankPost(): BlogPost {
+  const now = new Date().toISOString();
+  return {
+    id: '',
+    slug: '',
+    title: '',
+    excerpt: '',
+    body: '',
+    published: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
 export default function AdminBlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editing, setEditing] = useState<BlogPost | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    loadPosts();
+    void loadPosts();
   }, []);
 
   const loadPosts = async () => {
@@ -36,11 +51,8 @@ export default function AdminBlogPage() {
       setError(null);
       const res = await fetch('/api/admin/blog');
       const data = await res.json();
-      if (data.ok) {
-        setPosts(data.data);
-      } else {
-        setError(data.error?.message || 'Failed to load posts');
-      }
+      if (data.ok) setPosts(data.data);
+      else setError(data.error?.message || 'Failed to load posts');
     } catch (err) {
       setError('Failed to load blog posts');
       console.error(err);
@@ -53,22 +65,18 @@ export default function AdminBlogPage() {
     try {
       setError(null);
       setSuccess(null);
-      
       const method = post.id ? 'PUT' : 'POST';
-      const url = '/api/admin/blog';
-      
-      const res = await fetch(url, {
+      const res = await fetch('/api/admin/blog', {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(post),
       });
-      
       const data = await res.json();
       if (data.ok) {
         setEditing(null);
-        setSuccess('Post saved successfully!');
-        loadPosts();
-        setTimeout(() => setSuccess(null), 3000);
+        setSuccess('Post saved successfully.');
+        await loadPosts();
+        window.setTimeout(() => setSuccess(null), 3000);
       } else {
         setError(data.error?.message || data.error || 'Failed to save post');
       }
@@ -78,17 +86,17 @@ export default function AdminBlogPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) return;
-    
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
       setError(null);
-      const res = await fetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/blog?id=${deleteTarget.id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.ok) {
-        setSuccess('Post deleted successfully');
-        loadPosts();
-        setTimeout(() => setSuccess(null), 3000);
+        setSuccess('Post deleted successfully.');
+        setDeleteTarget(null);
+        await loadPosts();
+        window.setTimeout(() => setSuccess(null), 3000);
       } else {
         setError(data.error?.message || 'Failed to delete post');
       }
@@ -98,127 +106,104 @@ export default function AdminBlogPage() {
     }
   };
 
+  const publishedCount = posts.filter((post) => post.published).length;
+
   return (
     <AdminLayout>
-      <div className="p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Blog Posts</h1>
-            <p className="text-neutral-300">Create and manage blog posts and content pages</p>
-          </div>
-          <button
-            onClick={() => setEditing({
-              id: '',
-              slug: '',
-              title: '',
-              excerpt: '',
-              body: '',
-              published: false,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            })}
-            className="rounded-lg bg-pink-600 px-6 py-3 text-white font-semibold hover:bg-pink-700 transition-colors"
-          >
-            New Post
-          </button>
-        </div>
-
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-500/20 border border-red-500/50 px-4 py-3 text-red-300">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 rounded-lg bg-green-500/20 border border-green-500/50 px-4 py-3 text-green-300">
-            {success}
-          </div>
-        )}
-
-        {editing ? (
-          <BlogEditor
-            post={editing}
-            onSave={handleSave}
-            onCancel={() => setEditing(null)}
-          />
-        ) : loading ? (
-          <div className="text-neutral-400">Loading posts...</div>
-        ) : (
-          <div className="grid gap-4">
-            {posts.length === 0 ? (
-              <div className="rounded-xl border border-white/10 bg-black/50 p-8 text-center">
-                <p className="text-neutral-400 mb-4">No blog posts yet</p>
-                <button
-                  onClick={() => setEditing({
-                    id: '',
-                    slug: '',
-                    title: '',
-                    excerpt: '',
-                    body: '',
-                    published: false,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                  })}
-                  className="rounded-lg bg-pink-600 px-6 py-2 text-white hover:bg-pink-700"
-                >
-                  Create Your First Post
-                </button>
+      <main className="p-5 sm:p-7 lg:p-9">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-7 flex flex-col gap-5 border-b border-white/[0.08] pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="font-display text-3xl font-semibold text-[#f5eee9]">Blog</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#9f9490]">
+                Draft, preview, and publish stories without leaving the operations console.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="text-xs text-[#756b67]">
+                {publishedCount} published · {Math.max(0, posts.length - publishedCount)} drafts
               </div>
-            ) : (
-              posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="rounded-xl border border-white/10 bg-black/50 p-6 hover:border-white/20 transition-colors"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-semibold text-white">{post.title}</h3>
-                        {post.published ? (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded border border-green-500/30">
-                            Published
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded border border-gray-500/30">
-                            Draft
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-400 text-sm mb-2">
-                        <span className="font-mono">/{post.slug}</span>
-                        {' • '}
-                        {formatDate(post.createdAt)}
-                      </p>
-                      {post.excerpt && (
-                        <p className="text-gray-300 text-sm line-clamp-2">{post.excerpt}</p>
-                      )}
-                      {post.body && (
-                        <p className="text-gray-400 text-xs mt-2 line-clamp-1">
-                          {post.body.substring(0, 100)}...
-                        </p>
-                      )}
+              <button type="button" onClick={() => setEditing(blankPost())} className="mori-button-primary">
+                New post
+              </button>
+            </div>
+          </header>
+
+          {error && (
+            <div className="mb-5 rounded-xl border border-[#b66b66]/25 bg-[#5e2d2b]/16 px-4 py-3 text-sm text-[#e2aaa5]">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-5 rounded-xl border border-[#819477]/22 bg-[#42513b]/16 px-4 py-3 text-sm text-[#c3d5bf]">
+              {success}
+            </div>
+          )}
+
+          {editing ? (
+            <BlogEditor post={editing} onSave={handleSave} onCancel={() => setEditing(null)} />
+          ) : loading ? (
+            <div className="mori-admin-panel p-8 text-sm text-[#827873]">Loading posts…</div>
+          ) : posts.length === 0 ? (
+            <div className="mori-admin-panel p-10 text-center">
+              <h2 className="font-display text-xl text-[#f5eee9]">The archive is empty.</h2>
+              <p className="mt-2 text-sm text-[#827873]">Create the first post when you are ready.</p>
+              <button type="button" onClick={() => setEditing(blankPost())} className="mori-button-secondary mt-5">
+                Create first post
+              </button>
+            </div>
+          ) : (
+            <div className="mori-admin-panel overflow-hidden">
+              <div className="hidden grid-cols-[minmax(0,1fr)_9rem_8rem_10rem] gap-4 border-b border-white/[0.07] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#625a57] md:grid">
+                <span>Story</span>
+                <span>Status</span>
+                <span>Updated</span>
+                <span className="text-right">Actions</span>
+              </div>
+              <div className="divide-y divide-white/[0.07]">
+                {posts.map((post) => (
+                  <article key={post.id} className="grid gap-4 px-5 py-5 md:grid-cols-[minmax(0,1fr)_9rem_8rem_10rem] md:items-center">
+                    <div className="min-w-0">
+                      <h2 className="truncate text-base font-semibold text-[#f5eee9]">{post.title}</h2>
+                      <div className="mt-1 truncate font-mono text-xs text-[#756b67]">/blog/{post.slug}</div>
+                      {post.excerpt && <p className="mt-2 line-clamp-1 text-sm text-[#9f9490]">{post.excerpt}</p>}
                     </div>
-                    <div className="flex gap-2 ml-4">
-                      <button
-                        onClick={() => setEditing(post)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
-                      >
+                    <div>
+                      <span className="mori-status" data-tone={post.published ? 'ready' : 'draft'}>
+                        {post.published ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#827873]">{formatDate(post.updatedAt || post.createdAt)}</div>
+                    <div className="flex gap-2 md:justify-end">
+                      <button type="button" onClick={() => setEditing(post)} className="mori-button-secondary !min-h-9 !px-3 !py-1.5 text-xs">
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleDelete(post.id)}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
-                      >
+                      <button type="button" onClick={() => setDeleteTarget(post)} className="mori-button-danger !min-h-9 !px-3 !py-1.5 text-xs">
                         Delete
                       </button>
                     </div>
-                  </div>
-                </div>
-              ))
-            )}
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="presentation">
+          <div className="mori-admin-panel w-full max-w-md p-6" role="dialog" aria-modal="true" aria-labelledby="delete-post-title">
+            <h2 id="delete-post-title" className="font-display text-xl font-semibold text-[#f5eee9]">Delete this post?</h2>
+            <p className="mt-3 text-sm leading-6 text-[#9f9490]">
+              <span className="font-semibold text-[#e8dfda]">{deleteTarget.title}</span> will be permanently removed. This cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={() => setDeleteTarget(null)} className="mori-button-secondary">Cancel</button>
+              <button type="button" onClick={handleDelete} className="mori-button-danger">Delete post</button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
@@ -240,133 +225,162 @@ function BlogEditor({
     body: post.body || '',
     published: post.published ?? false,
   });
-
   const [slugError, setSlugError] = useState<string | null>(null);
 
+  const previewBody = useMemo(() => {
+    const body = (formData.body || '').trim();
+    return body ? body.split(/\n\s*\n/).slice(0, 3) : [];
+  }, [formData.body]);
+
+  const normalizeSlug = (value: string) =>
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  const handleTitleChange = (value: string) => {
+    const shouldGenerateSlug = !formData.id && (!formData.slug || formData.slug === normalizeSlug(formData.title));
+    setFormData({
+      ...formData,
+      title: value,
+      slug: shouldGenerateSlug ? normalizeSlug(value) : formData.slug,
+    });
+  };
+
   const handleSlugChange = (value: string) => {
-    const slug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const slug = normalizeSlug(value);
     setFormData({ ...formData, slug });
-    
-    if (slug.length === 0) {
-      setSlugError('Slug cannot be empty');
-    } else if (!/^[a-z0-9-]+$/.test(slug)) {
-      setSlugError('Slug can only contain lowercase letters, numbers, and hyphens');
-    } else {
-      setSlugError(null);
-    }
+    if (slug.length === 0) setSlugError('Slug cannot be empty');
+    else if (!/^[a-z0-9-]+$/.test(slug)) setSlugError('Use lowercase letters, numbers, and hyphens only');
+    else setSlugError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (slugError) return;
+    if (slugError || !formData.slug) {
+      if (!formData.slug) setSlugError('Slug cannot be empty');
+      return;
+    }
     onSave(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-white/10 bg-black/50 p-6 space-y-6">
-      <div>
-        <label htmlFor="blog-title" className="block text-white text-sm font-medium mb-2">
-          Title *
-        </label>
-        <input
-          id="blog-title"
-          type="text"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full px-4 py-2 bg-black/40 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          required
-          placeholder="Enter post title"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
+      <section className="mori-admin-panel p-5 sm:p-6">
+        <div className="mb-6 flex items-start justify-between gap-4 border-b border-white/[0.07] pb-5">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-[#f5eee9]">{formData.id ? 'Edit post' : 'New post'}</h2>
+            <p className="mt-1 text-xs text-[#756b67]">Markdown body · public preview at right</p>
+          </div>
+          <span className="mori-status" data-tone={formData.published ? 'ready' : 'draft'}>
+            {formData.published ? 'Published' : 'Draft'}
+          </span>
+        </div>
 
-      <div>
-        <label htmlFor="blog-slug" className="block text-white text-sm font-medium mb-2">
-          Slug * (URL: /blog/[slug])
-        </label>
-        <input
-          id="blog-slug"
-          type="text"
-          value={formData.slug}
-          onChange={(e) => handleSlugChange(e.target.value)}
-          className={`w-full px-4 py-2 bg-black/40 border rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-            slugError ? 'border-red-500' : 'border-white/20'
-          }`}
-          required
-          placeholder="url-friendly-slug"
-        />
-        {slugError && (
-          <p className="mt-1 text-sm text-red-400">{slugError}</p>
-        )}
-        <p className="mt-1 text-xs text-gray-400">
-          Only lowercase letters, numbers, and hyphens. Auto-generated from title if left empty.
-        </p>
-      </div>
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="blog-title" className="mb-2 block text-sm font-medium text-[#ddd4cf]">Title</label>
+            <input
+              id="blog-title"
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              className="mori-field w-full px-4 py-3"
+              required
+              placeholder="Post title"
+            />
+          </div>
 
-      <div>
-        <label htmlFor="blog-excerpt" className="block text-white text-sm font-medium mb-2">
-          Excerpt (optional, max 500 characters)
-        </label>
-        <textarea
-          id="blog-excerpt"
-          value={formData.excerpt || ''}
-          onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-          className="w-full px-4 py-2 bg-black/40 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          rows={3}
-          maxLength={500}
-          placeholder="Brief summary of the post (shown in previews)"
-        />
-        <p className="mt-1 text-xs text-gray-400">
-          {(formData.excerpt || '').length}/500 characters
-        </p>
-      </div>
+          <div>
+            <label htmlFor="blog-slug" className="mb-2 block text-sm font-medium text-[#ddd4cf]">URL slug</label>
+            <div className="flex items-center rounded-xl border border-white/[0.09] bg-[#060506] pl-3 focus-within:border-[#c7a97f]/30">
+              <span className="text-xs text-[#625a57]">/blog/</span>
+              <input
+                id="blog-slug"
+                type="text"
+                value={formData.slug}
+                onChange={(e) => handleSlugChange(e.target.value)}
+                className="min-w-0 flex-1 bg-transparent px-1 py-3 font-mono text-sm text-[#eee6e1] outline-none"
+                required
+                placeholder="url-friendly-slug"
+              />
+            </div>
+            {slugError && <p className="mt-2 text-xs text-[#e2aaa5]">{slugError}</p>}
+          </div>
 
-      <div>
-        <label htmlFor="blog-content" className="block text-white text-sm font-medium mb-2">
-          Content (Markdown) *
-        </label>
-        <textarea
-          id="blog-content"
-          value={formData.body || ''}
-          onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-          className="w-full px-4 py-2 bg-black/40 border border-white/20 rounded-lg text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          rows={25}
-          required
-          placeholder="Write your post content here using Markdown..."
-        />
-        <p className="mt-1 text-xs text-gray-400">
-          Supports Markdown formatting (headers, lists, links, images, etc.)
-        </p>
-      </div>
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label htmlFor="blog-excerpt" className="text-sm font-medium text-[#ddd4cf]">Excerpt</label>
+              <span className="text-[11px] text-[#625a57]">{(formData.excerpt || '').length}/500</span>
+            </div>
+            <textarea
+              id="blog-excerpt"
+              value={formData.excerpt || ''}
+              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+              className="mori-field w-full resize-y px-4 py-3"
+              rows={3}
+              maxLength={500}
+              placeholder="Short summary used in blog previews"
+            />
+          </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="published"
-          checked={formData.published}
-          onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-          className="w-4 h-4 rounded border-white/20 bg-black/40 text-pink-600 focus:ring-pink-500"
-        />
-        <label htmlFor="published" className="text-white text-sm cursor-pointer">
-          Published (visible to public)
-        </label>
-      </div>
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label htmlFor="blog-content" className="text-sm font-medium text-[#ddd4cf]">Content</label>
+              <span className="text-[11px] text-[#625a57]">Markdown</span>
+            </div>
+            <textarea
+              id="blog-content"
+              value={formData.body || ''}
+              onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+              className="mori-field min-h-[30rem] w-full resize-y px-4 py-3 font-mono text-sm leading-6"
+              required
+              placeholder="Write your post in Markdown…"
+            />
+          </div>
 
-      <div className="flex gap-4 pt-4 border-t border-white/10">
-        <button
-          type="submit"
-          className="px-6 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-semibold transition-colors"
-        >
-          {formData.id ? 'Update Post' : 'Create Post'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors"
-        >
-          Cancel
-        </button>
-      </div>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3">
+            <input
+              type="checkbox"
+              checked={formData.published}
+              onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+              className="h-4 w-4 rounded border-white/20 bg-black/40 text-[#a9855f] focus:ring-[#c7a97f]/40"
+            />
+            <span>
+              <span className="block text-sm font-medium text-[#ddd4cf]">Visible to the public</span>
+              <span className="mt-0.5 block text-xs text-[#756b67]">Leave off to save as a draft.</span>
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3 border-t border-white/[0.07] pt-5">
+          <button type="submit" className="mori-button-primary">{formData.id ? 'Save changes' : 'Create post'}</button>
+          <button type="button" onClick={onCancel} className="mori-button-secondary">Cancel</button>
+        </div>
+      </section>
+
+      <aside className="mori-admin-panel self-start overflow-hidden xl:sticky xl:top-6" aria-label="Post preview">
+        <div className="border-b border-white/[0.07] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#625a57]">Public preview</div>
+        <div className="min-h-[36rem] bg-[radial-gradient(circle_at_20%_0%,rgba(100,61,73,0.12),transparent_19rem),linear-gradient(180deg,#0b080d,#070608)] p-6 sm:p-8">
+          {formData.published ? <span className="mori-status" data-tone="ready">Published</span> : <span className="mori-status" data-tone="draft">Draft</span>}
+          <h2 className="font-display mt-6 text-3xl font-semibold leading-tight text-[#fff1e4]">
+            {formData.title || 'Untitled story'}
+          </h2>
+          {formData.excerpt ? (
+            <p className="mt-4 text-base leading-7 text-[#cdbbb7]">{formData.excerpt}</p>
+          ) : (
+            <p className="mt-4 text-sm italic text-[#756b67]">Your excerpt will appear here.</p>
+          )}
+          <div className="my-7 border-t border-white/[0.08]" />
+          <div className="space-y-4 text-sm leading-7 text-[#b9aeaa]">
+            {previewBody.length ? previewBody.map((paragraph, index) => <p key={`${paragraph.slice(0, 24)}-${index}`}>{paragraph}</p>) : <p className="italic text-[#756b67]">The opening paragraphs of your post will preview here as you write.</p>}
+          </div>
+          <div className="mt-8 font-mono text-xs text-[#625a57]">/blog/{formData.slug || 'your-slug'}</div>
+        </div>
+      </aside>
     </form>
   );
 }
-

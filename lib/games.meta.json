@@ -26,17 +26,17 @@
     {
       "id": "memory-match",
       "slug": "memory-match",
-      "title": "Memory Match",
-      "description": "Flip cards and match pairs. Perfect recall earns bonuses.",
+      "title": "Memory Card / Defrag",
+      "description": "Restore paired relic fragments with clean recall and careful moves.",
       "category": "puzzle",
       "difficulty": "easy",
       "estimatedTime": "3-10 min",
       "ageRating": "E",
       "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
       "tooltips": {
-        "hint": "Remember card positions! Use modifiers like flipped board for extra challenge.",
-        "levels": "Progress through increasingly difficult layouts",
-        "scoring": "Petals earned on streaks. Perfect matches give bonus rewards!"
+        "hint": "Remember each relic fragment and restore matching pairs.",
+        "levels": "Progress through increasingly difficult board sizes.",
+        "scoring": "Score reflects matches, move efficiency, time, and streak control."
       },
       "image": "/games/memory-match/cover.jpg",
       "icon": "[]",
@@ -68,7 +68,7 @@
     {
       "id": "bubble-girl",
       "slug": "bubble-girl",
-      "title": "Bubble Girl",
+      "title": "Bubble Ragdoll",
       "description": "Spawn bubbles, float and score. Sandbox or challenge mode.",
       "category": "physics",
       "difficulty": "medium",
@@ -80,10 +80,30 @@
         "chains": "Build combo chains for massive petal rewards",
         "modes": "Sandbox for creativity or challenge mode for high scores"
       },
-      "image": "/games/bubble-girl/cover.jpg",
+      "image": "/assets/games/covers/game-bubble-ragdoll-cover.webp",
       "icon": "(.)",
       "enabled": true,
       "order": 4
+    },
+    {
+      "id": "maid-cafe-manager",
+      "slug": "maid-cafe-manager",
+      "title": "Maid Café Manager",
+      "description": "Manage shifts and keep guests smiling.",
+      "category": "simulation",
+      "difficulty": "medium",
+      "estimatedTime": "10-20 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Balance orders, guest moods, and a busy café floor.",
+        "shifts": "Good shifts unlock the next day’s scenarios.",
+        "identity": "Your avatar remains part of the café’s presentation."
+      },
+      "image": "/assets/games/covers/game-maid-cafe-manager-cover.webp",
+      "icon": "◇",
+      "enabled": true,
+      "order": 4.5
     },
     {
       "id": "petal-storm-rhythm",
@@ -141,7 +161,7 @@
         "references": "Spot the anime and gaming easter eggs throughout",
         "gating": "Adult content - age verification required"
       },
-      "image": "/games/dungeon-of-desire/cover.jpg",
+      "image": "/assets/games/covers/game-dungeon-of-desire-cover.webp",
       "icon": "x",
       "enabled": true,
       "order": 7
@@ -162,7 +182,7 @@
         "physics": "Survive against giant thigh-crushers with humor-driven gameplay",
         "gating": "Adult content - age verification required"
       },
-      "image": "/games/thigh-coliseum/cover.jpg",
+      "image": "/assets/games/covers/game-thigh-colosseum-cover.webp",
       "icon": "()",
       "enabled": true,
       "order": 8
@@ -182,7 +202,7 @@
         "energy": "Manage your energy as you clear fog to reveal beautiful art",
         "packs": "Unlock new image packs and difficulty levels with petals"
       },
-      "image": "/games/puzzle-reveal/cover.jpg",
+      "image": "/assets/games/covers/game-puzzle-reveal-cover.webp",
       "icon": "+",
       "enabled": true,
       "order": 9

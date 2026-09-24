@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,7 +16,7 @@ export default function LeaderboardPage() {
     { id: 'all', name: 'Overall', icon: '' },
     { id: 'petal-samurai', name: 'Petal Samurai', icon: '' },
     { id: 'puzzle-reveal', name: 'Puzzle Reveal', icon: '' },
-    { id: 'bubble-girl', name: 'Bubble Girl', icon: '' },
+    { id: 'bubble-girl', name: 'Bubble Ragdoll', icon: '' },
     { id: 'memory-match', name: 'Memory Match', icon: '' },
   ];
 

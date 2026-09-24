@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+import { expectCurrentHomeHero } from './helpers/home';
+
 test.describe('Homepage petal stream guardrail', () => {
   test('should keep the legacy petal stream off homepage and mini-games', async ({ page }) => {
     await page.goto('/');
@@ -38,9 +40,7 @@ test.describe('Homepage petal stream guardrail', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    await expect(
-      page.getByRole('heading', { name: /Rest beneath the sakura tree/i }),
-    ).toBeVisible();
+    await expectCurrentHomeHero(page);
     await expect(page.getByText('Petal stream unavailable')).toHaveCount(0);
   });
 

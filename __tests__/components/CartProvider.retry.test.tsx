@@ -86,6 +86,24 @@ describe('CartProvider retry server sync', () => {
     localStorage.clear();
   });
 
+  it('does not call Clerk auth hooks in the explicit visual QA provider stack', async () => {
+    vi.mocked(useAuth).mockImplementation(() => {
+      throw new Error('Clerk useAuth should not run in visual QA cart mode');
+    });
+    const fetchMock = vi.fn();
+    globalThis.fetch = fetchMock as typeof fetch;
+
+    render(
+      <CartProvider visualQaAuth>
+        <Harness />
+      </CartProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId('item-count')).toHaveTextContent('1'));
+    expect(useAuth).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('keeps autosync enabled after a successful retry', async () => {
     const syncBodies: unknown[] = [];
     globalThis.fetch = vi.fn(async (input, init) => {

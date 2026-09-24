@@ -557,7 +557,7 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
     case 'bubble-girl':
       return {
         ...baseProfile,
-        displayName: 'Bubble Girl',
+        displayName: 'Bubble Ragdoll',
         theme: 'bubble',
         background: {
           kind: 'bubble',

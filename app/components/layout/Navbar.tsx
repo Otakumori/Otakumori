@@ -7,10 +7,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
-import { ShoppingCart, Menu, X, ChevronDown, Heart, MessageCircle } from 'lucide-react';
+import { ChevronDown, Heart, Menu, MessageCircle, ShoppingCart, X } from 'lucide-react';
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
+import PetalWalletNavLink from '@/app/components/nav/PetalWalletNavLink';
 
 const gamesRegistry = gamesRegistryData as {
   games?: Array<{
@@ -105,7 +106,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [_scrollY, setScrollY] = useState(0);
+  const isHome = pathname === paths.home();
 
   const userMenuAriaExpanded = useMemo(() => showUserMenu, [showUserMenu]);
   const mobileMenuAriaExpanded = useMemo(() => isMenuOpen, [isMenuOpen]);
@@ -132,9 +133,8 @@ export default function Navbar() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrollTop = window.scrollY;
-          setScrollY(scrollTop);
-          setIsScrolled(scrollTop > 50);
+          const nextScrolled = window.scrollY > 50;
+          setIsScrolled((current) => (current === nextScrolled ? current : nextScrolled));
           ticking = false;
         });
         ticking = true;
@@ -179,11 +179,21 @@ export default function Navbar() {
 
   return (
     <header
-      className={`navbar-scroll relative z-50 w-full font-ui transition-all duration-300 ${isScrolled ? 'scrolled shadow-lg shadow-black/80 border-b border-white/10' : 'border-b border-white/5'}`}
+      className={`navbar-scroll z-50 w-full font-ui transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? (isHome ? 'scrolled border-b border-[#efd0bc]/24 shadow-[0_8px_30px_rgba(4,2,5,0.28)]' : 'scrolled shadow-lg shadow-black/80 border-b border-white/10') : isHome ? 'border-b border-[#f4d5c4]/12' : 'border-b border-white/5'}`}
       style={{
-        backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.95)' : 'rgba(26, 24, 22, 0.7)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        backgroundColor: isScrolled
+          ? isHome
+            ? 'rgba(23, 16, 23, 0.78)'
+            : 'rgba(0, 0, 0, 0.95)'
+          : isHome
+            ? 'rgba(7, 4, 7, 0.08)'
+            : 'rgba(26, 24, 22, 0.7)',
+        backdropFilter: isHome ? (isScrolled ? 'saturate(1.04) blur(5px)' : 'none') : 'blur(8px)',
+        WebkitBackdropFilter: isHome
+          ? isScrolled
+            ? 'saturate(1.04) blur(5px)'
+            : 'none'
+          : 'blur(8px)',
       }}
     >
       <a
@@ -192,15 +202,20 @@ export default function Navbar() {
       >
         Skip to main content
       </a>
-      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
+      <nav
+        aria-label="Primary navigation"
+        className="container mx-auto flex items-center justify-between px-4 py-3"
+      >
         <Link href={paths.home()} className="flex items-center group py-1">
-          <div className="relative w-32 h-32 md:w-36 md:h-36">
+          <div
+            className={`relative ${isHome ? 'h-20 w-20 md:h-24 md:w-24' : 'h-32 w-32 md:h-36 md:w-36'}`}
+          >
             <Image
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
               fill
               priority
-              sizes="(min-width: 768px) 144px, 128px"
+              sizes={isHome ? '(min-width: 768px) 96px, 80px' : '(min-width: 768px) 144px, 128px'}
               className="object-contain"
             />
           </div>
@@ -375,25 +390,26 @@ export default function Navbar() {
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/wishlist' ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
           >
-            <Heart className="w-5 h-5" aria-hidden="true" />
+            <Heart className="h-5 w-5" aria-hidden="true" />
           </button>
           <button
             onClick={handleSoapstoneClick}
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
           >
-            <MessageCircle className="w-5 h-5" aria-hidden="true" />
+            <MessageCircle className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
         <div className="flex items-center gap-4">
-          <GlobalSearch className="hidden xl:block" />
+          {!isHome && <GlobalSearch className="hidden xl:block" />}
+          <PetalWalletNavLink isLoaded={isLoaded} isSignedIn={isSignedIn} signInHref={signInHref} />
           <Link
             href={paths.cart()}
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
             aria-label={`Shopping cart with ${itemCount} items`}
           >
-            <ShoppingCart className="w-5 h-5" aria-hidden="true" />
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center font-semibold">
                 {itemCount > 99 ? '99+' : itemCount}
@@ -557,7 +573,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 p-4 space-y-1">
+              <nav aria-label="Mobile menu navigation" className="flex-1 p-4 space-y-1">
                 <Link
                   href={paths.home()}
                   onClick={() => setIsMenuOpen(false)}
@@ -675,7 +691,7 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
                 >
-                  <Heart className="w-5 h-5" aria-hidden="true" />
+                  <Heart className="h-5 w-5" aria-hidden="true" />
                   <span>Wishlist</span>
                 </button>
                 <button
@@ -686,16 +702,23 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
                 >
-                  <MessageCircle className="w-5 h-5" aria-hidden="true" />
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
                   <span>Community</span>
                 </button>
+                <PetalWalletNavLink
+                  isLoaded={isLoaded}
+                  isSignedIn={isSignedIn}
+                  signInHref={signInHref}
+                  variant="mobile"
+                  onNavigate={() => setIsMenuOpen(false)}
+                />
                 <Link
                   href={paths.cart()}
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={`Shopping cart with ${itemCount} items`}
                 >
-                  <ShoppingCart className="w-5 h-5" aria-hidden="true" />
+                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                   <span>Cart</span>
                   {itemCount > 0 && (
                     <span className="ml-auto bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-2 flex items-center justify-center font-semibold">

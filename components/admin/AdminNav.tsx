@@ -13,98 +13,58 @@ import {
   Users,
   Palette,
   Shield,
+  ShoppingBag,
+  FileText,
+  SlidersHorizontal,
 } from 'lucide-react';
 
-const adminRoutes = [
+type AdminRoute = {
+  path: string;
+  name: string;
+  icon: typeof Home;
+  description: string;
+};
+
+type AdminGroup = {
+  label: string;
+  routes: AdminRoute[];
+};
+
+const adminGroups: AdminGroup[] = [
   {
-    path: '/admin',
-    name: 'Dashboard',
-    icon: Home,
-    description: 'Admin overview',
+    label: 'Operations',
+    routes: [
+      { path: '/admin', name: 'Dashboard', icon: Home, description: 'Operational overview' },
+      { path: '/admin/users', name: 'Users & Profiles', icon: Users, description: 'Accounts and player state' },
+      { path: '/admin/orders', name: 'Orders', icon: ShoppingBag, description: 'Order operations and tracking' },
+    ],
   },
   {
-    path: '/admin/users',
-    name: 'Users & Profiles',
-    icon: Users,
-    description: 'User overview and management',
+    label: 'Commerce',
+    routes: [
+      { path: '/admin/economy', name: 'Economy', icon: Sparkles, description: 'Petals, discounts, cosmetics' },
+      { path: '/admin/petal-shop', name: 'Petal Shop', icon: Flower, description: 'Petal shop inventory' },
+      { path: '/admin/vouchers', name: 'Vouchers', icon: Ticket, description: 'Discount vouchers' },
+      { path: '/admin/coupons', name: 'Coupons', icon: Ticket, description: 'Coupon SKUs and templates' },
+      { path: '/admin/discounts', name: 'Discount Rewards', icon: Ticket, description: 'Petal-purchased discounts' },
+    ],
   },
   {
-    path: '/admin/economy',
-    name: 'Economy Overview',
-    icon: Sparkles,
-    description: 'Monitor petals, discounts, and cosmetics',
+    label: 'World & Content',
+    routes: [
+      { path: '/admin/content/blog', name: 'Blog Posts', icon: FileText, description: 'Author and publish stories' },
+      { path: '/admin/settings', name: 'Appearance', icon: SlidersHorizontal, description: 'Theme and seasonal settings' },
+      { path: '/admin/cosmetics', name: 'Cosmetics', icon: Palette, description: 'Cosmetics configuration' },
+      { path: '/admin/runes', name: 'Rune System', icon: Sparkles, description: 'Runes and combinations' },
+      { path: '/admin/rewards', name: 'Rewards', icon: Flower, description: 'Petal reward rules' },
+      { path: '/admin/burst', name: 'Burst System', icon: Zap, description: 'Burst effect configuration' },
+    ],
   },
   {
-    path: '/admin/cosmetics',
-    name: 'Cosmetics',
-    icon: Palette,
-    description: 'Manage cosmetics config',
-  },
-  {
-    path: '/admin/vouchers',
-    name: 'Vouchers',
-    icon: Ticket,
-    description: 'Discount voucher management',
-  },
-  {
-    path: '/admin/nsfw',
-    name: 'NSFW Controls',
-    icon: Shield,
-    description: 'NSFW gating and controls',
-  },
-  {
-    path: '/admin/settings',
-    name: 'Appearance',
-    icon: Sparkles,
-    description: 'Theme and seasonal settings',
-  },
-  {
-    path: '/admin/runes',
-    name: 'Rune System',
-    icon: Sparkles,
-    description: 'Manage runes and combos',
-  },
-  {
-    path: '/admin/rewards',
-    name: 'Rewards',
-    icon: Flower,
-    description: 'Configure petal rewards',
-  },
-  {
-    path: '/admin/petal-shop',
-    name: 'Petal Shop',
-    icon: Flower,
-    description: 'Manage petal shop items',
-  },
-  {
-    path: '/admin/coupons',
-    name: 'Coupons',
-    icon: Ticket,
-    description: 'Coupon SKUs and templates',
-  },
-  {
-    path: '/admin/discounts',
-    name: 'Discount Rewards',
-    icon: Ticket,
-    description: 'Manage petal-purchased discount vouchers',
-  },
-  {
-    path: '/admin/burst',
-    name: 'Burst System',
-    icon: Zap,
-    description: 'Configure burst effects',
-  },
-  {
-    path: '/admin/orders',
-    name: 'Orders',
-    icon: Ticket,
-    description: 'Order operations center & financial tracking',
-  },
-  {
-    path: '/admin/content/blog',
-    name: 'Blog Posts',
-    icon: Flower,
-    description: 'Create and manage blog posts',
+    label: 'Governance',
+    routes: [
+      { path: '/admin/nsfw', name: 'NSFW Controls', icon: Shield, description: 'Age gating and controls' },
+    ],
   },
 ];
 
@@ -113,76 +73,79 @@ export default function AdminNav() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="fixed left-0 top-0 z-40 h-full border-r border-neutral-700 bg-neutral-900/95 backdrop-blur-sm transition-all duration-300">
-      <div className={`flex h-full flex-col ${isExpanded ? 'w-64' : 'w-16'}`}>
-        {/* Header */}
-        <div className="border-b border-neutral-700 p-4">
-          <div className="flex items-center justify-between">
-            {isExpanded && <h2 className="text-lg font-bold text-white">Admin Panel</h2>}
+    <aside className="fixed left-0 top-0 z-40 h-full border-r border-white/[0.08] bg-[#09080a]/96 shadow-[18px_0_50px_rgba(0,0,0,0.28)] backdrop-blur-md">
+      <div className={`flex h-full flex-col transition-[width] duration-200 ${isExpanded ? 'w-72' : 'w-16'}`}>
+        <div className="border-b border-white/[0.08] p-4">
+          <div className="flex items-center justify-between gap-3">
+            {isExpanded && (
+              <div>
+                <h2 className="font-display text-base font-semibold text-[#f5eee9]">Otaku-mori Admin</h2>
+                <p className="mt-0.5 text-[11px] text-[#8f8581]">Operations console</p>
+              </div>
+            )}
             <button
+              type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="rounded-lg p-2 transition-colors hover:bg-neutral-800"
+              className="rounded-lg border border-white/[0.08] p-2 text-[#9c918c] transition-colors hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white"
               aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
             >
-              <ChevronRight
-                className={`h-4 w-4 text-neutral-400 transition-transform ${
-                  isExpanded ? 'rotate-180' : ''
-                }`}
-              />
+              <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
             </button>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-2 p-4">
-          {adminRoutes.map((route) => {
-            const Icon = route.icon;
-            const isActive = pathname === route.path;
+        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Admin navigation">
+          {adminGroups.map((group) => (
+            <div key={group.label} className="mb-5 last:mb-0">
+              {isExpanded && (
+                <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6f6662]">
+                  {group.label}
+                </div>
+              )}
+              <div className="space-y-1">
+                {group.routes.map((route) => {
+                  const Icon = route.icon;
+                  const isActive = pathname === route.path || (route.path !== '/admin' && pathname.startsWith(`${route.path}/`));
 
-            return (
-              <Link
-                key={route.path}
-                href={route.path}
-                className={`group flex items-center space-x-3 rounded-lg p-3 transition-all duration-200 ${
-                  isActive
-                    ? 'border border-pink-500/30 bg-pink-500/20 text-pink-300'
-                    : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white'
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-pink-400' : 'text-neutral-400 group-hover:text-neutral-200'
-                  }`}
-                />
-
-                {isExpanded && (
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{route.name}</div>
-                    <div className="truncate text-xs text-neutral-500">{route.description}</div>
-                  </div>
-                )}
-              </Link>
-            );
-          })}
+                  return (
+                    <Link
+                      key={route.path}
+                      href={route.path}
+                      title={isExpanded ? undefined : route.name}
+                      className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors ${
+                        isActive
+                          ? 'border-[#a9855f]/24 bg-[#a9855f]/10 text-[#fff1e4]'
+                          : 'border-transparent text-[#b7aca7] hover:border-white/[0.07] hover:bg-white/[0.035] hover:text-white'
+                      }`}
+                    >
+                      <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#c7a97f]' : 'text-[#766d69] group-hover:text-[#aaa09b]'}`} />
+                      {isExpanded && (
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-medium">{route.name}</div>
+                          <div className="mt-0.5 truncate text-[11px] text-[#6f6662]">{route.description}</div>
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-neutral-700 p-4">
-          {isExpanded && (
-            <div className="text-center text-xs text-neutral-500">Admin Panel v1.0</div>
-          )}
+        <div className="border-t border-white/[0.08] p-4">
+          {isExpanded && <div className="text-xs text-[#6f6662]">Draft changes stay isolated until approved.</div>}
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
 
-// Layout wrapper for admin pages
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
+    <div className="mori-admin-shell">
       <AdminNav />
-      <div className="ml-16 lg:ml-64">{children}</div>
+      <div className="ml-16 min-h-screen lg:ml-72">{children}</div>
     </div>
   );
 }

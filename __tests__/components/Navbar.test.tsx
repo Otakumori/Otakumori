@@ -76,6 +76,16 @@ describe('Navbar Clerk session states', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          ok: true,
+          data: { balance: 37 },
+        }),
+      })),
+    );
     mockedPathname = '/admin/printify';
     setAuthState({ isLoaded: true, isSignedIn: false, user: null });
   });
@@ -197,7 +207,17 @@ describe('Navbar Clerk session states', () => {
     ]);
   });
 
-  it('renders signed-in username publicly and private email only inside the account menu', () => {
+  it('renders signed-out Petal Wallet access without a fake balance', () => {
+    render(<Navbar />);
+
+    const walletLinks = screen.getAllByRole('link', { name: /sign in to view petals/i });
+
+    expect(walletLinks[0]).toHaveAttribute('href', '/sign-in?redirect_url=%2Fadmin%2Fprintify');
+    expect(screen.queryByText(/^0$/)).not.toBeInTheDocument();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('renders signed-in username publicly and private email only inside the account menu', async () => {
     setAuthState({
       isLoaded: true,
       isSignedIn: true,
@@ -208,6 +228,9 @@ describe('Navbar Clerk session states', () => {
     render(<Navbar />);
 
     expect(screen.getByRole('button', { name: /user menu/i })).toHaveTextContent('sakura_admin');
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /view petals, 37 available/i })).toBeInTheDocument(),
+    );
     expect(screen.queryByText('admin@example.com')).not.toBeInTheDocument();
     expect(screen.queryByText('Shipping Recipient')).not.toBeInTheDocument();
 
@@ -222,7 +245,7 @@ describe('Navbar Clerk session states', () => {
     expect(screen.getByText('Wishlist')).toBeInTheDocument();
   });
 
-  it('uses initials when no avatar is available and matches mobile signed-in semantics', () => {
+  it('uses initials when no avatar is available and matches mobile signed-in semantics', async () => {
     setAuthState({
       isLoaded: true,
       isSignedIn: true,
@@ -235,6 +258,9 @@ describe('Navbar Clerk session states', () => {
     fireEvent.click(screen.getByRole('button', { name: /open menu/i }));
 
     expect(screen.getAllByText('neon_sakura').length).toBeGreaterThan(0);
+    await waitFor(() =>
+      expect(screen.getAllByRole('link', { name: /view petals, 37 available/i }).length).toBe(2),
+    );
     expect(screen.getByText('Signed in as')).toBeInTheDocument();
     expect(screen.getByText('admin@example.com')).toBeInTheDocument();
   });

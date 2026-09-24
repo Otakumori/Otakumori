@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 interface Game {
   id: string;
@@ -11,6 +12,7 @@ interface Game {
   thumbnail: string;
   slug?: string;
   href?: string;
+  thumbnailContainsTitle?: boolean;
 }
 
 interface GameCubeMenuProps {
@@ -62,6 +64,7 @@ export function GameCubeMenu({ games, onGameSelect }: GameCubeMenuProps) {
                   src={game.thumbnail}
                   alt={game.title}
                   fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -69,9 +72,18 @@ export function GameCubeMenu({ games, onGameSelect }: GameCubeMenuProps) {
                   }}
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              {!game.thumbnailContainsTitle && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              )}
               <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-white font-bold text-sm">{game.title}</h3>
+                <h3
+                  className={cn(
+                    'text-sm font-bold text-white',
+                    game.thumbnailContainsTitle && 'sr-only',
+                  )}
+                >
+                  {game.title}
+                </h3>
               </div>
             </div>
 
@@ -85,4 +97,3 @@ export function GameCubeMenu({ games, onGameSelect }: GameCubeMenuProps) {
     </div>
   );
 }
-

@@ -26,12 +26,9 @@ interface BlogData {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
-  try {
-    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, {
-      allowLive: true,
-    });
 
+  try {
+    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, { allowLive: true });
     if (isSuccess(result) && result.data?.post) {
       return {
         title: `${result.data.post.title} — Otaku-mori Blog`,
@@ -39,7 +36,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       };
     }
   } catch (error) {
-    logger.error('Error generating metadata for blog post:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error generating metadata for blog post:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
   }
 
   return {
@@ -50,100 +52,68 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
-  try {
-    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, {
-      allowLive: true,
-    });
 
-    if (!isSuccess(result) || !result.data?.post) {
-      return notFound();
-    }
+  try {
+    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, { allowLive: true });
+    if (!isSuccess(result) || !result.data?.post) return notFound();
 
     const post = result.data.post;
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
-        <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-          {/* Breadcrumb */}
-          <nav className="mb-8">
-            <ol className="flex items-center space-x-2 text-sm text-muted">
-              <li>
-                <Link href={paths.blogIndex()} className="hover:text-primary transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>/</li>
-              <li className="text-primary">{post.title}</li>
-            </ol>
+      <main className="mori-page pt-24">
+        <div className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14">
+          <nav className="mb-8 text-sm" aria-label="Blog breadcrumb">
+            <Link href={paths.blogIndex()} className="text-[#a9855f] transition-colors hover:text-[#c7a97f]">
+              ← Back to Blog
+            </Link>
           </nav>
 
-          {/* Article Header */}
-          <header className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">{post.title}</h1>
+          <header className="mb-10 border-b border-white/[0.08] pb-8">
+            <h1 className="font-display text-4xl font-semibold leading-[1.08] tracking-tight text-[#fff1e4] md:text-5xl">
+              {post.title}
+            </h1>
 
-            {post.excerpt && (
-              <p className="text-xl text-secondary mb-8 leading-relaxed">{post.excerpt}</p>
-            )}
+            {post.excerpt && <p className="mt-5 max-w-3xl text-lg leading-8 text-[#cdbbb7]">{post.excerpt}</p>}
 
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center space-x-4">
-                {post.author.avatar && (
-                  <Image
-                    src={post.author.avatar}
-                    alt={post.author.name}
-                    width={48}
-                    height={48}
-                    className="rounded-full"
-                  />
-                )}
-                <div>
-                  <p className="text-primary font-medium">{post.author.name}</p>
-                  <p className="text-muted text-sm">
-                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <Link href={paths.blogIndex()} className="btn-secondary">
-                  ← Back to Blog
-                </Link>
-              </div>
+            <div className="mt-7 flex flex-wrap items-center gap-4 text-sm text-[#8f7f7d]">
+              {post.author.avatar && (
+                <Image
+                  src={post.author.avatar}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="rounded-full border border-white/10 object-cover"
+                />
+              )}
+              <span className="text-[#d6c9c4]">{post.author.name}</span>
+              <span aria-hidden="true">·</span>
+              <time dateTime={post.publishedAt}>
+                {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
             </div>
           </header>
 
-          {/* Featured Image */}
           {post.image && (
-            <div className="mb-12">
-              <div className="relative aspect-video overflow-hidden rounded-2xl glass-card">
+            <div className="mori-panel mb-10 overflow-hidden p-1">
+              <div className="relative aspect-video overflow-hidden rounded-[0.75rem]">
                 <Image src={post.image} alt={post.title} fill className="object-cover" priority />
               </div>
             </div>
           )}
 
-          {/* Article Content */}
-          <article className="prose prose-invert max-w-none">
-            <div
-              className="text-secondary leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+          <article className="prose prose-invert prose-headings:font-display prose-headings:font-semibold prose-headings:text-[#fff1e4] prose-p:text-[#cdbbb7] prose-p:leading-8 prose-a:text-[#dca0b3] prose-strong:text-[#fff1e4] prose-blockquote:border-[#a9855f]/40 prose-blockquote:text-[#b9aeaa] max-w-none">
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </article>
 
-          {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-glass-border">
-              <h3 className="text-lg font-semibold text-primary mb-4">Tags</h3>
+            <div className="mt-12 border-t border-white/[0.08] pt-6">
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full"
-                  >
+                  <span key={tag} className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1 text-xs text-[#9f918c]">
                     {tag}
                   </span>
                 ))}
@@ -151,17 +121,21 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* Back to Blog */}
-          <div className="mt-12 text-center">
-            <Link href={paths.blogIndex()} className="btn-primary">
-              ← Back to Blog
+          <div className="mt-12">
+            <Link href={paths.blogIndex()} className="mori-button-secondary">
+              Back to Blog
             </Link>
           </div>
         </div>
-      </div>
+      </main>
     );
   } catch (error) {
-    logger.error('Error fetching blog post:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error fetching blog post:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return notFound();
   }
 }

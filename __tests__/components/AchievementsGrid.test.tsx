@@ -27,8 +27,10 @@ const unlockedAchievement = {
   rarity: 'rare' as const,
 };
 
-function progressBar(container: HTMLElement) {
-  return container.querySelector('.bg-fuchsia-400.h-2') as HTMLElement;
+function progressBar(container: HTMLElement, expectedPercentage: number) {
+  return container.querySelector(
+    `div[style*="width: ${expectedPercentage}%"]`,
+  ) as HTMLElement | null;
 }
 
 describe('AchievementsGrid progress summary', () => {
@@ -37,11 +39,11 @@ describe('AchievementsGrid progress summary', () => {
     const renderedText = container.textContent ?? '';
 
     expect(screen.getByText('0%')).toBeInTheDocument();
-    expect(screen.getByText('No achievements yet')).toBeInTheDocument();
+    expect(screen.getByText('No relics discovered yet')).toBeInTheDocument();
     expect(
-      screen.getByText('Start exploring to unlock your first achievement!'),
+      screen.getByText('Play, explore, and return when the first mark is earned.'),
     ).toBeInTheDocument();
-    expect(progressBar(container).style.width).toBe('0%');
+    expect(progressBar(container, 0)).toBeInTheDocument();
     expect(renderedText).not.toContain('NaN');
     expect(renderedText).not.toContain('Infinity');
   });
@@ -51,16 +53,16 @@ describe('AchievementsGrid progress summary', () => {
       <AchievementsGrid achievements={[unlockedAchievement, lockedAchievement]} />,
     );
 
-    expect(screen.getByText('1 of 2 achievements unlocked')).toBeInTheDocument();
+    expect(screen.getByText('1 of 2 relics discovered')).toBeInTheDocument();
     expect(screen.getByText('50%')).toBeInTheDocument();
-    expect(progressBar(container).style.width).toBe('50%');
+    expect(progressBar(container, 50)).toBeInTheDocument();
   });
 
   it('renders all-unlocked progress as 100%', () => {
     const { container } = render(<AchievementsGrid achievements={[unlockedAchievement]} />);
 
-    expect(screen.getByText('1 of 1 achievements unlocked')).toBeInTheDocument();
+    expect(screen.getByText('1 of 1 relics discovered')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(progressBar(container).style.width).toBe('100%');
+    expect(progressBar(container, 100)).toBeInTheDocument();
   });
 });

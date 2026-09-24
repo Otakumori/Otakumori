@@ -229,7 +229,7 @@ function MiniGamesPanel() {
     },
     {
       slug: 'bubble-girl',
-      title: 'Bubble Girl',
+      title: 'Bubble Ragdoll',
       description: COPY.games.bubbleGirl,
       available: true,
     },
@@ -340,7 +340,7 @@ function MobileHubList() {
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Hub Navigation</h2>
-      
+
       {/* Hub Options List */}
       <div className="space-y-4">
         {hubOptions.map((option) => (
@@ -369,12 +369,7 @@ function MobileHubList() {
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </motion.button>
         ))}
@@ -411,7 +406,13 @@ function MobileHubList() {
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-full"
                   aria-label="Close panel"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

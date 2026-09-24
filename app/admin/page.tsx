@@ -10,6 +10,8 @@ import { env } from '@/env.mjs';
 import AdminConsoleClient from './AdminConsoleClient';
 import Link from 'next/link';
 import { Users, Flower, Palette, Ticket, Shield, BarChart3, ShoppingBag } from 'lucide-react';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -57,9 +59,16 @@ export default async function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Admin Console</h1>
-          <p className="text-zinc-300">Manage Otaku-mori operations and settings</p>
+        <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <MoriArtwork
+            src={approvedVisualAssets.destinations.admin}
+            className="w-32 shrink-0 sm:w-40"
+            sizes="(max-width: 640px) 8rem, 10rem"
+          />
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Admin Console</h1>
+            <p className="text-zinc-300">Manage Otaku-mori operations and settings</p>
+          </div>
         </div>
 
         {/* Navigation Cards */}

@@ -1,42 +1,43 @@
-'use client';
+import Link from 'next/link';
+import Image from 'next/image';
+import { paths } from '@/lib/paths';
+import HeroSearch from './HeroSearch';
+import layoutStyles from './HeroLayout.module.css';
 
 export default function HeroContent() {
   return (
-    <div className="relative z-20 flex min-h-[100svh] items-center justify-center px-4 text-center">
-      <div className="max-w-3xl rounded-[2rem] border border-pink-100/14 bg-[#080611]/34 px-5 py-8 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:px-10">
-        <p className="font-ui text-xs font-semibold uppercase tracking-[0.34em] text-pink-100/75">
-          Welcome, traveler
-        </p>
-
-        <h1 className="font-display mt-4 text-balance text-5xl font-semibold tracking-tight text-[#f7eadf] md:text-7xl">
-          Rest beneath the sakura tree
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#f5d6dc]/76 md:text-lg">
-          Shop, play, and build your traveler identity inside a soft dark fantasy grove made for
-          anime, games, and careful little rituals.
-        </p>
-
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <a
-            href="/shop"
-            className="min-h-[44px] rounded-full border border-pink-100/30 bg-pink-300/16 px-6 py-3 text-sm font-semibold text-pink-50 transition hover:border-pink-100/55 hover:bg-pink-300/24"
+    <div className={`${layoutStyles.heroContent} relative z-20 flex text-[#fff4e8]`}>
+      <div
+        className={`${layoutStyles.surfaceContent} mx-auto flex w-full max-w-7xl items-end px-4 pb-[7svh] pt-24 sm:px-6 md:items-center md:justify-end md:px-10 md:pb-0 md:pt-[12svh]`}
+      >
+        <div
+          className={`${layoutStyles.heroCopy} w-full max-w-[31rem] text-left md:mr-[5vw] lg:mr-[8vw]`}
+        >
+          <h1
+            id="home-hero-title"
+            className={`${layoutStyles.title} font-display max-w-[24rem] text-balance text-xl font-semibold leading-[1.15] tracking-[-0.018em] text-[#fff1e4] sm:text-[1.35rem] md:text-[1.65rem]`}
           >
-            Visit the Shop
-          </a>
+            You found Otaku-mori.
+          </h1>
 
-          <a
-            href="/mini-games"
-            className="min-h-[44px] rounded-full border border-white/12 bg-white/6 px-6 py-3 text-sm font-semibold text-white transition hover:border-pink-100/30 hover:bg-white/10"
-          >
-            Play Mini-Games
-          </a>
+          <HeroSearch />
 
-          <a
-            href="/community"
-            className="min-h-[44px] rounded-full border border-white/12 bg-white/6 px-6 py-3 text-sm font-semibold text-white transition hover:border-pink-100/30 hover:bg-white/10"
-          >
-            Join the Community
-          </a>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link
+              href={paths.shop()}
+              className={`${layoutStyles.primaryAction} inline-flex min-h-[48px] items-center justify-center rounded-full px-6 text-sm font-semibold text-[#fff3e6] focus:outline-none`}
+            >
+              <span>Gear up</span>
+              <Image
+                src="/assets/home/ui/runtime/arrow-forward.webp"
+                alt=""
+                width={32}
+                height={22}
+                sizes="32px"
+                className="ml-2 h-[18px] w-[27px] object-contain"
+              />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

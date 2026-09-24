@@ -12,10 +12,6 @@ interface ProfileTabsProps {
 
 type TabId = 'overview' | 'achievements' | 'games' | 'cosmetics';
 
-/**
- * Tabbed interface for profile sections
- * Keyboard accessible and responsive
- */
 export default function ProfileTabs({
   overview,
   achievements,
@@ -24,83 +20,77 @@ export default function ProfileTabs({
 }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
-  const tabs: { id: TabId; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview', icon: '<span role="img" aria-label="emoji">�</span>�' },
-    { id: 'achievements', label: 'Achievements', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
-    { id: 'games', label: 'Games', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
-    { id: 'cosmetics', label: 'Cosmetics', icon: '<span role="img" aria-label="sparkles">✨</span>' },
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'achievements', label: 'Achievements' },
+    { id: 'games', label: 'Games' },
+    { id: 'cosmetics', label: 'Cosmetics' },
   ];
 
-  const handleKeyDown = (e: React.KeyboardEvent, tabId: TabId) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setActiveTab(tabId);
-    }
+  const panels: Record<TabId, ReactNode> = {
+    overview,
+    achievements,
+    games,
+    cosmetics,
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+
+    let nextIndex = index;
+    if (e.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+    if (e.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+    if (e.key === 'Home') nextIndex = 0;
+    if (e.key === 'End') nextIndex = tabs.length - 1;
+
+    const next = tabs[nextIndex];
+    if (!next) return;
+    setActiveTab(next.id);
+    document.getElementById(`tab-${next.id}`)?.focus();
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/50 overflow-hidden">
-      {/* Tab Navigation */}
-      <div className="flex border-b border-white/10 bg-white/5 overflow-x-auto">
-        {tabs.map((tab) => (
+    <section className="mori-panel overflow-hidden">
+      <div className="flex overflow-x-auto border-b border-white/[0.08] bg-black/10 px-2" role="tablist" aria-label="Profile sections">
+        {tabs.map((tab, index) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
-            onKeyDown={(e) => handleKeyDown(e, tab.id)}
-            className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            className={`relative shrink-0 px-4 py-4 text-sm font-medium transition-colors sm:px-5 ${
               activeTab === tab.id
-                ? 'bg-pink-500/20 text-pink-300 border-b-2 border-pink-500'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                ? 'text-[#fff1e4]'
+                : 'text-[#8f7f7d] hover:text-[#d9ccc7]'
             }`}
             role="tab"
             aria-selected={activeTab === tab.id}
             aria-controls={`tabpanel-${tab.id}`}
             id={`tab-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
           >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
+            {tab.label}
+            {activeTab === tab.id && (
+              <span className="absolute inset-x-3 bottom-0 h-px bg-[#c7a97f]" aria-hidden="true" />
+            )}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div className="p-6">
-        <div
-          id="tabpanel-overview"
-          role="tabpanel"
-          aria-labelledby="tab-overview"
-          hidden={activeTab !== 'overview'}
-        >
-          {activeTab === 'overview' && overview}
-        </div>
-
-        <div
-          id="tabpanel-achievements"
-          role="tabpanel"
-          aria-labelledby="tab-achievements"
-          hidden={activeTab !== 'achievements'}
-        >
-          {activeTab === 'achievements' && achievements}
-        </div>
-
-        <div
-          id="tabpanel-games"
-          role="tabpanel"
-          aria-labelledby="tab-games"
-          hidden={activeTab !== 'games'}
-        >
-          {activeTab === 'games' && games}
-        </div>
-
-        <div
-          id="tabpanel-cosmetics"
-          role="tabpanel"
-          aria-labelledby="tab-cosmetics"
-          hidden={activeTab !== 'cosmetics'}
-        >
-          {activeTab === 'cosmetics' && cosmetics}
-        </div>
+      <div className="p-4 sm:p-6">
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            id={`tabpanel-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${tab.id}`}
+            hidden={activeTab !== tab.id}
+          >
+            {activeTab === tab.id ? panels[tab.id] : null}
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 }

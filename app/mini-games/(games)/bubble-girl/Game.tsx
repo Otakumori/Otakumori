@@ -138,7 +138,12 @@ export default function Game({ skin, mode }: Props) {
             }),
           });
         } catch (error) {
-          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+          logger.error(
+            'Failed to submit score:',
+            undefined,
+            undefined,
+            error instanceof Error ? error : new Error(String(error)),
+          );
         }
       };
       submitScore();
@@ -156,7 +161,7 @@ export default function Game({ skin, mode }: Props) {
           height: '540px',
           backgroundColor: 'var(--om-bg-root, #1a1816)',
         }}
-        aria-label="Bubble Girl game area"
+        aria-label="Bubble Ragdoll game area"
       />
 
       {/* HUD Overlay */}
@@ -295,12 +300,7 @@ class GameEngine {
       const type = types[Math.floor(Math.random() * types.length)];
 
       this.bubbles.push(
-        new Bubble(
-          Math.random() * designWidth,
-          designHeight - 20,
-          Math.random() * 20 + 16,
-          type,
-        ),
+        new Bubble(Math.random() * designWidth, designHeight - 20, Math.random() * 20 + 16, type),
       );
     }
   }
@@ -376,12 +376,16 @@ class GameEngine {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Draw background using CSS variables
-    const bgColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() || '#1a1816'
-      : '#1a1816';
-    const accentColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#f3b7c2'
-      : '#f3b7c2';
+    const bgColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() ||
+          '#1a1816'
+        : '#1a1816';
+    const accentColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() ||
+          '#f3b7c2'
+        : '#f3b7c2';
 
     const gradient = this.ctx.createLinearGradient(0, 0, 0, designHeight);
     gradient.addColorStop(0, `${accentColor}1A`); // 10% opacity
@@ -436,12 +440,7 @@ class GameEngine {
       const type = types[Math.floor(Math.random() * types.length)];
 
       this.bubbles.push(
-        new Bubble(
-          Math.random() * designWidth,
-          designHeight - 20,
-          Math.random() * 20 + 16,
-          type,
-        ),
+        new Bubble(Math.random() * designWidth, designHeight - 20, Math.random() * 20 + 16, type),
       );
     }
   }
@@ -453,12 +452,7 @@ class GameEngine {
       const designHeight = parseInt(this.canvas.style.height) || 540;
 
       this.bubbles.push(
-        new Bubble(
-          Math.random() * designWidth,
-          designHeight - 20,
-          Math.random() * 20 + 16,
-          type,
-        ),
+        new Bubble(Math.random() * designWidth, designHeight - 20, Math.random() * 20 + 16, type),
       );
     }
   }

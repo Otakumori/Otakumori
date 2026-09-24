@@ -23,11 +23,14 @@ export interface PetalCollectionState {
   hasCollectedAny: boolean;
   showAchievement: boolean;
   lastCollectedValue: number; // Track for rare petal indicator
+  guestDailyLimit: number;
+  guestDailyRemaining: number;
+  guestDailyCapReached: boolean;
 }
 
 // Guest storage constants
 const GUEST_STORAGE_KEY = 'otm-guest-petals-background-v1';
-const GUEST_DAILY_LIMIT = 500;
+export const GUEST_DAILY_LIMIT = COLLECTION.GUEST_DAILY_LIMIT;
 const SESSION_STORAGE_KEY = 'otm-session-petals-v1';
 const COLLECTION_FLAG_KEY = 'otm-has-collected-petal';
 
@@ -104,6 +107,9 @@ export function usePetalCollection() {
     hasCollectedAny: false,
     showAchievement: false,
     lastCollectedValue: 1,
+    guestDailyLimit: GUEST_DAILY_LIMIT,
+    guestDailyRemaining: GUEST_DAILY_LIMIT,
+    guestDailyCapReached: false,
   });
 
   const pendingCollections = useRef<CollectedPetal[]>([]);
@@ -157,11 +163,15 @@ export function usePetalCollection() {
         }
       }
 
+      const guestDailyRemaining = Math.max(0, GUEST_DAILY_LIMIT - sessionTotal);
+
       setState((prev) => ({
         ...prev,
         sessionTotal,
         lifetimeTotal,
         hasCollectedAny: hasCollected || sessionTotal > 0,
+        guestDailyRemaining,
+        guestDailyCapReached: guestDailyRemaining === 0,
       }));
     } catch (error) {
       getLogger().then((logger) => {
@@ -337,21 +347,36 @@ export function usePetalCollection() {
   // Collect a petal
   const collectPetal = useCallback(
     (petalId: number, value: number, x: number, y: number) => {
+      const remainingBeforeCollect = Math.max(
+        0,
+        GUEST_DAILY_LIMIT - lastStateRef.current.sessionTotal,
+      );
+      const grantedValue = Math.min(value, remainingBeforeCollect);
+
+      if (grantedValue <= 0) {
+        setState((prev) => ({
+          ...prev,
+          guestDailyRemaining: 0,
+          guestDailyCapReached: true,
+        }));
+        return;
+      }
+
       // Track analytics
       trackPetalCollection({
         petalId,
-        amount: value,
+        amount: grantedValue,
         source: 'background_petal_click',
         location: { x, y },
         metadata: {
-          sessionTotal: lastStateRef.current.sessionTotal + value,
+          sessionTotal: lastStateRef.current.sessionTotal + grantedValue,
         },
       });
 
       // Add to pending
       pendingCollections.current.push({
         id: petalId,
-        value,
+        value: grantedValue,
         x,
         y,
         timestamp: Date.now(),
@@ -365,12 +390,17 @@ export function usePetalCollection() {
           safeLocalStorageSet(COLLECTION_FLAG_KEY, 'true');
         }
 
+        const nextSessionTotal = Math.min(GUEST_DAILY_LIMIT, prev.sessionTotal + grantedValue);
+        const guestDailyRemaining = Math.max(0, GUEST_DAILY_LIMIT - nextSessionTotal);
+
         const newState = {
           ...prev,
-          sessionTotal: prev.sessionTotal + value,
+          sessionTotal: nextSessionTotal,
           hasCollectedAny: true,
           showAchievement: isFirstCollection,
-          lastCollectedValue: value,
+          lastCollectedValue: grantedValue,
+          guestDailyRemaining,
+          guestDailyCapReached: guestDailyRemaining === 0,
         };
 
         // Persist session immediately

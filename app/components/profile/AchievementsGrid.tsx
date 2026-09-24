@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
 import GlassPanel from '../GlassPanel';
 
 type Achievement = {
@@ -20,236 +19,135 @@ type AchievementsGridProps = {
   achievements: Achievement[];
 };
 
+const rarityLabels: Record<Achievement['rarity'], string> = {
+  common: 'Common',
+  uncommon: 'Uncommon',
+  rare: 'Rare',
+  epic: 'Epic',
+  legendary: 'Legendary',
+};
+
+function getCrypticHint(achievement: Achievement) {
+  const hints = {
+    'first-steps': 'A blossom unseen under moonlight',
+    'petal-master': 'When the tree weeps, catch its tears',
+    explorer: 'Venture where shadows dance',
+    collector: 'Gather what others discard',
+    'social-butterfly': 'Speak to the silent stones',
+    'night-owl': 'When the world sleeps, you awaken',
+    perfectionist: 'Seek the flawless path',
+    mystic: 'Read the signs in the digital wind',
+  };
+  return hints[achievement.id as keyof typeof hints] || 'The path reveals itself to the patient';
+}
+
 export default function AchievementsGrid({ achievements }: AchievementsGridProps) {
-  const [hoveredAchievement, setHoveredAchievement] = useState<string | null>(null);
-  const [sparkleElements, setSparkleElements] = useState<
-    Array<{ id: string; x: number; y: number; delay: number }>
-  >([]);
-
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common':
-        return 'border-zinc-400 text-zinc-400';
-      case 'uncommon':
-        return 'border-green-400 text-green-400';
-      case 'rare':
-        return 'border-blue-400 text-blue-400';
-      case 'epic':
-        return 'border-purple-400 text-purple-400';
-      case 'legendary':
-        return 'border-yellow-400 text-yellow-400';
-      default:
-        return 'border-zinc-400 text-zinc-400';
-    }
-  };
-
-  const getRarityGlow = (rarity: string) => {
-    switch (rarity) {
-      case 'common':
-        return 'shadow-none';
-      case 'uncommon':
-        return 'shadow-[0_0_20px_rgba(34,197,94,0.3)]';
-      case 'rare':
-        return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
-      case 'epic':
-        return 'shadow-[0_0_20px_rgba(168,85,247,0.3)]';
-      case 'legendary':
-        return 'shadow-[0_0_20px_rgba(234,179,8,0.3)]';
-      default:
-        return 'shadow-none';
-    }
-  };
-
-  const getCrypticHint = (achievement: Achievement) => {
-    const hints = {
-      'first-steps': 'A blossom unseen under moonlight',
-      'petal-master': 'When the tree weeps, catch its tears',
-      explorer: 'Venture where shadows dance',
-      collector: 'Gather what others discard',
-      'social-butterfly': 'Speak to the silent stones',
-      'night-owl': 'When the world sleeps, you awaken',
-      perfectionist: 'Seek the flawless path',
-      mystic: 'Read the signs in the digital wind',
-    };
-    return hints[achievement.id as keyof typeof hints] || 'The path reveals itself to the patient';
-  };
-
-  const createSparkles = (achievementId: string, rect: DOMRect) => {
-    const sparkles = [];
-    for (let i = 0; i < 8; i++) {
-      sparkles.push({
-        id: `${achievementId}-sparkle-${i}`,
-        x: rect.left + Math.random() * rect.width,
-        y: rect.top + Math.random() * rect.height,
-        delay: i * 100,
-      });
-    }
-    setSparkleElements(sparkles);
-  };
-
-  const handleMouseEnter = (achievementId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    if (achievements.find((a) => a.id === achievementId)?.unlocked) {
-      setHoveredAchievement(achievementId);
-      const rect = event.currentTarget.getBoundingClientRect();
-      createSparkles(achievementId, rect);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredAchievement(null);
-    setSparkleElements([]);
-  };
-
-  useEffect(() => {
-    if (sparkleElements.length > 0) {
-      const timer = setTimeout(() => {
-        setSparkleElements([]);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [sparkleElements]);
-
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const totalCount = achievements.length;
   const completionPercentage =
     totalCount > 0 ? Math.min(100, Math.max(0, Math.round((unlockedCount / totalCount) * 100))) : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Stats */}
-      <GlassPanel className="p-6">
-        <div className="flex items-center justify-between">
+    <div className="space-y-7">
+      <GlassPanel className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-white">Progress</h2>
-            <p className="text-zinc-400">
-              {unlockedCount} of {totalCount} achievements unlocked
+            <h2 className="font-display text-lg font-semibold text-[#fff1e4]">Collection progress</h2>
+            <p className="mt-1 text-sm text-[#cdbbb7]">
+              {unlockedCount} of {totalCount} relics discovered
             </p>
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-fuchsia-300">{completionPercentage}%</div>
-            <div className="text-sm text-zinc-400">Complete</div>
+          <div className="text-left sm:text-right">
+            <div className="text-2xl font-semibold text-[#c7a97f]">{completionPercentage}%</div>
+            <div className="text-xs uppercase tracking-[0.14em] text-[#8f7f7d]">complete</div>
           </div>
         </div>
-        <div className="mt-4 w-full bg-white/10 rounded-full h-2">
+        <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
           <div
-            className="bg-fuchsia-400 h-2 rounded-full transition-all duration-300"
+            className="h-full rounded-full bg-[linear-gradient(90deg,#765f4b,#b69773,#d7b2b9)] transition-[width] duration-300"
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
       </GlassPanel>
 
-      {/* Achievements Grid */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 relative">
-        {achievements.map((achievement) => (
-          <div
-            key={achievement.id}
-            className={`p-4 transition-all duration-300 cursor-pointer rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_60px_-15px_rgba(200,120,255,0.25)] ${
-              achievement.unlocked
-                ? 'opacity-100 hover:scale-105'
-                : 'opacity-60 grayscale hover:opacity-80'
-            } ${
-              hoveredAchievement === achievement.id && achievement.unlocked
-                ? 'animate-pulse bg-fuchsia-500/10 border-fuchsia-400/50'
-                : ''
-            }`}
-            onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) =>
-              handleMouseEnter(achievement.id, e)
-            }
-            onMouseLeave={handleMouseLeave}
-            onFocus={(e: React.FocusEvent<HTMLDivElement>) =>
-              handleMouseEnter(achievement.id, e as any)
-            }
-            onBlur={handleMouseLeave}
-            role="button"
-            tabIndex={0}
-            aria-label={`${achievement.name} achievement${achievement.unlocked ? ' - unlocked' : ' - locked'}`}
-          >
-            <div className="text-center">
-              <div
-                className={`w-16 h-16 mx-auto mb-3 rounded-xl border-2 ${getRarityColor(achievement.rarity)} ${getRarityGlow(achievement.rarity)} flex items-center justify-center relative overflow-hidden`}
-              >
-                {achievement.unlocked ? (
-                  <Image
-                    src={`/assets/achievements/${achievement.icon}`}
-                    alt={achievement.name}
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-zinc-600 rounded"></div>
-                )}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {achievements.map((achievement) => {
+          const hint = achievement.unlocked ? achievement.description : getCrypticHint(achievement);
+          const progress =
+            achievement.progress !== undefined && achievement.maxProgress
+              ? Math.min(100, Math.max(0, (achievement.progress / achievement.maxProgress) * 100))
+              : null;
 
-                {/* Sparkle overlay for unlocked achievements */}
-                {hoveredAchievement === achievement.id && achievement.unlocked && (
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-fuchsia-400/20 to-transparent animate-pulse"></div>
+          return (
+            <article
+              key={achievement.id}
+              className="mori-achievement p-4"
+              data-rarity={achievement.rarity}
+              data-locked={achievement.unlocked ? 'false' : 'true'}
+            >
+              <div className="flex items-start gap-4">
+                <div className="mori-achievement-medallion relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full">
+                  {achievement.unlocked ? (
+                    <Image
+                      src={`/assets/achievements/${achievement.icon}`}
+                      alt=""
+                      width={36}
+                      height={36}
+                      className="h-9 w-9 object-contain"
+                    />
+                  ) : (
+                    <span aria-hidden="true" className="font-display text-xl text-[#8f7f7d]">
+                      ?
+                    </span>
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-display text-base font-semibold text-[#fff1e4]">
+                      {achievement.name}
+                    </h3>
+                    <span className="text-[10px] uppercase tracking-[0.13em] text-[#a9855f]">
+                      {rarityLabels[achievement.rarity]}
+                    </span>
                   </div>
-                )}
+                  <p className="mt-2 text-sm leading-6 text-[#cdbbb7]/82">{hint}</p>
+                </div>
               </div>
 
-              <h3
-                className={`font-semibold text-sm mb-1 ${
-                  achievement.unlocked ? 'text-white' : 'text-zinc-500'
-                }`}
-              >
-                {achievement.name}
-              </h3>
-
-              <p
-                className={`text-xs mb-2 ${
-                  achievement.unlocked ? 'text-zinc-300' : 'text-zinc-600'
-                }`}
-              >
-                {achievement.unlocked ? achievement.description : getCrypticHint(achievement)}
-              </p>
-
-              {achievement.progress !== undefined && achievement.maxProgress && (
-                <div className="w-full bg-white/10 rounded-full h-1 mb-2">
-                  <div
-                    className="bg-fuchsia-400 h-1 rounded-full transition-all duration-300"
-                    style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
-                  />
+              {progress !== null && (
+                <div className="mt-4">
+                  <div className="mb-1 flex items-center justify-between text-[11px] text-[#8f7f7d]">
+                    <span>{achievement.unlocked ? 'Mastered' : 'Progress'}</span>
+                    <span>
+                      {achievement.progress} / {achievement.maxProgress}
+                    </span>
+                  </div>
+                  <div className="h-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div
+                      className="h-full rounded-full bg-[#a9855f] transition-[width] duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
                 </div>
               )}
 
-              {achievement.unlocked && achievement.unlockedAt && (
-                <p className="text-xs text-zinc-500">
-                  Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
-                </p>
-              )}
-
-              {!achievement.unlocked && achievement.progress !== undefined && (
-                <p className="text-xs text-zinc-500">
-                  {achievement.progress} / {achievement.maxProgress}
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {/* Floating Sparkles */}
-        {sparkleElements.map((sparkle) => (
-          <div
-            key={sparkle.id}
-            className="absolute pointer-events-none animate-ping"
-            style={{
-              left: sparkle.x,
-              top: sparkle.y,
-              animationDelay: `${sparkle.delay}ms`,
-            }}
-          >
-            <div className="w-2 h-2 bg-fuchsia-400 rounded-full opacity-75"></div>
-          </div>
-        ))}
+              <div className="mt-4 border-t border-white/[0.07] pt-3 text-xs text-[#8f7f7d]">
+                {achievement.unlocked && achievement.unlockedAt
+                  ? `Discovered ${new Date(achievement.unlockedAt).toLocaleDateString()}`
+                  : achievement.unlocked
+                    ? 'Discovered'
+                    : 'Undiscovered'}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       {achievements.length === 0 && (
-        <div className="text-center py-12">
-          <GlassPanel className="p-8">
-            <h2 className="text-xl font-semibold text-white mb-4">No achievements yet</h2>
-            <p className="text-zinc-400">Start exploring to unlock your first achievement!</p>
-          </GlassPanel>
+        <div className="mori-panel-soft px-6 py-12 text-center">
+          <h2 className="font-display text-xl font-semibold text-[#fff1e4]">No relics discovered yet</h2>
+          <p className="mt-2 text-sm text-[#cdbbb7]">Play, explore, and return when the first mark is earned.</p>
         </div>
       )}
     </div>

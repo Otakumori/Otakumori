@@ -10,7 +10,7 @@ const games = [
   { slug: 'petal-collection', name: 'Petal Collection' },
   { slug: 'memory-match', name: 'Memory Match' },
   { slug: 'otaku-beat-em-up', name: 'Rhythm Beat' },
-  { slug: 'bubble-girl', name: 'Bubble Girl' },
+  { slug: 'bubble-girl', name: 'Bubble Ragdoll' },
   { slug: 'quick-math', name: 'Quick Math' },
   { slug: 'puzzle-reveal', name: 'Puzzle Reveal' },
 ];

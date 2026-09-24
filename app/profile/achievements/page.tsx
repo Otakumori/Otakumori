@@ -1,11 +1,11 @@
 import { generateSEO } from '@/app/lib/seo';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import Navbar from '../../components/layout/Navbar';
-import FooterDark from '../../components/FooterDark';
 import AchievementsTabs from '../../components/profile/AchievementsTabs';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
+import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 async function getAchievements() {
   try {
@@ -31,6 +31,7 @@ export function generateMetadata() {
     url: '/profile/achievements',
   });
 }
+
 export default async function AchievementsPage() {
   const { userId } = await auth();
 
@@ -41,21 +42,26 @@ export default async function AchievementsPage() {
   const achievements = await getAchievements();
 
   return (
-    <>
-      <Navbar />
-      <main className="relative z-10 min-h-screen bg-[#080611]">
-        <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">
+    <main className="mori-page pt-24">
+      <div className="mori-shell py-10 sm:py-14">
+        <header className="mb-8 flex max-w-4xl flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <MoriArtwork
+            src={approvedVisualAssets.destinations.achievements}
+            className="w-32 shrink-0 sm:w-40"
+            sizes="(max-width: 640px) 8rem, 10rem"
+          />
+          <div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-[#fff1e4] md:text-4xl">
               {t('achievements', 'title')}
             </h1>
-            <p className="mt-2 text-zinc-300/90">{t('achievements', 'subtitle')}</p>
+            <p className="mt-3 text-base leading-7 text-[#cdbbb7]">
+              {t('achievements', 'subtitle')}
+            </p>
           </div>
+        </header>
 
-          <AchievementsTabs achievements={achievements} />
-        </div>
-      </main>
-      <FooterDark />
-    </>
+        <AchievementsTabs achievements={achievements} />
+      </div>
+    </main>
   );
 }

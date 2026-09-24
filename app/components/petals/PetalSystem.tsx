@@ -19,6 +19,9 @@ function PetalSystemComponent() {
     dismissAchievement,
     hasCollectedAny,
     lastCollectedValue,
+    guestDailyLimit,
+    guestDailyRemaining,
+    guestDailyCapReached,
   } = usePetalCollectionContext();
 
   const handlePetalCollect = useCallback(
@@ -39,7 +42,15 @@ function PetalSystemComponent() {
       )}
 
       {/* Persistent counter - only shows after first collection */}
-      {hasCollectedAny && <PetalCounter count={sessionTotal} lastValue={lastCollectedValue} />}
+      {hasCollectedAny && (
+        <PetalCounter
+          count={sessionTotal}
+          lastValue={lastCollectedValue}
+          guestDailyLimit={guestDailyLimit}
+          guestDailyRemaining={guestDailyRemaining}
+          guestDailyCapReached={guestDailyCapReached}
+        />
+      )}
     </>
   );
 }

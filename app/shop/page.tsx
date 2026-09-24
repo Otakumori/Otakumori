@@ -14,30 +14,27 @@ export function generateMetadata() {
 
 export default function ShopPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#080611] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,148,201,0.18),transparent_30%),radial-gradient(circle_at_84%_18%,rgba(132,92,255,0.16),transparent_28%),linear-gradient(180deg,rgba(8,6,17,0.2),rgba(8,6,17,0.94))]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(90deg,transparent,rgba(255,222,233,0.08),transparent)]" />
-
-      <div className="relative z-10 container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <main className="mori-page overflow-hidden pt-24">
+      <div className="mori-shell py-10 sm:py-14">
         <DecorativeSectionHeader
           eyebrow="Curated grove market"
           title="Shop the Otaku-mori collection"
-          description="A focused catalog of anime and game-inspired pieces, framed for quick browsing and calm checkout decisions."
+          description="Anime and game-inspired pieces presented with calm product framing, clear variants, and room for the art to do the work."
         />
 
-        <StorefrontPanel className="mt-10 p-4 sm:p-6">
-          <div className="mb-6 grid gap-3 border-b border-pink-100/10 pb-5 text-sm text-[#f5d6dc]/68 md:grid-cols-3">
+        <StorefrontPanel className="mt-9 border-white/[0.09] bg-[#0b080c]/76 p-4 shadow-[0_22px_60px_rgba(0,0,0,0.34)] sm:p-6">
+          <div className="mb-6 grid gap-4 border-b border-white/[0.08] pb-5 text-sm leading-6 text-[#cdbbb7]/78 md:grid-cols-3">
             <p>
-              <span className="font-semibold text-pink-100">Images stay composed.</span> Shirts,
-              shoes, pins, stickers, and soft goods use product-aware framing.
+              <span className="font-semibold text-[#fff1e4]">Product art stays primary.</span> Apparel,
+              pins, stickers, and soft goods use framing that protects the design.
             </p>
             <p>
-              <span className="font-semibold text-pink-100">Variants stay clear.</span> Cards show
-              starting prices while detail pages handle option selection.
+              <span className="font-semibold text-[#fff1e4]">Variants stay legible.</span> Cards show
+              starting prices while detail pages handle the full choice.
             </p>
             <p>
-              <span className="font-semibold text-pink-100">Local curation stays safe.</span> Hidden
-              or archived products remain out of the public storefront.
+              <span className="font-semibold text-[#fff1e4]">Curation stays clean.</span> Hidden or
+              archived products remain out of the public storefront.
             </p>
           </div>
           <BuyReadyShopCatalog />

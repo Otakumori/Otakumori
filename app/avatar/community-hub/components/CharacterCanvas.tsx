@@ -5,9 +5,10 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import React, { Suspense, useMemo, useRef, useEffect, memo } from 'react';
+import React, { Suspense, useMemo, useRef, useEffect, useState, memo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
+import Image from 'next/image';
 import * as THREE from 'three';
 import type { CharacterConfig } from '../lib/character-state';
 import {
@@ -16,16 +17,29 @@ import {
   generateOutfit,
   generateAccessory,
 } from '../lib/procedural-meshes';
-import {
-  applyMaterialsToGroup,
-  createOutlineMesh,
-} from '../lib/materials';
+import { applyMaterialsToGroup, createOutlineMesh } from '../lib/materials';
 import { CAMERA_POSITION, CAMERA_TARGET } from '../lib/constants';
+import { approvedVisualAssets } from '@/lib/approved-visual-assets';
 
 interface CharacterCanvasProps {
   config: CharacterConfig;
   showOutline?: boolean;
   onSceneReady?: (scene: THREE.Group) => void;
+}
+
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncPreference = () => setPrefersReducedMotion(mediaQuery.matches);
+
+    syncPreference();
+    mediaQuery.addEventListener('change', syncPreference);
+    return () => mediaQuery.removeEventListener('change', syncPreference);
+  }, []);
+
+  return prefersReducedMotion;
 }
 
 /**
@@ -38,7 +52,8 @@ const CharacterScene = memo(function CharacterScene({
 }: CharacterCanvasProps) {
   const sceneRef = useRef<THREE.Group>(null);
   const { scene } = useThree();
-  
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   // Use scene from useThree for advanced operations (debugging, exports, etc.)
   useEffect(() => {
     if (scene && sceneRef.current) {
@@ -104,7 +119,9 @@ const CharacterScene = memo(function CharacterScene({
               const outline = createOutlineMesh(child, 0.02, 0x000000);
               outlineGroup.add(outline);
             } catch (error) {
-              logger.warn('Failed to create outline for mesh:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+              logger.warn('Failed to create outline for mesh:', undefined, {
+                error: error instanceof Error ? error : new Error(String(error)),
+              });
             }
           }
         });
@@ -113,7 +130,9 @@ const CharacterScene = memo(function CharacterScene({
 
       return group;
     } catch (error) {
-      logger.warn('Failed to generate character, using fallback:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+      logger.warn('Failed to generate character, using fallback:', undefined, {
+        error: error instanceof Error ? error : new Error(String(error)),
+      });
       // Fallback - simple box
       const fallbackGroup = new THREE.Group();
       const geometry = new THREE.BoxGeometry(0.5, 1.5, 0.5);
@@ -160,16 +179,23 @@ const CharacterScene = memo(function CharacterScene({
     if (sceneRef.current) {
       const character = sceneRef.current.getObjectByName('Character');
       if (character) {
+        if (prefersReducedMotion) {
+          character.scale.y = 1;
+          character.rotation.y = 0;
+          character.position.y = 0;
+          return;
+        }
+
         const time = state.clock.elapsedTime;
-        
+
         // Breathing effect - subtle scale on Y axis
         const breathingScale = 1 + Math.sin(time * 1.5) * 0.01;
         character.scale.y = breathingScale;
-        
+
         // Subtle swaying - small rotation on Y axis
         const swayAmount = Math.sin(time * 0.8) * 0.02;
         character.rotation.y = swayAmount;
-        
+
         // Subtle vertical bob
         const bobAmount = Math.sin(time * 1.2) * 0.005;
         character.position.y = bobAmount;
@@ -222,11 +248,32 @@ export default function CharacterCanvas({
   onSceneReady,
 }: CharacterCanvasProps) {
   return (
-    <div className="h-full w-full bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+    <div className="relative isolate h-full w-full overflow-hidden bg-gradient-to-b from-[#301d44] via-[#21132f] to-[#09070c]">
+      <Image
+        src={approvedVisualAssets.avatar.presentation.backplate}
+        alt=""
+        fill
+        sizes="(max-width: 1024px) 100vw, calc(100vw - 24rem)"
+        aria-hidden="true"
+        className="pointer-events-none z-0 object-contain object-center opacity-75"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-[12%] bottom-[3%] z-10 aspect-[1.08/1]"
+        aria-hidden="true"
+      >
+        <Image
+          src={approvedVisualAssets.avatar.presentation.groundingRing}
+          alt=""
+          fill
+          sizes="(max-width: 1024px) 76vw, 58vw"
+          className="object-contain object-bottom opacity-80"
+        />
+      </div>
       <Canvas
+        className="relative z-20"
         gl={{
           antialias: true,
-          alpha: false,
+          alpha: true,
           powerPreference: 'high-performance',
         }}
         shadows
@@ -273,17 +320,24 @@ export default function CharacterCanvas({
           <CharacterScene config={config} showOutline={showOutline} onSceneReady={onSceneReady} />
 
           {/* Ground plane for shadows */}
-          <mesh
-            rotation={[-Math.PI / 2, 0, 0]}
-            position={[0, -0.01, 0]}
-            receiveShadow
-          >
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
             <planeGeometry args={[10, 10]} />
             <meshStandardMaterial color="#1a1a1a" transparent opacity={0.3} />
           </mesh>
         </Suspense>
       </Canvas>
+      <div
+        className="pointer-events-none absolute inset-x-[15%] bottom-[-28%] z-10 aspect-square"
+        aria-hidden="true"
+      >
+        <Image
+          src={approvedVisualAssets.avatar.presentation.stage}
+          alt=""
+          fill
+          sizes="(max-width: 1024px) 84vw, 64vw"
+          className="object-contain object-bottom drop-shadow-[0_30px_40px_rgba(0,0,0,0.65)]"
+        />
+      </div>
     </div>
   );
 }
-
