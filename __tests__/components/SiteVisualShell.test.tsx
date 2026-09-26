@@ -35,6 +35,7 @@ describe('SiteVisualShell', () => {
     const shell = screen.getByTestId('mori-site-interior-shell');
     expect(shell).toHaveAttribute('id', 'main-content');
     expect(shell).toHaveAttribute('data-visual-surface', 'mori-interior');
+    expect(shell).toHaveAttribute('data-mori-route-shell', 'interior');
     expect(shell).toHaveClass('om-site-interior-shell');
     expect(screen.getByTestId('shop-child')).toBeInTheDocument();
   });
