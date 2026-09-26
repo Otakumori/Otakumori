@@ -20,7 +20,11 @@ describe('site visual CSS contract', () => {
   it('loads the incremental semantic Mori foundation after legacy global CSS', () => {
     expect(rootLayout).toContain("import './styles/mori-foundation.css';");
     expect(foundationCss).toContain('--mori-surface-parchment');
+    expect(foundationCss).toContain('--mori-pigment-sakura');
+    expect(foundationCss).toContain('--mori-material-sakura-silk');
     expect(foundationCss).toContain('--mori-world-echo-warmth');
+    expect(foundationCss).toContain("data-mori-containment='quiet'");
+    expect(foundationCss).toContain("data-mori-texture='grain'");
     expect(foundationCss).toContain('.mori-foundation-button:focus-visible');
     expect(foundationCss).toContain('@media (prefers-reduced-motion: reduce)');
   });

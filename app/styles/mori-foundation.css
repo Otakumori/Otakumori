@@ -45,13 +45,20 @@
   --mori-surface-lacquer: #11100f;
   --mori-surface-parchment: #e9dcc8;
   --mori-surface-ash: #302b28;
+  --mori-material-sakura-silk:
+    linear-gradient(135deg, rgb(112 55 71 / 92%), rgb(73 40 51 / 96%));
   --mori-text-primary: var(--mori-color-ivory-100);
   --mori-text-secondary: var(--mori-color-ivory-300);
   --mori-text-muted: #aa9c8d;
   --mori-edge-structural: rgb(198 167 125 / 38%);
   --mori-edge-branded: rgb(185 123 141 / 48%);
+  --mori-line-structural: var(--mori-edge-structural);
+  --mori-line-catalogue: rgb(198 167 125 / 24%);
+  --mori-line-ink: rgb(23 17 15 / 48%);
   --mori-edge-focus: #f0c9d2;
-  --mori-accent-sakura: var(--mori-color-rose-300);
+  --mori-pigment-sakura: var(--mori-color-rose-300);
+  --mori-pigment-sakura-muted: rgb(185 123 141 / 64%);
+  --mori-accent-sakura: var(--mori-pigment-sakura);
   --mori-accent-bronze: var(--mori-color-bronze-300);
   --mori-accent-danger: #e0a09b;
   --mori-state-selected: #f3ced7;
@@ -66,19 +73,31 @@
 }
 
 .om-site-interior-shell[data-mori-route-shell='interior'] {
-  background:
-    radial-gradient(circle at 12% 0%, rgb(169 133 95 / 10%), transparent 30rem),
-    radial-gradient(circle at 92% 16rem, rgb(185 123 141 / 8%), transparent 28rem),
-    linear-gradient(180deg, var(--mori-color-charcoal-900), var(--mori-surface-environment));
+  background: var(--mori-surface-environment);
+}
+
+.om-site-interior-shell[data-mori-route-shell='interior']::before,
+.om-site-interior-shell[data-mori-route-shell='interior']::after,
+.om-site-interior-shell[data-mori-route-shell='interior'] > .om-site-interior-shell__veil {
+  background: none;
+  opacity: 0;
 }
 
 .mori-foundation-surface {
   position: relative;
   isolation: isolate;
-  border: 1px solid var(--mori-edge-structural);
+  color: var(--mori-text-primary);
+}
+
+.mori-foundation-surface[data-mori-containment='quiet'] {
+  border: 1px solid var(--mori-line-structural);
+  border-radius: var(--mori-radius-object);
+}
+
+.mori-foundation-surface[data-mori-containment='raised'] {
+  border: 1px solid var(--mori-line-structural);
   border-radius: var(--mori-radius-object);
   box-shadow: var(--mori-shadow-rest);
-  color: var(--mori-text-primary);
 }
 
 .mori-foundation-surface[data-mori-material='paper'] {
@@ -94,7 +113,6 @@
 }
 
 .mori-foundation-surface[data-mori-material='parchment'] {
-  border-color: rgb(80 57 37 / 40%);
   background:
     linear-gradient(105deg, rgb(255 255 255 / 20%), transparent 42%),
     var(--mori-surface-parchment);
@@ -102,13 +120,36 @@
 }
 
 .mori-foundation-surface[data-mori-material='ash'] {
-  border-color: rgb(210 196 176 / 20%);
   background: var(--mori-surface-ash);
+}
+
+.mori-foundation-surface[data-mori-material='parchment'][data-mori-containment='quiet'],
+.mori-foundation-surface[data-mori-material='parchment'][data-mori-containment='raised'] {
+  border-color: rgb(80 57 37 / 40%);
+}
+
+.mori-foundation-surface[data-mori-material='ash'][data-mori-containment='quiet'],
+.mori-foundation-surface[data-mori-material='ash'][data-mori-containment='raised'] {
+  border-color: rgb(210 196 176 / 20%);
+}
+
+.mori-foundation-surface[data-mori-texture='grain']::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+  opacity: 0.12;
+  background-image:
+    radial-gradient(rgb(255 255 255 / 42%) 0.45px, transparent 0.7px),
+    radial-gradient(rgb(0 0 0 / 36%) 0.45px, transparent 0.7px);
+  background-position: 0 0, 9px 11px;
+  background-size: 17px 19px, 23px 29px;
 }
 
 .mori-foundation-frame {
   position: relative;
-  border: 1px solid var(--mori-edge-structural);
+  border: 1px solid var(--mori-line-structural);
   border-radius: var(--mori-radius-object);
 }
 
@@ -119,6 +160,14 @@
   height: 1.25rem;
   content: '';
   pointer-events: none;
+}
+
+.mori-foundation-catalogue-line {
+  border-inline-start: 1px solid var(--mori-line-catalogue);
+}
+
+.mori-foundation-catalogue-line[data-mori-pigment='sakura'] {
+  border-inline-start-color: var(--mori-pigment-sakura-muted);
 }
 
 .mori-foundation-frame::before {

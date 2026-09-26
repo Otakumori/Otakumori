@@ -3,23 +3,37 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export type MoriMaterial = 'paper' | 'lacquer' | 'parchment' | 'ash';
+export type MoriContainment = 'none' | 'quiet' | 'raised';
+export type MoriSurfaceElement = 'div' | 'section' | 'article';
+export type MoriTexture = 'none' | 'grain';
 export type MoriButtonVariant = 'primary' | 'secondary' | 'danger';
 export type MoriStatusTone = 'neutral' | 'success' | 'error' | 'selected';
 
 export function MoriSurface({
+  as: Element = 'div',
   children,
   className,
+  containment = 'none',
   material = 'paper',
+  texture = 'none',
   ...props
-}: HTMLAttributes<HTMLElement> & { children: ReactNode; material?: MoriMaterial }) {
+}: HTMLAttributes<HTMLElement> & {
+  as?: MoriSurfaceElement;
+  children: ReactNode;
+  containment?: MoriContainment;
+  material?: MoriMaterial;
+  texture?: MoriTexture;
+}) {
   return (
-    <section
+    <Element
       {...props}
       className={cn('mori-foundation-surface', className)}
+      data-mori-containment={containment}
       data-mori-material={material}
+      data-mori-texture={texture}
     >
       {children}
-    </section>
+    </Element>
   );
 }
 
@@ -56,10 +70,18 @@ export function MoriSectionHeader({
 }
 
 export function MoriDivider({ label }: { label?: string }) {
+  if (!label) {
+    return (
+      <div aria-hidden="true" className="mori-foundation-divider">
+        <span className="mori-foundation-divider__seal" />
+      </div>
+    );
+  }
+
   return (
-    <div className="mori-foundation-divider" aria-hidden={label ? undefined : true}>
+    <div aria-label={label} className="mori-foundation-divider" role="separator">
       <span className="mori-foundation-divider__seal" />
-      {label ? <span>{label}</span> : null}
+      <span aria-hidden="true">{label}</span>
     </div>
   );
 }

@@ -35,7 +35,9 @@ export function StorefrontPanel({
   return (
     <MoriSurface
       {...props}
+      as="section"
       className={`relative overflow-hidden p-0 ${className}`}
+      containment="raised"
       material="lacquer"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(169,133,95,0.07),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.025),transparent_45%)]" />
