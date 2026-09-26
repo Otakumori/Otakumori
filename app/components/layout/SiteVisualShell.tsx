@@ -17,6 +17,7 @@ export default function SiteVisualShell({ children }: { children: ReactNode }) {
     <div
       id="main-content"
       className="om-site-interior-shell font-body"
+      data-mori-route-shell="interior"
       data-visual-surface="mori-interior"
       data-testid="mori-site-interior-shell"
     >
