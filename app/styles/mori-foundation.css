@@ -1,0 +1,287 @@
+/*
+ * Mori System Foundation
+ *
+ * This layer is deliberately loaded after legacy global CSS. It establishes
+ * semantic values and opt-in primitives without changing legacy route rules.
+ */
+
+:root {
+  /* Primitive palette */
+  --mori-color-charcoal-950: #0a0908;
+  --mori-color-charcoal-900: #14110f;
+  --mori-color-charcoal-800: #201b18;
+  --mori-color-ivory-100: #f6eddf;
+  --mori-color-ivory-300: #d9cdbd;
+  --mori-color-bronze-400: #a9855f;
+  --mori-color-bronze-300: #c6a77d;
+  --mori-color-rose-400: #b97b8d;
+  --mori-color-rose-300: #d7a5b2;
+  --mori-color-seal-500: #8b3d3c;
+  --mori-color-ash-500: #81756b;
+  --mori-color-ink: #17110f;
+
+  --mori-space-1: 0.25rem;
+  --mori-space-2: 0.5rem;
+  --mori-space-3: 0.75rem;
+  --mori-space-4: 1rem;
+  --mori-space-6: 1.5rem;
+  --mori-space-8: 2rem;
+  --mori-space-12: 3rem;
+  --mori-radius-control: 0.375rem;
+  --mori-radius-object: 0.75rem;
+  --mori-radius-seal: 999px;
+  --mori-shadow-rest: 0 14px 34px rgb(0 0 0 / 22%);
+  --mori-shadow-lift: 0 18px 42px rgb(0 0 0 / 30%);
+  --mori-ease-respond: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mori-ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --mori-duration-respond: 140ms;
+  --mori-duration-settle: 220ms;
+  --mori-duration-reveal: 320ms;
+  --mori-duration-trace: 420ms;
+
+  /* Semantic material and interaction layer */
+  --mori-surface-environment: var(--mori-color-charcoal-950);
+  --mori-surface-paper: #211c18;
+  --mori-surface-lacquer: #11100f;
+  --mori-surface-parchment: #e9dcc8;
+  --mori-surface-ash: #302b28;
+  --mori-text-primary: var(--mori-color-ivory-100);
+  --mori-text-secondary: var(--mori-color-ivory-300);
+  --mori-text-muted: #aa9c8d;
+  --mori-edge-structural: rgb(198 167 125 / 38%);
+  --mori-edge-branded: rgb(185 123 141 / 48%);
+  --mori-edge-focus: #f0c9d2;
+  --mori-accent-sakura: var(--mori-color-rose-300);
+  --mori-accent-bronze: var(--mori-color-bronze-300);
+  --mori-accent-danger: #e0a09b;
+  --mori-state-selected: #f3ced7;
+  --mori-state-disabled: #7a7068;
+  --mori-content-safe-inline: clamp(1rem, 3vw, 3rem);
+  --mori-content-safe-block: clamp(1.5rem, 4vw, 4rem);
+
+  /* World Echo hooks. Route work may set these values without changing layout. */
+  --mori-world-echo-warmth: 0;
+  --mori-world-echo-shadow-temperature: 0;
+  --mori-world-echo-bronze-warmth: 0;
+}
+
+.om-site-interior-shell[data-mori-route-shell='interior'] {
+  background:
+    radial-gradient(circle at 12% 0%, rgb(169 133 95 / 10%), transparent 30rem),
+    radial-gradient(circle at 92% 16rem, rgb(185 123 141 / 8%), transparent 28rem),
+    linear-gradient(180deg, var(--mori-color-charcoal-900), var(--mori-surface-environment));
+}
+
+.mori-foundation-surface {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--mori-edge-structural);
+  border-radius: var(--mori-radius-object);
+  box-shadow: var(--mori-shadow-rest);
+  color: var(--mori-text-primary);
+}
+
+.mori-foundation-surface[data-mori-material='paper'] {
+  background:
+    linear-gradient(110deg, rgb(255 255 255 / 2%), transparent 36%),
+    var(--mori-surface-paper);
+}
+
+.mori-foundation-surface[data-mori-material='lacquer'] {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 24%),
+    var(--mori-surface-lacquer);
+}
+
+.mori-foundation-surface[data-mori-material='parchment'] {
+  border-color: rgb(80 57 37 / 40%);
+  background:
+    linear-gradient(105deg, rgb(255 255 255 / 20%), transparent 42%),
+    var(--mori-surface-parchment);
+  color: var(--mori-color-ink);
+}
+
+.mori-foundation-surface[data-mori-material='ash'] {
+  border-color: rgb(210 196 176 / 20%);
+  background: var(--mori-surface-ash);
+}
+
+.mori-foundation-frame {
+  position: relative;
+  border: 1px solid var(--mori-edge-structural);
+  border-radius: var(--mori-radius-object);
+}
+
+.mori-foundation-frame::before,
+.mori-foundation-frame::after {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  content: '';
+  pointer-events: none;
+}
+
+.mori-foundation-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--mori-accent-bronze);
+  border-left: 2px solid var(--mori-accent-bronze);
+  border-start-start-radius: var(--mori-radius-control);
+}
+
+.mori-foundation-frame::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 2px solid var(--mori-accent-bronze);
+  border-bottom: 2px solid var(--mori-accent-bronze);
+  border-end-end-radius: var(--mori-radius-control);
+}
+
+.mori-foundation-eyebrow {
+  margin: 0;
+  color: var(--mori-accent-bronze);
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.mori-foundation-heading {
+  margin: var(--mori-space-2) 0 0;
+  color: var(--mori-text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.mori-foundation-description {
+  max-width: 42rem;
+  margin: var(--mori-space-4) 0 0;
+  color: var(--mori-text-secondary);
+  font-family: var(--font-body);
+  line-height: 1.65;
+}
+
+.mori-foundation-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--mori-space-3);
+  color: var(--mori-accent-bronze);
+}
+
+.mori-foundation-divider::before,
+.mori-foundation-divider::after {
+  height: 1px;
+  flex: 1;
+  content: '';
+  background: linear-gradient(90deg, transparent, var(--mori-edge-structural));
+}
+
+.mori-foundation-divider::after {
+  transform: scaleX(-1);
+}
+
+.mori-foundation-divider__seal {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid currentColor;
+  border-radius: var(--mori-radius-seal);
+}
+
+.mori-foundation-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mori-space-2);
+  border: 1px solid var(--mori-edge-structural);
+  border-radius: var(--mori-radius-control);
+  padding: 0.625rem 1rem;
+  color: var(--mori-text-primary);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  line-height: 1.2;
+  transition:
+    background-color var(--mori-duration-respond) var(--mori-ease-respond),
+    border-color var(--mori-duration-respond) var(--mori-ease-respond),
+    color var(--mori-duration-respond) var(--mori-ease-respond),
+    transform var(--mori-duration-respond) var(--mori-ease-respond);
+}
+
+.mori-foundation-button[data-mori-variant='primary'] {
+  border-color: var(--mori-edge-branded);
+  background: #572e3b;
+}
+
+.mori-foundation-button[data-mori-variant='secondary'] {
+  background: var(--mori-surface-lacquer);
+}
+
+.mori-foundation-button[data-mori-variant='danger'] {
+  border-color: rgb(224 160 155 / 55%);
+  background: #442323;
+}
+
+.mori-foundation-button:hover:not(:disabled) {
+  border-color: var(--mori-accent-bronze);
+  transform: translateY(-1px);
+}
+
+.mori-foundation-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.mori-foundation-button:disabled,
+.mori-foundation-button[aria-disabled='true'] {
+  cursor: not-allowed;
+  border-color: transparent;
+  background: #302c29;
+  color: var(--mori-state-disabled);
+  opacity: 1;
+}
+
+.mori-foundation-button:focus-visible,
+.mori-foundation-surface:focus-visible {
+  outline: 3px solid var(--mori-edge-focus);
+  outline-offset: 3px;
+}
+
+.mori-foundation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mori-space-2);
+  border: 1px solid var(--mori-edge-structural);
+  border-radius: var(--mori-radius-seal);
+  padding: 0.25rem 0.625rem;
+  color: var(--mori-text-secondary);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mori-foundation-status::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: var(--mori-radius-seal);
+  content: '';
+  background: currentColor;
+}
+
+.mori-foundation-status[data-mori-tone='success'] { color: #b7d4b0; }
+.mori-foundation-status[data-mori-tone='error'] { color: var(--mori-accent-danger); }
+.mori-foundation-status[data-mori-tone='selected'] { color: var(--mori-state-selected); }
+
+@media (max-width: 24rem) {
+  .mori-foundation-heading { font-size: 1.625rem; }
+  .mori-foundation-button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mori-foundation-button { transition: none; }
+  .mori-foundation-button:hover:not(:disabled),
+  .mori-foundation-button:active:not(:disabled) { transform: none; }
+}
