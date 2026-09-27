@@ -2,7 +2,6 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
-import { db } from '@/app/lib/db';
 import { LocalUserUnavailableError, requireLocalViewer } from '@/app/lib/auth/viewer';
 
 const stripeSessionCreate = vi.hoisted(() => vi.fn());
@@ -46,22 +45,6 @@ vi.mock('@/app/lib/prisma', () => ({
   },
 }));
 
-vi.mock('@/app/lib/db', () => ({
-  db: {
-    product: {
-      findUnique: vi.fn(),
-    },
-    order: {
-      create: vi.fn(),
-    },
-    orderItem: {
-      create: vi.fn(),
-    },
-  },
-  DatabaseAccess: {
-    getCurrentUser: vi.fn(),
-  },
-}));
 
 vi.mock('@/app/lib/rateLimit', () => ({
   rateLimitConfigs: { api: {}, auth: {} },
@@ -211,27 +194,13 @@ describe('checkout session safety gates', () => {
     expect(prisma.user.create).not.toHaveBeenCalled();
   });
 
-  it('/api/checkout/session rejects hidden products before Stripe', async () => {
-    vi.mocked(db.product.findUnique).mockResolvedValue(hiddenProduct() as never);
-    const mod = await import('../../app/api/checkout/session/route');
+  it('delegates legacy checkout endpoints to the canonical transaction handler', async () => {
+    const canonical = await import('../../app/api/v1/checkout/session/route');
+    const legacySession = await import('../../app/api/checkout/session/route');
+    const legacyCheckout = await import('../../app/api/checkout/route');
 
-    const response = await mod.POST(request('http://localhost/api/checkout/session'));
-    const json = await response.json();
-
-    expect(response.status).toBe(404);
-    expect(json.code).toBe('PRODUCT_NOT_PUBLIC');
-    expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(legacySession.POST).toBe(canonical.POST);
+    expect(legacyCheckout.POST).toBe(canonical.POST);
   });
 
-  it('/api/checkout/session rejects non-Printify products before Stripe', async () => {
-    vi.mocked(db.product.findUnique).mockResolvedValue(merchizeProduct() as never);
-    const mod = await import('../../app/api/checkout/session/route');
-
-    const response = await mod.POST(request('http://localhost/api/checkout/session'));
-    const json = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(json.code).toBe('UNSUPPORTED_PROVIDER');
-    expect(stripeSessionCreate).not.toHaveBeenCalled();
-  });
 });

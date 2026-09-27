@@ -90,8 +90,8 @@ test.describe('Critical User Journey', () => {
     await expect(page.locator('[data-testid="cart-success"]')).toBeVisible({ timeout: 5000 });
 
     // Navigate to cart
-    await page.click('a[href="/cart"]');
-    await expect(page).toHaveURL('/cart');
+    await page.click('a[href="/shop/cart"]');
+    await expect(page).toHaveURL('/shop/cart');
 
     // Verify cart items
     await page.waitForSelector('[data-testid="cart-items"]', { timeout: 10000 });
@@ -123,7 +123,7 @@ test.describe('Critical User Journey', () => {
 
     const parsedRedirectUrl = new URL(redirectUrl!);
     expect(parsedRedirectUrl.origin).toBe(cartOrigin);
-    expect(parsedRedirectUrl.pathname).toBe('/checkout');
+    expect(parsedRedirectUrl.pathname).toBe('/shop/checkout');
     expect(parsedRedirectUrl.origin).not.toBe('https://www.otaku-mori.com');
 
     expect(applicationServerErrors).toEqual([]);

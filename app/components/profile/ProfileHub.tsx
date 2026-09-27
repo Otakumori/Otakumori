@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import ProfileLoadout from './ProfileLoadout';
+import { paths } from '@/lib/paths';
 
 type ProfileData = {
   id: string;
@@ -25,7 +26,7 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
 
   const tabs = [
     { id: 'overview', label: 'Overview', href: '/profile' },
-    { id: 'orders', label: 'Orders', href: '/profile/orders' },
+    { id: 'orders', label: 'Orders', href: paths.orders() },
     { id: 'petals', label: 'Rewards (Petals)', href: '/profile/petals' },
     { id: 'achievements', label: 'Achievements', href: '/profile/achievements' },
     { id: 'addresses', label: 'Addresses', href: '/profile/addresses' },

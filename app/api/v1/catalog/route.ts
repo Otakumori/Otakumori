@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
+import { toPublicCatalogProduct } from '@/lib/catalog/publicProduct';
 import { getE2EFallbackProducts, shouldUseCatalogFallback } from '@/lib/catalog/e2eFallback';
 import { generateRequestId, createApiError, createApiSuccess } from '@/app/lib/api-contracts';
 
@@ -47,63 +48,6 @@ const QueryParamsSchema = z.object({
   sortBy: z.enum(['createdAt', 'updatedAt', 'name', 'price', 'relevance', 'title']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });
-
-function isRenderableListingImage(url: string | null | undefined): boolean {
-  if (!url || typeof url !== 'string') return false;
-  const normalized = url.trim().toLowerCase();
-  if (!normalized) return false;
-  if (normalized.includes('seller.merchize.com/login')) return false;
-  if (normalized.includes('drive.google.com/drive/folders')) return false;
-  if (normalized.includes('drive.google.com/drive/u/')) return false;
-  if (normalized.includes('docs.google.com')) return false;
-  if (normalized.includes('placeholder') || normalized.includes('seed:')) return false;
-  if (normalized.startsWith('/')) return true;
-  if (normalized.includes('images-api.printify.com')) return true;
-  return /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(normalized);
-}
-
-function normalizeListingImages(images: string[]): string[] {
-  return images
-    .filter((image, index, arr) => isRenderableListingImage(image) && arr.indexOf(image) === index)
-    .slice(0, 2);
-}
-
-function toListingProduct(product: CatalogProduct): CatalogProduct {
-  const images = normalizeListingImages(product.images || []);
-  const primaryImage = isRenderableListingImage(product.image)
-    ? product.image
-    : (images[0] ?? null);
-  const trimmedVariants = (product.variants || [])
-    .filter((variant) => variant.isEnabled && variant.inStock)
-    .slice(0, 12)
-    .map((variant) => ({
-      id: variant.id,
-      provider: variant.provider,
-      providerVariantId: variant.providerVariantId,
-      title: variant.title,
-      sku: variant.sku,
-      price: variant.price,
-      priceCents: variant.priceCents,
-      inStock: variant.inStock,
-      isEnabled: variant.isEnabled,
-      printifyVariantId: variant.printifyVariantId,
-      optionValues: (variant.optionValues || []).slice(0, 6),
-      previewImageUrl: isRenderableListingImage(variant.previewImageUrl)
-        ? variant.previewImageUrl
-        : null,
-    }));
-
-  return {
-    ...product,
-    description: (product.description || '').slice(0, 400),
-    image: primaryImage,
-    images: primaryImage
-      ? [primaryImage, ...images.filter((image) => image !== primaryImage)].slice(0, 2)
-      : images,
-    available: trimmedVariants.length > 0,
-    variants: trimmedVariants,
-  };
-}
 
 function filterProducts(
   products: CatalogProduct[],
@@ -170,7 +114,9 @@ function catalogFallbackResponse(
   page: number,
   limit: number,
 ) {
-  const products = getE2EFallbackProducts().map(toListingProduct);
+  const products = getE2EFallbackProducts()
+    .map((product) => toPublicCatalogProduct(product, { allowTestFallback: true }))
+    .filter((product): product is CatalogProduct => product !== null);
   const filtered = sortProducts(filterProducts(products, params), params);
   const total = filtered.length;
   const totalPages = Math.ceil(total / limit);
@@ -238,13 +184,13 @@ export async function GET(request: NextRequest) {
 
     let checkoutSafeProducts = prismaProducts
       .map(serializeProduct)
-      .map(toListingProduct)
-      .filter(
-        (product) => Boolean(product.image) && product.available && product.variants.length > 0,
-      );
+      .map((product) => toPublicCatalogProduct(product))
+      .filter((product): product is CatalogProduct => product !== null);
 
     if (checkoutSafeProducts.length === 0 && shouldUseCatalogFallback()) {
-      checkoutSafeProducts = getE2EFallbackProducts().map(toListingProduct);
+      checkoutSafeProducts = getE2EFallbackProducts()
+        .map((product) => toPublicCatalogProduct(product, { allowTestFallback: true }))
+        .filter((product): product is CatalogProduct => product !== null);
     }
 
     const filtered = sortProducts(filterProducts(checkoutSafeProducts, params), params);

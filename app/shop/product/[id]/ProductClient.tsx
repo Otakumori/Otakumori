@@ -433,7 +433,7 @@ export default function ProductClient({ productId }: { productId: string }) {
               <div className="space-y-2 text-sm text-green-300" data-testid="cart-success">
                 <p>Added to cart!</p>
                 <Link
-                  href="/cart"
+                  href={paths.cart()}
                   className="inline-flex text-pink-200 underline underline-offset-4 hover:text-pink-100"
                 >
                   View cart

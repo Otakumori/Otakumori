@@ -2,8 +2,9 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, Lock } from 'lucide-react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useCart } from '../../components/cart/CartProvider';
@@ -78,11 +79,32 @@ function buildInvalidItemsMessage(invalidItems: InvalidCheckoutItem[]): string {
   return `Some items in your cart are no longer available and were removed: ${names.join(', ')}. Please review your cart and try again.`;
 }
 
+function normalizeCouponCodes(value: string | null): string[] {
+  if (!value) return [];
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map((code) => code.trim().toUpperCase())
+        .filter((code) => /^[A-Z0-9-]{1,64}$/.test(code)),
+    ),
+  ).slice(0, 8);
+}
+
 export default function CheckoutPage() {
   const { items: cart, total, removeItem } = useCart();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const signInHref = buildCanonicalSignInUrl(paths.checkout());
+  const searchParams = useSearchParams();
+  const couponCodes = useMemo(
+    () => normalizeCouponCodes(searchParams.get('coupons')),
+    [searchParams],
+  );
+  const checkoutPath = couponCodes.length
+    ? `${paths.checkout()}?coupons=${encodeURIComponent(couponCodes.join(','))}`
+    : paths.checkout();
+  const signInHref = buildCanonicalSignInUrl(checkoutPath);
+  const reviewCartRef = useRef<HTMLAnchorElement>(null);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',
@@ -109,6 +131,10 @@ export default function CheckoutPage() {
       email: prev.email || user.primaryEmailAddress?.emailAddress || '',
     }));
   }, [user]);
+
+  useEffect(() => {
+    if (cartNeedsReview) reviewCartRef.current?.focus();
+  }, [cartNeedsReview]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -185,6 +211,7 @@ export default function CheckoutPage() {
           shippingInfo,
           successUrl: `${window.location.origin}${paths.checkoutSuccess()}`,
           cancelUrl: `${window.location.origin}${paths.cart()}`,
+          couponCodes,
         }),
       });
 
@@ -264,38 +291,67 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <section className="rounded-2xl border border-pink-500/20 bg-white/5 p-6">
             <h2 className="mb-6 text-2xl font-semibold">Checkout</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isProcessing}>
               <div className="grid grid-cols-2 gap-4">
-                <input name="firstName" value={shippingInfo.firstName} onChange={handleInputChange} placeholder="First name" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-                <input name="lastName" value={shippingInfo.lastName} onChange={handleInputChange} placeholder="Last name" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                <div>
+                  <label htmlFor="checkout-first-name" className="mb-1 block text-sm text-pink-100">First name</label>
+                  <input id="checkout-first-name" name="firstName" value={shippingInfo.firstName} onChange={handleInputChange} placeholder="First name" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                </div>
+                <div>
+                  <label htmlFor="checkout-last-name" className="mb-1 block text-sm text-pink-100">Last name</label>
+                  <input id="checkout-last-name" name="lastName" value={shippingInfo.lastName} onChange={handleInputChange} placeholder="Last name" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                </div>
               </div>
-              <input name="email" type="email" value={shippingInfo.email} onChange={handleInputChange} placeholder="Email" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              <input name="address" value={shippingInfo.address} onChange={handleInputChange} placeholder="Street address" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
-              <select name="country" value={shippingInfo.country} onChange={handleInputChange} className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
-                {COUNTRY_OPTIONS.map((country) => (
-                  <option key={country.value} value={country.value} className="bg-[#2b1738] text-white">{country.label}</option>
-                ))}
-              </select>
+              <div>
+                <label htmlFor="checkout-email" className="mb-1 block text-sm text-pink-100">Email</label>
+                <input id="checkout-email" name="email" type="email" value={shippingInfo.email} onChange={handleInputChange} placeholder="Email" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+              </div>
+              <div>
+                <label htmlFor="checkout-address" className="mb-1 block text-sm text-pink-100">Street address</label>
+                <input id="checkout-address" name="address" value={shippingInfo.address} onChange={handleInputChange} placeholder="Street address" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+              </div>
+              <div>
+                <label htmlFor="checkout-country" className="mb-1 block text-sm text-pink-100">Country</label>
+                <select id="checkout-country" name="country" value={shippingInfo.country} onChange={handleInputChange} className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
+                  {COUNTRY_OPTIONS.map((country) => (
+                    <option key={country.value} value={country.value} className="bg-[#2b1738] text-white">{country.label}</option>
+                  ))}
+                </select>
+              </div>
               <div className="grid grid-cols-3 gap-4">
-                <input name="city" value={shippingInfo.city} onChange={handleInputChange} placeholder="City" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                <div>
+                  <label htmlFor="checkout-city" className="mb-1 block text-sm text-pink-100">City</label>
+                  <input id="checkout-city" name="city" value={shippingInfo.city} onChange={handleInputChange} placeholder="City" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                </div>
                 {isUS ? (
-                  <select name="state" value={shippingInfo.state} onChange={handleInputChange} className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
-                    <option value="" className="bg-[#2b1738] text-white">State</option>
-                    {US_STATE_OPTIONS.map((state) => (
-                      <option key={state} value={state} className="bg-[#2b1738] text-white">{state}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label htmlFor="checkout-state" className="mb-1 block text-sm text-pink-100">State</label>
+                    <select id="checkout-state" name="state" value={shippingInfo.state} onChange={handleInputChange} className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required>
+                      <option value="" className="bg-[#2b1738] text-white">Select</option>
+                      {US_STATE_OPTIONS.map((state) => (
+                        <option key={state} value={state} className="bg-[#2b1738] text-white">{state}</option>
+                      ))}
+                    </select>
+                  </div>
                 ) : (
-                  <input name="state" value={shippingInfo.state} onChange={handleInputChange} placeholder="Region" className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                  <div>
+                    <label htmlFor="checkout-state" className="mb-1 block text-sm text-pink-100">Region</label>
+                    <input id="checkout-state" name="state" value={shippingInfo.state} onChange={handleInputChange} placeholder="Region" className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                  </div>
                 )}
-                <input name="zipCode" value={shippingInfo.zipCode} onChange={handleInputChange} placeholder={zipPlaceholder} className="rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                <div>
+                  <label htmlFor="checkout-zip-code" className="mb-1 block text-sm text-pink-100">{zipPlaceholder}</label>
+                  <input id="checkout-zip-code" name="zipCode" value={shippingInfo.zipCode} onChange={handleInputChange} placeholder={zipPlaceholder} className="w-full rounded-xl border border-pink-500/20 bg-white/5 px-4 py-3 text-white" required />
+                </div>
               </div>
 
+              {couponCodes.length > 0 ? <p className="text-sm text-pink-100">Coupon code{couponCodes.length > 1 ? 's' : ''} applied: {couponCodes.join(', ')}</p> : null}
+
               {error && (
-                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 whitespace-pre-wrap">
+                <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 whitespace-pre-wrap">
                   <div>{error}</div>
                   {cartNeedsReview && (
-                    <Link href={paths.cart()} className="mt-3 inline-block rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20">
+                    <Link ref={reviewCartRef} href={paths.cart()} className="mt-3 inline-block rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20">
                       Review cart
                     </Link>
                   )}
