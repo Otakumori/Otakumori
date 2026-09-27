@@ -201,6 +201,8 @@ describe('checkout session safety gates', () => {
 
     expect(legacySession.POST).toBe(canonical.POST);
     expect(legacyCheckout.POST).toBe(canonical.POST);
+    expect(legacySession.maxDuration).toBe(10);
+    expect(legacyCheckout).not.toHaveProperty('maxDuration');
   });
 
 });
