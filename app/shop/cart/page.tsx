@@ -88,7 +88,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black pt-20">
+      <main className="om-route-page om-route-page--cart min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
             <EmptyCart />
@@ -99,7 +99,7 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black pt-20">
+    <main className="om-route-page om-route-page--cart min-h-screen pt-20">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8 flex items-center">
           <Link href={paths.shop()} className="flex items-center text-secondary hover:text-primary transition-colors">

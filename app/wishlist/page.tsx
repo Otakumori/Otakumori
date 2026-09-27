@@ -131,7 +131,7 @@ export default function WishlistPage() {
   if (!isLoaded || loading) {
     return (
       <>
-        <main className="relative z-10 min-h-screen bg-[#080611]">
+        <main className="om-route-page om-route-page--wishlist relative z-10 min-h-screen">
           <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-white md:text-4xl">My Wishlist</h1>
@@ -148,7 +148,7 @@ export default function WishlistPage() {
   if (error) {
     return (
       <>
-        <main className="relative z-10 min-h-screen bg-[#080611]">
+        <main className="om-route-page om-route-page--wishlist relative z-10 min-h-screen">
           <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-white md:text-4xl">My Wishlist</h1>
@@ -172,7 +172,7 @@ export default function WishlistPage() {
 
   return (
     <>
-      <main className="relative z-10 min-h-screen bg-[#080611]">
+      <main className="om-route-page om-route-page--wishlist relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white md:text-4xl">My Wishlist</h1>

@@ -93,7 +93,7 @@ export default function CheckoutSuccessPage() {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+    <main className="om-route-page om-route-page--success min-h-screen pt-20">
       <div className="container mx-auto px-4 py-16">
         <Card className="mx-auto max-w-2xl border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
           {state.kind === 'loading' ? (
@@ -106,6 +106,7 @@ export default function CheckoutSuccessPage() {
 
           {state.kind === 'confirmed' ? (
             <>
+              <span aria-hidden="true" className="om-provisional-seal" />
               <CheckCircle2 className="mx-auto h-16 w-16 text-pink-500" aria-hidden="true" />
               <h1 className="mt-6 text-3xl font-bold text-white">Order Confirmed</h1>
               <p className="mt-3 text-pink-100">

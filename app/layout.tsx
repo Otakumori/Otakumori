@@ -1,6 +1,7 @@
 import './globals.css';
 import './mori-visual-system.css';
 import './styles/mori-foundation.css';
+import './styles/sitewide-visual-stabilization.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';

@@ -7,7 +7,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
-import { ChevronDown, Heart, Menu, MessageCircle, ShoppingCart, X } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import { MoriProvisionalIcon } from '@/app/components/mori/MoriProvisionalIcon';
 import { GlobalSearch } from '@/app/components/search/GlobalSearch';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { useAccountState } from '@/app/hooks/useAccountState';
@@ -390,14 +391,14 @@ export default function Navbar() {
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/wishlist' ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
           >
-            <Heart className="h-5 w-5" aria-hidden="true" />
+            <MoriProvisionalIcon name="wishlist" />
           </button>
           <button
             onClick={handleSoapstoneClick}
             className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
             aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
           >
-            <MessageCircle className="h-5 w-5" aria-hidden="true" />
+            <MoriProvisionalIcon name="community" />
           </button>
         </div>
 
@@ -409,7 +410,7 @@ export default function Navbar() {
             className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
             aria-label={`Shopping cart with ${itemCount} items`}
           >
-            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+            <MoriProvisionalIcon name="cart" />
             {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center font-semibold">
                 {itemCount > 99 ? '99+' : itemCount}
@@ -546,9 +547,9 @@ export default function Navbar() {
           aria-expanded={mobileMenuAriaExpanded}
         >
           {isMenuOpen ? (
-            <X className="w-6 h-6" aria-hidden="true" />
+            <MoriProvisionalIcon name="close" size={24} />
           ) : (
-            <Menu className="w-6 h-6" aria-hidden="true" />
+            <MoriProvisionalIcon name="menu" size={24} />
           )}
         </button>
       </nav>
@@ -569,7 +570,7 @@ export default function Navbar() {
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white p-2"
                   aria-label="Close menu"
                 >
-                  <X className="w-6 h-6" aria-hidden="true" />
+                  <MoriProvisionalIcon name="close" size={24} />
                 </button>
               </div>
 
@@ -691,7 +692,7 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
                 >
-                  <Heart className="h-5 w-5" aria-hidden="true" />
+                  <MoriProvisionalIcon name="wishlist" />
                   <span>Wishlist</span>
                 </button>
                 <button
@@ -702,7 +703,7 @@ export default function Navbar() {
                   className="w-full flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={isSignedIn ? 'Community' : 'Sign in to access community'}
                 >
-                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                  <MoriProvisionalIcon name="community" />
                   <span>Community</span>
                 </button>
                 <PetalWalletNavLink
@@ -718,7 +719,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 min-h-[44px] px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   aria-label={`Shopping cart with ${itemCount} items`}
                 >
-                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                  <MoriProvisionalIcon name="cart" />
                   <span>Cart</span>
                   {itemCount > 0 && (
                     <span className="ml-auto bg-primary text-white text-xs rounded-full min-w-[20px] h-5 px-2 flex items-center justify-center font-semibold">

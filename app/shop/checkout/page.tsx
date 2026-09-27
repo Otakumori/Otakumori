@@ -256,7 +256,7 @@ export default function CheckoutPage() {
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
+      <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
         <div className="mx-auto max-w-3xl px-4 py-16">
           <h1 className="text-2xl font-semibold">Sign In Required</h1>
           <p className="mt-3 text-pink-200">Please sign in to complete your purchase.</p>
@@ -268,7 +268,7 @@ export default function CheckoutPage() {
 
   if (cart.length === 0) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
+      <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
         <div className="mx-auto max-w-3xl px-4 py-16">
           <h1 className="text-2xl font-semibold">Your Cart is Empty</h1>
           <p className="mt-3 text-pink-200">Add an item to continue.</p>
@@ -279,7 +279,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#120917] text-white pt-20">
+    <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
       <div className="mx-auto max-w-5xl px-4 py-12">
         <div className="mb-8">
           <Link href={paths.cart()} className="inline-flex items-center text-pink-200 hover:text-white">

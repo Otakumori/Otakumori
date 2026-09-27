@@ -1,0 +1,118 @@
+/* Additive, non-Home interior treatment for provisional visual pass 1. */
+
+:root {
+  --om-interior-ink: #0a0908;
+  --om-interior-deep: #12100e;
+  --om-interior-line: rgb(198 167 125 / 32%);
+  --om-interior-grain: rgb(246 237 223 / 3%);
+}
+
+.om-site-interior-shell[data-mori-route-shell='interior'] {
+  isolation: isolate;
+  min-height: 100svh;
+  position: relative;
+  background:
+    radial-gradient(100% 58% at 50% -24%, rgb(198 167 125 / 7%), transparent 68%),
+    linear-gradient(180deg, var(--om-interior-deep), var(--om-interior-ink) 64%);
+}
+
+.om-site-interior-shell[data-mori-route-shell='interior']::before {
+  background-image:
+    linear-gradient(90deg, transparent, var(--om-interior-grain) 50%, transparent),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgb(255 255 255 / 1.4%) 4px);
+  background-size: 100% 100%, 5px 5px;
+  content: '';
+  inset: 0;
+  opacity: 0.24;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.om-site-interior-shell__content {
+  min-height: 100svh;
+  position: relative;
+}
+
+.om-site-interior-shell__content > main.om-route-page,
+.om-site-interior-shell__content > main.mori-page,
+.om-site-interior-shell__content > main.mori-game-shell,
+.om-site-interior-shell__content > main[class*='bg-gradient'],
+.om-site-interior-shell__content > main[class*='bg-[#'] {
+  background: transparent !important;
+}
+
+.om-route-page {
+  color: var(--mori-text-primary);
+  min-height: 100svh;
+  overflow: clip;
+  padding-top: 5rem;
+  position: relative;
+}
+
+.om-route-page::before,
+.om-route-page::after {
+  background: url('/assets/provisional/sitewide-visual-pass-1/ornament-branch.svg') no-repeat;
+  background-size: contain;
+  content: '';
+  height: 11rem;
+  opacity: 0.22;
+  pointer-events: none;
+  position: absolute;
+  width: 14rem;
+}
+
+.om-route-page::before { right: -2rem; top: 4.5rem; }
+.om-route-page::after { bottom: 2rem; left: -5rem; opacity: 0.1; transform: rotate(180deg); }
+
+.om-route-page--checkout::before,
+.om-route-page--checkout::after,
+.om-route-page--settings::before,
+.om-route-page--settings::after { display: none; }
+
+.om-site-interior-shell .glass-card,
+.om-site-interior-shell .glass-panel {
+  background: linear-gradient(145deg, rgb(33 28 24 / 94%), rgb(17 15 13 / 94%));
+  border-color: var(--om-interior-line);
+  border-radius: var(--mori-radius-object);
+  box-shadow: var(--mori-shadow-rest);
+  backdrop-filter: none;
+}
+
+.om-site-interior-shell .mori-panel,
+.om-site-interior-shell .mori-panel-soft,
+.om-site-interior-shell .mori-game-card { border-color: var(--om-interior-line); }
+.om-site-interior-shell .mori-game-shell { background: transparent; }
+.om-site-interior-shell .mori-game-card { box-shadow: none; }
+
+.mori-provisional-icon {
+  background-color: currentColor;
+  display: inline-block;
+  flex: none;
+  mask: var(--mori-provisional-icon) center / contain no-repeat;
+  -webkit-mask: var(--mori-provisional-icon) center / contain no-repeat;
+  vertical-align: middle;
+}
+
+.om-provisional-rule {
+  background: url('/assets/provisional/sitewide-visual-pass-1/catalogue-rule.svg') center / 100% 100% no-repeat;
+  height: 1rem;
+  margin-block: var(--mori-space-6);
+  max-width: 24rem;
+  opacity: 0.76;
+}
+
+.om-provisional-seal {
+  background: url('/assets/provisional/sitewide-visual-pass-1/merchant-seal.svg') center / contain no-repeat;
+  display: block;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  opacity: 0.86;
+  width: 4rem;
+}
+
+@media (max-width: 640px) {
+  .om-route-page { padding-top: 4.5rem; }
+  .om-route-page::before { height: 7rem; opacity: 0.13; right: -2.5rem; top: 4rem; width: 9rem; }
+  .om-route-page::after { display: none; }
+}

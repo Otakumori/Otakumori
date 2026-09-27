@@ -104,7 +104,7 @@ export default function OrdersPage() {
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
           <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
             <h1 className="mb-4 text-2xl font-bold text-white">Sign In Required</h1>
@@ -120,7 +120,7 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
           <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
@@ -133,7 +133,7 @@ export default function OrdersPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
           <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
             <h1 className="mb-4 text-2xl font-bold text-white">Error</h1>
@@ -148,7 +148,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+    <main className="om-route-page om-route-page--orders min-h-screen pt-20">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Your Orders</h1>

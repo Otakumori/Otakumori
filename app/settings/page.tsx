@@ -23,12 +23,14 @@ export default async function SettingsPage() {
   const me = await currentUser();
   const profile = await db.userProfile.findUnique({ where: { userId: localUserId } });
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
-      <h1 className="mb-6 text-2xl font-semibold">Settings</h1>
-      {(() => {
-        const initial = (profile?.gamertag ?? me?.publicMetadata?.gamertag) as string | undefined;
-        return initial && <OneTapGamertagWrapper initial={initial} />;
-      })()}
-    </div>
+    <main className="om-route-page om-route-page--settings">
+      <div className="mx-auto max-w-3xl px-6 py-10">
+        <h1 className="mb-6 font-display text-2xl font-semibold">Settings</h1>
+        {(() => {
+          const initial = (profile?.gamertag ?? me?.publicMetadata?.gamertag) as string | undefined;
+          return initial && <OneTapGamertagWrapper initial={initial} />;
+        })()}
+      </div>
+    </main>
   );
 }
