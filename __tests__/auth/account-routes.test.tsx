@@ -28,8 +28,8 @@ function mockRequestHeaders(values: Record<string, string | null>) {
   } as Awaited<ReturnType<typeof headers>>);
 }
 
-async function expectRedirect(action: () => Promise<unknown>) {
-  await expect(action()).rejects.toThrow(/^NEXT_REDIRECT:/);
+async function expectRedirect(action: () => Promise<unknown> | unknown) {
+  await expect(Promise.resolve().then(action)).rejects.toThrow(/^NEXT_REDIRECT:/);
   return String(mockedRedirect.mock.calls.at(-1)?.[0] ?? '');
 }
 
@@ -162,61 +162,10 @@ describe('account and local auth route redirects', () => {
     expect(target).not.toContain('/sign-in?redirect_url=/account');
   });
 
-  it('redirects signed-out checkout to hosted sign-in with the current Preview checkout return URL', async () => {
-    vi.stubEnv('VERCEL_ENV', 'preview');
-    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
-
+  it('redirects the legacy checkout route to canonical checkout before authentication', async () => {
     const target = await expectRedirect(() => CheckoutPage());
-    const url = new URL(target);
 
-    expect(url.origin).toBe('https://accounts.otaku-mori.com');
-    expect(url.pathname).toBe('/sign-in');
-    expect(url.searchParams.get('redirect_url')).toBe(
-      'https://otaku-mori-git-auth-otaku-mori-babe.vercel.app/checkout',
-    );
-  });
-
-  it('redirects signed-out staging checkout to hosted sign-in with a staging return URL', async () => {
-    vi.stubEnv('VERCEL_ENV', 'preview');
-    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
-    mockRequestHeaders({
-      'x-forwarded-host': 'staging.otaku-mori.com',
-      'x-forwarded-proto': 'https',
-    });
-
-    const target = await expectRedirect(() => CheckoutPage());
-    const url = new URL(target);
-
-    expect(url.origin).toBe('https://accounts.otaku-mori.com');
-    expect(url.pathname).toBe('/sign-in');
-    expect(url.searchParams.get('redirect_url')).toBe('https://staging.otaku-mori.com/checkout');
-  });
-
-  it('preserves the exact PR #73 custom Preview origin for signed-out checkout', async () => {
-    vi.stubEnv('VERCEL_ENV', 'preview');
-    vi.stubEnv('VERCEL_BRANCH_URL', 'otaku-mori-git-auth-otaku-mori-babe.vercel.app');
-    mockRequestHeaders({
-      'x-forwarded-host': 'pr73-preview.otaku-mori.com',
-      'x-forwarded-proto': 'https',
-    });
-
-    const target = await expectRedirect(() => CheckoutPage());
-    const url = new URL(target);
-
-    expect(url.origin).toBe('https://accounts.otaku-mori.com');
-    expect(url.pathname).toBe('/sign-in');
-    expect(url.searchParams.get('redirect_url')).toBe(`${PR73_PREVIEW_ORIGIN}/checkout`);
-  });
-
-  it('redirects signed-out local checkout to hosted sign-in with a local checkout return URL', async () => {
-    mockRequestHeaders({ host: '127.0.0.1:3000', 'x-forwarded-proto': 'http' });
-
-    const target = await expectRedirect(() => CheckoutPage());
-    const url = new URL(target);
-
-    expect(url.origin).toBe('https://accounts.otaku-mori.com');
-    expect(url.pathname).toBe('/sign-in');
-    expect(url.searchParams.get('redirect_url')).toBe('http://127.0.0.1:3000/checkout');
+    expect(target).toBe('/shop/checkout');
   });
 
   it('turns the local sign-in route into a hosted Account Portal redirect', async () => {

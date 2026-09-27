@@ -13,6 +13,7 @@ export const paths = {
   cart: () => '/shop/cart',
   checkout: () => '/shop/checkout',
   checkoutSuccess: () => '/shop/checkout/success',
+  orders: () => '/orders',
 
   // Blog
   blogIndex: (page?: number) => (page && page > 1 ? `/blog?page=${page}` : '/blog'),
