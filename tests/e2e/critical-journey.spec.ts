@@ -93,10 +93,12 @@ test.describe('Critical User Journey', () => {
     await page.click('a[href="/shop/cart"]');
     await expect(page).toHaveURL('/shop/cart');
 
-    // Verify cart items
-    await page.waitForSelector('[data-testid="cart-items"]', { timeout: 10000 });
-    const cartItems = page.locator('[data-testid="cart-item"]');
-    expect(await cartItems.count()).toBeGreaterThan(0);
+    // The canonical cart renders semantic line-item controls rather than the
+    // test hooks used by the superseded /cart implementation.
+    await expect(page.getByRole('heading', { name: 'Shopping Cart' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /Increase quantity for .+/ }).first(),
+    ).toBeVisible({ timeout: 10000 });
 
     // Proceed to checkout
     const cartOrigin = new URL(page.url()).origin;
@@ -104,7 +106,7 @@ test.describe('Critical User Journey', () => {
       request.url().startsWith('https://accounts.otaku-mori.com/sign-in'),
     );
 
-    await page.click('[data-testid="checkout-button"]');
+    await page.getByRole('link', { name: 'Proceed to Checkout' }).click();
     const authRequest = await authBoundaryRequest;
 
     // The internal checkout route is protected. Without a real Clerk session,
