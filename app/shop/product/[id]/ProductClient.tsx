@@ -176,7 +176,6 @@ export default function ProductClient({ productId }: { productId: string }) {
           undefined,
           err instanceof Error ? err : new Error(String(err)),
         );
-        showError('Failed to fetch product details. Please try again.');
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -245,12 +244,11 @@ export default function ProductClient({ productId }: { productId: string }) {
       <main className="om-route-page om-route-page--pdp min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
           <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Not Found
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">{error || 'This treasure has gone missing.'}</p>
+            <span aria-hidden="true" className="om-route-state__mark" />
+            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
+            <p className="text-[#d9cdbd] mb-6">This item is unavailable or could not be loaded right now.</p>
             <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+              <Button className="mori-button-primary">
                 Return to Shop
               </Button>
             </Link>
@@ -266,12 +264,11 @@ export default function ProductClient({ productId }: { productId: string }) {
       <main className="om-route-page om-route-page--pdp min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
           <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Image Not Available
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">This product is missing required images.</p>
+            <span aria-hidden="true" className="om-route-state__mark" />
+            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
+            <p className="text-[#d9cdbd] mb-6">This item cannot be displayed right now.</p>
             <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+              <Button className="mori-button-primary">
                 Return to Shop
               </Button>
             </Link>

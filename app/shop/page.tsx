@@ -1,6 +1,6 @@
 import { generateSEO } from '@/app/lib/seo';
 import BuyReadyShopCatalog from '../components/shop/BuyReadyShopCatalog';
-import { DecorativeSectionHeader, StorefrontPanel } from '../components/shop/StorefrontPrimitives';
+import { DecorativeSectionHeader } from '../components/shop/StorefrontPrimitives';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,23 +23,9 @@ export default function ShopPage() {
         />
         <div aria-hidden="true" className="om-provisional-rule mx-auto" />
 
-        <StorefrontPanel className="mt-9 border-white/[0.09] bg-[#0b080c]/76 p-4 shadow-[0_22px_60px_rgba(0,0,0,0.34)] sm:p-6">
-          <div className="mb-6 grid gap-4 border-b border-white/[0.08] pb-5 text-sm leading-6 text-[#cdbbb7]/78 md:grid-cols-3">
-            <p>
-              <span className="font-semibold text-[#fff1e4]">Product art stays primary.</span> Apparel,
-              pins, stickers, and soft goods use framing that protects the design.
-            </p>
-            <p>
-              <span className="font-semibold text-[#fff1e4]">Variants stay legible.</span> Cards show
-              starting prices while detail pages handle the full choice.
-            </p>
-            <p>
-              <span className="font-semibold text-[#fff1e4]">Curation stays clean.</span> Hidden or
-              archived products remain out of the public storefront.
-            </p>
-          </div>
+        <section className="mt-9" aria-label="Curated products">
           <BuyReadyShopCatalog />
-        </StorefrontPanel>
+        </section>
       </div>
     </main>
   );

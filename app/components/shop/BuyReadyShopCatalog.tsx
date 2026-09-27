@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { ProductGrid } from './StorefrontProductCard';
-import { StorefrontPanel } from './StorefrontPrimitives';
 
 interface ApiResponse {
   ok?: boolean;
@@ -65,9 +64,8 @@ export default function BuyReadyShopCatalog() {
         const payload = (await response.json()) as ApiResponse;
         const loaded = payload.data?.products ?? payload.products ?? [];
         if (!cancelled) setProducts(dedupeProducts(loaded.filter(isBuyReadyProduct)));
-      } catch (err) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : 'Failed to load buy-ready products');
+      } catch {
+        if (!cancelled) setError('unavailable');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -87,11 +85,8 @@ export default function BuyReadyShopCatalog() {
         data-testid="product-grid"
       >
         {Array.from({ length: 6 }, (_, index) => (
-          <div
-            key={index}
-            className="min-h-[31rem] animate-pulse rounded-[1.8rem] border border-pink-100/10 bg-white/[0.045] p-3"
-          >
-            <div className="aspect-[4/5] rounded-[1.55rem] bg-white/[0.06]" />
+          <div key={index} className="mori-foundation-frame min-h-[26rem] animate-pulse bg-white/[0.025] p-3">
+            <div className="aspect-square bg-white/[0.045]" />
             <div className="mt-5 space-y-3 px-2">
               <div className="h-5 w-3/4 rounded bg-white/[0.08]" />
               <div className="h-4 w-1/3 rounded bg-white/[0.08]" />
@@ -105,24 +100,25 @@ export default function BuyReadyShopCatalog() {
 
   if (error) {
     return (
-      <StorefrontPanel className="p-8 text-red-100">
-        <h2 className="font-display text-2xl font-semibold text-red-100">
-          Unable to load storefront
-        </h2>
-        <p className="mt-3 text-sm leading-6 text-red-100/75">{error}</p>
-      </StorefrontPanel>
+      <section className="om-route-state om-route-state--bounded om-route-state--error" aria-live="polite">
+        <span aria-hidden="true" className="om-route-state__mark" />
+        <h2 className="font-display text-2xl font-semibold text-[#f6eddf]">Storefront temporarily unavailable</h2>
+        <p className="mt-3 text-sm leading-6 text-[#d9cdbd]">
+          We couldn&apos;t load this part of Otaku-mori. Please refresh or return shortly.
+        </p>
+      </section>
     );
   }
 
   if (visibleProducts.length === 0) {
     return (
-      <StorefrontPanel className="p-8 text-center text-pink-100" data-testid="product-grid">
+      <section className="om-route-state mori-foundation-frame" data-testid="product-grid">
         <h2 className="font-display text-2xl font-semibold">No buy-ready products yet</h2>
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-pink-100/70">
           The public shop is only showing products with images, prices, and in-stock variants right
           now. Sync or enable products in admin, then refresh this page.
         </p>
-      </StorefrontPanel>
+      </section>
     );
   }
 

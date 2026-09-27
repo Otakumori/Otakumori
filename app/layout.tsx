@@ -59,12 +59,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang="en" className="font-body">
         <body className="font-body" data-visual-qa-auth="true">
           <VisualQaAuthProvider initialState={visualQaAuthState}>
-            <AppQueryProvider>
-              <CartProvider visualQaAuth>
-                <StaticPublicNavbar />
-                <SiteVisualShell>{children}</SiteVisualShell>
-              </CartProvider>
-            </AppQueryProvider>
+            <ToastProvider>
+              <AppQueryProvider>
+                <CartProvider visualQaAuth>
+                  <StaticPublicNavbar />
+                  <SiteVisualShell>{children}</SiteVisualShell>
+                </CartProvider>
+              </AppQueryProvider>
+            </ToastProvider>
           </VisualQaAuthProvider>
         </body>
       </html>

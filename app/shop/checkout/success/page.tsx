@@ -57,11 +57,7 @@ export default function CheckoutSuccessPage() {
       .then(async (response) => {
         const result = await response.json().catch(() => null);
         if (!response.ok || !result?.ok || !result.data) {
-          throw new Error(
-            typeof result?.error === 'string'
-              ? result.error
-              : 'We could not verify this checkout return.',
-          );
+          throw new Error('We could not verify this checkout return.');
         }
         return result.data as Confirmation;
       })
@@ -73,11 +69,11 @@ export default function CheckoutSuccessPage() {
           clearedSessionRef.current = sessionId;
         }
       })
-      .catch((error) => {
+      .catch(() => {
         if (cancelled) return;
         setState({
           kind: 'unverified',
-          message: error instanceof Error ? error.message : 'We could not verify this checkout return.',
+          message: 'We could not verify this checkout return.',
         });
       });
 
@@ -95,29 +91,29 @@ export default function CheckoutSuccessPage() {
   return (
     <main className="om-route-page om-route-page--success min-h-screen pt-20">
       <div className="container mx-auto px-4 py-16">
-        <Card className="mx-auto max-w-2xl border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
+        <Card className="om-route-state om-route-state--bounded mx-auto max-w-2xl border-[#c6a77d]/36 bg-transparent p-8 text-center shadow-none backdrop-blur-none">
           {state.kind === 'loading' ? (
             <div role="status" aria-live="polite">
-              <Loader2 className="mx-auto h-10 w-10 animate-spin text-pink-200" aria-hidden="true" />
-              <h1 className="mt-6 text-3xl font-bold text-white">Verifying your order</h1>
-              <p className="mt-3 text-pink-100">Please wait while we confirm payment securely.</p>
+              <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#c6a77d]" aria-hidden="true" />
+              <h1 className="mt-6 font-display text-3xl font-semibold text-[#f6eddf]">Verifying your order</h1>
+              <p className="mt-3 text-[#d9cdbd]">Please wait while we confirm payment securely.</p>
             </div>
           ) : null}
 
           {state.kind === 'confirmed' ? (
             <>
               <span aria-hidden="true" className="om-provisional-seal" />
-              <CheckCircle2 className="mx-auto h-16 w-16 text-pink-500" aria-hidden="true" />
-              <h1 className="mt-6 text-3xl font-bold text-white">Order Confirmed</h1>
-              <p className="mt-3 text-pink-100">
+              <CheckCircle2 className="mx-auto h-12 w-12 text-[#c6a77d]" aria-hidden="true" />
+              <h1 className="mt-6 font-display text-3xl font-semibold text-[#f6eddf]">Order Confirmed</h1>
+              <p className="mt-3 text-[#d9cdbd]">
                 Thank you for your purchase. Order #{state.confirmation.orderNumber} is recorded.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 <Link href={paths.shop()}>
-                  <Button className="w-full bg-pink-500 hover:bg-pink-600 sm:w-auto">Continue Shopping</Button>
+                  <Button className="mori-button-primary w-full sm:w-auto">Continue Shopping</Button>
                 </Link>
                 <Link href={paths.orders()}>
-                  <Button variant="outline" className="w-full border-pink-500/30 text-pink-200 hover:bg-pink-500/10 sm:w-auto">
+                  <Button variant="outline" className="mori-button-secondary w-full sm:w-auto">
                     <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
                     View Orders
                   </Button>
@@ -128,8 +124,8 @@ export default function CheckoutSuccessPage() {
 
           {state.kind === 'sign-in-required' ? (
             <>
-              <h1 className="text-3xl font-bold text-white">Sign in to confirm your order</h1>
-              <p className="mt-3 text-pink-100">Use the account that completed checkout to view the order record.</p>
+              <h1 className="font-display text-3xl font-semibold text-[#f6eddf]">Sign in to confirm your order</h1>
+              <p className="mt-3 text-[#d9cdbd]">Use the account that completed checkout to view the order record.</p>
               <Link href={signInHref} className="mt-8 inline-block">
                 <Button>Sign In</Button>
               </Link>
@@ -138,14 +134,15 @@ export default function CheckoutSuccessPage() {
 
           {state.kind === 'unverified' ? (
             <>
-              <h1 className="text-3xl font-bold text-white">Order confirmation unavailable</h1>
-              <p className="mt-3 text-pink-100" role="alert">{state.message}</p>
+              <span aria-hidden="true" className="om-provisional-seal om-provisional-seal--quiet" />
+              <h1 className="font-display text-3xl font-semibold text-[#f6eddf]">Order confirmation unavailable</h1>
+              <p className="mt-3 text-[#d9cdbd]" role="alert">{state.message}</p>
               <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 <Link href={paths.orders()}>
-                  <Button variant="outline">View Orders</Button>
+                  <Button variant="outline" className="mori-button-secondary">View Orders</Button>
                 </Link>
                 <Link href={paths.shop()}>
-                  <Button>Return to Shop</Button>
+                  <Button className="mori-button-primary">Return to Shop</Button>
                 </Link>
               </div>
             </>
