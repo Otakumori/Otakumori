@@ -1,33 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
 import Link from 'next/link';
-
-async function getLogger() {
-  const { logger } = await import('@/app/lib/logger');
-  return logger;
-}
 
 /**
  * Error boundary for mini-games route
  * Catches Server Component render errors and provides a graceful fallback UI
  */
 export default function MiniGamesError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log error for debugging (only in dev or if Sentry is available)
-    if (process.env.NODE_ENV === 'development') {
-      getLogger().then((logger) => {
-        logger.error('[MiniGamesError] Error boundary caught:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-      });
-    }
-  }, [error]);
-
   return (
     <main className="om-route-page om-route-page--games flex min-h-screen items-center justify-center px-4">
       <section className="om-route-state om-route-state--bounded om-route-state--error">
