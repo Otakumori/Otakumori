@@ -127,11 +127,11 @@ body {
 }
 
 /* Border-to-fill controls: bronze architecture at rest, lacquer on activation. */
-.mori-foundation-button,
-.mori-button-primary,
-.mori-button-secondary,
-.mori-button-danger,
-.om-button-border-fill {
+.om-site-interior-shell .mori-foundation-button,
+.om-site-interior-shell .mori-button-primary,
+.om-site-interior-shell .mori-button-secondary,
+.om-site-interior-shell .mori-button-danger,
+.om-site-interior-shell .om-button-border-fill {
   border-color: var(--om-line) !important;
   border-radius: 0.24rem !important;
   box-shadow: none !important;
@@ -146,11 +146,11 @@ body {
     transform var(--om-motion-fast) ease;
 }
 
-.mori-foundation-button::before,
-.mori-button-primary::before,
-.mori-button-secondary::before,
-.mori-button-danger::before,
-.om-button-border-fill::before {
+.om-site-interior-shell .mori-foundation-button::before,
+.om-site-interior-shell .mori-button-primary::before,
+.om-site-interior-shell .mori-button-secondary::before,
+.om-site-interior-shell .mori-button-danger::before,
+.om-site-interior-shell .om-button-border-fill::before {
   background: linear-gradient(115deg, #241d17, #100e0c);
   content: '';
   inset: 0;
@@ -160,33 +160,33 @@ body {
   z-index: -1;
 }
 
-.mori-foundation-button:hover:not(:disabled),
-.mori-button-primary:hover:not(:disabled),
-.mori-button-secondary:hover:not(:disabled),
-.mori-button-danger:hover:not(:disabled),
-.om-button-border-fill:hover:not(:disabled) {
+.om-site-interior-shell .mori-foundation-button:hover:not(:disabled),
+.om-site-interior-shell .mori-button-primary:hover:not(:disabled),
+.om-site-interior-shell .mori-button-secondary:hover:not(:disabled),
+.om-site-interior-shell .mori-button-danger:hover:not(:disabled),
+.om-site-interior-shell .om-button-border-fill:hover:not(:disabled) {
   border-color: var(--om-bronze) !important;
   transform: translateY(-1px);
 }
 
-.mori-foundation-button:hover:not(:disabled)::before,
-.mori-button-primary:hover:not(:disabled)::before,
-.mori-button-secondary:hover:not(:disabled)::before,
-.mori-button-danger:hover:not(:disabled)::before,
-.om-button-border-fill:hover:not(:disabled)::before { transform: translateX(0); }
+.om-site-interior-shell .mori-foundation-button:hover:not(:disabled)::before,
+.om-site-interior-shell .mori-button-primary:hover:not(:disabled)::before,
+.om-site-interior-shell .mori-button-secondary:hover:not(:disabled)::before,
+.om-site-interior-shell .mori-button-danger:hover:not(:disabled)::before,
+.om-site-interior-shell .om-button-border-fill:hover:not(:disabled)::before { transform: translateX(0); }
 
-.mori-foundation-button:active:not(:disabled),
-.mori-button-primary:active:not(:disabled),
-.mori-button-secondary:active:not(:disabled),
-.mori-button-danger:active:not(:disabled),
-.om-button-border-fill:active:not(:disabled) { transform: translateY(0); }
+.om-site-interior-shell .mori-foundation-button:active:not(:disabled),
+.om-site-interior-shell .mori-button-primary:active:not(:disabled),
+.om-site-interior-shell .mori-button-secondary:active:not(:disabled),
+.om-site-interior-shell .mori-button-danger:active:not(:disabled),
+.om-site-interior-shell .om-button-border-fill:active:not(:disabled) { transform: translateY(0); }
 
-[data-mori-selected='true'] {
+.om-site-interior-shell [data-mori-selected='true'] {
   border-color: var(--om-sakura) !important;
   color: var(--om-ivory) !important;
 }
 
-[data-mori-selected='true']::before { background: linear-gradient(115deg, #3e222b, #17100f); transform: translateX(0); }
+.om-site-interior-shell [data-mori-selected='true']::before { background: linear-gradient(115deg, #3e222b, #17100f); transform: translateX(0); }
 
 :where(a, button, input, textarea, select):focus-visible {
   outline: 2px solid var(--om-focus);
