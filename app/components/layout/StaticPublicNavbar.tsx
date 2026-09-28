@@ -47,6 +47,7 @@ export default function StaticPublicNavbar() {
             : ''
       }`}
       data-home-navbar-state={isHome ? (isScrolled ? 'scrolled' : 'top') : 'interior'}
+      data-mori-navbar={isHome ? 'home' : 'interior'}
     >
       <a
         href="#main-content"

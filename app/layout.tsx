@@ -2,6 +2,7 @@ import './globals.css';
 import './mori-visual-system.css';
 import './styles/mori-foundation.css';
 import './styles/sitewide-visual-stabilization.css';
+import './styles/otakumori-uiux-overhaul.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
@@ -16,6 +17,7 @@ import SiteVisualShell from './components/layout/SiteVisualShell';
 import { CartProvider } from './components/cart/CartProvider';
 import { isLighthouseCiRuntime } from './lib/performance/lighthouseMode';
 import { VisualQaAuthProvider } from './lib/visual-qa/clerk-nextjs';
+import { marcellusSc } from './fonts';
 import {
   VISUAL_QA_AUTH_STATE_HEADER,
   isVisualQaAuthEnabled,
@@ -42,10 +44,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     normalizeVisualQaAuthState(headersList.get(VISUAL_QA_AUTH_STATE_HEADER)) ??
     resolveVisualQaAuthStateFromCookieHeader(headersList.get('cookie')) ??
     'signed-out';
+  const rootClassName = `${marcellusSc.variable} font-body`;
 
   if (useLighthouseShell) {
     return (
-      <html lang="en" className="font-body">
+      <html lang="en" className={rootClassName}>
         <body className="font-body">
           <StaticPublicNavbar />
           <SiteVisualShell>{children}</SiteVisualShell>
@@ -56,7 +59,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   if (useVisualQaShell) {
     return (
-      <html lang="en" className="font-body">
+      <html lang="en" className={rootClassName}>
         <body className="font-body" data-visual-qa-auth="true">
           <VisualQaAuthProvider initialState={visualQaAuthState}>
             <ToastProvider>
@@ -75,7 +78,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <ClerkProviderWrapper nonce={nonce || undefined} requestHost={requestHost}>
-      <html lang="en" className="font-body">
+      <html lang="en" className={rootClassName}>
         <body className="font-body">
           <AuthProvider>
             <ToastProvider>
