@@ -28,4 +28,10 @@ describe('Otaku-mori UI/UX system contract', () => {
     expect(css).toContain('.om-games-selector__option');
     expect(css).toContain('.om-game-relic');
   });
+
+  it('keeps Mini-Games selector text at the Lighthouse legibility floor', () => {
+    expect(css).toContain('.om-games-selector__eyebrow { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
+    expect(css).toContain('.om-games-selector__option-label { display: block; font-family: var(--font-display); font-size: clamp(0.75rem, 1.1vw, 0.9rem);');
+    expect(css).toContain('.om-games-selector__record-meta { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
+  });
 });
