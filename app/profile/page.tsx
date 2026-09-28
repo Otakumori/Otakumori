@@ -54,7 +54,7 @@ export default async function ProfilePage() {
     const appOrigin = await resolveServerAppOrigin();
 
     return (
-      <main className="mori-page pt-24">
+      <main className="om-route-page om-route-page--profile mori-page pt-24">
         <div className="mori-shell py-10">
           <ProfileHeader />
           <div className="mori-panel mt-8 p-8 text-center sm:p-12">
@@ -90,7 +90,7 @@ export default async function ProfilePage() {
     }[profileState];
 
     return (
-      <main className="mori-page pt-24">
+      <main className="om-route-page om-route-page--profile mori-page pt-24">
         <div className="mori-shell py-10">
           <ProfileHeader />
           <div className="mori-panel mt-8 border-[#a9855f]/25 p-8 text-center sm:p-12">
@@ -113,7 +113,7 @@ export default async function ProfilePage() {
   const displayName = _user?.fullName || _user?.username || 'Wanderer';
 
   return (
-    <main className="mori-page pt-24">
+    <main className="om-route-page om-route-page--profile mori-page pt-24">
       <div className="mori-shell space-y-8 py-10">
         <ProfileHeader displayName={displayName} />
 

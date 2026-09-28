@@ -52,11 +52,11 @@ export function ProductPrice({ product }: { product: CatalogProduct }) {
   return (
     <div>
       {hasMultipleOptions ? (
-        <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-pink-100/50">
+        <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#c6a77d]/72">
           Starting at
         </p>
       ) : null}
-      <p className="font-display text-xl font-semibold text-pink-100">
+      <p className="font-display text-xl font-semibold text-[#f6eddf]">
         {getStartingPriceLabel(product)}
       </p>
     </div>
@@ -75,7 +75,7 @@ export function ProductImageFrame({
   mode: string;
 }) {
   return (
-    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.55rem] border border-pink-100/12 bg-[radial-gradient(circle_at_center,rgba(255,235,245,0.09),rgba(12,8,18,0.92)_62%)]">
+    <div className="mori-foundation-frame relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_center,rgba(198,167,125,0.08),rgba(12,8,18,0.92)_62%)]">
       <Image
         src={image}
         alt={title}
@@ -85,7 +85,7 @@ export function ProductImageFrame({
         priority={priority}
         unoptimized
       />
-      <div className="pointer-events-none absolute inset-3 rounded-[1.2rem] border border-white/8" />
+      <div className="pointer-events-none absolute inset-3 border border-[#c6a77d]/15" />
     </div>
   );
 }
@@ -102,8 +102,7 @@ export function StorefrontProductCard({
   const productHref = paths.product(product.id);
 
   return (
-    <article className="group relative overflow-hidden rounded-[1.8rem] border border-pink-100/14 bg-[#140f18]/88 p-3 shadow-[0_18px_60px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-pink-100/28">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,153,204,0.14),transparent_36%)] opacity-80" />
+    <article className="group relative border-t border-[#c6a77d]/30 bg-[#120f0d]/42 p-3 transition duration-300 hover:border-[#c6a77d]/65">
       <div className="relative z-10">
         <Link href={productHref} className="block" data-testid="product-card">
           <ProductImageFrame
@@ -115,7 +114,7 @@ export function StorefrontProductCard({
         </Link>
 
         {product.provider ? (
-          <div className="absolute right-5 top-5 rounded-full border border-white/12 bg-black/68 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-pink-50/82">
+          <div className="absolute right-5 top-5 border border-[#c6a77d]/25 bg-black/68 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#f6eddf]/82">
             {product.provider}
           </div>
         ) : null}
@@ -123,14 +122,14 @@ export function StorefrontProductCard({
         <div className="space-y-4 p-3 pt-5">
           <div className="flex items-start justify-between gap-4">
             <Link href={productHref} className="min-w-0 flex-1">
-              <h2 className="line-clamp-2 font-display text-xl font-semibold leading-snug text-[#f7eadf] transition-colors hover:text-pink-100">
+              <h2 className="line-clamp-2 font-display text-xl font-semibold leading-snug text-[#f7eadf] transition-colors hover:text-[#c6a77d]">
                 {product.title}
               </h2>
             </Link>
             <ProductPrice product={product} />
           </div>
 
-          <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-[#f5d6dc]/68">
+          <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-[#d9cdbd]/78">
             {summary || 'Premium quality print-on-demand merchandise.'}
           </p>
 

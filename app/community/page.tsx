@@ -19,27 +19,26 @@ export default async function CommunityPage() {
 
   if (!isClerkConfigured) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="glass-card p-8 rounded-2xl">
-            <h1 className="text-3xl font-bold text-primary mb-4">Community Coming Soon</h1>
-            <p className="text-secondary mb-6">
-              Community features require authentication. Once Clerk is configured, you'll be able to
-              leave messages for fellow travelers, share avatars, and participate in discussions.
-            </p>
-            <p className="text-muted text-sm">
-              In the meantime, you can browse products and play mini-games!
-            </p>
-          </div>
-        </div>
-      </div>
+      <main className="om-route-page om-route-page--community flex min-h-screen items-center justify-center px-4">
+        <section className="om-route-state om-route-state--bounded" aria-labelledby="community-title">
+          <span aria-hidden="true" className="om-route-state__mark" />
+          <p className="mori-foundation-eyebrow">Correspondence archive</p>
+          <h1 id="community-title" className="mt-3 font-display text-3xl font-semibold text-[#f6eddf]">
+            Community is being prepared
+          </h1>
+          <p className="mt-4 text-sm leading-7 text-[#d9cdbd]">
+            Messages, avatars, and traveler correspondence will appear here when this archive is available.
+          </p>
+          <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[#c6a77d]">Return when the seal is ready</p>
+        </section>
+      </main>
     );
   }
 
   // Allow guest access - CommunityHub will handle auth-gated features
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
+    <main className="om-route-page om-route-page--community min-h-screen">
       <CommunityHub performanceMode={useLighthouseShell} />
-    </div>
+    </main>
   );
 }

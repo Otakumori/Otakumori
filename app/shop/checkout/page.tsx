@@ -60,11 +60,8 @@ function getLineKey(item: CartItem) {
   return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
 }
 
-function formatServerError(data: any): string {
-  const parts = [data?.error || 'Failed to create checkout session.'];
-  if (data?.stage) parts.push(`Stage: ${data.stage}`);
-  if (data?.requestId) parts.push(`Request ID: ${data.requestId}`);
-  return parts.join('\n');
+function formatServerError(_data: unknown): string {
+  return 'We could not begin checkout right now. Please try again in a moment.';
 }
 
 function buildInvalidItemsMessage(invalidItems: InvalidCheckoutItem[]): string {
@@ -246,9 +243,8 @@ export default function CheckoutPage() {
         setError(formatServerError(data));
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
       console.error('Checkout submit crash:', err);
-      setError(`Checkout crashed before redirect: ${message}`);
+      setError('We could not begin checkout right now. Please try again in a moment.');
     } finally {
       setIsProcessing(false);
     }
@@ -256,11 +252,14 @@ export default function CheckoutPage() {
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
+      <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
         <div className="mx-auto max-w-3xl px-4 py-16">
-          <h1 className="text-2xl font-semibold">Sign In Required</h1>
-          <p className="mt-3 text-pink-200">Please sign in to complete your purchase.</p>
-          <Link href={signInHref} className="mt-6 inline-block rounded-lg bg-pink-500 px-4 py-2 text-white">Sign In</Link>
+          <section className="om-route-state om-route-state--bounded mx-0" aria-labelledby="checkout-sign-in-title">
+            <p className="mori-foundation-eyebrow">Quiet transaction chamber</p>
+            <h1 id="checkout-sign-in-title" className="mt-3 font-display text-3xl font-semibold">Sign in to continue</h1>
+            <p className="mt-3 text-[#d9cdbd]">Please sign in to complete your purchase.</p>
+            <Link href={signInHref} className="mori-button-primary mt-6">Sign In</Link>
+          </section>
         </div>
       </main>
     );
@@ -268,7 +267,7 @@ export default function CheckoutPage() {
 
   if (cart.length === 0) {
     return (
-      <main className="min-h-screen bg-[#120917] text-white pt-20">
+      <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
         <div className="mx-auto max-w-3xl px-4 py-16">
           <h1 className="text-2xl font-semibold">Your Cart is Empty</h1>
           <p className="mt-3 text-pink-200">Add an item to continue.</p>
@@ -279,7 +278,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#120917] text-white pt-20">
+    <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
       <div className="mx-auto max-w-5xl px-4 py-12">
         <div className="mb-8">
           <Link href={paths.cart()} className="inline-flex items-center text-pink-200 hover:text-white">
@@ -289,7 +288,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <section className="rounded-2xl border border-pink-500/20 bg-white/5 p-6">
+          <section className="om-checkout-pane p-6">
             <h2 className="mb-6 text-2xl font-semibold">Checkout</h2>
             <form onSubmit={handleSubmit} className="space-y-4" aria-busy={isProcessing}>
               <div className="grid grid-cols-2 gap-4">
@@ -364,7 +363,7 @@ export default function CheckoutPage() {
             </form>
           </section>
 
-          <section className="rounded-2xl border border-pink-500/20 bg-white/5 p-6">
+          <section className="om-checkout-pane p-6">
             <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
             <div className="space-y-4">
               {cart.map((item) => (

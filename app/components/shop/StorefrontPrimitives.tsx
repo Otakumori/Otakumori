@@ -56,7 +56,7 @@ export function StorefrontButton({
 }) {
   return (
     <span
-      className={`inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/[0.12] bg-[#7c4c5d]/48 px-5 py-2 text-sm font-semibold text-[#fff1e4] transition hover:border-[#efc7d2]/28 hover:bg-[#8a5668]/58 ${className}`}
+      className={`inline-flex min-h-[44px] items-center justify-center rounded-[0.375rem] border border-[#c6a77d]/45 bg-[#17120f] px-5 py-2 text-sm font-semibold text-[#f6eddf] transition hover:border-[#c6a77d]/75 hover:bg-[#211913] ${className}`}
     >
       {children}
     </span>

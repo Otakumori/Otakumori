@@ -38,7 +38,7 @@ function MiniGamesIntro({ onEnter }: { onEnter: () => void }) {
   );
 
   return (
-    <main className="mori-game-shell px-5 pb-20 pt-28 sm:px-8">
+    <main className="om-route-page om-route-page--games mori-game-shell px-5 pb-20 pt-28 sm:px-8">
       <section className="mori-shell">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(32rem,1.1fr)] lg:items-end">
           <div className="max-w-2xl">

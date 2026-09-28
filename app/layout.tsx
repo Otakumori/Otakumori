@@ -1,6 +1,7 @@
 import './globals.css';
 import './mori-visual-system.css';
 import './styles/mori-foundation.css';
+import './styles/sitewide-visual-stabilization.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
@@ -58,12 +59,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang="en" className="font-body">
         <body className="font-body" data-visual-qa-auth="true">
           <VisualQaAuthProvider initialState={visualQaAuthState}>
-            <AppQueryProvider>
-              <CartProvider visualQaAuth>
-                <StaticPublicNavbar />
-                <SiteVisualShell>{children}</SiteVisualShell>
-              </CartProvider>
-            </AppQueryProvider>
+            <ToastProvider>
+              <AppQueryProvider>
+                <CartProvider visualQaAuth>
+                  <StaticPublicNavbar />
+                  <SiteVisualShell>{children}</SiteVisualShell>
+                </CartProvider>
+              </AppQueryProvider>
+            </ToastProvider>
           </VisualQaAuthProvider>
         </body>
       </html>

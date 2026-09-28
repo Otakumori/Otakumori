@@ -7,7 +7,7 @@ import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
 
 export function EmptyCart() {
   return (
-    <section className="flex flex-col items-center gap-3 rounded-3xl border border-white/20 bg-white/5 backdrop-blur-lg px-6 py-8 text-center shadow-[0_26px_80px_rgba(15,23,42,0.96)]">
+    <section className="mori-foundation-frame flex flex-col items-center gap-3 border-[#c6a77d]/35 bg-transparent px-6 py-8 text-center shadow-none backdrop-blur-none">
       <MoriArtwork src={approvedVisualAssets.emptyStates.cart} />
       <h2 className="text-sm font-semibold tracking-[0.28em] uppercase text-white/80">
         Your cart is feeling light
@@ -17,7 +17,7 @@ export function EmptyCart() {
       </p>
       <Link
         href={paths.shop()}
-        className="mt-3 rounded-full bg-gradient-to-r from-pink-500/80 via-pink-500 to-pink-400 px-5 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(236,72,153,0.3)] hover:from-pink-500 hover:via-pink-400 hover:to-pink-300 transition-all"
+        className="mori-button-primary mt-3 inline-flex px-5 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
       >
         Browse products
       </Link>

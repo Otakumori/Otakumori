@@ -1,9 +1,6 @@
 import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 // Use relative API path during SSR to avoid base-URL issues
-import StarfieldPurple from '../../components/StarfieldPurple';
-import Navbar from '../../components/layout/Navbar';
-import FooterDark from '../../components/FooterDark';
 import SoapstoneCommunity from '../../components/community/SoapstoneCommunity';
 
 // Force dynamic rendering to prevent timeout during static generation
@@ -38,10 +35,7 @@ export default async function SoapstoneCommunityPage() {
   const soapstones = await getSoapstones();
 
   return (
-    <>
-      <StarfieldPurple />
-      <Navbar />
-      <main className="relative z-10 min-h-screen">
+    <main className="om-route-page om-route-page--community relative z-10 min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white md:text-4xl mb-4">Soapstone Messages</h1>
@@ -52,8 +46,6 @@ export default async function SoapstoneCommunityPage() {
 
           <SoapstoneCommunity initialSoapstones={soapstones} />
         </div>
-      </main>
-      <FooterDark />
-    </>
+    </main>
   );
 }

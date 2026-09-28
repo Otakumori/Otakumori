@@ -176,7 +176,6 @@ export default function ProductClient({ productId }: { productId: string }) {
           undefined,
           err instanceof Error ? err : new Error(String(err)),
         );
-        showError('Failed to fetch product details. Please try again.');
       } finally {
         if (!isCancelled) setLoading(false);
       }
@@ -231,53 +230,51 @@ export default function ProductClient({ productId }: { productId: string }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080611] flex items-center justify-center">
+      <main className="om-route-page om-route-page--pdp min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-300 border-r-transparent" />
           <p className="mt-4 text-pink-100">Loading treasure...</p>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-[#080611]">
+      <main className="om-route-page om-route-page--pdp min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
           <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Not Found
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">{error || 'This treasure has gone missing.'}</p>
+            <span aria-hidden="true" className="om-route-state__mark" />
+            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
+            <p className="text-[#d9cdbd] mb-6">This item is unavailable or could not be loaded right now.</p>
             <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+              <Button className="mori-button-primary">
                 Return to Shop
               </Button>
             </Link>
           </StorefrontPanel>
         </div>
-      </div>
+      </main>
     );
   }
 
   const imageUrl = displayImageUrl;
   if (!imageUrl) {
     return (
-      <div className="min-h-screen bg-[#080611]">
+      <main className="om-route-page om-route-page--pdp min-h-screen">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
           <StorefrontPanel className="p-8 text-center">
-            <h1 className="font-display text-3xl font-semibold text-pink-100 mb-4">
-              Product Image Not Available
-            </h1>
-            <p className="text-[#f5d6dc]/70 mb-6">This product is missing required images.</p>
+            <span aria-hidden="true" className="om-route-state__mark" />
+            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
+            <p className="text-[#d9cdbd] mb-6">This item cannot be displayed right now.</p>
             <Link href={paths.shop()}>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+              <Button className="mori-button-primary">
                 Return to Shop
               </Button>
             </Link>
           </StorefrontPanel>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -291,8 +288,7 @@ export default function ProductClient({ productId }: { productId: string }) {
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#080611] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,148,201,0.16),transparent_30%),radial-gradient(circle_at_84%_18%,rgba(132,92,255,0.14),transparent_28%),linear-gradient(180deg,rgba(8,6,17,0.1),rgba(8,6,17,0.94))]" />
+    <main className="om-route-page om-route-page--pdp min-h-screen overflow-hidden text-white">
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <nav className="mb-8">
           <ol className="flex flex-wrap items-center gap-2 text-sm text-[#f5d6dc]/60">
@@ -462,6 +458,6 @@ export default function ProductClient({ productId }: { productId: string }) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

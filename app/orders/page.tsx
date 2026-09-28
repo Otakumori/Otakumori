@@ -63,10 +63,10 @@ export default function OrdersPage() {
       if (data.ok) {
         setOrders(data.data.orders);
       } else {
-        setError(data.error || 'Failed to fetch orders');
+        setError('unavailable');
       }
     } catch {
-      setError('Failed to fetch orders');
+      setError('unavailable');
     } finally {
       setLoading(false);
     }
@@ -104,13 +104,14 @@ export default function OrdersPage() {
 
   if (!isSignedIn) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
-          <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
-            <h1 className="mb-4 text-2xl font-bold text-white">Sign In Required</h1>
-            <p className="mb-8 text-pink-200">Please sign in to view your orders</p>
+          <Card className="om-route-state om-route-state--bounded border-[#c6a77d]/30 bg-transparent p-8 text-center shadow-none backdrop-blur-none">
+            <p className="mori-foundation-eyebrow">Merchant records</p>
+            <h1 className="mb-4 mt-3 font-display text-3xl font-semibold text-[#f6eddf]">Sign in to view your orders</h1>
+            <p className="mb-8 text-[#d9cdbd]">Your completed purchases and shipping records are kept here.</p>
             <Link href="/sign-in">
-              <Button className="bg-pink-500 hover:bg-pink-600">Sign In</Button>
+              <Button className="mori-button-primary">Sign In</Button>
             </Link>
           </Card>
         </div>
@@ -120,7 +121,7 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
           <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
@@ -133,12 +134,13 @@ export default function OrdersPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
         <div className="container mx-auto px-4 py-16">
-          <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
-            <h1 className="mb-4 text-2xl font-bold text-white">Error</h1>
-            <p className="mb-8 text-red-300">{error}</p>
-            <Button onClick={fetchOrders} className="bg-pink-500 hover:bg-pink-600">
+          <Card className="om-route-state om-route-state--bounded om-route-state--error border-[#c07d75]/50 bg-transparent p-8 text-center shadow-none backdrop-blur-none">
+            <span aria-hidden="true" className="om-route-state__mark" />
+            <h1 className="mb-4 font-display text-3xl font-semibold text-[#f6eddf]">Orders temporarily unavailable</h1>
+            <p className="mb-8 text-[#d9cdbd]">We couldn&apos;t load your order records right now.</p>
+            <Button onClick={fetchOrders} className="mori-button-primary">
               Try Again
             </Button>
           </Card>
@@ -148,7 +150,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
+    <main className="om-route-page om-route-page--orders min-h-screen pt-20">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Your Orders</h1>

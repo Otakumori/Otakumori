@@ -1,0 +1,22 @@
+{
+  "family": "sitewide-visual-pass-1",
+  "status": "provisional",
+  "purpose": "Replaceable vector support for the sitewide visual stabilization pass. These assets are not canonical art.",
+  "assets": [
+    { "id": "icon-cart", "role": "utility navigation", "surface": "navbar/cart", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/cart.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-wishlist", "role": "utility navigation", "surface": "navbar/wishlist", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/wishlist.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-search", "role": "utility navigation", "surface": "search", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/search.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-profile", "role": "utility navigation", "surface": "profile", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/profile.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-settings", "role": "utility navigation", "surface": "settings", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/settings.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-orders", "role": "utility navigation", "surface": "orders", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/orders.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-community", "role": "utility navigation", "surface": "community", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/community.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-home", "role": "utility navigation", "surface": "home link", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/home.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-filter", "role": "utility navigation", "surface": "catalogue filters", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/filter.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-back", "role": "utility navigation", "surface": "back links", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/back.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-close", "role": "utility navigation", "surface": "dismiss controls", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/close.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "icon-menu", "role": "utility navigation", "surface": "mobile navigation", "runtime": "public/assets/provisional/sitewide-visual-pass-1/icons/menu.svg", "dimensions": "24x24", "status": "provisional" },
+    { "id": "ornament-branch", "role": "edge ornament", "surface": "interior routes", "runtime": "public/assets/provisional/sitewide-visual-pass-1/ornament-branch.svg", "dimensions": "240x180", "status": "provisional" },
+    { "id": "catalogue-rule", "role": "structural rule", "surface": "catalogue and headings", "runtime": "public/assets/provisional/sitewide-visual-pass-1/catalogue-rule.svg", "dimensions": "320x16", "status": "provisional" },
+    { "id": "merchant-seal", "role": "completion/record seal", "surface": "success and orders", "runtime": "public/assets/provisional/sitewide-visual-pass-1/merchant-seal.svg", "dimensions": "96x96", "status": "provisional" }
+  ]
+}
