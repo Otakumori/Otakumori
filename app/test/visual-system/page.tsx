@@ -8,6 +8,7 @@ import {
 } from '@/app/components/mori/MoriFoundation';
 import { MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
 import { MoriProvisionalIcon } from '@/app/components/mori/MoriProvisionalIcon';
+import { InteractionLab } from './InteractionLab';
 
 const icons = ['home', 'search', 'cart', 'wishlist', 'orders', 'community', 'settings'] as const;
 
@@ -83,6 +84,8 @@ export default function VisualSystemPage() {
             </div>
           ))}
         </div>
+
+        <InteractionLab />
       </div>
     </main>
   );

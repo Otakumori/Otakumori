@@ -34,4 +34,10 @@ describe('Otaku-mori UI/UX system contract', () => {
     expect(css).toContain('.om-games-selector__option-label { display: block; font-family: var(--font-display); font-size: clamp(0.75rem, 1.1vw, 0.9rem);');
     expect(css).toContain('.om-games-selector__record-meta { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
   });
+
+  it('contains interaction experiments in the internal lab with a reduced-motion final state', () => {
+    expect(css).toContain('.om-interaction-lab');
+    expect(css).toContain('.om-interaction-lab *, .om-interaction-lab *::before, .om-interaction-lab *::after');
+    expect(css).toContain('.om-lab-transition-stage__aperture { opacity: 0.82;');
+  });
 });

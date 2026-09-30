@@ -61,3 +61,22 @@ inside their existing routes.
 `/test/visual-system` uses production primitives to exercise display typography, all four
 containment modes, control states, status semantics, linework, and provisional navigation icon
 masks. It is an internal specimen, not a route design source.
+
+### Interaction-language lab
+
+The lab also holds a deliberately local set of interaction proofs. They establish the shared
+vocabulary without enabling an effect across production routes:
+
+| Verb | Site primitive | Game / relic use | World-moment use |
+| --- | --- | --- | --- |
+| Trace | Short structural line entrance | Relic-frame geometry | No persistent tracing |
+| Reveal | Selected content only | Aperture and depth reveal | Rare memory/unlock expression |
+| Lift | 2px material acknowledgement | Shallow pointer-aware relic tilt | Not a global hover treatment |
+| Select | Native button state and material shift | Existing Mini-Games selector | Not applicable |
+| Confirm | Brief status mark | Seal / inventory acknowledgement | Rare completion ceremony |
+| Transition | None globally | Local game composition only | Explicitly reviewed local moment |
+
+`DRIFT`, `BREATHE`, and `SETTLE` are ambient modifiers, not interaction primitives. They stay
+subordinate to focus, reading, and critical controls; reduced-motion renders each specimen in its
+final stable state. Rope, fluid, particle, and constraint simulations remain research concepts in
+the lab until a route-specific performance and accessibility review authorizes an isolated proof.
