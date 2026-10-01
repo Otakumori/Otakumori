@@ -140,7 +140,7 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
             // Legacy catalogue image strings are not asset authority and several
             // point at retired paths, so an unapproved relic falls back to an
             // intentional material frame rather than a broken image.
-            const art = gamePresentation?.hub ?? gamePresentation?.cover;
+            const art = gamePresentation?.hub;
 
             return (
               <button
