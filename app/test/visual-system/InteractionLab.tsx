@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, type PointerEvent } from 'react';
 
 import { MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
@@ -33,6 +34,8 @@ export function InteractionLab() {
   const [confirmation, setConfirmation] = useState<'rest' | 'seal' | 'ink' | 'ivory'>('rest');
   const [transition, setTransition] = useState<'aperture' | 'passage' | null>(null);
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [pigmentRevealed, setPigmentRevealed] = useState(false);
+  const [sealRevealed, setSealRevealed] = useState(false);
 
   const reveal = (kind: string) => setRevealed((current) => ({ ...current, [kind]: !current[kind] }));
 
@@ -49,6 +52,15 @@ export function InteractionLab() {
   const resetRelicTilt = (event: PointerEvent<HTMLButtonElement>) => {
     event.currentTarget.style.setProperty('--om-lab-tilt-x', '0deg');
     event.currentTarget.style.setProperty('--om-lab-tilt-y', '0deg');
+  };
+
+  const setSealAperture = (event: PointerEvent<HTMLButtonElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const target = event.currentTarget;
+    const bounds = target.getBoundingClientRect();
+    target.style.setProperty('--om-lab-aperture-x', `${((event.clientX - bounds.left) / bounds.width) * 100}%`);
+    target.style.setProperty('--om-lab-aperture-y', `${((event.clientY - bounds.top) / bounds.height) * 100}%`);
   };
 
   return (
@@ -117,6 +129,75 @@ export function InteractionLab() {
             );
           })}
         </div>
+      </section>
+
+      <section aria-labelledby="pigment-reveal-title" className="om-lab-section">
+        <div className="om-lab-section__heading">
+          <p className="om-lab-kicker">REVEAL · pigment / clip proof</p>
+          <h3 id="pigment-reveal-title">A selected image can return from ash without becoming a banner.</h3>
+        </div>
+        <div className="om-lab-two-up">
+          <figure className={`om-lab-pigment-reveal ${pigmentRevealed ? 'is-revealed' : ''}`}>
+            <Image
+              alt="Bubble Ragdoll cover used as a pigment reveal sample."
+              className="om-lab-pigment-reveal__base"
+              fill
+              sizes="(max-width: 640px) 100vw, 34rem"
+              src="/assets/games/covers/game-bubble-ragdoll-cover.webp"
+            />
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="om-lab-pigment-reveal__rich"
+              fill
+              sizes="(max-width: 640px) 100vw, 34rem"
+              src="/assets/games/covers/game-bubble-ragdoll-cover.webp"
+            />
+            <span aria-hidden="true" className="om-lab-pigment-reveal__mask" />
+            <figcaption>Muted archive → clipped pigment → bronze/Sakura terminal.</figcaption>
+          </figure>
+          <article className="om-lab-specimen om-lab-reveal-proof">
+            <span className="om-lab-suitability">GAME · COLLECTION · MEMORY</span>
+            <h4>Image reveal</h4>
+            <p>
+              The image stays meaningful without motion. The richer layer is only an authored response to a chosen reveal.
+            </p>
+            <button
+              aria-pressed={pigmentRevealed}
+              className="mori-foundation-button"
+              onClick={() => setPigmentRevealed((current) => !current)}
+              type="button"
+            >
+              {pigmentRevealed ? 'Return to ash' : 'Reveal pigment'}
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="seal-reveal-title" className="om-lab-section">
+        <div className="om-lab-section__heading">
+          <p className="om-lab-kicker">REVEAL · interactive seal · lab only</p>
+          <h3 id="seal-reveal-title">The aperture follows intent; it never hides the control.</h3>
+        </div>
+        <button
+          aria-pressed={sealRevealed}
+          className={`om-lab-seal-reveal ${sealRevealed ? 'is-revealed' : ''}`}
+          onClick={() => setSealRevealed((current) => !current)}
+          onPointerMove={setSealAperture}
+          type="button"
+        >
+          <span aria-hidden="true" className="om-lab-seal-reveal__field">
+            <MoriProvisionalIcon name="wishlist" size={62} />
+            <span className="om-lab-seal-reveal__aperture" />
+          </span>
+          <span className="om-lab-seal-reveal__copy">
+            <span>{sealRevealed ? 'Seal revealed' : 'Reveal archive seal'}</span>
+            <small>Pointer, touch, and keyboard share this one finite state.</small>
+          </span>
+        </button>
+        <p className="om-lab-selection-readout" role="status">
+          {sealRevealed ? 'Archive seal revealed.' : 'Archive seal concealed until explicitly revealed.'}
+        </p>
       </section>
 
       <section aria-labelledby="lift-title" className="om-lab-section">

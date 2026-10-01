@@ -1,5 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('next/image', () => ({
+  default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={src} />,
+}));
 
 import { MiniGameArcSelector } from '@/app/mini-games/_components/MiniGameArcSelector';
 
@@ -17,6 +21,27 @@ const games = [
     id: 'second',
     slug: 'second-game',
     title: 'Second Game',
+  },
+  {
+    category: 'Rhythm',
+    description: 'A bright third game.',
+    id: 'third',
+    slug: 'third-game',
+    title: 'Third Game',
+  },
+  {
+    category: 'Adventure',
+    description: 'A distant fourth game.',
+    id: 'fourth',
+    slug: 'fourth-game',
+    title: 'Fourth Game',
+  },
+  {
+    category: 'Strategy',
+    description: 'A careful fifth game.',
+    id: 'fifth',
+    slug: 'fifth-game',
+    title: 'Fifth Game',
   },
 ];
 
@@ -42,5 +67,32 @@ describe('MiniGameArcSelector', () => {
 
     expect(screen.getByRole('link', { name: 'Enter game' })).toBeVisible();
     expect(screen.getByRole('img', { name: 'Selected game' })).toBeVisible();
+  });
+
+  it('derives an occluded relic slice from one canonical logical list', () => {
+    const { container } = render(<MiniGameArcSelector games={games} />);
+
+    const selector = screen.getByRole('listbox', { name: 'Mini-game selector' });
+    const options = screen.getAllByRole('option');
+
+    expect(options).toHaveLength(games.length);
+    expect(selector).toHaveAttribute('aria-activedescendant', 'mini-game-option-first');
+    expect(options.every((option) => option.getAttribute('tabindex') === '-1')).toBe(true);
+    expect(screen.getByRole('option', { name: 'Third Game' })).toHaveClass('is-perceptible');
+    expect(screen.getByRole('option', { name: 'Fourth Game' })).toHaveClass('is-perceptible');
+    expect(screen.getByRole('status')).toHaveTextContent('Selected game: First Game. 1 of 5.');
+    expect(container.querySelector('.om-games-selector__cover--fallback')).toBeVisible();
+  });
+
+  it('supports neighbor click and preserves deterministic wraparound', () => {
+    render(<MiniGameArcSelector games={games} />);
+
+    fireEvent.click(screen.getByRole('option', { name: 'Second Game' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Selected game: Second Game. 2 of 5.');
+
+    fireEvent.keyDown(screen.getByRole('listbox', { name: 'Mini-game selector' }), {
+      key: 'ArrowLeft',
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('Selected game: First Game. 1 of 5.');
   });
 });

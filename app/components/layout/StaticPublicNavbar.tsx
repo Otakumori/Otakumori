@@ -71,6 +71,7 @@ export default function StaticPublicNavbar() {
         <div className="hidden flex-wrap items-center justify-end gap-3 md:flex md:gap-6">
           {links.map((link) => (
             <Link
+              aria-current={pathname === link.href ? 'page' : undefined}
               key={link.href}
               href={link.href}
               className="min-h-[44px] px-2 py-3 text-sm text-text-link transition-colors hover:text-text-link-hover"
@@ -79,6 +80,7 @@ export default function StaticPublicNavbar() {
             </Link>
           ))}
           <Link
+            aria-current={pathname === paths.cart() ? 'page' : undefined}
             href={paths.cart()}
             className="min-h-[44px] rounded-lg border border-white/15 px-4 py-3 text-sm text-text-link transition-colors hover:text-text-link-hover"
           >
@@ -94,6 +96,7 @@ export default function StaticPublicNavbar() {
           >
             {links.map((link) => (
               <Link
+                aria-current={pathname === link.href ? 'page' : undefined}
                 key={link.href}
                 href={link.href}
                 className="min-h-[44px] rounded-lg px-3 py-3 text-sm text-[#fff0e7] transition hover:bg-[#f3b3c8]/12 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/42"
@@ -102,6 +105,7 @@ export default function StaticPublicNavbar() {
               </Link>
             ))}
             <Link
+              aria-current={pathname === paths.cart() ? 'page' : undefined}
               href={paths.cart()}
               className="min-h-[44px] rounded-lg px-3 py-3 text-sm text-[#fff0e7] transition hover:bg-[#f3b3c8]/12 focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/42"
             >

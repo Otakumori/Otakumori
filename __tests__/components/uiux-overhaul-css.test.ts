@@ -14,6 +14,12 @@ describe('Otaku-mori UI/UX system contract', () => {
     expect(layout).toContain('marcellusSc.variable');
   });
 
+  it('makes Marcellus SC the visible first-party face for body, UI, and legacy sans utilities', () => {
+    expect(css).toContain("--font-body: var(--font-marcellus-sc), 'Marcellus SC'");
+    expect(css).toContain("--font-ui: var(--font-marcellus-sc), 'Marcellus SC'");
+    expect(css).toContain('.font-sans { font-family: var(--font-ui); }');
+  });
+
   it('keeps Home outside the interior visual-system selector and defines explicit containment', () => {
     expect(css).toContain(".om-site-interior-shell[data-mori-route-shell='interior']");
     expect(css).toContain('.om-surface--field');
@@ -31,8 +37,16 @@ describe('Otaku-mori UI/UX system contract', () => {
 
   it('keeps Mini-Games selector text at the Lighthouse legibility floor', () => {
     expect(css).toContain('.om-games-selector__eyebrow { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
-    expect(css).toContain('.om-games-selector__option-label { display: block; font-family: var(--font-display); font-size: clamp(0.75rem, 1.1vw, 0.9rem);');
+    expect(css).toContain('.om-games-selector__option-label { display: block; font-family: var(--font-ui); font-size: clamp(0.75rem, 1.1vw, 0.94rem);');
     expect(css).toContain('.om-games-selector__record-meta { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
+  });
+
+  it('uses masked relative geometry and preserves that composition under reduced motion', () => {
+    expect(css).toContain('masked relic procession, not a row');
+    expect(css).toContain('--om-relic-x');
+    expect(css).toContain('.om-games-selector__option.is-occluded { pointer-events: none; }');
+    expect(css).toContain('.om-games-selector__rail:focus-visible { outline: 2px solid var(--om-focus);');
+    expect(css).toContain('.om-games-selector__option { transition: none !important; }');
   });
 
   it('contains interaction experiments in the internal lab with a reduced-motion final state', () => {

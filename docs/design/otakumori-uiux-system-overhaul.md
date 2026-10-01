@@ -21,8 +21,11 @@ frame; surrounding route layout should remain environmental.
 
 ## Type and color roles
 
-- `Marcellus SC` is the production display face through `next/font` with `display: swap`.
-- Body and UI text remain clean, system-first sans-serif for compact reading and controls.
+- `Marcellus SC` is the first-party visible site face through `next/font` with `display: swap`.
+  It covers headings, body, controls, labels, prices, metadata, and status language; hierarchy comes
+  from size, leading, tracking, spacing, and colour rather than a generic UI sans fallback.
+- Important production text stays at or above the 12px legibility floor. Editorial body copy uses a
+  comfortably larger size and avoids aggressive paragraph tracking.
 - Black lacquer and charcoal paper are the default field; bronze provides architecture; ivory holds
   information; Sakura is a selected, emotional, or completion interruption.
 - Seal red is reserved for bounded danger or interrupted states. It is not a routine CTA colour.
@@ -46,12 +49,17 @@ Controls keep native buttons or links, retain visible labels or accessible names
 
 ### Mini-games selector
 
-The hub is a semantic `listbox` with `option` buttons plus one ordinary game-entry link. It supports:
+The hub is one semantic `listbox` with one canonical `option` button per game plus one ordinary
+game-entry link. Relative geometry is derived from the selected index; there are no fixed nth-child
+slots or duplicated focus targets. A masked aperture intentionally reveals only the selected relic,
+one or two neighboring relics per side, and a suggestion that the mechanism continues beyond view.
+
+It supports:
 
 - desktop pointer selection, keyboard Arrow keys, Home, and End;
 - touch/pointer swipe after a 32px threshold without a Canvas, WebGL scene, or persistent loop;
-- a selected record with optional shallow pointer tilt capped at 2 degrees;
-- no tilt, transition, or auto-motion under reduced-motion preferences.
+- a stable selected record with optional shallow pointer tilt capped at 4 degrees and 2px lift;
+- immediate visual selection under reduced-motion while preserving the same occluded composition.
 
 The selector changes only hub navigation. Individual game mechanics and presentation authority stay
 inside their existing routes.
@@ -78,5 +86,8 @@ vocabulary without enabling an effect across production routes:
 
 `DRIFT`, `BREATHE`, and `SETTLE` are ambient modifiers, not interaction primitives. They stay
 subordinate to focus, reading, and critical controls; reduced-motion renders each specimen in its
-final stable state. Rope, fluid, particle, and constraint simulations remain research concepts in
-the lab until a route-specific performance and accessibility review authorizes an isolated proof.
+final stable state. The lab additionally includes two intentionally bounded proofs: a pigment/clip
+image reveal (ash-treated base to richer selected image) and an interactive seal aperture with a
+native keyboard/touch fallback. Rope, fluid, particle, archive procession, constraint, and full
+cloth simulations remain research concepts until a route-specific performance and accessibility
+review authorizes an isolated proof.
