@@ -254,8 +254,8 @@ export default function CheckoutPage() {
     return (
       <main className="om-route-page om-route-page--checkout min-h-screen text-white pt-20">
         <div className="mx-auto max-w-3xl px-4 py-16">
-          <section className="om-route-state om-route-state--bounded mx-0" aria-labelledby="checkout-sign-in-title">
-            <p className="mori-foundation-eyebrow">Quiet transaction chamber</p>
+          <section className="om-route-state om-route-state--open mx-0" aria-labelledby="checkout-sign-in-title">
+            <p className="text-sm text-[#d9cdbd]">Checkout</p>
             <h1 id="checkout-sign-in-title" className="mt-3 font-display text-3xl font-semibold">Sign in to continue</h1>
             <p className="mt-3 text-[#d9cdbd]">Please sign in to complete your purchase.</p>
             <Link href={signInHref} className="mori-button-primary mt-6">Sign In</Link>

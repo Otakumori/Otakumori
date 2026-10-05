@@ -181,6 +181,7 @@ export default function Navbar() {
   return (
     <header
       className={`navbar-scroll z-50 w-full font-ui transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${isHome ? 'absolute left-0 top-0' : 'relative'} ${isScrolled ? (isHome ? 'scrolled border-b border-[#efd0bc]/24 shadow-[0_8px_30px_rgba(4,2,5,0.28)]' : 'scrolled shadow-lg shadow-black/80 border-b border-white/10') : isHome ? 'border-b border-[#f4d5c4]/12' : 'border-b border-white/5'}`}
+      data-mori-navbar={isHome ? 'home' : 'interior'}
       style={{
         backgroundColor: isScrolled
           ? isHome
