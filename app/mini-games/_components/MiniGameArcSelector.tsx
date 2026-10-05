@@ -5,7 +5,6 @@ import Link from 'next/link';
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
-import { MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
 import { getApprovedGamePresentation } from '@/lib/approved-visual-assets';
 
 export type MiniGameArcOption = {
@@ -38,8 +37,8 @@ function getRelicDepth(relative: number) {
 
 export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const pointerStart = useRef<{ id: number; x: number } | null>(null);
-  const selectedRelicRef = useRef<HTMLElement | null>(null);
+  const pointerStart = useRef<{ id: number; x: number; optionId?: string } | null>(null);
+  const selectedRelicRef = useRef<HTMLSpanElement | null>(null);
   const selectedGame = games[selectedIndex];
   const presentation = useMemo(
     () => (selectedGame ? getApprovedGamePresentation(selectedGame.slug) : undefined),
@@ -97,12 +96,11 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
   return (
     <section className="om-games-selector" aria-labelledby="mini-games-title">
       <div className="om-games-selector__intro">
-        <p className="om-games-selector__eyebrow">Portal index · choose a threshold</p>
         <h1 id="mini-games-title" className="om-games-selector__title">
-          Mini-games, held in the dark.
+          Mini-Games
         </h1>
         <p className="mt-5 max-w-xl text-base leading-7 text-[#d9cdbd] sm:text-lg">
-          Each doorway keeps its own game feel. Turn the reliquary index to choose one clear way in.
+          Choose a game.
         </p>
       </div>
 
@@ -118,15 +116,24 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
           className="om-games-selector__rail"
           onKeyDown={handleKeyDown}
           onPointerDown={(event) => {
-            pointerStart.current = { id: event.pointerId, x: event.clientX };
+            const option = (event.target as HTMLElement).closest<HTMLElement>('[role="option"]');
+            pointerStart.current = { id: event.pointerId, x: event.clientX, optionId: option?.id };
             event.currentTarget.setPointerCapture(event.pointerId);
           }}
+          onPointerCancel={() => { pointerStart.current = null; }}
           onPointerUp={(event) => {
             const start = pointerStart.current;
             pointerStart.current = null;
             if (!start || start.id !== event.pointerId) return;
             const distance = event.clientX - start.x;
-            if (Math.abs(distance) >= swipeThreshold) selectOffset(distance > 0 ? -1 : 1);
+            if (Math.abs(distance) >= swipeThreshold) {
+              resetRelicTilt();
+              selectOffset(distance > 0 ? -1 : 1);
+            } else if (start.optionId) {
+              // Pointer capture keeps swipes local; resolve a tap to its original item.
+              const tappedIndex = games.findIndex((game) => `mini-game-option-${game.id}` === start.optionId);
+              if (tappedIndex >= 0) setSelectedIndex(tappedIndex);
+            }
           }}
           role="listbox"
           tabIndex={0}
@@ -138,8 +145,8 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
             const gameName = gamePresentation?.displayName ?? game.title;
             // Only the audited presentation registry can supply hub artwork.
             // Legacy catalogue image strings are not asset authority and several
-            // point at retired paths, so an unapproved relic falls back to an
-            // intentional material frame rather than a broken image.
+            // point at retired paths, so an unapproved relic falls back to a
+            // printed, named disc rather than a broken or blank image.
             const art = gamePresentation?.hub;
 
             return (
@@ -165,8 +172,16 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
                 tabIndex={-1}
                 type="button"
               >
-                <span className="om-games-selector__relic-frame" aria-hidden="true">
-                  {art ? (
+                <span
+                  className={`om-games-selector__relic-frame ${index === selectedIndex ? 'om-game-relic' : ''}`}
+                  aria-hidden="true"
+                  onPointerMove={index === selectedIndex ? setRelicTilt : undefined}
+                  onPointerLeave={resetRelicTilt}
+                  ref={index === selectedIndex ? selectedRelicRef : undefined}
+                >
+                  <span className="om-games-selector__case-spine" />
+                  <span className="om-games-selector__media-disc">
+                    {art ? (
                     <Image
                       alt=""
                       className="om-games-selector__cover"
@@ -175,9 +190,14 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
                       sizes="(max-width: 640px) 10rem, 17rem"
                       src={art}
                     />
-                  ) : (
-                    <span className="om-games-selector__cover om-games-selector__cover--fallback" />
-                  )}
+                    ) : (
+                      <span className="om-games-selector__cover om-games-selector__cover--fallback">
+                        <span>{gameName}</span>
+                      </span>
+                    )}
+                    <span className="om-games-selector__disc-hub" />
+                  </span>
+                  <span className="om-games-selector__case-index">{String(index + 1).padStart(2, '0')}</span>
                 </span>
                 <span className="om-games-selector__option-label">{gameName}</span>
               </button>
@@ -191,20 +211,13 @@ export function MiniGameArcSelector({ games }: { games: MiniGameArcOption[] }) {
           Selected game: {displayName}. {selectedIndex + 1} of {games.length}.
         </p>
 
-        <article
-          className="om-game-relic om-games-selector__record"
-          onPointerLeave={resetRelicTilt}
-          onPointerMove={setRelicTilt}
-          ref={selectedRelicRef}
-        >
+        <article className="om-games-selector__record">
           <div className="om-games-selector__record-copy">
             <p className="om-games-selector__record-meta">{selectedGame.category}</p>
             <h2 className="om-games-selector__record-title mt-3">{displayName}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#d9cdbd]">{selectedGame.description}</p>
-            <MoriLineTrace className="mt-5" />
           </div>
-          <div className="flex flex-col items-end justify-between gap-5">
-            <MoriSealMark label="Selected game" />
+          <div className="flex items-end">
             <Link className="mori-button-primary" href={`/mini-games/${selectedGame.slug}`}>
               Enter game
             </Link>

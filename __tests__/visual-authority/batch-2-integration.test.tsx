@@ -49,7 +49,7 @@ describe('approved visual assets batch 2', () => {
   });
 
   it.each([
-    [EmptyCart, 'Your cart is feeling light', approvedVisualAssets.emptyStates.cart],
+    [EmptyCart, 'Your bottomless bag is... seemingly empty?', approvedVisualAssets.emptyStates.cart],
     [EmptyWishlist, 'No favorites yet', approvedVisualAssets.emptyStates.wishlist],
     [EmptySearch, 'No results found', approvedVisualAssets.emptyStates.search],
     [EmptyOrders, 'No orders yet', approvedVisualAssets.destinations.orders],

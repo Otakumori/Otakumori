@@ -22,11 +22,10 @@ export default async function SettingsPage() {
       const appOrigin = await resolveServerAppOrigin();
       return (
         <main className="om-route-page om-route-page--settings min-h-screen">
-          <section className="om-route-state om-route-state--bounded mx-auto mt-16 max-w-2xl" aria-labelledby="settings-title">
-            <p className="mori-foundation-eyebrow">Quiet utility chamber</p>
+          <section className="om-route-state om-route-state--open mx-auto mt-12 max-w-2xl" aria-labelledby="settings-title">
             <h1 id="settings-title" className="mt-3 font-display text-3xl font-semibold text-[#f6eddf]">Settings</h1>
             <p className="mt-4 text-sm leading-7 text-[#d9cdbd]">Sign in to manage your Otaku-mori preferences.</p>
-            <a href={buildCanonicalSignInUrl('/settings', appOrigin)} className="mori-button-primary mt-6">Sign In</a>
+            <a href={buildCanonicalSignInUrl('/settings', appOrigin)} className="mori-button-primary mt-6">Sign in</a>
           </section>
         </main>
       );
@@ -39,7 +38,6 @@ export default async function SettingsPage() {
   return (
     <main className="om-route-page om-route-page--settings">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <p className="mori-foundation-eyebrow">Quiet utility chamber</p>
         <h1 className="mt-3 font-display text-3xl font-semibold">Settings</h1>
         <div aria-hidden="true" className="om-provisional-rule mt-4" />
         {(() => {

@@ -66,7 +66,9 @@ describe('MiniGameArcSelector', () => {
     render(<MiniGameArcSelector games={games} />);
 
     expect(screen.getByRole('link', { name: 'Enter game' })).toBeVisible();
-    expect(screen.getByRole('img', { name: 'Selected game' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Mini-Games', level: 1 })).toBeVisible();
+    expect(screen.getByText('Choose a game.')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Selected game: First Game.');
   });
 
   it('derives an occluded relic slice from one canonical logical list', () => {
@@ -94,5 +96,31 @@ describe('MiniGameArcSelector', () => {
       key: 'ArrowLeft',
     });
     expect(screen.getByRole('status')).toHaveTextContent('Selected game: First Game. 1 of 5.');
+  });
+
+  it('uses approved artwork on the disc and keeps physical relief off the information record', () => {
+    const { container } = render(<MiniGameArcSelector games={[{ ...games[0], slug: 'bubble-ragdoll' }]} />);
+    const disc = container.querySelector('.om-games-selector__media-disc');
+    expect(disc?.querySelector('img')).toHaveAttribute('src', '/assets/games/hub/game-bubble-ragdoll-hub.webp');
+    expect(disc?.closest('.om-game-relic')).not.toBeNull();
+    expect(container.querySelector('article')).not.toHaveClass('om-game-relic');
+    expect(screen.getByRole('option', { name: 'Bubble Ragdoll' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('resolves captured taps to the original media item and swipes to one logical neighbor', () => {
+    vi.stubGlobal('PointerEvent', class extends MouseEvent { pointerId = 1; });
+    try {
+      render(<MiniGameArcSelector games={games} />);
+      const selector = screen.getByRole('listbox', { name: 'Mini-game selector' });
+      selector.setPointerCapture = vi.fn();
+      fireEvent.pointerDown(screen.getByRole('option', { name: 'Second Game' }), { clientX: 150 });
+      fireEvent.pointerUp(selector, { clientX: 150 });
+      expect(screen.getByRole('option', { name: 'Second Game' })).toHaveAttribute('aria-selected', 'true');
+      fireEvent.pointerDown(selector, { clientX: 150 });
+      fireEvent.pointerUp(selector, { clientX: 90 });
+      expect(screen.getByRole('option', { name: 'Third Game' })).toHaveAttribute('aria-selected', 'true');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

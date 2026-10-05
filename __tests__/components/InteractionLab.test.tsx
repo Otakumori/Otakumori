@@ -47,6 +47,8 @@ describe('interaction-language lab', () => {
     expect(container.querySelector('.om-lab-pigment-reveal')).toHaveClass('is-revealed');
 
     const seal = screen.getByRole('button', { name: /^Reveal archive seal/ });
+    expect(seal.querySelector('.om-archive-seal')).toHaveAttribute('aria-hidden', 'true');
+    expect(seal.querySelector('.mori-provisional-icon')).toBeNull();
     expect(seal).toHaveAttribute('aria-pressed', 'false');
     act(() => fireEvent.click(seal));
     expect(seal).toHaveAttribute('aria-pressed', 'true');

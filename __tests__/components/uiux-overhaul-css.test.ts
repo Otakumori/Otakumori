@@ -36,9 +36,8 @@ describe('Otaku-mori UI/UX system contract', () => {
   });
 
   it('keeps Mini-Games selector text at the Lighthouse legibility floor', () => {
-    expect(css).toContain('.om-games-selector__eyebrow { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
     expect(css).toContain('.om-games-selector__option-label { display: block; font-family: var(--font-ui); font-size: clamp(0.75rem, 1.1vw, 0.94rem);');
-    expect(css).toContain('.om-games-selector__record-meta { color: var(--om-bronze); font-family: var(--font-ui); font-size: 0.75rem;');
+    expect(css).toContain('.om-games-selector__record-meta { color: var(--om-ivory-muted); font-family: var(--font-ui); font-size: 0.75rem;');
   });
 
   it('uses masked relative geometry and preserves that composition under reduced motion', () => {

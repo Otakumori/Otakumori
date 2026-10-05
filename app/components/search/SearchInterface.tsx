@@ -13,7 +13,6 @@ import {
   type SearchResponse,
   type SearchResult,
 } from '@/app/lib/contracts';
-import { t } from '@/lib/microcopy';
 import { cn } from '@/lib/utils';
 import { EmptySearch } from '../empty-states/EmptySearch';
 
@@ -259,10 +258,9 @@ export default function SearchInterface() {
 
   return (
     <div className="space-y-6">
-      <GlassPanel className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label htmlFor="search-query" className="block text-sm font-medium text-white/80">
-            {t('search', 'placeholder') ?? 'Search'}
+        <form onSubmit={handleSubmit} className="om-search-form space-y-5" role="search">
+          <label htmlFor="search-query" className="sr-only">
+            Search Otaku-mori
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
@@ -273,25 +271,24 @@ export default function SearchInterface() {
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t('search', 'placeholder') ?? 'Find something magical'}
-              className="w-full rounded-lg border border-white/10 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+              placeholder="What’re ya eyein’?"
+              className="om-search-input w-full py-4 pl-11 pr-4"
               autoComplete="off"
             />
           </div>
 
-          <div className="flex gap-2 text-sm">
+          <div className="om-search-filters flex flex-wrap gap-2 text-sm" role="group" aria-label="Search types">
             {(['all', 'products', 'posts', 'games'] as const).map((tab) => {
               const isPressed = activeTab === tab;
               return (
                 <button
                   key={tab}
                   type="button"
+                  aria-pressed={isPressed}
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    'rounded-full px-4 py-2 transition-colors',
-                    isPressed
-                      ? 'bg-fuchsia-600 text-white'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20',
+                    'om-search-filter px-4 py-2 transition-colors',
+                    isPressed && 'is-selected',
                   )}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -302,15 +299,14 @@ export default function SearchInterface() {
 
           <button
             type="submit"
-            className="inline-flex items-center justify-center rounded-lg bg-fuchsia-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-fuchsia-600"
+            className="mori-button-primary"
           >
             Search
           </button>
         </form>
-      </GlassPanel>
 
       {historyVisible && (
-        <GlassPanel className="p-6">
+        <section className="om-search-history py-6" aria-label="Recent searches">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-sm font-medium text-white/80">Recent searches</span>
             <button
@@ -334,7 +330,7 @@ export default function SearchInterface() {
               </button>
             ))}
           </div>
-        </GlassPanel>
+        </section>
       )}
 
       {activeQuery && (
@@ -344,7 +340,7 @@ export default function SearchInterface() {
               <Skeleton />
             </div>
           ) : error ? (
-            <GlassPanel className="p-6 text-sm text-amber-300">{error}</GlassPanel>
+            <p className="py-6 text-sm" role="alert">Search is temporarily unavailable. Please try again.</p>
           ) : hasResults ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -420,10 +416,7 @@ export default function SearchInterface() {
       )}
 
       {!activeQuery && (
-        <GlassPanel className="p-8 text-center">
-          <h3 className="mb-4 text-xl font-semibold text-white">{t('search', 'suggesting')}</h3>
-          <p className="text-zinc-400">Search for products, blog posts, or games to get started.</p>
-        </GlassPanel>
+        <p className="om-search-hint pt-3">Find products, stories, and games.</p>
       )}
     </div>
   );

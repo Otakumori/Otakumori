@@ -1,6 +1,5 @@
 import { generateSEO } from '@/app/lib/seo';
 import SearchInterface from '../components/search/SearchInterface';
-import { t } from '@/lib/microcopy';
 
 
 export function generateMetadata() {
@@ -13,10 +12,9 @@ export function generateMetadata() {
 export default function SearchPage() {
   return (
     <main className="om-route-page om-route-page--search relative z-10 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white md:text-4xl mb-4">Search</h1>
-            <p className="text-lg text-zinc-300/90">{t('search', 'suggesting')}</p>
+        <div className="mx-auto max-w-4xl px-6 py-8 md:py-12">
+          <div className="mb-8">
+            <h1 className="font-display text-3xl font-normal md:text-4xl">Search</h1>
           </div>
 
           <SearchInterface />

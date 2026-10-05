@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, type PointerEvent } from 'react';
 
-import { MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
+import { MoriArchiveSeal, MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
 import { MoriProvisionalIcon } from '@/app/components/mori/MoriProvisionalIcon';
 
 const traces = [
@@ -187,7 +187,7 @@ export function InteractionLab() {
           type="button"
         >
           <span aria-hidden="true" className="om-lab-seal-reveal__field">
-            <MoriProvisionalIcon name="wishlist" size={62} />
+            <MoriArchiveSeal />
             <span className="om-lab-seal-reveal__aperture" />
           </span>
           <span className="om-lab-seal-reveal__copy">
