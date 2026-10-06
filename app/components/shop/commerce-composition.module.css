@@ -1,0 +1,327 @@
+.page {
+  min-height: 100vh;
+  padding-block: 7rem 5rem;
+  color: var(--om-ivory);
+}
+.shell {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}
+.introduction {
+  max-width: 48rem;
+  margin-block: 1rem 3rem;
+}
+.introduction h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.15;
+}
+.introduction p {
+  max-width: 38rem;
+  margin-top: 1rem;
+  color: var(--om-ivory-muted);
+  line-height: 1.7;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1.25rem 2rem;
+  padding-block: 1.5rem;
+  margin-bottom: 2.5rem;
+  border-block: 1px solid var(--om-line-quiet);
+}
+.search {
+  display: flex;
+  flex: 1 1 20rem;
+  align-items: end;
+  gap: 0.75rem;
+}
+.field {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 0.5rem;
+}
+.field label {
+  font-size: 0.875rem;
+  color: var(--om-ivory-muted);
+}
+.field input,
+.field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--om-line);
+  border-radius: 0.2rem;
+  background: var(--om-lacquer-950);
+  color: var(--om-ivory);
+  font: inherit;
+  font-size: 1rem;
+}
+.filters {
+  min-width: 0;
+  flex: 1 1 24rem;
+}
+.filters summary {
+  width: fit-content;
+  cursor: pointer;
+  padding-block: 0.75rem;
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+}
+.filterFields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+.filterFields .field {
+  flex-basis: 10rem;
+}
+.filterFields button,
+.search button {
+  min-height: 2.75rem;
+}
+.catalogue {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem 2rem;
+}
+.record {
+  min-width: 0;
+}
+.recordLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.recordMedia,
+.productMedia {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--om-charcoal-paper);
+}
+.recordMedia::after,
+.productMedia::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-block: 1px solid var(--om-line-quiet);
+}
+.recordImage {
+  transition: transform var(--om-motion-settle) ease;
+}
+.recordIdentity {
+  padding-top: 1.2rem;
+}
+.recordIdentity h2 {
+  font-size: 1.3rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.recordContext,
+.priceContext {
+  font-size: 0.875rem;
+  color: var(--om-ivory-muted);
+}
+.recordContext {
+  margin-top: 0.4rem;
+}
+.recordPrice {
+  margin-top: 0.75rem;
+  font-size: 1.125rem;
+  overflow-wrap: anywhere;
+}
+.priceContext {
+  display: inline;
+}
+.recordAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  margin-top: 0.4rem;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.35rem;
+  text-decoration-color: var(--om-line);
+}
+.recordLink:focus-visible,
+.page :is(input, select, summary, a, button):focus-visible {
+  outline: 2px solid var(--om-focus);
+  outline-offset: 5px;
+}
+.state {
+  padding-block: 3rem 5rem;
+  max-width: 38rem;
+  border-top: 1px solid var(--om-line-quiet);
+}
+.state h1,
+.state h2 {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.3;
+}
+.state p {
+  margin-block: 1rem 1.5rem;
+  color: var(--om-ivory-muted);
+  line-height: 1.75;
+}
+.skeleton {
+  aspect-ratio: 1;
+  background: var(--om-charcoal-paper);
+}
+.skeletonText {
+  height: 1rem;
+  width: 65%;
+  background: var(--om-charcoal-paper-soft);
+  margin-top: 1rem;
+}
+.breadcrumb {
+  margin-bottom: 2rem;
+  color: var(--om-ivory-muted);
+  font-size: 0.875rem;
+}
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.breadcrumb li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.productLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem 4rem;
+  align-items: start;
+}
+.productObject,
+.purchase {
+  min-width: 0;
+}
+.purchase h1 {
+  font-size: clamp(1.9rem, 3.5vw, 3rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.price {
+  margin-top: 1.25rem;
+  font-size: 1.75rem;
+  overflow-wrap: anywhere;
+}
+.availability {
+  margin-block: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--om-ivory-muted);
+}
+.purchaseControls {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: 1.5rem;
+  border-block: 1px solid var(--om-line-quiet);
+}
+.purchaseAction {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.purchaseAction .field {
+  flex: 0 1 6rem;
+}
+.purchaseAction button {
+  flex: 1 1 12rem;
+  min-height: 3rem;
+}
+.added {
+  min-height: 3.5rem;
+  padding-block: 1rem;
+  font-size: 0.875rem;
+}
+.added a {
+  display: inline-block;
+  margin-left: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+.support {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+.details {
+  padding-top: 2rem;
+}
+.details h2 {
+  font-size: 1.35rem;
+  margin-bottom: 1rem;
+}
+.details p {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--om-ivory-muted);
+  margin-top: 1rem;
+  overflow-wrap: anywhere;
+}
+.metadata {
+  display: grid;
+  grid-template-columns: minmax(0, 6rem) minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--om-line-quiet);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.metadata dt {
+  color: var(--om-ivory-muted);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--om-ivory-muted);
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .recordLink:hover .recordImage {
+    transform: translateY(-2px) scale(1.015);
+  }
+}
+@media (min-width: 640px) {
+  .shell {
+    width: min(100% - 4rem, 80rem);
+  }
+  .catalogue {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3.5rem 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .catalogue {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4rem 2.5rem;
+  }
+  .productLayout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+  .productObject {
+    position: sticky;
+    top: 7rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recordImage {
+    transition: none;
+    transform: none;
+  }
+}

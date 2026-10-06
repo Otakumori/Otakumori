@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import type { CatalogProduct } from '@/lib/catalog/serialize';
+import { shopProduct as baseProduct } from '@/tests/fixtures/shop-product';
+import { canOptimizeProductImage } from '@/app/components/shop/product-image';
 import { ProductGrid, productImageMode } from '@/app/components/shop/StorefrontProductCard';
 
 vi.mock('next/image', () => ({
@@ -13,60 +14,6 @@ vi.mock('next/image', () => ({
   }: any) => <img alt={alt} {...props} />,
 }));
 
-const baseProduct: CatalogProduct = {
-  id: 'product-1',
-  title: 'Sakura Starter Tee',
-  slug: 'sakura-starter-tee',
-  description: '<p>Soft cotton traveler gear.</p>',
-  image: 'https://example.com/tee.png',
-  images: ['https://example.com/tee.png'],
-  tags: [],
-  category: 'Apparel',
-  categorySlug: 'apparel',
-  price: 24,
-  priceCents: 2400,
-  priceRange: { min: 2400, max: 3200 },
-  available: true,
-  visible: true,
-  active: true,
-  provider: 'printify',
-  variants: [
-    {
-      id: 'variant-1',
-      provider: 'printify',
-      providerVariantId: '101',
-      title: 'Small',
-      sku: 'sku-1',
-      price: 24,
-      priceCents: 2400,
-      inStock: true,
-      isEnabled: true,
-      printifyVariantId: 101,
-      optionValues: [],
-      previewImageUrl: null,
-    },
-    {
-      id: 'variant-2',
-      provider: 'printify',
-      providerVariantId: '102',
-      title: 'Medium',
-      sku: 'sku-2',
-      price: 32,
-      priceCents: 3200,
-      inStock: true,
-      isEnabled: true,
-      printifyVariantId: 102,
-      optionValues: [],
-      previewImageUrl: null,
-    },
-  ],
-  integrationRef: 'printify',
-  printifyProductId: 'printify-1',
-  blueprintId: 1,
-  printProviderId: 1,
-  lastSyncedAt: null,
-};
-
 describe('storefront product card system', () => {
   it('renders the preserved product-grid and product-card contracts', () => {
     render(<ProductGrid products={[baseProduct]} />);
@@ -76,7 +23,10 @@ describe('storefront product card system', () => {
     expect(screen.getByText('Sakura Starter Tee')).toBeInTheDocument();
     expect(screen.getByText('$24.00')).toBeInTheDocument();
     expect(screen.getByText('Starting at')).toBeInTheDocument();
-    expect(screen.getByText('Choose options')).toBeInTheDocument();
+    expect(screen.getByText('View details')).toBeInTheDocument();
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.queryByText('printify')).not.toBeInTheDocument();
+    expect(screen.queryByText('Soft cotton traveler gear.')).not.toBeInTheDocument();
   });
 
   it('uses contained image framing for product types that need full composition', () => {
@@ -87,5 +37,13 @@ describe('storefront product card system', () => {
       'object-contain',
     );
     expect(productImageMode(baseProduct)).toBe('object-cover');
+  });
+  it('optimizes compatible sources and preserves other catalogue image hosts', () => {
+    expect(canOptimizeProductImage('/products/tee.webp')).toBe(true);
+    expect(canOptimizeProductImage('https://images-api.printify.com/mockup/tee.png')).toBe(true);
+    expect(canOptimizeProductImage('https://other.example/tee.png')).toBe(false);
+    expect(canOptimizeProductImage('https://images-api.printify.com:8443/tee.png')).toBe(false);
+    expect(canOptimizeProductImage('//other.example/tee.png')).toBe(false);
+    expect(canOptimizeProductImage('https://printify.com.other.example/tee.png')).toBe(false);
   });
 });

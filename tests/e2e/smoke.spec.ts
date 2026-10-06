@@ -18,7 +18,9 @@ test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
 
   // Back to shop
   await page.goto('/shop');
-  await expect(page.getByRole('heading', { name: /shop/i })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'The Otaku-mori collection' }),
+  ).toBeVisible();
 
   // First product
   const productHref = await page.getByTestId('product-card').first().getAttribute('href');
