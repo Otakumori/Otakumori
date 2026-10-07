@@ -105,28 +105,34 @@ def validate_mesh(
 
     errors.extend(object_transform_errors(obj))
 
+    armature_modifiers = [
+        modifier for modifier in obj.modifiers if modifier.type == "ARMATURE"
+    ]
+    is_skinned = bool(armature_modifiers)
+
     unweighted = 0
     too_many_influences = 0
     max_seen = 0
 
-    for vertex in mesh.vertices:
-        active = [group for group in vertex.groups if group.weight > EPSILON]
-        count = len(active)
-        max_seen = max(max_seen, count)
+    if is_skinned:
+        for vertex in mesh.vertices:
+            active = [group for group in vertex.groups if group.weight > EPSILON]
+            count = len(active)
+            max_seen = max(max_seen, count)
 
-        if count == 0:
-            unweighted += 1
-        elif count > max_influences:
-            too_many_influences += 1
+            if count == 0:
+                unweighted += 1
+            elif count > max_influences:
+                too_many_influences += 1
 
-    if unweighted:
-        errors.append(f"{obj.name}: {unweighted} vertices have no non-zero skin weights")
+        if unweighted:
+            errors.append(f"{obj.name}: {unweighted} vertices have no non-zero skin weights")
 
-    if too_many_influences:
-        errors.append(
-            f"{obj.name}: {too_many_influences} vertices exceed "
-            f"{max_influences} skin influences"
-        )
+        if too_many_influences:
+            errors.append(
+                f"{obj.name}: {too_many_influences} vertices exceed "
+                f"{max_influences} skin influences"
+            )
 
     shape_keys = []
     if mesh.shape_keys:
@@ -138,6 +144,7 @@ def validate_mesh(
         "polygons": len(mesh.polygons),
         "trianglesEstimate": sum(max(0, len(poly.vertices) - 2) for poly in mesh.polygons),
         "materials": len(obj.material_slots),
+        "skinned": is_skinned,
         "maxSkinInfluencesSeen": max_seen,
         "shapeKeys": shape_keys,
     }
