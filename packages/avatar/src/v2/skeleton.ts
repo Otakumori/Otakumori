@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 export const OM_HUMANOID_V1_RIG_ID = 'OM_Humanoid_v1' as const;
 
 export interface CanonicalBoneDefinition {
@@ -57,20 +55,23 @@ export interface SkeletonSignatureInput {
   name: string;
   parent: string | null;
   /**
-   * Bind matrix flattened in column-major order. Values should be rounded by
-   * the validator before hashing to avoid exporter floating-point noise.
+   * Bind matrix flattened in column-major order. Values are normalized here so
+   * a build-side SHA-256 implementation can hash deterministic payloads without
+   * importing Node-only crypto into the browser package.
    */
   bindMatrix: readonly number[];
 }
 
-export function createSkeletonSignature(entries: readonly SkeletonSignatureInput[]): string {
-  const normalized = entries.map((entry) => ({
-    name: entry.name,
-    parent: entry.parent,
-    bindMatrix: entry.bindMatrix.map((value) => Number(value.toFixed(6))),
-  }));
-
-  return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+export function normalizeSkeletonSignaturePayload(
+  entries: readonly SkeletonSignatureInput[],
+): string {
+  return JSON.stringify(
+    entries.map((entry) => ({
+      name: entry.name,
+      parent: entry.parent,
+      bindMatrix: entry.bindMatrix.map((value) => Number(value.toFixed(6))),
+    })),
+  );
 }
 
 export interface SkeletonValidationResult {
