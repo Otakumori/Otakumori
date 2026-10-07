@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "rigId": "OM_Humanoid_v1",
+  "authoring": {
+    "blenderVersion": "5.2.2",
+    "unitScaleMeters": 1,
+    "blenderUpAxis": "Z",
+    "blenderForwardAxis": "-Y",
+    "runtimeUpAxis": "Y",
+    "runtimeForwardAxis": "+Z",
+    "maxSkinInfluences": 4
+  },
+  "requiredBones": [
+    { "name": "root", "parent": null },
+    { "name": "hips", "parent": "root" },
+    { "name": "spine_01", "parent": "hips" },
+    { "name": "spine_02", "parent": "spine_01" },
+    { "name": "chest", "parent": "spine_02" },
+    { "name": "neck", "parent": "chest" },
+    { "name": "head", "parent": "neck" },
+    { "name": "clavicle_l", "parent": "chest" },
+    { "name": "upperarm_l", "parent": "clavicle_l" },
+    { "name": "lowerarm_l", "parent": "upperarm_l" },
+    { "name": "hand_l", "parent": "lowerarm_l" },
+    { "name": "clavicle_r", "parent": "chest" },
+    { "name": "upperarm_r", "parent": "clavicle_r" },
+    { "name": "lowerarm_r", "parent": "upperarm_r" },
+    { "name": "hand_r", "parent": "lowerarm_r" },
+    { "name": "thigh_l", "parent": "hips" },
+    { "name": "shin_l", "parent": "thigh_l" },
+    { "name": "foot_l", "parent": "shin_l" },
+    { "name": "toe_l", "parent": "foot_l" },
+    { "name": "thigh_r", "parent": "hips" },
+    { "name": "shin_r", "parent": "thigh_r" },
+    { "name": "foot_r", "parent": "shin_r" },
+    { "name": "toe_r", "parent": "foot_r" }
+  ],
+  "requiredSockets": [
+    "socket_fp_camera",
+    "socket_head",
+    "socket_back",
+    "socket_hand_l",
+    "socket_hand_r",
+    "socket_hip_l",
+    "socket_hip_r"
+  ]
+}
