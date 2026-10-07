@@ -39,3 +39,27 @@ export type {
   BindCanonicalSkeletonResult,
   CanonicalSkeletonBinding,
 } from './bindCanonicalSkeleton';
+
+export {
+  projectedDiameterPx,
+  resolveProjectedLodWithHysteresis,
+  DEFAULT_PROJECTED_LOD_THRESHOLDS,
+} from './projectedLod';
+export type {
+  ProjectedLodThresholds,
+  RuntimeLod,
+} from './projectedLod';
+
+export {
+  readAvatarRendererTelemetry,
+} from './telemetry';
+export type {
+  AvatarRendererTelemetry,
+} from './telemetry';
+
+export {
+  AvatarSelectionController,
+} from './SelectionController';
+export type {
+  AvatarSelectionRequest,
+} from './SelectionController';
