@@ -76,6 +76,7 @@ export class AvatarAssetRepository {
       cached.lastUsed = this.now();
       if (options.pinned) cached.pinned = true;
       this.onEvent?.({ type: 'acquired', key, refCount: cached.refCount });
+      this.enforceBudget();
       return cached;
     }
 
@@ -99,6 +100,7 @@ export class AvatarAssetRepository {
         refCount: record.refCount,
       });
 
+      this.enforceBudget();
       return record;
     } finally {
       if (this.inflight.get(key) === pending) {
@@ -288,8 +290,6 @@ export class AvatarAssetRepository {
       key,
       bytes: record.estimatedGpuBytes,
     });
-
-    this.enforceBudget();
 
     return record;
   }
