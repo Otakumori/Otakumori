@@ -11,6 +11,9 @@ export type { AvatarSpecV15Type, EquipmentSlotType } from './spec';
 // V2 production contracts. V1.5 remains exported during migration.
 export * from './v2/index';
 
+// Production runtime primitives
+export * from './runtime/index';
+
 // Serialization
 export { serializeAvatar, deserializeAvatar, createDefaultAvatarSpec } from './serialize';
 
