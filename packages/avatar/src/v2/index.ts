@@ -60,3 +60,20 @@ export type {
   AvatarRuntimeQualityState,
   FrameBudgetSample,
 } from './runtimeQuality';
+
+export {
+  ResolvedAvatarAssetV2,
+  ResolvedAvatarV2,
+} from './resolved';
+export type {
+  ResolvedAvatarAssetV2Type,
+  ResolvedAvatarV2Type,
+} from './resolved';
+
+export {
+  isSlotVisibleForDressState,
+  resolveOccludedBodyRegions,
+} from './coverage';
+export type {
+  EquippedManifest,
+} from './coverage';
