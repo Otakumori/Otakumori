@@ -63,3 +63,11 @@ export {
 export type {
   AvatarSelectionRequest,
 } from './SelectionController';
+
+export {
+  AvatarFrameActivityController,
+} from './FrameActivityController';
+export type {
+  AvatarFrameActivity,
+  AvatarFrameloopMode,
+} from './FrameActivityController';
