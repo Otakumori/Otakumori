@@ -86,3 +86,18 @@ export type {
   AvatarV2PolicyContext,
   AvatarV2PolicyResult,
 } from './policy';
+
+export {
+  AVATAR_V2_MORPH_IDS,
+} from './morphs';
+export type {
+  AvatarV2KnownMorphId,
+} from './morphs';
+
+export {
+  migrateAvatarSpecV15ToV2,
+} from './migrateV15';
+export type {
+  AvatarV15MigrationOptions,
+  AvatarV15MigrationResult,
+} from './migrateV15';
