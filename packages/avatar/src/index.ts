@@ -8,6 +8,9 @@ export {
 } from './spec';
 export type { AvatarSpecV15Type, EquipmentSlotType } from './spec';
 
+// V2 production contracts. V1.5 remains exported during migration.
+export * from './v2/index';
+
 // Serialization
 export { serializeAvatar, deserializeAvatar, createDefaultAvatarSpec } from './serialize';
 
