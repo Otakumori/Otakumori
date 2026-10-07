@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "assetId": "body-feminine-01",
+  "kind": "body",
+  "displayName": "Mori Feminine Base 01",
+  "rigId": "OM_Humanoid_v1",
+  "bodyFamilies": ["feminine-01"],
+  "lods": {
+    "lod0": {
+      "url": "/avatar/v2/canonical/om-humanoid-v1/body-feminine-01/lod0.glb",
+      "triangles": 150000,
+      "drawCallsExpected": 4
+    },
+    "lod1": {
+      "url": "/avatar/v2/canonical/om-humanoid-v1/body-feminine-01/lod1.glb",
+      "triangles": 85000,
+      "drawCallsExpected": 4
+    },
+    "lod2": {
+      "url": "/avatar/v2/canonical/om-humanoid-v1/body-feminine-01/lod2.glb",
+      "triangles": 48000,
+      "drawCallsExpected": 4
+    },
+    "retro": {
+      "url": "/avatar/v2/canonical/om-humanoid-v1/body-feminine-01/retro.glb",
+      "triangles": 14000,
+      "drawCallsExpected": 3
+    }
+  },
+  "textures": [
+    {
+      "id": "body-feminine-01-normal",
+      "url": "/avatar/v2/textures/body-feminine-01/normal.ktx2",
+      "semantic": "normal",
+      "codec": "uastc",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "id": "body-feminine-01-basecolor",
+      "url": "/avatar/v2/textures/body-feminine-01/basecolor.ktx2",
+      "semantic": "baseColor",
+      "codec": "etc1s",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "id": "body-feminine-01-orm",
+      "url": "/avatar/v2/textures/body-feminine-01/orm.ktx2",
+      "semantic": "orm",
+      "codec": "uastc",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "materialFamily": "skin",
+  "supportedMorphs": [
+    "height",
+    "torsoLength",
+    "shoulderWidth",
+    "waist",
+    "hipWidth",
+    "bodyMass"
+  ],
+  "correctiveMorphs": [],
+  "occludes": [],
+  "physics": {
+    "solver": "none",
+    "boneNames": [],
+    "updateHz": 30
+  },
+  "contentRating": "adult",
+  "contentTags": ["canonical-body", "adult-capable"],
+  "source": {
+    "title": "Otaku-mori bespoke production body",
+    "author": "Otaku-mori",
+    "sourceUrl": "https://otaku-mori.com/",
+    "licenseSpdx": "LicenseRef-OtakuMori"
+  },
+  "immutableRevision": "PLACEHOLDER-REPLACE-WITH-CONTENT-HASH",
+  "generatedAt": "2026-10-07T00:00:00.000Z"
+}
