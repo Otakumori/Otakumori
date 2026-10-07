@@ -17,15 +17,15 @@
   --om-charcoal-paper-soft: #222324;
   --om-ivory: #f6eddf;
   --om-ivory-muted: #d9cdbd;
-  --om-bronze: #c6a77d;
-  --om-bronze-muted: #a9855f;
-  --om-sakura: #c98f9d;
+  --om-bronze: var(--mori-color-bronze-500);
+  --om-bronze-muted: #75613f;
+  --om-sakura: var(--mori-color-sakura-500);
   --om-seal-red: #8b4a45;
-  --om-line: rgb(198 167 125 / 38%);
-  --om-line-quiet: rgb(198 167 125 / 22%);
+  --om-line: rgb(137 111 72 / 42%);
+  --om-line-quiet: rgb(137 111 72 / 24%);
   --om-focus: #f0c9d2;
-  --om-motion-fast: 140ms;
-  --om-motion-settle: 240ms;
+  --om-motion-fast: var(--mori-duration-respond);
+  --om-motion-settle: var(--mori-duration-settle);
   --om-motion-reveal: 360ms;
 }
 
