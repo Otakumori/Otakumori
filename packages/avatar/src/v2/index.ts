@@ -77,3 +77,12 @@ export {
 export type {
   EquippedManifest,
 } from './coverage';
+
+export {
+  isAvatarAssetRatingAllowed,
+  resolveAvatarV2Policy,
+} from './policy';
+export type {
+  AvatarV2PolicyContext,
+  AvatarV2PolicyResult,
+} from './policy';
