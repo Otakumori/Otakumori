@@ -9,6 +9,7 @@ import {
 import { MoriLineTrace, MoriSealMark } from '@/app/components/mori/MoriInteraction';
 import { MoriProvisionalIcon } from '@/app/components/mori/MoriProvisionalIcon';
 import { InteractionLab } from './InteractionLab';
+import { ProductionSystemLab } from './ProductionSystemLab';
 
 const icons = ['home', 'search', 'cart', 'wishlist', 'orders', 'community', 'settings'] as const;
 
@@ -74,7 +75,10 @@ export default function VisualSystemPage() {
         </div>
 
         <MoriDivider label="Navigation glyphs" />
-        <div className="mt-6 flex flex-wrap gap-6" aria-label="Provisional navigation icon specimen">
+        <div
+          className="mt-6 flex flex-wrap gap-6"
+          aria-label="Provisional navigation icon specimen"
+        >
           {icons.map((icon) => (
             <div className="flex flex-col items-center gap-2" key={icon}>
               <MoriProvisionalIcon name={icon} size={28} />
@@ -86,6 +90,7 @@ export default function VisualSystemPage() {
         </div>
 
         <InteractionLab />
+        <ProductionSystemLab />
       </div>
     </main>
   );

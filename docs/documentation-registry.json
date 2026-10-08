@@ -12,6 +12,25 @@
       "verification": "corepack pnpm docs:security:check"
     },
     {
+      "path": "docs/design/mori-production-system.md",
+      "domain": "visual-system",
+      "status": "canonical",
+      "owner": "design-systems",
+      "lastVerifiedDate": "2026-10-07",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/components/MoriProduction.test.tsx"
+    },
+    {
+      "path": "docs/design/checkpoint.md",
+      "domain": "visual-system",
+      "status": "current-reference",
+      "owner": "design-systems",
+      "lastVerifiedDate": "2026-10-07",
+      "maintenance": "manual",
+      "verification": "manual review",
+      "entryPoint": "docs/design/mori-production-system.md"
+    },
+    {
       "path": "docs/documentation-registry.json",
       "domain": "repository-operations",
       "status": "canonical",

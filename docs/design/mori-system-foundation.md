@@ -10,16 +10,16 @@ The shared system follows one rule: **mystery belongs to the world; clarity belo
 
 ## Materials
 
-| Material | Meaning | Intended use |
-| --- | --- | --- |
-| Charcoal paper | Quiet Mori interior | Ordinary route substrate |
-| Black lacquer | Permanence and intentional presentation | High-value control regions and relics |
-| Parchment | Recorded human information | Archive content and documentation-like information |
-| Antique bronze | Craft, structure, preservation | Hairline frames, dividers, and focus-adjacent structure |
-| Sakura pigment / ink | Botanical line, selected indicator, restrained print or stamp | Sparse signal only |
-| Sakura silk material | Rare authored textile-like presentation | Personal, reward, or deliberately framed use only |
-| Ash | Threshold and aftermath | Games or special environmental contexts |
-| Ink and memory light | Record and rare exceptional state | Never ordinary glow |
+| Material             | Meaning                                                       | Intended use                                            |
+| -------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| Charcoal paper       | Quiet Mori interior                                           | Ordinary route substrate                                |
+| Black lacquer        | Permanence and intentional presentation                       | High-value control regions and relics                   |
+| Parchment            | Recorded human information                                    | Archive content and documentation-like information      |
+| Antique bronze       | Craft, structure, preservation                                | Hairline frames, dividers, and focus-adjacent structure |
+| Sakura pigment / ink | Botanical line, selected indicator, restrained print or stamp | Sparse signal only                                      |
+| Sakura silk material | Rare authored textile-like presentation                       | Personal, reward, or deliberately framed use only       |
+| Ash                  | Threshold and aftermath                                       | Games or special environmental contexts                 |
+| Ink and memory light | Record and rare exceptional state                             | Never ordinary glow                                     |
 
 Each local composition should normally combine one dominant material, one supporting material, and
 one accent. It should not use glass blur, large rounded SaaS cards, or a complete motif catalogue.
@@ -110,11 +110,10 @@ must not treat the absence of botanical or relic imagery here as authority.
 
 ## Typography authority
 
-`MoriSectionHeader` uses the existing `--font-display`; body copy and controls use the existing
-`--font-body` and `--font-ui`. Those variables resolve in `app/globals.css` to the current
-Roboto Condensed/Cinzel fallback stack. The only duplicate local-font export is limited to the
-mini-games layout and does not override this foundation. No font changed in this pass; typography
-art direction remains a separately bounded review.
+`MoriSectionHeader` uses `--font-display`; body copy and controls use `--font-body` and `--font-ui`.
+All three resolve to the Marcellus SC first-party face established by Mori Visual Baseline v1.
+Hierarchy comes from size, leading, tracking, case, opacity, spacing, and color. Important production
+UI text remains at or above 12px.
 
 ## Deferred work
 

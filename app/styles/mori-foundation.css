@@ -12,10 +12,12 @@
   --mori-color-charcoal-800: #201b18;
   --mori-color-ivory-100: #f6eddf;
   --mori-color-ivory-300: #d9cdbd;
-  --mori-color-bronze-400: #a9855f;
-  --mori-color-bronze-300: #c6a77d;
-  --mori-color-rose-400: #b97b8d;
-  --mori-color-rose-300: #d7a5b2;
+  --mori-color-bronze-500: #896f48;
+  --mori-color-bronze-400: #896f48;
+  --mori-color-bronze-300: #b69a70;
+  --mori-color-sakura-500: #ab6366;
+  --mori-color-rose-400: var(--mori-color-sakura-500);
+  --mori-color-rose-300: #c88c8e;
   --mori-color-seal-500: #8b3d3c;
   --mori-color-ash-500: #81756b;
   --mori-color-ink: #17110f;
@@ -27,17 +29,35 @@
   --mori-space-6: 1.5rem;
   --mori-space-8: 2rem;
   --mori-space-12: 3rem;
-  --mori-radius-control: 0.375rem;
-  --mori-radius-object: 0.75rem;
+  --mori-radius-control: 9px;
+  --mori-radius-object: 9px;
   --mori-radius-seal: 999px;
   --mori-shadow-rest: 0 14px 34px rgb(0 0 0 / 22%);
   --mori-shadow-lift: 0 18px 42px rgb(0 0 0 / 30%);
   --mori-ease-respond: cubic-bezier(0.2, 0.8, 0.2, 1);
   --mori-ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
-  --mori-duration-respond: 140ms;
-  --mori-duration-settle: 220ms;
+  --mori-duration-respond: 180ms;
+  --mori-duration-settle: 360ms;
   --mori-duration-reveal: 320ms;
   --mori-duration-trace: 420ms;
+
+  /* Owner-locked production characteristics. Unitless values are 0–1. */
+  --mori-presence-sakura: 0.02;
+  --mori-surface-grain-opacity: 0.12;
+  --mori-texture-visibility: 0.4;
+  --mori-underground-texture-gain: 0.63;
+  --mori-anime-stylization: 0.63;
+  --mori-motion-amplitude-ceiling: 0.8;
+  --mori-surface-lift: 24px;
+  --mori-inset-depth: 15px;
+  --mori-overlay-depth: 32px;
+  --mori-channel-depth: 12px;
+  --mori-control-recess: 20px;
+  --mori-control-press-travel: 9px;
+  --mori-socket-depth: 20px;
+  --mori-material-overlap: 24px;
+  --mori-glass-containment: 24px;
+  --mori-bronze-lip-width: 1px;
 
   /* Semantic material and interaction layer */
   --mori-surface-environment: var(--mori-color-charcoal-950);
@@ -45,8 +65,13 @@
   --mori-surface-lacquer: #11100f;
   --mori-surface-parchment: #e9dcc8;
   --mori-surface-ash: #302b28;
-  --mori-material-sakura-silk:
-    linear-gradient(135deg, rgb(112 55 71 / 92%), rgb(73 40 51 / 96%));
+  --mori-surface-charcoal: #141312;
+  --mori-surface-bronze: #3a3023;
+  --mori-surface-glass: rgb(19 19 19 / 68%);
+  --mori-surface-stone: #2b2926;
+  --mori-surface-root: #241c17;
+  --mori-surface-sakura: #4a2f31;
+  --mori-material-sakura-silk: linear-gradient(135deg, rgb(112 55 71 / 92%), rgb(73 40 51 / 96%));
   --mori-text-primary: var(--mori-color-ivory-100);
   --mori-text-secondary: var(--mori-color-ivory-300);
   --mori-text-muted: #aa9c8d;
@@ -56,15 +81,70 @@
   --mori-line-catalogue: rgb(198 167 125 / 24%);
   --mori-line-ink: rgb(23 17 15 / 48%);
   --mori-edge-focus: #f0c9d2;
-  --mori-pigment-sakura: var(--mori-color-rose-300);
-  --mori-pigment-sakura-muted: rgb(185 123 141 / 64%);
+  --mori-pigment-sakura: var(--mori-color-sakura-500);
+  --mori-pigment-sakura-muted: rgb(171 99 102 / 64%);
   --mori-accent-sakura: var(--mori-pigment-sakura);
-  --mori-accent-bronze: var(--mori-color-bronze-300);
+  --mori-accent-bronze: var(--mori-color-bronze-500);
   --mori-accent-danger: #e0a09b;
   --mori-state-selected: #f3ced7;
   --mori-state-disabled: #7a7068;
+  --mori-state-success: #91ad89;
+  --mori-state-warning: #c19a58;
+  --mori-state-error: #b76761;
+  --mori-state-unavailable: #9a9086;
   --mori-content-safe-inline: clamp(1rem, 3vw, 3rem);
   --mori-content-safe-block: clamp(1.5rem, 4vw, 4rem);
+
+  /* Material contracts: macro → meso → micro, with deterministic placement. */
+  --mori-charcoal-roughness: 0.62;
+  --mori-charcoal-normal-depth: 0.7;
+  --mori-charcoal-macro-contrast: 0.56;
+  --mori-charcoal-meso-contrast: 0.51;
+  --mori-charcoal-micro-contrast: 0.04;
+  --mori-charcoal-response: 0.87;
+  --mori-charcoal-bevel: 10px;
+  --mori-charcoal-light-angle: 210deg;
+  --mori-bronze-roughness: 0.7;
+  --mori-bronze-patina: 0.01;
+  --mori-bronze-normal-depth: 0.12;
+  --mori-bronze-macro-contrast: 1;
+  --mori-bronze-meso-contrast: 0.18;
+  --mori-bronze-micro-contrast: 0.25;
+  --mori-bronze-response: 1;
+  --mori-bronze-bevel: 16px;
+  --mori-bronze-light-angle: 275deg;
+  --mori-glass-roughness: 0.39;
+  --mori-glass-transmission: 0.82;
+  --mori-glass-ior: 1.58;
+  --mori-glass-macro-contrast: 0.77;
+  --mori-glass-response: 1;
+  --mori-glass-edge: 18px;
+  --mori-glass-light-angle: 360deg;
+  --mori-stone-roughness: 0.94;
+  --mori-stone-plane-depth: 0.6;
+  --mori-stone-normal-depth: 1;
+  --mori-stone-macro-contrast: 0.59;
+  --mori-stone-meso-contrast: 0.51;
+  --mori-stone-micro-contrast: 0.35;
+  --mori-stone-response: 0.72;
+  --mori-stone-bevel: 12px;
+  --mori-stone-light-angle: 156deg;
+  --mori-paper-roughness: 0.75;
+  --mori-paper-fiber-angle: 162deg;
+  --mori-paper-fiber-depth: 0.27;
+  --mori-paper-fiber-visibility: 0.27;
+  --mori-paper-micro-contrast: 0.1;
+  --mori-paper-response: 0.85;
+  --mori-paper-light-angle: 253deg;
+  --mori-root-roughness: 0.55;
+  --mori-root-growth-angle: 140deg;
+  --mori-root-groove-depth: 0.79;
+  --mori-root-macro-contrast: 0.62;
+  --mori-root-meso-contrast: 0.32;
+  --mori-root-micro-contrast: 0.24;
+  --mori-root-response: 0.41;
+  --mori-root-bevel: 8px;
+  --mori-root-light-angle: 225deg;
 
   /* World Echo hooks. Route work may set these values without changing layout. */
   --mori-world-echo-warmth: 0;
@@ -102,25 +182,63 @@
 
 .mori-foundation-surface[data-mori-material='paper'] {
   background:
-    linear-gradient(110deg, rgb(255 255 255 / 2%), transparent 36%),
-    var(--mori-surface-paper);
+    linear-gradient(110deg, rgb(255 255 255 / 2%), transparent 36%), var(--mori-surface-paper);
 }
 
 .mori-foundation-surface[data-mori-material='lacquer'] {
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 24%),
-    var(--mori-surface-lacquer);
+    linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 24%), var(--mori-surface-lacquer);
 }
 
 .mori-foundation-surface[data-mori-material='parchment'] {
   background:
-    linear-gradient(105deg, rgb(255 255 255 / 20%), transparent 42%),
-    var(--mori-surface-parchment);
+    linear-gradient(105deg, rgb(255 255 255 / 20%), transparent 42%), var(--mori-surface-parchment);
   color: var(--mori-color-ink);
 }
 
 .mori-foundation-surface[data-mori-material='ash'] {
   background: var(--mori-surface-ash);
+}
+
+.mori-foundation-surface[data-mori-material='charcoal'] {
+  background:
+    linear-gradient(var(--mori-charcoal-light-angle), rgb(255 255 255 / 2%), transparent 42%),
+    var(--mori-surface-charcoal);
+}
+
+.mori-foundation-surface[data-mori-material='bronze'] {
+  background:
+    linear-gradient(var(--mori-bronze-light-angle), rgb(255 255 255 / 5%), transparent 34%),
+    var(--mori-surface-bronze);
+}
+
+.mori-foundation-surface[data-mori-material='glass'] {
+  border-color: rgb(137 111 72 / 32%);
+  background:
+    linear-gradient(var(--mori-glass-light-angle), rgb(255 255 255 / 7%), transparent 30%),
+    var(--mori-surface-glass);
+  backdrop-filter: blur(10px) saturate(0.82);
+}
+
+.mori-foundation-surface[data-mori-material='stone'] {
+  background:
+    linear-gradient(var(--mori-stone-light-angle), rgb(255 255 255 / 3%), transparent 48%),
+    var(--mori-surface-stone);
+}
+
+.mori-foundation-surface[data-mori-material='root'] {
+  background:
+    linear-gradient(
+      var(--mori-root-growth-angle),
+      transparent 0 42%,
+      rgb(137 111 72 / 8%) 43% 44%,
+      transparent 45%
+    ),
+    var(--mori-surface-root);
+}
+
+.mori-foundation-surface[data-mori-material='sakura'] {
+  background: var(--mori-surface-sakura);
 }
 
 .mori-foundation-surface[data-mori-material='parchment'][data-mori-containment='quiet'],
@@ -139,12 +257,16 @@
   z-index: -1;
   content: '';
   pointer-events: none;
-  opacity: 0.12;
+  opacity: var(--mori-surface-grain-opacity);
   background-image:
     radial-gradient(rgb(255 255 255 / 42%) 0.45px, transparent 0.7px),
     radial-gradient(rgb(0 0 0 / 36%) 0.45px, transparent 0.7px);
-  background-position: 0 0, 9px 11px;
-  background-size: 17px 19px, 23px 29px;
+  background-position:
+    0 0,
+    9px 11px;
+  background-size:
+    17px 19px,
+    23px 29px;
 }
 
 .mori-foundation-frame {
@@ -190,7 +312,7 @@
   margin: 0;
   color: var(--mori-accent-bronze);
   font-family: var(--font-ui);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -320,17 +442,518 @@
   background: currentColor;
 }
 
-.mori-foundation-status[data-mori-tone='success'] { color: #b7d4b0; }
-.mori-foundation-status[data-mori-tone='error'] { color: var(--mori-accent-danger); }
-.mori-foundation-status[data-mori-tone='selected'] { color: var(--mori-state-selected); }
+.mori-foundation-status[data-mori-tone='success'] {
+  color: #b7d4b0;
+}
+.mori-foundation-status[data-mori-tone='error'] {
+  color: var(--mori-accent-danger);
+}
+.mori-foundation-status[data-mori-tone='selected'] {
+  color: var(--mori-state-selected);
+}
+
+/* Production construction vocabulary. These primitives add physical logic, not ornament. */
+.mori-construction {
+  position: relative;
+  isolation: isolate;
+}
+
+.mori-construction[data-mori-construction='raised'] {
+  border-top: var(--mori-bronze-lip-width) solid rgb(137 111 72 / 42%);
+  background: linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 30%);
+  box-shadow: 0 16px 30px rgb(0 0 0 / 14%);
+}
+
+.mori-construction[data-mori-construction='inset'],
+.mori-construction[data-mori-construction='recess'] {
+  background: rgb(7 7 7 / 58%);
+  box-shadow: inset 0 12px 20px rgb(0 0 0 / 28%);
+}
+
+.mori-construction[data-mori-construction='channel'] {
+  border-block: 1px solid rgb(137 111 72 / 24%);
+  padding-block: var(--mori-channel-depth);
+}
+
+.mori-construction[data-mori-construction='lip'] {
+  border: var(--mori-bronze-lip-width) solid rgb(137 111 72 / 56%);
+}
+
+.mori-construction[data-mori-construction='overlay'] {
+  z-index: 1;
+  box-shadow: 0 20px var(--mori-overlay-depth) rgb(0 0 0 / 16%);
+}
+
+.mori-construction[data-mori-construction='retained-glass'] {
+  border: var(--mori-bronze-lip-width) solid rgb(137 111 72 / 44%);
+  background: var(--mori-surface-glass);
+  box-shadow: inset 0 0 0 3px rgb(8 8 8 / 72%);
+  backdrop-filter: blur(10px) saturate(0.82);
+}
+
+.mori-construction[data-mori-construction='seam'] {
+  border-inline-start: 1px solid rgb(137 111 72 / 14%);
+}
+
+.mori-construction[data-mori-construction='hinge'] {
+  border-inline-start: 2px double rgb(137 111 72 / 48%);
+}
+
+.mori-construction[data-mori-construction='hinge']::before {
+  position: absolute;
+  inset-block: 18% auto;
+  inset-inline-start: -3px;
+  width: 5px;
+  height: 48%;
+  border-block: 1px solid rgb(137 111 72 / 58%);
+  content: '';
+}
+
+.mori-construction[data-mori-construction='transition'] {
+  border-inline-start: var(--mori-material-overlap) solid var(--mori-surface-charcoal);
+  box-shadow: inset 1px 0 rgb(137 111 72 / 28%);
+}
+
+.mori-construction[data-mori-construction='press'] {
+  transition:
+    background-color var(--mori-duration-respond) var(--mori-ease-respond),
+    border-color var(--mori-duration-respond) var(--mori-ease-respond),
+    transform var(--mori-duration-respond) var(--mori-ease-respond);
+}
+
+.mori-construction[data-mori-construction='press']:is(:hover, :focus-within) {
+  transform: translateY(-1px);
+}
+
+.mori-construction[data-mori-construction='press']:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* Page archetypes define composition defaults without assuming route content or business logic. */
+.mori-archetype {
+  width: 100%;
+  min-width: 0;
+  color: var(--mori-text-primary);
+}
+
+.mori-archetype input[type='range'],
+.mori-game-hud progress {
+  accent-color: var(--mori-bronze);
+}
+
+.mori-archetype[data-mori-archetype='merchant'] {
+  --mori-archetype-gap: clamp(2rem, 5vw, 5.5rem);
+  --mori-archetype-max: none;
+  padding: clamp(2rem, 5vw, 5rem) var(--mori-content-safe-inline);
+}
+
+.mori-archetype[data-mori-archetype='commander'] {
+  --mori-archetype-gap: clamp(1.5rem, 3vw, 3rem);
+  --mori-archetype-max: 78rem;
+  max-width: var(--mori-archetype-max);
+  margin-inline: auto;
+  padding: clamp(2rem, 4vw, 4rem) var(--mori-content-safe-inline);
+}
+
+.mori-archetype[data-mori-archetype='discovery'] {
+  --mori-archetype-gap: clamp(3rem, 7vw, 7rem);
+  --mori-archetype-max: 90rem;
+  max-width: var(--mori-archetype-max);
+  margin-inline: auto;
+  padding: clamp(3rem, 8vw, 8rem) var(--mori-content-safe-inline);
+}
+
+.mori-archetype[data-mori-archetype='ritual'] {
+  --mori-archetype-gap: clamp(1rem, 2.5vw, 2.5rem);
+  --mori-archetype-max: 72rem;
+  max-width: var(--mori-archetype-max);
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 5rem) var(--mori-content-safe-inline);
+}
+
+.mori-archetype[data-mori-archetype='game-threshold'] {
+  --mori-archetype-gap: clamp(2.5rem, 7vw, 7rem);
+  min-height: min(52rem, 100svh);
+  padding: clamp(2.5rem, 7vw, 7rem) var(--mori-content-safe-inline);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 2%), transparent 24%), var(--mori-color-charcoal-950);
+}
+
+.mori-archetype__flow {
+  display: grid;
+  gap: var(--mori-archetype-gap, var(--mori-space-8));
+}
+
+/* Artifact families expose routing hooks; they do not force every artifact into a frame. */
+.mori-artifact {
+  --mori-artifact-edge: rgb(137 111 72 / 42%);
+  --mori-artifact-accent: var(--mori-color-bronze-500);
+  position: relative;
+  min-width: 0;
+}
+
+.mori-artifact[data-mori-artifact-family='commerce'],
+.mori-artifact[data-mori-artifact-family='commander'],
+.mori-artifact[data-mori-artifact-family='navigation'],
+.mori-artifact[data-mori-artifact-family='system'] {
+  --mori-artifact-material: var(--mori-surface-charcoal);
+}
+
+.mori-artifact[data-mori-artifact-family='game'] {
+  --mori-artifact-material: var(--mori-surface-glass);
+  --mori-artifact-edge: rgb(137 111 72 / 52%);
+}
+
+/* One accessible semantic wrapper for loading, locked, unavailable, success, warning, error, empty. */
+.mori-system-state {
+  --mori-system-state-color: var(--mori-state-unavailable);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--mori-space-4);
+  align-items: start;
+  max-width: 48rem;
+  border-block-start: 1px solid color-mix(in srgb, var(--mori-system-state-color) 44%, transparent);
+  padding-block: var(--mori-space-6);
+  color: var(--mori-text-primary);
+}
+
+.mori-system-state__mark {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: 0.3rem;
+  border: 1px solid var(--mori-system-state-color);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px var(--mori-color-charcoal-950);
+  background: var(--mori-system-state-color);
+}
+
+.mori-system-state__copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.mori-system-state__copy p {
+  margin: var(--mori-space-2) 0 0;
+  color: var(--mori-text-secondary);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.mori-system-state__action {
+  grid-column: 2;
+  margin-top: var(--mori-space-2);
+}
+
+.mori-system-state[data-mori-system-state='loading'] {
+  --mori-system-state-color: var(--mori-color-bronze-500);
+}
+.mori-system-state[data-mori-system-state='locked'] {
+  --mori-system-state-color: var(--mori-color-ivory-300);
+}
+.mori-system-state[data-mori-system-state='success'] {
+  --mori-system-state-color: var(--mori-state-success);
+}
+.mori-system-state[data-mori-system-state='warning'] {
+  --mori-system-state-color: var(--mori-state-warning);
+}
+.mori-system-state[data-mori-system-state='error'] {
+  --mori-system-state-color: var(--mori-state-error);
+}
+.mori-system-state[data-mori-system-state='empty'] {
+  --mori-system-state-color: var(--mori-color-sakura-500);
+}
+
+.mori-system-state[data-mori-system-state='loading'] .mori-system-state__mark {
+  animation: mori-state-breathe 700ms var(--mori-ease-settle) infinite alternate;
+}
+
+/* Code-native, skin-capable shared game family. */
+.mori-game-threshold {
+  display: grid;
+  align-content: center;
+  overflow: clip;
+}
+
+.mori-game-hud {
+  display: grid;
+  gap: var(--mori-space-4);
+  border: 1px solid var(--mori-artifact-edge);
+  border-radius: var(--mori-radius-object);
+  padding: var(--mori-space-4);
+  background: var(--mori-artifact-material);
+  backdrop-filter: blur(10px) saturate(0.82);
+}
+
+.mori-game-hud__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mori-space-6);
+  margin: 0;
+}
+
+.mori-game-hud__metrics > div {
+  min-width: 5rem;
+}
+.mori-game-hud__metrics dt,
+.mori-game-hud__progress label {
+  color: var(--mori-text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+.mori-game-hud__metrics dd {
+  margin: 0.2rem 0 0;
+  color: var(--mori-text-primary);
+  font-size: 1.35rem;
+}
+.mori-game-hud__metrics [data-mori-emphasis='selected'] dd {
+  color: var(--mori-color-sakura-500);
+}
+.mori-game-hud__metrics [data-mori-emphasis='warning'] dd {
+  color: var(--mori-state-warning);
+}
+
+.mori-game-hud__progress {
+  display: grid;
+  gap: var(--mori-space-2);
+}
+.mori-game-hud__progress progress {
+  width: 100%;
+  height: 0.5rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  appearance: none;
+  background: var(--mori-color-charcoal-700);
+  accent-color: var(--mori-color-bronze-500);
+}
+
+.mori-game-hud__progress progress::-webkit-progress-bar {
+  background: var(--mori-color-charcoal-700);
+}
+
+.mori-game-hud__progress progress::-webkit-progress-value {
+  background: var(--mori-color-bronze-500);
+}
+
+.mori-game-hud__progress progress::-moz-progress-bar {
+  background: var(--mori-color-bronze-500);
+}
+
+.mori-game-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--mori-content-safe-inline);
+  background: rgb(6 6 6 / 78%);
+  color: var(--mori-text-primary);
+}
+
+.mori-game-overlay::backdrop {
+  background: rgb(6 6 6 / 78%);
+}
+
+.mori-game-overlay__panel {
+  width: min(100%, 34rem);
+  border: 1px solid var(--mori-artifact-edge);
+  border-radius: var(--mori-radius-object);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: var(--mori-artifact-material);
+  backdrop-filter: blur(12px) saturate(0.82);
+}
+
+.mori-game-overlay__index {
+  display: block;
+  width: 3rem;
+  border-top: 1px solid var(--mori-color-bronze-500);
+}
+.mori-game-overlay__panel h2 {
+  margin: var(--mori-space-4) 0 0;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 400;
+}
+.mori-game-overlay__panel p {
+  color: var(--mori-text-secondary);
+  line-height: 1.65;
+}
+.mori-game-overlay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mori-space-3);
+  margin-top: var(--mori-space-6);
+}
+
+@keyframes mori-state-breathe {
+  from {
+    opacity: 0.45;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Internal QA composition uses the real production primitives above. */
+.mori-production-lab {
+  display: grid;
+  gap: clamp(4rem, 10vw, 8rem);
+  margin-top: clamp(4rem, 10vw, 8rem);
+}
+
+.mori-production-lab__section {
+  display: grid;
+  gap: var(--mori-space-8);
+  border-top: 1px solid rgb(137 111 72 / 24%);
+  padding-top: var(--mori-space-8);
+}
+
+.mori-production-lab__construction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--mori-space-4);
+}
+
+.mori-production-lab__construction-grid > * {
+  display: grid;
+  min-height: 6.5rem;
+  place-items: center;
+  padding: var(--mori-space-4);
+  color: var(--mori-text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.mori-production-lab__archetypes {
+  display: grid;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+
+.mori-production-lab__archetypes > .mori-archetype {
+  border-top: 1px solid rgb(137 111 72 / 24%);
+}
+
+.mori-production-lab__archetypes h3 {
+  max-width: 42rem;
+  margin: var(--mori-space-3) 0 0;
+  color: var(--mori-text-primary);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.mori-production-lab__archetypes p,
+.mori-production-lab__archetypes label {
+  color: var(--mori-text-secondary);
+  line-height: 1.65;
+}
+
+.mori-production-lab__archetypes label {
+  display: grid;
+  gap: var(--mori-space-3);
+  max-width: 42rem;
+  margin-top: var(--mori-space-8);
+}
+
+.mori-production-lab__archetypes :is(input[type='search'], input[type='range']) {
+  min-height: 2.75rem;
+  border: 0;
+  border-bottom: 1px solid rgb(137 111 72 / 52%);
+  border-radius: 0;
+  background: rgb(8 8 8 / 45%);
+  color: var(--mori-text-primary);
+  font: inherit;
+}
+
+.mori-production-lab__archetypes input[type='search'] {
+  padding: 0.65rem 0.75rem;
+}
+.mori-production-lab__archetypes input:focus-visible {
+  outline: 3px solid var(--mori-edge-focus);
+  outline-offset: 3px;
+}
+
+.mori-production-lab__object {
+  width: min(100%, 25rem);
+  aspect-ratio: 1;
+  margin-block: var(--mori-space-8) var(--mori-space-4);
+  background:
+    radial-gradient(circle at 50% 45%, rgb(171 99 102 / 18%), transparent 3rem),
+    linear-gradient(145deg, rgb(255 255 255 / 3%), transparent 36%), var(--mori-surface-lacquer);
+}
+
+.mori-production-lab__game-stage {
+  position: relative;
+  display: grid;
+  gap: var(--mori-space-8);
+  min-height: 32rem;
+  align-content: center;
+  overflow: hidden;
+}
+
+.mori-production-lab__actions,
+.mori-production-lab__state-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mori-space-3);
+}
+
+.mori-production-lab__state {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+@media (max-width: 40rem) {
+  .mori-production-lab__construction-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mori-production-lab__state-picker .mori-foundation-button {
+    width: auto;
+    flex: 1 1 8rem;
+  }
+  .mori-production-lab__game-stage {
+    min-height: 38rem;
+  }
+}
 
 @media (max-width: 24rem) {
-  .mori-foundation-heading { font-size: 1.625rem; }
-  .mori-foundation-button { width: 100%; }
+  .mori-foundation-heading {
+    font-size: 1.625rem;
+  }
+  .mori-foundation-button {
+    width: 100%;
+  }
+  .mori-system-state {
+    grid-template-columns: 1fr;
+  }
+  .mori-system-state__action {
+    grid-column: 1;
+  }
+  .mori-game-overlay__actions {
+    display: grid;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mori-foundation-button { transition: none; }
+  .mori-foundation-button,
+  .mori-construction[data-mori-construction='press'] {
+    transition: none;
+  }
   .mori-foundation-button:hover:not(:disabled),
-  .mori-foundation-button:active:not(:disabled) { transform: none; }
+  .mori-foundation-button:active:not(:disabled),
+  .mori-construction[data-mori-construction='press']:is(:hover, :focus-within, :active) {
+    transform: none;
+  }
+  .mori-system-state[data-mori-system-state='loading'] .mori-system-state__mark {
+    animation: none;
+  }
 }
