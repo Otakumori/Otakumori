@@ -104,11 +104,27 @@ describe('Mori production system', () => {
     const onPrimary = vi.fn();
 
     render(
-      <MoriGameOverlay onPrimary={onPrimary} primaryLabel="Resume" state="pause" title="Paused" />,
+      <MoriGameOverlay
+        onPrimary={onPrimary}
+        onSecondary={vi.fn()}
+        primaryLabel="Resume"
+        secondaryLabel="Close"
+        state="pause"
+        title="Paused"
+      />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Paused' })).toHaveAttribute('aria-modal', 'true');
-    await user.click(screen.getByRole('button', { name: 'Resume' }));
+    const dialog = screen.getByRole('dialog', { name: 'Paused' });
+    const resume = screen.getByRole('button', { name: 'Resume' });
+
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(dialog).toHaveAttribute('open');
+    expect(resume).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+    await user.tab();
+    expect(resume).toHaveFocus();
+    await user.click(resume);
     expect(onPrimary).toHaveBeenCalledOnce();
   });
 });

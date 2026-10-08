@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 import { MoriButton } from './MoriFoundation';
@@ -93,15 +93,67 @@ export function MoriGameOverlay({
   state: 'pause' | 'reward' | 'results';
   title: string;
 }) {
-  const titleId = `mori-game-${state}-title`;
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = `mori-game-${state}-${useId()}`;
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const containFocus = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => !element.hasAttribute('hidden'));
+      const first = focusable[0];
+      const last = focusable.at(-1);
+
+      if (!first || !last) {
+        event.preventDefault();
+        dialog.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    dialog.addEventListener('keydown', containFocus);
+
+    if (!dialog.open) {
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute('open', '');
+      }
+    }
+
+    dialog.querySelector<HTMLButtonElement>('button')?.focus();
+
+    return () => {
+      dialog.removeEventListener('keydown', containFocus);
+      if (dialog.open && typeof dialog.close === 'function') {
+        dialog.close();
+      }
+    };
+  }, []);
 
   return (
-    <div
+    <dialog
       aria-labelledby={titleId}
       aria-modal="true"
       className={cn('mori-game-overlay', className)}
       data-mori-game-state={state}
-      role="dialog"
+      onCancel={(event) => {
+        event.preventDefault();
+        onPrimary();
+      }}
+      ref={dialogRef}
     >
       <MoriArtifact className="mori-game-overlay__panel" family="game">
         <span aria-hidden="true" className="mori-game-overlay__index" />
@@ -117,6 +169,6 @@ export function MoriGameOverlay({
           ) : null}
         </div>
       </MoriArtifact>
-    </div>
+    </dialog>
   );
 }
