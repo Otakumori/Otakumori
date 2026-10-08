@@ -24,10 +24,10 @@ This is the current entry point for documentation trust. It does not replace sou
 - Provider integrations: current behavior must be verified from provider adapters and guarded admin/API routes. No provider write is authorized by documentation alone.
 - Database and migrations: use the guarded Production Prisma migration workflow only after owner approval. Do not run manual SQL from docs.
 - CI and release: verify against `.github/workflows` and Vercel deployment state, not historical readiness checklists.
-- Visual implementation: first-class repository domain, but no canonical visual-system document
-  exists yet. Future visual work must audit or replace `docs/design/mori-visual-system.md` if it
-  is introduced, and stale visual PRs are reference material only until extracted against current
-  `origin/main`.
+- Visual implementation: `docs/design/mori-production-system.md` is the canonical first-party
+  material, construction, page-archetype, artifact-family, accessibility, and performance contract.
+  Approved asset authority remains in `docs/design/visual-authority/`; stale visual PRs are reference
+  material only until extracted against current `origin/main`.
 - Historical/archive material: old setup, completion, session, Cursor, and status notes can be useful context but must not guide current implementation without source verification.
 
 ## Trust Rules
@@ -46,4 +46,4 @@ This is the current entry point for documentation trust. It does not replace sou
 - Package script consolidation is still needed.
 - Import alias cleanup is still needed.
 - Auth, rate-limit, logger, provider-adapter, and health-system consolidation are still deferred.
-- Full visual-system implementation is still deferred.
+- Incremental route adoption of the canonical visual-system primitives remains ongoing.

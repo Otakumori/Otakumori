@@ -2,7 +2,17 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-export type MoriMaterial = 'paper' | 'lacquer' | 'parchment' | 'ash';
+export type MoriMaterial =
+  | 'charcoal'
+  | 'bronze'
+  | 'glass'
+  | 'stone'
+  | 'paper'
+  | 'root'
+  | 'lacquer'
+  | 'parchment'
+  | 'ash'
+  | 'sakura';
 export type MoriContainment = 'none' | 'quiet' | 'raised';
 export type MoriSurfaceElement = 'div' | 'section' | 'article';
 export type MoriTexture = 'none' | 'grain';
