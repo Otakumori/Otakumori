@@ -1,15 +1,16 @@
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { EmptyOrders } from '@/app/components/empty-states';
+import {
+  CommanderArchiveHeading,
+  CommanderArchiveShell,
+} from '@/app/components/commander/CommanderArchive';
+import { MoriSystemState } from '@/app/components/mori/MoriProduction';
+import { MoriStatus, type MoriStatusTone } from '@/app/components/mori/MoriFoundation';
 
 interface OrderItem {
   id: string;
@@ -49,13 +50,9 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isSignedIn && userId) {
-      fetchOrders();
-    }
-  }, [isSignedIn, userId]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/orders');
       const data = await response.json();
@@ -70,180 +67,182 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isSignedIn && userId) void fetchOrders();
+  }, [fetchOrders, isSignedIn, userId]);
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'paid':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle aria-hidden="true" className="h-3.5 w-3.5" />;
       case 'shipped':
-        return <Truck className="h-4 w-4 text-blue-500" />;
+        return <Truck aria-hidden="true" className="h-3.5 w-3.5" />;
       case 'delivered':
-        return <Package className="h-4 w-4 text-purple-500" />;
+        return <Package aria-hidden="true" className="h-3.5 w-3.5" />;
       case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
+        return <Clock aria-hidden="true" className="h-3.5 w-3.5" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-500" />;
+        return <AlertCircle aria-hidden="true" className="h-3.5 w-3.5" />;
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusTone = (status: string): MoriStatusTone => {
     switch (status.toLowerCase()) {
       case 'paid':
-        return 'bg-green-500/20 text-green-300 border-green-500/30';
+        return 'success';
       case 'shipped':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+        return 'selected';
       case 'delivered':
-        return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+        return 'success';
       case 'pending':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+        return 'neutral';
       default:
-        return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+        return 'error';
     }
   };
 
   if (!isSignedIn) {
     return (
-      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
-        <div className="container mx-auto px-4 py-16">
-          <Card className="om-route-state om-route-state--bounded border-[#c6a77d]/30 bg-transparent p-8 text-center shadow-none backdrop-blur-none">
-            <p className="mori-foundation-eyebrow">Merchant records</p>
-            <h1 className="mb-4 mt-3 font-display text-3xl font-semibold text-[#f6eddf]">Sign in to view your orders</h1>
-            <p className="mb-8 text-[#d9cdbd]">Your completed purchases and shipping records are kept here.</p>
-            <Link href="/sign-in">
-              <Button className="mori-button-primary">Sign In</Button>
+      <CommanderArchiveShell current="orders" className="om-route-page om-route-page--orders">
+        <CommanderArchiveHeading
+          title="Orders"
+          description="Completed purchases, fulfillment progress, and shipping records remain together."
+        />
+        <MoriSystemState
+          state="locked"
+          title="Sign in to view your orders"
+          description="Your completed purchases and shipping records are private to your account."
+          action={
+            <Link href="/sign-in" className="mori-foundation-button">
+              Sign In
             </Link>
-          </Card>
-        </div>
-      </main>
+          }
+        />
+      </CommanderArchiveShell>
     );
   }
 
   if (loading) {
     return (
-      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
-        <div className="container mx-auto px-4 py-16">
-          <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
-            <p className="mt-4 text-pink-200">Loading your orders...</p>
-          </Card>
-        </div>
-      </main>
+      <CommanderArchiveShell current="orders" className="om-route-page om-route-page--orders">
+        <CommanderArchiveHeading
+          title="Orders"
+          description="Completed purchases, fulfillment progress, and shipping records remain together."
+        />
+        <MoriSystemState
+          state="loading"
+          title="Opening your order archive"
+          description="Gathering your purchase records…"
+        />
+      </CommanderArchiveShell>
     );
   }
 
   if (error) {
     return (
-      <main className="om-route-page om-route-page--orders min-h-screen pt-20">
-        <div className="container mx-auto px-4 py-16">
-          <Card className="om-route-state om-route-state--bounded om-route-state--error border-[#c07d75]/50 bg-transparent p-8 text-center shadow-none backdrop-blur-none">
-            <span aria-hidden="true" className="om-route-state__mark" />
-            <h1 className="mb-4 font-display text-3xl font-semibold text-[#f6eddf]">Orders temporarily unavailable</h1>
-            <p className="mb-8 text-[#d9cdbd]">We couldn&apos;t load your order records right now.</p>
-            <Button onClick={fetchOrders} className="mori-button-primary">
+      <CommanderArchiveShell current="orders" className="om-route-page om-route-page--orders">
+        <CommanderArchiveHeading
+          title="Orders"
+          description="Completed purchases, fulfillment progress, and shipping records remain together."
+        />
+        <MoriSystemState
+          state="error"
+          title="Orders temporarily unavailable"
+          description="We couldn't load your order records right now."
+          action={
+            <button type="button" onClick={fetchOrders} className="mori-foundation-button">
               Try Again
-            </Button>
-          </Card>
-        </div>
-      </main>
+            </button>
+          }
+        />
+      </CommanderArchiveShell>
     );
   }
 
   return (
-    <main className="om-route-page om-route-page--orders min-h-screen pt-20">
-      <div className="container mx-auto px-4 py-16">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Your Orders</h1>
-          <p className="text-pink-200 mt-2">Track your purchases and order status</p>
-        </div>
+    <CommanderArchiveShell current="orders" className="om-route-page om-route-page--orders">
+      <CommanderArchiveHeading
+        title="Orders"
+        description="Completed purchases, fulfillment progress, and shipping records remain together."
+      />
 
-        {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <EmptyOrders />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <Card key={order.id} className="border-pink-500/30 bg-white/10 p-6 backdrop-blur-lg">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-white">
-                        Order #{order.orderNumber}
-                      </h3>
-                      <Badge className={`${getStatusColor(order.status)} border`}>
-                        <span className="flex items-center gap-1">
-                          {getStatusIcon(order.status)}
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
-                      </Badge>
-                    </div>
-                    <p className="text-pink-200 text-sm">
-                      Placed on {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
+      {orders.length === 0 ? (
+        <EmptyOrders />
+      ) : (
+        <section aria-label="Order history" className="commander-order-list">
+          {orders.map((order) => (
+            <article key={order.id} className="commander-order">
+              <header className="commander-order__header">
+                <div>
+                  <div className="commander-order__title-row">
+                    <h2>Order #{order.orderNumber}</h2>
+                    <MoriStatus tone={getStatusTone(order.status)}>
+                      {getStatusIcon(order.status)}
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </MoriStatus>
                   </div>
-                  <div className="text-right mt-4 lg:mt-0">
-                    <p className="text-2xl font-bold text-white">${order.total.toFixed(2)}</p>
-                    <p className="text-pink-200 text-sm">{order.currency}</p>
-                  </div>
+                  <p className="commander-order__date">
+                    Placed on {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-
-                <Separator className="bg-pink-500/30 mb-4" />
-
-                <div className="space-y-3">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
-                        {item.product?.primaryImageUrl ? (
-                          <img
-                            src={item.product.primaryImageUrl}
-                            alt={item.product.name}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <Package className="h-6 w-6 text-pink-300" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-white">{item.name}</h4>
-                        {item.variant && (
-                          <p className="text-sm text-pink-200">{item.variant.name}</p>
-                        )}
-                        <p className="text-sm text-pink-300">SKU: {item.sku}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-white">Qty: {item.quantity}</p>
-                        <p className="text-pink-200">${item.price.toFixed(2)}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div>
+                  <p className="commander-order__total">${order.total.toFixed(2)}</p>
+                  <p className="commander-order__currency">{order.currency}</p>
                 </div>
+              </header>
 
-                {order.trackingUrl && (
-                  <>
-                    <Separator className="bg-pink-500/30 my-4" />
-                    <div className="flex items-center gap-2 text-blue-300">
-                      <Truck className="h-4 w-4" />
-                      <span className="text-sm">
-                        {order.carrier && `${order.carrier} `}
-                        {order.trackingNumber && `#${order.trackingNumber}`}
-                      </span>
-                      <a
-                        href={order.trackingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 underline"
-                      >
-                        Track Package
-                      </a>
+              <ul
+                className="commander-order__items"
+                aria-label={`Items in order ${order.orderNumber}`}
+              >
+                {order.items.map((item) => (
+                  <li key={item.id} className="commander-order__item">
+                    <div className="commander-order__image">
+                      {item.product?.primaryImageUrl ? (
+                        <img
+                          src={item.product.primaryImageUrl}
+                          alt=""
+                          width="56"
+                          height="56"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Package aria-hidden="true" className="h-6 w-6 text-[#b79b73]" />
+                      )}
                     </div>
-                  </>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+                    <div className="min-w-0">
+                      <p className="commander-order__item-name">{item.name}</p>
+                      {item.variant ? (
+                        <p className="commander-order__item-detail">{item.variant.name}</p>
+                      ) : null}
+                      <p className="commander-order__item-detail">SKU: {item.sku}</p>
+                    </div>
+                    <div className="commander-order__item-summary">
+                      <p className="commander-order__item-price">${item.price.toFixed(2)}</p>
+                      <p className="commander-order__item-detail">Quantity {item.quantity}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {order.trackingUrl ? (
+                <div className="commander-order__tracking">
+                  <Truck aria-hidden="true" className="h-4 w-4" />
+                  <span>
+                    {order.carrier ? `${order.carrier} ` : ''}
+                    {order.trackingNumber ? `#${order.trackingNumber}` : ''}
+                  </span>
+                  <a href={order.trackingUrl} target="_blank" rel="noopener noreferrer">
+                    Track package
+                  </a>
+                </div>
+              ) : null}
+            </article>
+          ))}
+        </section>
+      )}
+    </CommanderArchiveShell>
   );
 }
