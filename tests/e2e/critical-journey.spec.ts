@@ -150,10 +150,10 @@ test.describe('Critical User Journey', () => {
     }
 
     // Check for proper form labels
-    const searchInput = page.locator('input[type="search"]');
-    if ((await searchInput.count()) > 0) {
-      const label = page.locator('label[for="search"]');
-      await expect(label).toBeVisible();
+    const searchInputs = page.locator('input[type="search"]');
+    const searchInputCount = await searchInputs.count();
+    for (let i = 0; i < searchInputCount; i++) {
+      await expect(searchInputs.nth(i)).toHaveAccessibleName(/\S+/);
     }
 
     // Check for proper button roles

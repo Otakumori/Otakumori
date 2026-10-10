@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
-import { stripHtml } from '@/lib/html';
 import { paths } from '@/lib/paths';
-import { StorefrontButton } from './StorefrontPrimitives';
+import { canOptimizeProductImage } from './product-image';
+import styles from './commerce-composition.module.css';
 
 function getStartingPriceLabel(product: CatalogProduct) {
   const min = product.priceRange?.min ?? product.priceCents ?? null;
@@ -14,27 +14,9 @@ function getStartingPriceLabel(product: CatalogProduct) {
   return 'Price unavailable';
 }
 
-function cleanSummary(raw: string) {
-  return stripHtml(raw || '')
-    .replace(/&ldquo;|&rdquo;/g, '"')
-    .replace(/&rsquo;|&lsquo;/g, "'")
-    .replace(/&times;/g, 'x')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/\b(xs|s|m|l|xl|2xl|3xl|4xl)\b(\s+\b(xs|s|m|l|xl|2xl|3xl|4xl)\b)+/gi, ' ')
-    .replace(/\b(length|width|height|size guide|sizes?)\b[\s\S]*$/i, ' ')
-    .replace(/\bpadding:\s*\d+/gi, ' ')
-    .replace(/\bcolor:\s*#[0-9a-f]+/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 170);
-}
-
 export function productImageMode(product: CatalogProduct) {
-  const title = product.title.toLowerCase();
-  const category = `${product.category ?? ''} ${product.categorySlug ?? ''}`.toLowerCase();
-  const text = `${title} ${category}`;
-
+  const text =
+    `${product.title} ${product.category ?? ''} ${product.categorySlug ?? ''}`.toLowerCase();
   if (
     /(shoe|sneaker|pin|sticker|keychain|charm|wrapping|paper|poster|print|pillow|tote|bag)/.test(
       text,
@@ -42,24 +24,16 @@ export function productImageMode(product: CatalogProduct) {
   ) {
     return 'object-contain p-7 sm:p-8';
   }
-
   return 'object-cover';
 }
 
 export function ProductPrice({ product }: { product: CatalogProduct }) {
   const hasMultipleOptions = Boolean(product.variants?.length && product.variants.length > 1);
-
   return (
-    <div>
-      {hasMultipleOptions ? (
-        <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#c6a77d]/72">
-          Starting at
-        </p>
-      ) : null}
-      <p className="font-display text-xl font-semibold text-[#f6eddf]">
-        {getStartingPriceLabel(product)}
-      </p>
-    </div>
+    <p className={styles.recordPrice}>
+      {hasMultipleOptions ? <span className={styles.priceContext}>Starting at </span> : null}
+      <span>{getStartingPriceLabel(product)}</span>
+    </p>
   );
 }
 
@@ -75,17 +49,16 @@ export function ProductImageFrame({
   mode: string;
 }) {
   return (
-    <div className="mori-foundation-frame relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_center,rgba(198,167,125,0.08),rgba(12,8,18,0.92)_62%)]">
+    <div className={styles.recordMedia}>
       <Image
         src={image}
         alt={title}
         fill
-        className={`${mode} transition-transform duration-500 group-hover:scale-[1.035]`}
-        sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+        className={`${mode} ${styles.recordImage}`}
+        sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc((100vw - 96px) / 2), (max-width: 1399px) calc((100vw - 144px) / 3), 400px"
         priority={priority}
-        unoptimized
+        unoptimized={!canOptimizeProductImage(image)}
       />
-      <div className="pointer-events-none absolute inset-3 border border-[#c6a77d]/15" />
     </div>
   );
 }
@@ -98,56 +71,47 @@ export function StorefrontProductCard({
   index?: number;
 }) {
   const image = product.image ?? product.images?.[0] ?? '';
-  const summary = cleanSummary(product.description || '');
-  const productHref = paths.product(product.id);
-
   return (
-    <article className="group relative border-t border-[#c6a77d]/30 bg-[#120f0d]/42 p-3 transition duration-300 hover:border-[#c6a77d]/65">
-      <div className="relative z-10">
-        <Link href={productHref} className="block" data-testid="product-card">
-          <ProductImageFrame
-            image={image}
-            title={product.title}
-            priority={index === 0}
-            mode={productImageMode(product)}
-          />
-        </Link>
-
-        {product.provider ? (
-          <div className="absolute right-5 top-5 border border-[#c6a77d]/25 bg-black/68 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[#f6eddf]/82">
-            {product.provider}
-          </div>
-        ) : null}
-
-        <div className="space-y-4 p-3 pt-5">
-          <div className="flex items-start justify-between gap-4">
-            <Link href={productHref} className="min-w-0 flex-1">
-              <h2 className="line-clamp-2 font-display text-xl font-semibold leading-snug text-[#f7eadf] transition-colors hover:text-[#c6a77d]">
-                {product.title}
-              </h2>
-            </Link>
-            <ProductPrice product={product} />
-          </div>
-
-          <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-[#d9cdbd]/78">
-            {summary || 'Premium quality print-on-demand merchandise.'}
-          </p>
-
-          <Link href={productHref} aria-label={`View details for ${product.title}`}>
-            <StorefrontButton className="w-full">Choose options</StorefrontButton>
-          </Link>
+    <article className={styles.record}>
+      <Link
+        href={paths.product(product.id)}
+        className={styles.recordLink}
+        data-testid="product-card"
+        aria-label={`View ${product.title}`}
+      >
+        <ProductImageFrame
+          image={image}
+          title={product.title}
+          priority={index === 0}
+          mode={productImageMode(product)}
+        />
+        <div className={styles.recordIdentity}>
+          <h2>{product.title}</h2>
+          {product.category ? <p className={styles.recordContext}>{product.category}</p> : null}
+          <ProductPrice product={product} />
+          <span className={styles.recordAction}>
+            View details
+            <svg
+              aria-hidden="true"
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.2"
+            >
+              <path d="M3 13 13 3M4 3h9v9" />
+            </svg>
+          </span>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
 
 export function ProductGrid({ products }: { products: CatalogProduct[] }) {
   return (
-    <div
-      className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
-      data-testid="product-grid"
-    >
+    <div className={styles.catalogue} data-testid="product-grid">
       {products.map((product, index) => (
         <StorefrontProductCard key={product.id} product={product} index={index} />
       ))}

@@ -2,6 +2,10 @@
 
 ## Authority and scope
 
+**Mori Visual Baseline v1:** `6f83f9dd4cfca2c6effdf4c9c529a1db34529ceb`, the main merge
+of owner-approved PR #91 (`af99700058484770796862c789d838e94a9c02a0`). Route work inherits
+this baseline through main ancestry; it does not recreate the system or promote provisional art.
+
 This layer is additive to the Mori System Foundation. Home retains its approved environmental scene
 and is intentionally excluded from interior-shell selectors. Existing provisional SVGs remain
 provisional; this pass does not promote an asset to canonical status.
@@ -29,6 +33,35 @@ frame; surrounding route layout should remain environmental.
 - Black lacquer and charcoal paper are the default field; bronze provides architecture; ivory holds
   information; Sakura is a selected, emotional, or completion interruption.
 - Seal red is reserved for bounded danger or interrupted states. It is not a routine CTA colour.
+
+### Frozen route contract
+
+Marcellus SC covers all first-party visible UI, including transactional controls. No route-specific
+font system is permitted without an explicit owner exception. Use sentence case, restrained tracking,
+comfortable leading, size, opacity and spacing for hierarchy; important UI remains at least 12px and
+usable at 200% zoom. Third-party rendered interfaces remain outside this typography contract.
+
+Reuse `--om-lacquer-*`, `--om-charcoal-paper`, `--om-ivory*`, `--om-bronze*`, `--om-sakura`
+and `--om-line*` in `app/styles/otakumori-uiux-overhaul.css`. Charcoal is substrate; bronze is
+structure/craft; Sakura is life, selection, reward and identity; ivory is information/revelation.
+These are not interchangeable operational status colors. Success, warning, destructive and
+informational states require distinct explicit text and appropriate semantics, never decorative
+brand color alone. Existing MoriStatus success/error/neutral tones support status presentation;
+selected is a selection state, not a synonym for success. This freeze adds no status palette.
+
+The normal material vocabulary stays limited to charcoal/lacquer, aged-bronze structure, restrained
+Sakura pigment (rare authored Sakura material), and paper/parchment archive material. Existing ash
+support is contextual, not permission to invent a material for each route.
+
+Reuse the foundation spacing scale (`--mori-space-*`) and responsive safe insets. Elevation is
+explicit, not automatic: ordinary content remains open, object frames are partial, and full
+chambers serve actual controls or recovery. Game tilt stays game-only. Keep the existing external
+focus outline, native semantics and comfortable touch targets. Icons retain their utility-first
+provisional family, single-color readability and accessible names on controls; decorative marks
+stay hidden from assistive technology. No icon is promoted here.
+
+The interaction contract below is frozen, not expanded. Route work reuses its fast material changes
+and reduced-motion stable states; no global particle, physics or persistent motion system follows.
 
 ## Interaction contract
 

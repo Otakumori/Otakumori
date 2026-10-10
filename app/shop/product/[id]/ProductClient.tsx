@@ -3,7 +3,6 @@
 import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';
 import { t } from '@/lib/microcopy';
@@ -12,11 +11,12 @@ import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { ShareButtons } from '@/app/components/shop/ShareButtons';
 import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import { useToastContext } from '@/app/contexts/ToastContext';
-import { HeaderButton } from '@/components/ui/header-button';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalDiscountBadge } from '@/app/components/shop/PetalDiscountBadge';
-import { StorefrontPanel } from '@/app/components/shop/StorefrontPrimitives';
+import { MoriButton } from '@/app/components/mori/MoriFoundation';
+import { canOptimizeProductImage } from '@/app/components/shop/product-image';
+import styles from '@/app/components/shop/commerce-composition.module.css';
 import { productImageMode } from '@/app/components/shop/StorefrontProductCard';
 
 type CatalogVariant = CatalogProduct['variants'][number];
@@ -230,54 +230,44 @@ export default function ProductClient({ productId }: { productId: string }) {
 
   if (loading) {
     return (
-      <main className="om-route-page om-route-page--pdp min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-pink-300 border-r-transparent" />
-          <p className="mt-4 text-pink-100">Loading treasure...</p>
+      <main className={`om-route-page om-route-page--pdp ${styles.page}`} aria-busy="true">
+        <div className={styles.shell}>
+          <p role="status" className={styles.availability}>
+            Loading product…
+          </p>
+          <div className={styles.productLayout} aria-hidden="true">
+            <div className={styles.skeleton} />
+            <div>
+              <div className={styles.skeletonText} />
+              <div className={styles.skeletonText} />
+            </div>
+          </div>
         </div>
       </main>
     );
   }
 
-  if (error || !product) {
+  if (error || !product || !displayImageUrl) {
     return (
-      <main className="om-route-page om-route-page--pdp min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
-          <StorefrontPanel className="p-8 text-center">
-            <span aria-hidden="true" className="om-route-state__mark" />
-            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
-            <p className="text-[#d9cdbd] mb-6">This item is unavailable or could not be loaded right now.</p>
-            <Link href={paths.shop()}>
-              <Button className="mori-button-primary">
-                Return to Shop
-              </Button>
+      <main className={`om-route-page om-route-page--pdp ${styles.page}`}>
+        <div className={styles.shell}>
+          <section className={styles.state}>
+            <h1>Product unavailable</h1>
+            <p>This item is unavailable or could not be loaded right now.</p>
+            <Link
+              href={paths.shop()}
+              className="mori-foundation-button"
+              data-mori-variant="secondary"
+            >
+              Return to Shop
             </Link>
-          </StorefrontPanel>
+          </section>
         </div>
       </main>
     );
   }
 
   const imageUrl = displayImageUrl;
-  if (!imageUrl) {
-    return (
-      <main className="om-route-page om-route-page--pdp min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
-          <StorefrontPanel className="p-8 text-center">
-            <span aria-hidden="true" className="om-route-state__mark" />
-            <h1 className="font-display text-3xl font-semibold text-[#f6eddf] mb-4">Product unavailable</h1>
-            <p className="text-[#d9cdbd] mb-6">This item cannot be displayed right now.</p>
-            <Link href={paths.shop()}>
-              <Button className="mori-button-primary">
-                Return to Shop
-              </Button>
-            </Link>
-          </StorefrontPanel>
-        </div>
-      </main>
-    );
-  }
-
   const currentPriceCents =
     selectedVariant?.priceCents ??
     (product.priceRange.min != null
@@ -288,173 +278,129 @@ export default function ProductClient({ productId }: { productId: string }) {
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
-    <main className="om-route-page om-route-page--pdp min-h-screen overflow-hidden text-white">
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <nav className="mb-8">
-          <ol className="flex flex-wrap items-center gap-2 text-sm text-[#f5d6dc]/60">
+    <main className={`om-route-page om-route-page--pdp ${styles.page}`}>
+      <div className={styles.shell}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <ol>
             <li>
-              <Link href={paths.shop()} className="hover:text-pink-100 transition-colors">
-                {t('nav', 'shop')}
-              </Link>
+              <Link href={paths.shop()}>{t('nav', 'shop')}</Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-pink-100">{product.title}</li>
+            <li aria-current="page">{product.title}</li>
           </ol>
         </nav>
-
         {isNSFW && <NSFWAffirmNote />}
-
-        <div
-          className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(26rem,0.82fr)] lg:gap-12"
-          data-testid="product-details"
-        >
-          <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-pink-100/14 bg-[radial-gradient(circle_at_center,rgba(255,235,245,0.09),rgba(12,8,18,0.92)_62%)] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.36)]">
-              <div className="relative h-full overflow-hidden rounded-[1.55rem]">
-                <Image
-                  src={imageUrl}
-                  alt={product.title}
-                  fill
-                  className={productImageMode(product)}
-                  priority
-                />
-              </div>
-              <div className="pointer-events-none absolute inset-6 rounded-[1.35rem] border border-white/8" />
-            </div>
-
-            {product.tags && product.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-6">
-            <StorefrontPanel className="p-5 sm:p-7">
-              <div className="flex items-start justify-between mb-4">
-                <h1
-                  className="font-display text-3xl font-semibold text-[#f7eadf] sm:text-4xl"
-                  data-testid="product-name"
-                >
-                  {product.title}
-                </h1>
-              </div>
-              <div className="flex items-center gap-4 mb-6">
-                <p
-                  className="font-display text-3xl font-semibold text-pink-100"
-                  data-testid="product-price"
-                >
-                  {currency === 'USD' ? '$' : currency}
-                  {currentPrice.toFixed(2)}
-                </p>
-                <ShareButtons productTitle={product.title} productId={product.id} />
-              </div>
-              <PetalDiscountBadge productPrice={currentPrice} />
-              <div className="space-y-4 text-base leading-8 text-[#f5d6dc]/72">
-                {descriptionParagraphs.length > 0 ? (
-                  descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-                ) : (
-                  <p>Premium quality print-on-demand merchandise.</p>
-                )}
-              </div>
-            </StorefrontPanel>
-
-            {product.variants && product.variants.length > 0 && (
-              <StorefrontPanel className="p-4">
-                <label
-                  htmlFor="variant-select"
-                  className="block text-sm font-medium text-pink-200 mb-2"
-                >
-                  Select Variant
-                </label>
-                <select
-                  id="variant-select"
-                  value={selectedVariant?.id || ''}
-                  onChange={(e) => {
-                    const variant = product.variants?.find((v) => v.id === e.target.value);
-                    if (variant) setSelectedVariant(variant);
-                  }}
-                  className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
-                >
-                  {product.variants.map((variant) => (
-                    <option
-                      key={variant.id}
-                      value={variant.id}
-                      disabled={!variant.isEnabled || !variant.inStock}
-                      className="bg-purple-900"
-                    >
-                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
-                      {(
-                        (variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100
-                      ).toFixed(2)}
-                      {!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
-                    </option>
-                  ))}
-                </select>
-              </StorefrontPanel>
-            )}
-
-            <StorefrontPanel className="p-4">
-              <label htmlFor="quantity" className="block text-sm font-medium text-pink-200 mb-2">
-                Quantity
-              </label>
-              <input
-                id="quantity"
-                type="number"
-                min="1"
-                max="99"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full rounded-xl border border-pink-100/18 bg-black/35 px-4 py-3 text-white"
+        <div className={styles.productLayout} data-testid="product-details">
+          <div className={styles.productObject}>
+            <div className={styles.productMedia}>
+              <Image
+                src={imageUrl}
+                alt={product.title}
+                fill
+                className={productImageMode(product)}
+                sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 64px), (max-width: 1399px) 52vw, 700px"
+                unoptimized={!canOptimizeProductImage(imageUrl)}
+                priority
               />
-            </StorefrontPanel>
-
-            <HeaderButton
-              onClick={handleAddToCart}
-              disabled={!variantAvailable}
-              className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
-              data-testid="add-to-cart"
-            >
-              Add to Cart
-            </HeaderButton>
-
-            {added ? (
-              <div className="space-y-2 text-sm text-green-300" data-testid="cart-success">
-                <p>Added to cart!</p>
-                <Link
-                  href={paths.cart()}
-                  className="inline-flex text-pink-200 underline underline-offset-4 hover:text-pink-100"
+            </div>
+          </div>
+          <div className={styles.purchase}>
+            <h1 data-testid="product-name">{product.title}</h1>
+            <p className={styles.price} data-testid="product-price">
+              {currency === 'USD' ? '$' : currency}
+              {currentPrice.toFixed(2)}
+            </p>
+            <p className={styles.availability} aria-live="polite">
+              {variantAvailable ? 'In stock' : 'This option is unavailable'}
+            </p>
+            <div className={styles.purchaseControls}>
+              {product.variants && product.variants.length > 0 && (
+                <div className={styles.field}>
+                  <label htmlFor="variant-select">Select Variant</label>
+                  <select
+                    id="variant-select"
+                    value={selectedVariant?.id || ''}
+                    onChange={(e) => {
+                      const variant = product.variants?.find((v) => v.id === e.target.value);
+                      if (variant) setSelectedVariant(variant);
+                    }}
+                  >
+                    {product.variants.map((variant) => (
+                      <option
+                        key={variant.id}
+                        value={variant.id}
+                        disabled={!variant.isEnabled || !variant.inStock}
+                      >
+                        {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
+                        {(
+                          (variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100
+                        ).toFixed(2)}
+                        {!variant.isEnabled || !variant.inStock ? ' (Unavailable)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className={styles.purchaseAction}>
+                <div className={styles.field}>
+                  <label htmlFor="quantity">Quantity</label>
+                  <input
+                    id="quantity"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  />
+                </div>
+                <MoriButton
+                  onClick={handleAddToCart}
+                  disabled={!variantAvailable}
+                  data-testid="add-to-cart"
                 >
-                  View cart
-                </Link>
+                  Add to Cart
+                </MoriButton>
               </div>
-            ) : null}
-
-            <StorefrontPanel className="p-6 space-y-3">
-              <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
-              <div className="space-y-2 text-sm text-[#f5d6dc]/70">
-                <p>
-                  <span className="font-medium">SKU:</span>{' '}
-                  {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}
-                </p>
-                {product.category && (
-                  <p>
-                    <span className="font-medium">Category:</span> {product.category}
-                  </p>
-                )}
-                <p>
-                  <span className="font-medium">Availability:</span>{' '}
-                  {variantAvailable ? 'In Stock' : 'Unavailable'}
-                </p>
-              </div>
-            </StorefrontPanel>
+            </div>
+            <div className={styles.added} role="status">
+              {added ? (
+                <div data-testid="cart-success">
+                  <span>Added to cart!</span>
+                  <Link href={paths.cart()}>View cart</Link>
+                </div>
+              ) : null}
+            </div>
+            <PetalDiscountBadge productPrice={currentPrice} />
+            <section className={styles.details} aria-labelledby="product-description">
+              <h2 id="product-description">About this piece</h2>
+              {descriptionParagraphs.length > 0 ? (
+                descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+              ) : (
+                <p>No additional description is available.</p>
+              )}
+              <dl className={styles.metadata}>
+                <dt>SKU</dt>
+                <dd>{selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}</dd>
+                {product.category ? (
+                  <>
+                    <dt>Category</dt>
+                    <dd>{product.category}</dd>
+                  </>
+                ) : null}
+                <dt>Availability</dt>
+                <dd>{variantAvailable ? 'In Stock' : 'Unavailable'}</dd>
+              </dl>
+              {product.tags.length > 0 ? (
+                <ul className={styles.tags} aria-label="Product tags">
+                  {product.tags.map((tag, index) => (
+                    <li key={index}>{tag}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+            <div className={styles.support}>
+              <ShareButtons productTitle={product.title} productId={product.id} />
+            </div>
           </div>
         </div>
       </div>
