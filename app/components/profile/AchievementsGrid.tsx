@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import GlassPanel from '../GlassPanel';
 
 type Achievement = {
   id: string;
@@ -49,10 +48,12 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
 
   return (
     <div className="space-y-7">
-      <GlassPanel className="p-5 sm:p-6">
+      <section className="commander-material-region" aria-labelledby="achievement-progress-heading">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-lg font-semibold text-[#fff1e4]">Collection progress</h2>
+            <h2 id="achievement-progress-heading" className="font-display text-lg text-[#fff1e4]">
+              Collection progress
+            </h2>
             <p className="mt-1 text-sm text-[#cdbbb7]">
               {unlockedCount} of {totalCount} relics discovered
             </p>
@@ -68,7 +69,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
-      </GlassPanel>
+      </section>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {achievements.map((achievement) => {
@@ -146,8 +147,12 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
 
       {achievements.length === 0 && (
         <div className="mori-panel-soft px-6 py-12 text-center">
-          <h2 className="font-display text-xl font-semibold text-[#fff1e4]">No relics discovered yet</h2>
-          <p className="mt-2 text-sm text-[#cdbbb7]">Play, explore, and return when the first mark is earned.</p>
+          <h2 className="font-display text-xl font-semibold text-[#fff1e4]">
+            No relics discovered yet
+          </h2>
+          <p className="mt-2 text-sm text-[#cdbbb7]">
+            Play, explore, and return when the first mark is earned.
+          </p>
         </div>
       )}
     </div>

@@ -12,6 +12,8 @@ import ProfileStatsCard from '../components/profile/ProfileStatsCard';
 import MiniGameStats from '../components/profile/MiniGameStats';
 import RecentActivity from '../components/profile/RecentActivity';
 import CosmeticsTab from '../components/profile/CosmeticsTab';
+import { CommanderArchiveShell } from '@/app/components/commander/CommanderArchive';
+import { MoriSystemState } from '@/app/components/mori/MoriProduction';
 import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 import {
@@ -32,8 +34,12 @@ export function generateMetadata() {
 
 export default async function ProfilePage() {
   let profileData = null;
-  let profileState: 'ready' | 'signed-out' | 'provisioning-unavailable' | 'schema-unavailable' | 'error' =
-    'signed-out';
+  let profileState:
+    | 'ready'
+    | 'signed-out'
+    | 'provisioning-unavailable'
+    | 'schema-unavailable'
+    | 'error' = 'signed-out';
 
   try {
     profileData = await getProfileData();
@@ -54,22 +60,25 @@ export default async function ProfilePage() {
     const appOrigin = await resolveServerAppOrigin();
 
     return (
-      <main className="om-route-page om-route-page--profile mori-page pt-24">
-        <div className="mori-shell py-10">
-          <ProfileHeader />
-          <div className="mori-panel mt-8 p-8 text-center sm:p-12">
-            <h2 className="font-display text-2xl font-semibold text-[#fff1e4]">
-              Sign in to view your Otaku-mori profile
-            </h2>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#cdbbb7] sm:text-base">
-              Profiles track your lifetime petals, achievements, avatar, game records, and rewards.
-            </p>
-            <a href={buildCanonicalSignInUrl('/profile', appOrigin)} className="mori-button-primary mt-6">
+      <CommanderArchiveShell
+        current="profile"
+        className="om-route-page om-route-page--profile mori-page"
+      >
+        <ProfileHeader />
+        <MoriSystemState
+          state="locked"
+          title="Sign in to view your Otaku-mori profile"
+          description="Your lifetime petals, achievements, avatar, game records, and rewards are kept here."
+          action={
+            <a
+              href={buildCanonicalSignInUrl('/profile', appOrigin)}
+              className="mori-foundation-button"
+            >
               Sign In
             </a>
-          </div>
-        </div>
-      </main>
+          }
+        />
+      </CommanderArchiveShell>
     );
   }
 
@@ -90,15 +99,13 @@ export default async function ProfilePage() {
     }[profileState];
 
     return (
-      <main className="om-route-page om-route-page--profile mori-page pt-24">
-        <div className="mori-shell py-10">
-          <ProfileHeader />
-          <div className="mori-panel mt-8 border-[#a9855f]/25 p-8 text-center sm:p-12">
-            <h2 className="font-display text-2xl font-semibold text-[#fff1e4]">{copy.title}</h2>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#cdbbb7] sm:text-base">{copy.body}</p>
-          </div>
-        </div>
-      </main>
+      <CommanderArchiveShell
+        current="profile"
+        className="om-route-page om-route-page--profile mori-page"
+      >
+        <ProfileHeader />
+        <MoriSystemState state="unavailable" title={copy.title} description={copy.body} />
+      </CommanderArchiveShell>
     );
   }
 
@@ -113,44 +120,47 @@ export default async function ProfilePage() {
   const displayName = _user?.fullName || _user?.username || 'Wanderer';
 
   return (
-    <main className="om-route-page om-route-page--profile mori-page pt-24">
-      <div className="mori-shell space-y-8 py-10">
-        <ProfileHeader displayName={displayName} />
+    <CommanderArchiveShell
+      current="profile"
+      className="om-route-page om-route-page--profile mori-page"
+    >
+      <ProfileHeader displayName={displayName} />
 
-        {gamertag && <OneTapGamertag initial={gamertag} />}
+      {gamertag && <OneTapGamertag initial={gamertag} />}
 
-        <ProfileLayout
-          left={
-            <>
-              <ProfileAvatarCard />
-              <ProfileStatsCard />
-            </>
-          }
-          right={
-            <ProfileTabs
-              overview={
-                <div className="space-y-6">
-                  <RewardsSummary />
-                  <div className="mori-panel p-5">
-                    <DailyQuests />
-                  </div>
-                  <div className="mori-panel p-5">
-                    <RecentActivity />
-                  </div>
-                </div>
-              }
-              achievements={<AchievementsPanel />}
-              games={
-                <div className="mori-panel p-5">
-                  <h2 className="font-display mb-4 text-xl font-semibold text-[#fff1e4]">Game Stats</h2>
-                  <MiniGameStats />
-                </div>
-              }
-              cosmetics={<CosmeticsTab />}
-            />
-          }
-        />
-      </div>
-    </main>
+      <ProfileLayout
+        left={
+          <>
+            <ProfileAvatarCard />
+            <ProfileStatsCard />
+          </>
+        }
+        right={
+          <ProfileTabs
+            overview={
+              <div className="commander-profile__overview">
+                <RewardsSummary />
+                <section className="commander-material-region">
+                  <DailyQuests />
+                </section>
+                <section className="commander-material-region">
+                  <RecentActivity />
+                </section>
+              </div>
+            }
+            achievements={<AchievementsPanel />}
+            games={
+              <section className="commander-material-region">
+                <h2 className="font-display mb-4 text-xl font-semibold text-[#fff1e4]">
+                  Game Stats
+                </h2>
+                <MiniGameStats />
+              </section>
+            }
+            cosmetics={<CosmeticsTab />}
+          />
+        }
+      />
+    </CommanderArchiveShell>
   );
 }

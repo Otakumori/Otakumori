@@ -51,8 +51,8 @@ export default function ProfileTabs({
   };
 
   return (
-    <section className="mori-panel overflow-hidden">
-      <div className="flex overflow-x-auto border-b border-white/[0.08] bg-black/10 px-2" role="tablist" aria-label="Profile sections">
+    <section className="commander-profile__tabs">
+      <div className="commander-profile__tab-list" role="tablist" aria-label="Profile sections">
         {tabs.map((tab, index) => (
           <button
             key={tab.id}
@@ -60,9 +60,7 @@ export default function ProfileTabs({
             onClick={() => setActiveTab(tab.id)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={`relative shrink-0 px-4 py-4 text-sm font-medium transition-colors sm:px-5 ${
-              activeTab === tab.id
-                ? 'text-[#fff1e4]'
-                : 'text-[#8f7f7d] hover:text-[#d9ccc7]'
+              activeTab === tab.id ? 'text-[#fff1e4]' : 'text-[#8f7f7d] hover:text-[#d9ccc7]'
             }`}
             role="tab"
             aria-selected={activeTab === tab.id}
@@ -78,7 +76,7 @@ export default function ProfileTabs({
         ))}
       </div>
 
-      <div className="p-4 sm:p-6">
+      <div className="commander-profile__tab-panel">
         {tabs.map((tab) => (
           <div
             key={tab.id}
