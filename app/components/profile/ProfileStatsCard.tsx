@@ -34,7 +34,12 @@ export default function ProfileStatsCard() {
           }
         }
       } catch (err) {
-        logger.error('Failed to fetch petal summary:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+        logger.error(
+          'Failed to fetch petal summary:',
+          undefined,
+          undefined,
+          err instanceof Error ? err : new Error(String(err)),
+        );
       }
     }
 
@@ -60,50 +65,43 @@ export default function ProfileStatsCard() {
   const achievementCount = summary?.achievements.count || 0;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/50 p-6">
-      <h3 className="text-lg font-semibold text-white mb-4">Stats</h3>
+    <section className="commander-material-region" aria-labelledby="profile-record-heading">
+      <h2 id="profile-record-heading" className="font-display text-xl text-[#fff1e4]">
+        Record
+      </h2>
 
-      <div className="space-y-4">
-        {/* Joined Date */}
+      <dl className="commander-stat-list">
         {joinedDate && (
           <div>
-            <div className="text-xs text-zinc-400 mb-1">Joined</div>
-            <div className="text-sm text-white">{joinedDate}</div>
+            <dt>Joined</dt>
+            <dd>{joinedDate}</dd>
           </div>
         )}
 
-        {/* Rank/Title */}
         <div>
-          <div className="text-xs text-zinc-400 mb-1">Rank</div>
-          <div className="text-sm font-semibold text-pink-300">{rankTitle}</div>
+          <dt>Rank</dt>
+          <dd>{rankTitle}</dd>
         </div>
 
-        {/* Achievements */}
         <div>
-          <div className="text-xs text-zinc-400 mb-1">Achievements</div>
-          <div className="text-sm text-white">
-            {isSignedIn ? `${achievementCount} unlocked` : '—'}
-          </div>
+          <dt>Achievements</dt>
+          <dd>{isSignedIn ? `${achievementCount} unlocked` : '—'}</dd>
         </div>
 
-        {/* Lifetime Petals */}
         {summary && (
           <div>
-            <div className="text-xs text-zinc-400 mb-1">Lifetime Petals</div>
-            <div className="text-sm font-semibold text-pink-300">
-              {summary.lifetimePetalsEarned.toLocaleString()}
-            </div>
+            <dt>Lifetime petals</dt>
+            <dd>{summary.lifetimePetalsEarned.toLocaleString()}</dd>
           </div>
         )}
 
-        {/* Today's Petals */}
         {summary && (
           <div>
-            <div className="text-xs text-zinc-400 mb-1">Today's Petals</div>
-            <div className="text-sm text-white">{summary.todayEarned.toLocaleString()}</div>
+            <dt>Today&apos;s petals</dt>
+            <dd>{summary.todayEarned.toLocaleString()}</dd>
           </div>
         )}
-      </div>
-    </div>
+      </dl>
+    </section>
   );
 }

@@ -56,26 +56,29 @@ export default function RecentActivity() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+      <h2 className="font-display mb-4 text-xl text-[#fff1e4]">Recent Activity</h2>
       {loading ? (
-        <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
-          <p className="text-sm text-zinc-400">Loading activities...</p>
+        <div className="py-4" aria-busy="true" role="status">
+          <p className="text-sm text-[#9f928a]">Loading activities…</p>
         </div>
       ) : error ? (
-        <p className="text-sm text-zinc-400 text-center py-4">{error}</p>
+        <p className="py-4 text-sm text-[#9f928a]" role="status">
+          Recent activity is temporarily unavailable.
+        </p>
       ) : activities.length === 0 ? (
-        <p className="text-sm text-zinc-400 text-center py-4">No recent activity</p>
+        <p className="py-4 text-sm text-[#9f928a]">No recent activity</p>
       ) : (
         activities.map((activity) => (
           <div
             key={activity.id}
-            className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
+            className="flex items-center gap-3 border-t border-[#896f48]/20 py-3"
           >
-            <div className="text-lg">{activity.icon}</div>
+            <div className="text-lg" aria-hidden="true">
+              {activity.icon}
+            </div>
             <div className="flex-1">
-              <p className="text-sm text-white">{activity.text}</p>
-              <p className="text-xs text-zinc-400">{activity.time}</p>
+              <p className="text-sm text-[#fff1e4]">{activity.text}</p>
+              <p className="text-xs text-[#9f928a]">{activity.time}</p>
             </div>
           </div>
         ))
@@ -83,4 +86,3 @@ export default function RecentActivity() {
     </div>
   );
 }
-

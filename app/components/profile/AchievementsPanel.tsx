@@ -5,7 +5,7 @@ export default async function AchievementsPanel() {
   const { catalog, ownedSet, earnedPoints, totalPoints } = await loadAchievementsForProfile();
 
   return (
-    <section aria-labelledby="achievements" className="mori-panel p-5">
+    <section aria-labelledby="achievements" className="commander-material-region">
       <div className="mb-5 flex items-end justify-between gap-4 border-b border-white/[0.08] pb-4">
         <div>
           <h2 id="achievements" className="font-display text-lg font-semibold text-[#fff1e4]">

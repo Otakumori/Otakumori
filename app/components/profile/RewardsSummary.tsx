@@ -49,7 +49,12 @@ export default function RewardsSummary() {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
-        logger.error('Error fetching petal summary:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+        logger.error(
+          'Error fetching petal summary:',
+          undefined,
+          undefined,
+          err instanceof Error ? err : new Error(String(err)),
+        );
       } finally {
         setLoading(false);
       }
@@ -60,13 +65,13 @@ export default function RewardsSummary() {
 
   if (!isSignedIn) {
     return (
-      <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
-        <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
-        <div className="text-center py-8">
-          <p className="text-zinc-300 mb-2">
+      <section className="commander-material-region">
+        <h2 className="font-display text-xl text-[#fff1e4]">Your Petal Rewards</h2>
+        <div className="py-6">
+          <p className="text-[#d9cdbd]">
             Sign in to save your petals and track your lifetime total.
           </p>
-          <p className="text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-[#9f928a]">
             Your progress will be saved and you can unlock achievements!
           </p>
         </div>
@@ -76,10 +81,10 @@ export default function RewardsSummary() {
 
   if (loading) {
     return (
-      <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
-        <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
-        <div className="text-center py-8">
-          <div className="animate-pulse text-zinc-400">Loading your rewards...</div>
+      <section className="commander-material-region" aria-busy="true">
+        <h2 className="font-display text-xl text-[#fff1e4]">Your Petal Rewards</h2>
+        <div className="py-6" role="status">
+          <div className="text-[#9f928a]">Loading your rewards…</div>
         </div>
       </section>
     );
@@ -87,88 +92,79 @@ export default function RewardsSummary() {
 
   if (error || !summary) {
     return (
-      <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
-        <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
-        <div className="text-center py-8">
-          <p className="text-red-400 mb-2">Failed to load rewards</p>
-          <p className="text-sm text-zinc-400">{error || 'Please try again later'}</p>
+      <section className="commander-material-region">
+        <h2 className="font-display text-xl text-[#fff1e4]">Your Petal Rewards</h2>
+        <div className="py-6" role="status">
+          <p className="text-[#d69a92]">Rewards are temporarily unavailable.</p>
+          <p className="mt-2 text-sm text-[#9f928a]">Please try again later.</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
-      <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
+    <section className="commander-material-region">
+      <h2 className="font-display text-xl text-[#fff1e4]">Your Petal Rewards</h2>
 
-      {/* Current Balance & Lifetime */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="rounded-xl border border-pink-500/30 bg-pink-500/10 p-4">
-          <div className="text-sm text-pink-200/70 mb-1">Current Balance</div>
-          <div className="text-3xl font-bold text-white">{summary.balance.toLocaleString()}</div>
-          <div className="text-xs text-pink-200/50 mt-1">Available to spend</div>
+      <div className="commander-record-grid mt-5">
+        <div className="commander-record-cell">
+          <div className="commander-record-cell__label">Current balance</div>
+          <div className="commander-record-cell__value">{summary.balance.toLocaleString()}</div>
+          <div className="mt-1 text-xs text-[#9f928a]">Available to spend</div>
         </div>
 
-        <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-          <div className="text-sm text-purple-200/70 mb-1">Lifetime Earned</div>
-          <div className="text-3xl font-bold text-white">
+        <div className="commander-record-cell">
+          <div className="commander-record-cell__label">Lifetime earned</div>
+          <div className="commander-record-cell__value">
             {summary.lifetimePetalsEarned.toLocaleString()}
           </div>
-          <div className="text-xs text-purple-200/50 mt-1">Total all-time</div>
+          <div className="mt-1 text-xs text-[#9f928a]">Total all-time</div>
         </div>
       </div>
 
-      {/* Today's Progress */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-zinc-300">Today's Earnings</div>
+      <div className="mt-6 border-t border-[#896f48]/20 pt-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm text-[#d9cdbd]">Today&apos;s earnings</div>
           {summary.dailyCapReached && (
-            <span className="text-xs text-yellow-400 bg-yellow-400/20 px-2 py-1 rounded">
-              Daily Cap Reached
-            </span>
+            <span className="text-xs text-[#e0b76a]">Daily Cap Reached</span>
           )}
         </div>
-        <div className="text-2xl font-semibold text-white">
-          {summary.todayEarned.toLocaleString()}
-        </div>
-        <div className="text-xs text-zinc-400 mt-1">Petals earned today</div>
+        <div className="mt-2 text-2xl text-[#fff1e4]">{summary.todayEarned.toLocaleString()}</div>
+        <div className="mt-1 text-xs text-[#9f928a]">Petals earned today</div>
       </div>
 
-      {/* Achievements Summary */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-6">
-        <div className="text-sm text-zinc-300 mb-2">Achievements</div>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="mt-6 border-t border-[#896f48]/20 pt-5">
+        <div className="mb-2 text-sm text-[#d9cdbd]">Achievements</div>
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <div className="text-xl font-semibold text-white">{summary.achievements.count}</div>
-            <div className="text-xs text-zinc-400">Unlocked</div>
+            <div className="text-xl text-[#fff1e4]">{summary.achievements.count}</div>
+            <div className="text-xs text-[#9f928a]">Unlocked</div>
           </div>
           <div>
-            <div className="text-xl font-semibold text-white">
+            <div className="text-xl text-[#fff1e4]">
               {summary.achievements.petalsEarned.toLocaleString()}
             </div>
-            <div className="text-xs text-zinc-400">Petals from achievements</div>
+            <div className="text-xs text-[#9f928a]">Petals from achievements</div>
           </div>
         </div>
       </div>
 
       {/* Cosmetics Summary */}
       {summary.cosmetics && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-6">
-          <div className="text-sm text-zinc-300 mb-2">Cosmetics</div>
+        <div className="mt-6 border-t border-[#896f48]/20 pt-5">
+          <div className="mb-2 text-sm text-[#d9cdbd]">Cosmetics</div>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <div className="text-xl font-semibold text-white">{summary.cosmetics.totalOwned}</div>
-              <div className="text-xs text-zinc-400">Total Owned</div>
+              <div className="text-xl text-[#fff1e4]">{summary.cosmetics.totalOwned}</div>
+              <div className="text-xs text-[#9f928a]">Total Owned</div>
             </div>
             <div>
-              <div className="text-xl font-semibold text-white">{summary.cosmetics.hudSkins}</div>
-              <div className="text-xs text-zinc-400">HUD Skins</div>
+              <div className="text-xl text-[#fff1e4]">{summary.cosmetics.hudSkins}</div>
+              <div className="text-xs text-[#9f928a]">HUD Skins</div>
             </div>
             <div>
-              <div className="text-xl font-semibold text-white">
-                {summary.cosmetics.avatarCosmetics}
-              </div>
-              <div className="text-xs text-zinc-400">Avatar Items</div>
+              <div className="text-xl text-[#fff1e4]">{summary.cosmetics.avatarCosmetics}</div>
+              <div className="text-xs text-[#9f928a]">Avatar Items</div>
             </div>
           </div>
         </div>
@@ -176,10 +172,10 @@ export default function RewardsSummary() {
 
       {/* Active Vouchers */}
       {summary.vouchers && summary.vouchers.activeCount > 0 && (
-        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4">
-          <div className="text-sm text-green-200/70 mb-2">Active Discount Vouchers</div>
-          <div className="text-2xl font-semibold text-white">{summary.vouchers.activeCount}</div>
-          <div className="text-xs text-green-200/50 mt-1">Available for checkout</div>
+        <div className="mt-6 border-t border-[#618c72]/35 pt-5">
+          <div className="mb-2 text-sm text-[#b9d3c1]">Active discount vouchers</div>
+          <div className="text-2xl text-[#fff1e4]">{summary.vouchers.activeCount}</div>
+          <div className="mt-1 text-xs text-[#9f928a]">Available for checkout</div>
         </div>
       )}
     </section>

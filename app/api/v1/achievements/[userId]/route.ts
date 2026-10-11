@@ -49,11 +49,11 @@ const ACHIEVEMENT_DEFINITIONS: Record<string, any> = {
   // Add more achievements as needed
 };
 
-async function handler(request: NextRequest, { params }: { params: { userId: string } }) {
+async function handler(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const startTime = Date.now();
 
   try {
-    const { userId: paramUserId } = params;
+    const { userId: paramUserId } = await params;
     const { userId: currentUserId } = await auth();
 
     // Log request timing

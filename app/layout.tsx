@@ -3,6 +3,7 @@ import './mori-visual-system.css';
 import './styles/mori-foundation.css';
 import './styles/sitewide-visual-stabilization.css';
 import './styles/otakumori-uiux-overhaul.css';
+import './styles/commander-archive.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';

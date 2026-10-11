@@ -3,10 +3,7 @@ import type { ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ProfilePage from '@/app/profile/page';
 import { getProfileData } from '@/app/profile/_data/profile';
-import {
-  AuthenticationRequiredError,
-  LocalUserUnavailableError,
-} from '@/app/lib/auth/viewer';
+import { AuthenticationRequiredError, LocalUserUnavailableError } from '@/app/lib/auth/viewer';
 
 vi.mock('server-only', () => ({}));
 
@@ -25,7 +22,9 @@ vi.mock('@/app/lib/auth/serverAppOrigin', () => ({
 }));
 
 vi.mock('@/app/components/profile/ProfileHeader', () => ({
-  default: ({ displayName }: { displayName?: string }) => <header>{displayName ?? 'Profile'}</header>,
+  default: ({ displayName }: { displayName?: string }) => (
+    <header>{displayName ?? 'Profile'}</header>
+  ),
 }));
 
 vi.mock('@/app/components/profile/ProfileLayout', () => ({
@@ -43,7 +42,9 @@ vi.mock('@/app/components/profile/ProfileTabs', () => ({
 
 vi.mock('@/app/components/profile/ProfileAvatarCard', () => ({ default: () => <div>Avatar</div> }));
 vi.mock('@/app/components/profile/ProfileStatsCard', () => ({ default: () => <div>Stats</div> }));
-vi.mock('@/app/components/profile/AchievementsPanel', () => ({ default: () => <div>Achievements</div> }));
+vi.mock('@/app/components/profile/AchievementsPanel', () => ({
+  default: () => <div>Achievements</div>,
+}));
 vi.mock('@/app/components/profile/OneTapGamertag', () => ({ default: () => <div>Gamertag</div> }));
 vi.mock('@/app/components/quests/DailyQuests', () => ({ default: () => <div>Quests</div> }));
 vi.mock('@/app/components/profile/RewardsSummary', () => ({ default: () => <div>Rewards</div> }));
@@ -58,6 +59,7 @@ describe('profile authenticated state boundary', () => {
     const html = renderToStaticMarkup(await ProfilePage());
 
     expect(html).toContain('Sign in to view your Otaku-mori profile');
+    expect(html).toContain('data-mori-archetype="commander"');
   });
 
   it('does not show sign-in when a signed-in local profile cannot be provisioned', async () => {

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import AchievementsGrid from './AchievementsGrid';
 
-type Achievement = {
+export type Achievement = {
   id: string;
   name: string;
   description: string;
@@ -82,7 +82,7 @@ export default function AchievementsTabs({ achievements }: { achievements: Achie
   return (
     <div className="space-y-6">
       <div
-        className="flex gap-1 overflow-x-auto border-b border-white/10 pb-3"
+        className="commander-profile__tab-list gap-1"
         role="tablist"
         aria-label="Achievement collection filters"
       >
@@ -93,10 +93,10 @@ export default function AchievementsTabs({ achievements }: { achievements: Achie
             role="tab"
             aria-selected={tab === item.id}
             onClick={() => setTab(item.id)}
-            className={`shrink-0 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
+            className={`shrink-0 border-b px-3 py-3 text-xs transition-colors ${
               tab === item.id
-                ? 'border border-[#c7a97f]/30 bg-[#a9855f]/15 text-[#fff1e4]'
-                : 'border border-transparent text-[#cdbbb7] hover:border-white/10 hover:bg-white/[0.035] hover:text-white'
+                ? 'border-[#ab6366] text-[#fff1e4]'
+                : 'border-transparent text-[#cdbbb7] hover:border-[#896f48]/40 hover:text-white'
             }`}
             data-testid={`ach-tab-${item.id}`}
           >

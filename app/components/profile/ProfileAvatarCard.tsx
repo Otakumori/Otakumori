@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { AvatarDisplay } from './AvatarDisplay';
+import { MoriArtifact, MoriConstructedSurface } from '@/app/components/mori/MoriProduction';
 
 /**
  * Avatar card for profile left column
@@ -35,74 +36,68 @@ export default function ProfileAvatarCard() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      logger.error('Failed to copy profile link:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Failed to copy profile link:',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     }
   };
 
   if (!isSignedIn) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-black/50 p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Avatar</h3>
-        <div className="aspect-square rounded-lg border-2 border-dashed border-white/20 bg-black/30 flex items-center justify-center mb-4">
-          <div className="text-center">
-            <div className="text-4xl mb-2">
-              <span role="img" aria-label="User icon">
-                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
-              </span>
-            </div>
-            <p className="text-sm text-zinc-400">No avatar yet</p>
-          </div>
-        </div>
-        <p className="text-xs text-zinc-500 text-center mb-4">
+      <MoriArtifact as="section" family="commander" className="commander-material-region">
+        <h2 className="font-display text-xl text-[#fff1e4]">Avatar</h2>
+        <p className="mt-3 text-sm leading-6 text-[#cdbbb7]">
           Sign in to save your avatar and profile.
         </p>
-      </div>
+      </MoriArtifact>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/50 p-6">
-      <h3 className="text-lg font-semibold text-white mb-4">Avatar</h3>
+    <MoriArtifact as="section" family="commander" className="commander-material-region">
+      <h2 className="font-display text-xl text-[#fff1e4]">Avatar</h2>
 
-      {/* Avatar Display */}
       {avatarLoading ? (
-        <div className="aspect-square rounded-lg border border-white/20 bg-black/30 flex items-center justify-center mb-4">
-          <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+        <div aria-busy="true" className="commander-artifact-frame mt-4 aspect-square" role="status">
+          <span className="text-sm text-[#cdbbb7]">Preparing avatar…</span>
         </div>
       ) : hasAvatar ? (
-        <div className="mb-4">
+        <MoriConstructedSurface
+          construction="retained-glass"
+          className="commander-artifact-frame mt-4"
+        >
           <AvatarDisplay size="lg" showEditButton={false} />
-          <p className="text-xs text-zinc-400 text-center mt-2">This is your Otaku-mori avatar</p>
-        </div>
+          <p className="mt-2 text-center text-xs text-[#9f928a]">Your Otaku-mori avatar</p>
+        </MoriConstructedSurface>
       ) : (
-        <div className="aspect-square rounded-lg border-2 border-dashed border-white/20 bg-black/30 flex items-center justify-center mb-4">
-          <div className="text-center">
-            <div className="text-4xl mb-2">
-              <span role="img" aria-label="Cherry blossom">
-                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
-              </span>
-            </div>
-            <p className="text-sm text-zinc-400">No avatar yet</p>
+        <MoriConstructedSurface
+          construction="retained-glass"
+          className="commander-artifact-frame mt-4 grid aspect-square place-items-center text-center"
+        >
+          <div>
+            <p className="font-display text-xl text-[#fff1e4]">No avatar yet</p>
+            <p className="mt-2 text-sm text-[#cdbbb7]">Your identity frame is waiting.</p>
           </div>
-        </div>
+        </MoriConstructedSurface>
       )}
 
-      {/* Action Buttons */}
-      <div className="space-y-2">
-        <Link
-          href="/community"
-          className="block w-full px-4 py-2 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/30 rounded-lg text-center text-sm text-white transition-colors"
-        >
+      <div className="commander-profile__actions">
+        <Link href="/community" className="mori-foundation-button text-center">
           {hasAvatar ? 'Customize Avatar' : 'Create Avatar'}
         </Link>
 
         <button
+          type="button"
           onClick={handleCopyProfileLink}
-          className="w-full px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-colors"
+          className="mori-foundation-button"
+          data-mori-variant="secondary"
         >
-          {copied ? '✓ Copied!' : 'Copy Profile Link'}
+          {copied ? 'Copied' : 'Copy Profile Link'}
         </button>
       </div>
-    </div>
+    </MoriArtifact>
   );
 }

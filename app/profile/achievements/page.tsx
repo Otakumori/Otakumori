@@ -1,13 +1,18 @@
 import { generateSEO } from '@/app/lib/seo';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import AchievementsTabs from '../../components/profile/AchievementsTabs';
+import AchievementsTabs, { type Achievement } from '../../components/profile/AchievementsTabs';
+import { extractAchievements } from './_data/response';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
 import { approvedVisualAssets } from '@/lib/approved-visual-assets';
 import { MoriArtwork } from '@/app/components/approved-art/MoriArtwork';
+import {
+  CommanderArchiveHeading,
+  CommanderArchiveShell,
+} from '@/app/components/commander/CommanderArchive';
 
-async function getAchievements() {
+async function getAchievements(): Promise<Achievement[]> {
   try {
     const { getToken } = await auth();
     const token = await getToken({ template: 'otakumori-jwt' });
@@ -18,7 +23,7 @@ async function getAchievements() {
     });
 
     if (!response.ok) return [];
-    return response.json();
+    return extractAchievements(await response.json());
   } catch {
     return [];
   }
@@ -42,26 +47,20 @@ export default async function AchievementsPage() {
   const achievements = await getAchievements();
 
   return (
-    <main className="mori-page pt-24">
-      <div className="mori-shell py-10 sm:py-14">
-        <header className="mb-8 flex max-w-4xl flex-col items-start gap-4 sm:flex-row sm:items-center">
+    <CommanderArchiveShell current="achievements" className="mori-page">
+      <CommanderArchiveHeading
+        title={t('achievements', 'title')}
+        description={t('achievements', 'subtitle')}
+        artwork={
           <MoriArtwork
             src={approvedVisualAssets.destinations.achievements}
-            className="w-32 shrink-0 sm:w-40"
-            sizes="(max-width: 640px) 8rem, 10rem"
+            className="w-full"
+            sizes="(max-width: 640px) 7rem, 10rem"
           />
-          <div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-[#fff1e4] md:text-4xl">
-              {t('achievements', 'title')}
-            </h1>
-            <p className="mt-3 text-base leading-7 text-[#cdbbb7]">
-              {t('achievements', 'subtitle')}
-            </p>
-          </div>
-        </header>
+        }
+      />
 
-        <AchievementsTabs achievements={achievements} />
-      </div>
-    </main>
+      <AchievementsTabs achievements={achievements} />
+    </CommanderArchiveShell>
   );
 }
