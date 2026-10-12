@@ -4,6 +4,7 @@ import { logger } from '@/app/lib/logger';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { getBrandedErrorMessage, getErrorType } from '@/app/lib/branded-errors';
+import { RitualStatePage } from '@/app/components/system/RitualStatePage';
 
 export default function Error({
   error,
@@ -42,33 +43,31 @@ export default function Error({
   }, [error]);
 
   const errorType = getErrorType(error);
-  const errorMessage = getBrandedErrorMessage(errorType, {
-    customMessage: error.message,
-  });
+  const errorMessage = getBrandedErrorMessage(errorType);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#080611]">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_circle_at_50%_35%,#1a0f2a,#120b1f_40%,#080611_100%)]" />
-      <div className="rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 p-8 text-center max-w-md mx-4">
-        <h2 className="mb-4 text-2xl md:text-3xl font-bold text-pink-300">{errorMessage.title}</h2>
-        <p className="mb-6 text-zinc-300">{errorMessage.message}</p>
-        <div className="flex gap-4 justify-center">
+    <RitualStatePage
+      description={errorMessage.message}
+      state="error"
+      title={errorMessage.title}
+      action={
+        <div className="ritual-system-actions">
           <button
             onClick={reset}
-            className="rounded-xl bg-pink-500/90 px-6 py-3 text-white hover:bg-pink-500 transition-colors"
+            className="mori-button-primary"
           >
             Try again
           </button>
           {errorMessage.cta && (
             <Link
               href={errorMessage.cta.href}
-              className="rounded-xl bg-white/10 px-6 py-3 text-white hover:bg-white/20 transition-colors border border-white/20"
+              className="mori-button-secondary"
             >
               {errorMessage.cta.label}
             </Link>
           )}
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }

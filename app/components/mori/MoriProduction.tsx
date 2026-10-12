@@ -95,6 +95,7 @@ export function MoriSystemState({
   children,
   className,
   description,
+  headingLevel = 2,
   state,
   title,
 }: {
@@ -102,10 +103,12 @@ export function MoriSystemState({
   children?: ReactNode;
   className?: string;
   description?: string;
+  headingLevel?: 1 | 2 | 3;
   state: MoriSystemStateKind;
   title: string;
 }) {
   const isAssertive = state === 'error' || state === 'warning';
+  const Heading = `h${headingLevel}` as const;
 
   return (
     <section
@@ -117,7 +120,7 @@ export function MoriSystemState({
     >
       <span aria-hidden="true" className="mori-system-state__mark" />
       <div className="mori-system-state__copy">
-        <h2>{title}</h2>
+        <Heading>{title}</Heading>
         {description ? <p>{description}</p> : null}
         {children}
       </div>
