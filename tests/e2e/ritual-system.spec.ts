@@ -9,7 +9,9 @@ test.describe('Ritual / System Space', () => {
     if (visualQaAuthEnabled) {
       await page.goto('/settings');
       await expect(page.locator('main[data-mori-archetype="ritual"]')).toBeVisible();
-      await expect(page.getByRole('status')).toHaveAttribute('data-mori-system-state', 'locked');
+      await expect(
+        page.locator('[role="status"][data-mori-system-state="locked"]'),
+      ).toBeVisible();
       return;
     }
 
@@ -37,7 +39,9 @@ test.describe('Ritual / System Space', () => {
       await expect(page.locator('main[data-mori-archetype="ritual"]')).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Settings sections' })).toBeVisible();
       await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
-      await expect(page.getByRole('status')).toHaveAttribute('data-mori-system-state', 'success');
+      await expect(
+        page.locator('[role="status"][data-mori-system-state="success"]'),
+      ).toBeVisible();
 
       const dimensions = await page.evaluate(() => ({
         clientWidth: document.documentElement.clientWidth,
