@@ -1,24 +1,28 @@
 import { generateSEO } from '@/app/lib/seo';
+import { MoriArchetype } from '@/app/components/mori/MoriProduction';
 import SearchInterface from '../components/search/SearchInterface';
 
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    title: 'Search',
+    description: 'Search Otaku-mori products, stories, games, and community records.',
     url: '/search',
   });
 }
 export default function SearchPage() {
   return (
-    <main className="om-route-page om-route-page--search relative z-10 min-h-screen">
-        <div className="mx-auto max-w-4xl px-6 py-8 md:py-12">
-          <div className="mb-8">
-            <h1 className="font-display text-3xl font-normal md:text-4xl">Search</h1>
-          </div>
-
-          <SearchInterface />
-        </div>
-    </main>
+    <MoriArchetype
+      as="main"
+      archetype="discovery"
+      className="discovery-space discovery-space--search om-route-page om-route-page--search"
+    >
+      <header className="discovery-space__hero">
+        <p className="discovery-space__eyebrow">Archive index</p>
+        <h1>Search Otaku-mori</h1>
+        <p>Products, stories, games, and people gathered in one index.</p>
+      </header>
+      <SearchInterface />
+    </MoriArchetype>
   );
 }

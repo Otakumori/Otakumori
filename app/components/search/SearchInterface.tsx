@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Gamepad2, Search, ShoppingBag, Trash2 } from 'lucide-react';
-import GlassPanel from '../GlassPanel';
 import {
   type ApiEnvelope,
   type SearchRequest,
@@ -15,6 +14,7 @@ import {
 } from '@/app/lib/contracts';
 import { cn } from '@/lib/utils';
 import { EmptySearch } from '../empty-states/EmptySearch';
+import { MoriSystemState } from '../mori/MoriProduction';
 
 const HISTORY_STORAGE_KEY = 'search-history';
 const HISTORY_LIMIT = 10;
@@ -86,6 +86,7 @@ function mapResult(result: SearchResult): ExtendedResult {
 export default function SearchInterface() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const urlQuery = searchParams.get('q') ?? '';
 
   const [query, setQuery] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
@@ -117,10 +118,9 @@ export default function SearchInterface() {
   }, []);
 
   useEffect(() => {
-    const paramQuery = searchParams.get('q') ?? '';
-    setQuery(paramQuery);
-    setActiveQuery(paramQuery);
-  }, [searchParams]);
+    setQuery(urlQuery);
+    setActiveQuery(urlQuery);
+  }, [urlQuery]);
 
   const filteredResults = useMemo(() => {
     if (activeTab === 'all') {
@@ -257,27 +257,28 @@ export default function SearchInterface() {
   const hasResults = filteredResults.length > 0;
 
   return (
-    <div className="space-y-6">
-        <form onSubmit={handleSubmit} className="om-search-form space-y-5" role="search">
+    <div className="discovery-search" data-results-active={activeQuery ? 'true' : 'false'}>
+        <form onSubmit={handleSubmit} className="discovery-search__form om-search-form" role="search">
           <label htmlFor="search-query" className="sr-only">
             Search Otaku-mori
           </label>
-          <div className="relative">
-            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
+          <div className="discovery-search__field">
+            <span className="discovery-search__field-icon" aria-hidden="true">
               <Search className="h-5 w-5" aria-hidden="true" />
             </span>
             <input
               id="search-query"
+              name="q"
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="What’re ya eyein’?"
-              className="om-search-input w-full py-4 pl-11 pr-4"
+              className="om-search-input discovery-search__input"
               autoComplete="off"
             />
           </div>
 
-          <div className="om-search-filters flex flex-wrap gap-2 text-sm" role="group" aria-label="Search types">
+          <div className="om-search-filters discovery-search__filters" role="group" aria-label="Search types">
             {(['all', 'products', 'posts', 'games'] as const).map((tab) => {
               const isPressed = activeTab === tab;
               return (
@@ -287,7 +288,7 @@ export default function SearchInterface() {
                   aria-pressed={isPressed}
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    'om-search-filter px-4 py-2 transition-colors',
+                    'om-search-filter discovery-search__filter',
                     isPressed && 'is-selected',
                   )}
                 >
@@ -299,32 +300,32 @@ export default function SearchInterface() {
 
           <button
             type="submit"
-            className="mori-button-primary"
+            className="mori-button-primary discovery-search__submit"
           >
             Search
           </button>
         </form>
 
       {historyVisible && (
-        <section className="om-search-history py-6" aria-label="Recent searches">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-medium text-white/80">Recent searches</span>
+        <section className="om-search-history discovery-search__history" aria-label="Recent searches">
+          <div className="discovery-search__history-heading">
+            <h2>Recent searches</h2>
             <button
               type="button"
               onClick={clearHistory}
-              className="flex items-center gap-1 text-xs text-zinc-400 transition-colors hover:text-white"
+              className="discovery-search__clear"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
               Clear
             </button>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="discovery-search__history-list">
             {searchHistory.map((term) => (
               <button
                 key={term}
                 type="button"
                 onClick={() => handleHistorySelect(term)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="discovery-search__history-item"
               >
                 {term}
               </button>
@@ -334,28 +335,37 @@ export default function SearchInterface() {
       )}
 
       {activeQuery && (
-        <div className="space-y-4">
+        <section className="discovery-search__results" aria-label="Search results">
           {isLoading ? (
-            <div className="py-12 text-center">
-              <Skeleton />
-            </div>
+            <MoriSystemState
+              state="loading"
+              title="Searching the archive"
+              description={`Looking for “${activeQuery}”.`}
+            >
+              <div className="discovery-search__skeleton" aria-hidden="true"><Skeleton /></div>
+            </MoriSystemState>
           ) : error ? (
-            <p className="py-6 text-sm" role="alert">Search is temporarily unavailable. Please try again.</p>
+            <MoriSystemState
+              state="error"
+              title="Search is temporarily unavailable"
+              description="Please try again in a moment."
+            />
           ) : hasResults ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">
+            <div className="discovery-results">
+              <div className="discovery-results__heading" role="status" aria-live="polite">
+                <h2>
                   {filteredResults.length} result{filteredResults.length === 1 ? '' : 's'} for "
                   {activeQuery}"
-                </h3>
+                </h2>
               </div>
 
+              <ol className="discovery-results__list">
               {filteredResults.map((result) => (
-                <GlassPanel key={`${result.type}-${result.id}`} className="p-4">
-                  <Link href={result.url} className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
+                <li key={`${result.type}-${result.id}`} className="discovery-result">
+                  <Link href={result.url} className="discovery-result__link">
+                    <div className="discovery-result__media">
                       {result.image ? (
-                        <div className="relative h-16 w-16 overflow-hidden rounded-lg">
+                        <div className="discovery-result__image">
                           <Image
                             src={result.image}
                             alt={result.title}
@@ -365,7 +375,7 @@ export default function SearchInterface() {
                           />
                         </div>
                       ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-white/5 text-fuchsia-300">
+                        <div className="discovery-result__fallback">
                           {result.type === 'product' ? (
                             <ShoppingBag className="h-6 w-6" aria-hidden="true" />
                           ) : result.type === 'game' ? (
@@ -377,25 +387,25 @@ export default function SearchInterface() {
                       )}
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex items-center gap-2">
-                        <h4 className="truncate text-lg font-semibold text-white">
+                    <div className="discovery-result__copy">
+                      <div className="discovery-result__title-line">
+                        <h3>
                           {result.title}
-                        </h4>
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/70">
-                          {result.type.toUpperCase()}
+                        </h3>
+                        <span className="discovery-result__type">
+                          {result.type}
                         </span>
                       </div>
 
                       {result.description && (
-                        <p className="mb-2 line-clamp-2 text-sm text-zinc-300">
+                        <p className="discovery-result__description">
                           {result.description}
                         </p>
                       )}
 
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400">
+                      <div className="discovery-result__meta">
                         {typeof result.price === 'number' && (
-                          <span className="font-semibold text-fuchsia-300">
+                          <span className="discovery-result__price">
                             ${result.price.toFixed(2)}
                           </span>
                         )}
@@ -406,17 +416,18 @@ export default function SearchInterface() {
                       </div>
                     </div>
                   </Link>
-                </GlassPanel>
+                </li>
               ))}
+              </ol>
             </div>
           ) : (
             <EmptySearch query={activeQuery} />
           )}
-        </div>
+        </section>
       )}
 
       {!activeQuery && (
-        <p className="om-search-hint pt-3">Find products, stories, and games.</p>
+        <p className="om-search-hint discovery-search__hint">Begin with a name, title, or subject.</p>
       )}
     </div>
   );

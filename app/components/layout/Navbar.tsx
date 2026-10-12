@@ -206,11 +206,11 @@ export default function Navbar() {
       </a>
       <nav
         aria-label="Primary navigation"
-        className="container mx-auto flex items-center justify-between px-4 py-3"
+        className="container mx-auto flex items-center justify-between px-[16px] py-3"
       >
         <Link href={paths.home()} className="flex items-center group py-1">
           <div
-            className={`relative ${isHome ? 'h-20 w-20 md:h-24 md:w-24' : 'h-32 w-32 md:h-36 md:w-36'}`}
+            className={`relative ${isHome ? 'h-[80px] w-[80px] md:h-[96px] md:w-[96px]' : 'h-[128px] w-[128px] md:h-[144px] md:w-[144px]'}`}
           >
             <Image
               src="/assets/images/circlelogo.png"
@@ -403,12 +403,12 @@ export default function Navbar() {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-[16px]">
           {!isHome && <GlobalSearch className="hidden xl:block" />}
           <PetalWalletNavLink isLoaded={isLoaded} isSignedIn={isSignedIn} signInHref={signInHref} />
           <Link
             href={paths.cart()}
-            className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-text-link hover:text-text-link-hover transition-colors"
+            className="relative min-h-[44px] min-w-[44px] flex items-center justify-center p-[8px] text-text-link hover:text-text-link-hover transition-colors"
             aria-label={`Shopping cart with ${itemCount} items`}
           >
             <MoriProvisionalIcon name="cart" />
@@ -543,7 +543,7 @@ export default function Navbar() {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center text-white p-2"
+          className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center text-white p-[8px]"
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileMenuAriaExpanded}
         >
