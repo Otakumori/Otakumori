@@ -11,7 +11,17 @@ test.describe('Game Threshold', () => {
       await page.setViewportSize(viewport);
       await page.goto('/mini-games');
 
-      await expect(page.locator('section[data-mori-archetype="game-threshold"]')).toBeVisible();
+      const thresholdNodes = page.locator(
+        'section[data-mori-archetype="game-threshold"][aria-label="Mini-game collection"]'
+      );
+      const threshold = page.getByRole('region', { name: 'Mini-game collection' });
+
+      // A repeated App Router navigation can briefly retain the streamed route in
+      // a hidden segment. Wait for that transient DOM copy to retire, then prove
+      // the settled page exposes one canonical, named threshold region.
+      await expect(thresholdNodes).toHaveCount(1);
+      await expect(threshold).toHaveCount(1);
+      await expect(threshold).toBeVisible();
       await expect(page.getByRole('heading', { level: 1, name: 'Mini-Games' })).toBeVisible({
         timeout: 15_000,
       });
