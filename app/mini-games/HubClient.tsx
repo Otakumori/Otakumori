@@ -1,6 +1,7 @@
 'use client';
 
 import gamesRegistry from '@/lib/games.meta.json';
+import { MoriGameThreshold } from '@/app/components/mori/MoriGameSystem';
 import { MiniGameArcSelector, type MiniGameArcOption } from './_components/MiniGameArcSelector';
 
 function getEnabledGames(): MiniGameArcOption[] {
@@ -23,7 +24,9 @@ function getEnabledGames(): MiniGameArcOption[] {
 export default function HubClient() {
   return (
     <main className="om-route-page om-route-page--games mori-game-shell px-5 pb-20 pt-28 sm:px-8">
-      <MiniGameArcSelector games={getEnabledGames()} />
+      <MoriGameThreshold className="game-threshold-index" label="Mini-game collection">
+        <MiniGameArcSelector games={getEnabledGames()} />
+      </MoriGameThreshold>
     </main>
   );
 }
