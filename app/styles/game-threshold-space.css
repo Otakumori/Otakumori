@@ -49,6 +49,89 @@
   animation: game-threshold-settle 360ms var(--mori-ease-settle) both;
 }
 
+.game-threshold-panel--launch {
+  grid-template-columns: minmax(16rem, 0.82fr) minmax(22rem, 1.18fr);
+  width: min(100%, 68rem);
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(1.25rem, 3.5vw, 3rem);
+}
+
+.game-threshold-focal {
+  position: relative;
+  min-height: min(68dvh, 42rem);
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgb(246 237 223 / 12%);
+  border-radius: var(--mori-radius-object);
+  background:
+    radial-gradient(circle at 50% 38%, rgb(137 111 72 / 22%), transparent 40%),
+    linear-gradient(160deg, rgb(35 42 44 / 72%), rgb(5 7 8 / 92%));
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 75%),
+    inset 0 -5rem 8rem rgb(0 0 0 / 62%);
+}
+
+.game-threshold-focal::after {
+  position: absolute;
+  inset: auto 12% 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(171 99 102 / 72%), transparent);
+  content: '';
+}
+
+.game-threshold-focal__orbit {
+  position: absolute;
+  inset: 12% 9%;
+  border: 1px solid rgb(137 111 72 / 28%);
+  border-radius: 50%;
+}
+
+.game-threshold-focal__orbit::before,
+.game-threshold-focal__orbit::after {
+  position: absolute;
+  inset: 12%;
+  border: 1px solid rgb(246 237 223 / 7%);
+  border-radius: inherit;
+  content: '';
+}
+
+.game-threshold-focal__orbit::after {
+  inset: 30%;
+}
+
+.game-threshold-focal__art {
+  z-index: 1;
+  object-fit: contain;
+  object-position: 50% 100%;
+  filter: saturate(0.72) contrast(1.04);
+}
+
+.game-threshold-focal__monogram {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  color: rgb(246 237 223 / 76%);
+  font-size: clamp(4rem, 9vw, 8rem);
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.game-threshold-launch-copy {
+  display: grid;
+  align-content: center;
+  gap: clamp(1.25rem, 2.4vw, 2rem);
+  min-width: 0;
+}
+
+.game-threshold-readiness {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--mori-text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
 .game-threshold-panel__header {
   display: flex;
   align-items: center;
@@ -70,6 +153,10 @@
   text-wrap: balance;
 }
 
+.game-threshold-panel--launch .game-threshold-panel__copy h1 {
+  font-size: clamp(3.25rem, 6.5vw, 6.5rem);
+}
+
 .game-threshold-panel__copy p {
   max-width: 42rem;
   margin: 1rem 0 0;
@@ -79,8 +166,8 @@
 }
 
 .game-threshold-instructions {
-  padding-block: 1.25rem;
-  border-block: 1px solid rgb(137 111 72 / 35%);
+  padding-block: 1rem;
+  border-block: 1px solid rgb(137 111 72 / 28%);
 }
 
 .game-threshold-instructions h2,
@@ -91,12 +178,44 @@
   letter-spacing: 0.04em;
 }
 
+.game-threshold-instructions ol,
 .game-threshold-instructions ul {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin: 0.8rem 0 0;
-  padding-left: 1.25rem;
+  padding: 0;
   color: var(--mori-text-primary);
+  list-style: none;
+}
+
+.game-threshold-instructions ol li {
+  display: grid;
+  grid-template-columns: 1.8rem 1fr;
+  gap: 0.65rem;
+  align-items: baseline;
+  line-height: 1.45;
+}
+
+.game-threshold-instructions ol li > span:first-child {
+  color: var(--mori-color-bronze-500);
+  font-size: 0.72rem;
+}
+
+.game-threshold-instructions details {
+  margin-top: 0.8rem;
+  color: var(--mori-text-secondary);
+  font-size: 0.82rem;
+}
+
+.game-threshold-instructions summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--mori-text-primary);
+}
+
+.game-threshold-instructions details li {
+  padding-left: 2.45rem;
+  line-height: 1.45;
 }
 
 .game-threshold-actions {
@@ -108,6 +227,12 @@
 .game-threshold-actions > * {
   min-width: 10rem;
   min-height: 44px;
+}
+
+.game-threshold-actions--launch .mori-foundation-button:first-child {
+  min-width: 13rem;
+  border-color: rgb(171 99 102 / 72%);
+  background: linear-gradient(180deg, #633544, #45242f);
 }
 
 .game-threshold-results {
@@ -157,7 +282,7 @@
 @media (max-width: 40rem) {
   .game-threshold-screen,
   .game-threshold-state {
-    align-content: end;
+    align-content: center;
     padding-inline: max(1rem, env(safe-area-inset-left));
   }
 
@@ -170,6 +295,39 @@
     width: 100%;
     max-height: calc(100dvh - 1.25rem);
     padding: 1.4rem;
+  }
+
+  .game-threshold-panel--launch {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-height: calc(100dvh - 1.25rem);
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .game-threshold-focal {
+    min-height: clamp(8rem, 24dvh, 12rem);
+  }
+
+  .game-threshold-focal__art {
+    object-position: 50% 22%;
+  }
+
+  .game-threshold-launch-copy {
+    gap: 0.9rem;
+  }
+
+  .game-threshold-panel--launch .game-threshold-panel__copy h1 {
+    font-size: clamp(2.65rem, 13vw, 4rem);
+  }
+
+  .game-threshold-panel__copy p {
+    margin-top: 0.5rem;
+    line-height: 1.45;
+  }
+
+  .game-threshold-instructions {
+    padding-block: 0.75rem;
   }
 
   .game-threshold-actions {

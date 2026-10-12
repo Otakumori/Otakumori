@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('next/image', () => ({
+  default: ({ alt, className, src }: { alt: string; className?: string; src: string }) => (
+    <img alt={alt} className={className} src={src} />
+  ),
+}));
+
 import { GameResultsScreen } from '@/app/mini-games/_shared/GameResultsScreen';
 import { GameTitleScreen } from '@/app/mini-games/_shared/GameTitleScreen';
 import MiniGamesError from '@/app/mini-games/error';
@@ -22,13 +28,37 @@ describe('Game Threshold shared screens', () => {
     expect(container.querySelector('[data-mori-archetype="game-threshold"]')).toBeVisible();
     expect(screen.getByRole('heading', { level: 1, name: 'Memory Keeper' })).toBeVisible();
     expect(screen.getByRole('heading', { level: 2, name: 'How to play' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Return to games' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Return to Mini-Games' })).toHaveAttribute(
       'href',
       '/mini-games',
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Start game' }));
     expect(onStart).toHaveBeenCalledOnce();
+  });
+
+  it('supports a game-specific focal asset and keeps extended instructions disclosed', () => {
+    const { container } = render(
+      <GameTitleScreen
+        artworkSrc="/assets/mini-games/memory-defrag/keeper/keeper-layer.webp"
+        inputLabel="Keyboard / touch"
+        instructions={['Move between fragments.', 'Match each memory.', 'Keep the archive stable.']}
+        launchLabel="Enter the archive"
+        onStart={vi.fn()}
+        title="Memory Keeper"
+      />,
+    );
+
+    expect(container.querySelector('img')).toHaveAttribute(
+      'src',
+      expect.stringContaining('keeper-layer.webp'),
+    );
+    expect(screen.getByLabelText('Game readiness')).toHaveTextContent('ReadyKeyboard / touch');
+    expect(screen.getByText('Move between fragments.')).toBeVisible();
+    expect(screen.getByText('Match each memory.')).toBeVisible();
+    expect(screen.getByText('Keep the archive stable.')).not.toBeVisible();
+    expect(screen.getByText('More instructions')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Enter the archive' })).toBeVisible();
   });
 
   it('keeps results readable and preserves existing restart and return callbacks', () => {
