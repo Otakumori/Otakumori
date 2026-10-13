@@ -37,6 +37,7 @@ import { createGlowEffect } from '../../_shared/enhancedTextures';
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
   difficulty?: 'easy' | 'normal' | 'medium' | 'hard';
+  paused?: boolean;
   onGameEnd?: (results: { score: number; combo: number; misses: number; didWin: boolean }) => void;
   onStatsUpdate?: (stats: { score: number; combo: number; timer: number; progress: number; lives?: number }) => void;
 };
@@ -103,10 +104,18 @@ interface PowerUp {
   active: boolean;
   }
 
-export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUpdate }: Props) {
+export default function Game({
+  mode,
+  difficulty = 'normal',
+  paused = false,
+  onGameEnd,
+  onStatsUpdate,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<GameEngine | null>(null);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     combo: 0,
@@ -166,7 +175,7 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
       const deltaTime = Math.min(0.033, (currentTime - lastTime) / 1000);
       lastTime = currentTime;
 
-      if (gameState.isRunning && !gameState.isStunned) {
+      if (gameState.isRunning && !gameState.isStunned && !pausedRef.current) {
         gameRef.current.update(deltaTime);
         gameRef.current.render();
 
@@ -260,6 +269,10 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
     };
   }, [mode, difficulty, recordResult, onGameEnd, onStatsUpdate]);
 
+  useEffect(() => {
+    gameRef.current?.setPaused(paused);
+  }, [paused]);
+
   // Handle mouse/touch slash mechanics
   const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
   const isSlashing = useRef(false);
@@ -272,16 +285,16 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
 
   const handleMouseDown = useCallback(
     (_event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (gameState.isStunned) return;
+      if (paused || gameState.isStunned) return;
       isSlashing.current = true;
       slashPoints.current = [];
     },
-    [gameState.isStunned],
+    [gameState.isStunned, paused],
   );
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!isSlashing.current || !canvasRef.current || !gameRef.current) return;
+      if (paused || !isSlashing.current || !canvasRef.current || !gameRef.current) return;
 
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
@@ -329,7 +342,7 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
       // Draw slash trail
       gameRef.current.setSlashTrail(slashPoints.current);
     },
-    [shake],
+    [paused, shake],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -349,6 +362,7 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
       setPetalParticles([]); // Clear particles when not playing
       return;
     }
+    if (paused) return;
 
     let animationId: number | null = null;
     let lastTime = performance.now();
@@ -382,7 +396,7 @@ export default function Game({ mode, difficulty = 'normal', onGameEnd, onStatsUp
         cancelAnimationFrame(animationId);
       }
     };
-  }, [gameState.isRunning]);
+  }, [gameState.isRunning, paused]);
 
   // Handle power-up activation
   const handlePowerUpClick = useCallback((powerUpType: string) => {
@@ -578,6 +592,7 @@ class GameEngine {
   private spriteSheetLoaded: boolean = false;
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
   private isGameStarted: boolean = false;
+  private isPaused: boolean = false;
   private difficulty: 'easy' | 'normal' | 'medium' | 'hard' = 'normal';
   private logicalWidth: number;
   private logicalHeight: number;
@@ -635,8 +650,10 @@ class GameEngine {
 
   private startGameLoop() {
     const gameLoop = () => {
-      this.update(1 / 60);
-      this.render();
+      if (!this.isPaused) {
+        this.update(1 / 60);
+        this.render();
+      }
       this.animationId = requestAnimationFrame(gameLoop);
     };
     this.animationId = requestAnimationFrame(gameLoop);
@@ -1583,6 +1600,10 @@ class GameEngine {
     this.isGameStarted = true;
     this.gameTime = 0; // Reset game time when starting
     this.lastPetalSpawn = 0; // Reset spawn timer
+  }
+
+  setPaused(paused: boolean) {
+    this.isPaused = paused;
   }
 
   endGame() {

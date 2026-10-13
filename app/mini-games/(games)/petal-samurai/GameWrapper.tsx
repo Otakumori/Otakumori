@@ -1,10 +1,16 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
 import { GameResultsScreen } from '../../_shared/GameResultsScreen';
-import { GameUI } from '../../_shared/GameUI';
+import {
+  GamePlatformHud,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
 import Game from './Game';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
@@ -14,14 +20,20 @@ interface PetalSamuraiGameWrapperProps {
   difficulty?: 'easy' | 'normal' | 'medium' | 'hard';
 }
 
+type PetalSamuraiResult = GameSessionResult & {
+  outcome: 'completed';
+  score: number;
+  combo: number;
+  misses: number;
+  didWin: boolean;
+};
+
 export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }: PetalSamuraiGameWrapperProps) {
-  const [gameState, setGameState] = useState<GameState>('loading');
-  const [gameResults, setGameResults] = useState<{
-    score: number;
-    combo: number;
-    misses: number;
-    didWin: boolean;
-  } | null>(null);
+  const router = useRouter();
+  const session = useGameSession<PetalSamuraiResult>({
+    onExit: () => router.push('/mini-games'),
+  });
+  const [gameResults, setGameResults] = useState<PetalSamuraiResult | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
     combo: 0,
@@ -41,10 +53,14 @@ export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }:
     ].filter(Boolean),
   };
 
-  const handleGameEnd = useCallback((results: { score: number; combo: number; misses: number; didWin: boolean }) => {
-    setGameResults(results);
-    setGameState('results');
-  }, []);
+  const handleGameEnd = useCallback(
+    (results: { score: number; combo: number; misses: number; didWin: boolean }) => {
+      const completed: PetalSamuraiResult = { ...results, outcome: 'completed' };
+      setGameResults(completed);
+      session.complete(completed);
+    },
+    [session.complete],
+  );
 
   const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer: number; progress: number; lives?: number }) => {
     setGameStats({
@@ -56,12 +72,21 @@ export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }:
     });
   }, []);
 
+  const syncSession = useCallback(
+    (state: GameState) => {
+      if (state === 'loading' || state === 'boot') session.prepare();
+      if (state === 'title') session.ready();
+      if (state === 'playing') session.start();
+    },
+    [session.prepare, session.ready, session.start],
+  );
+
   return (
     <GameStateMachine
       gameId="petal-samurai"
       gameTitle="Petal Samurai"
       assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
-      onStateChange={setGameState}
+      onStateChange={syncSession}
     >
       {(state, transitionTo) => {
         if (state === 'title') {
@@ -97,11 +122,10 @@ export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }:
               onRestart={() => {
                 setGameResults(null);
                 setGameStats({ score: 0, combo: 0, timer: 60, progress: 0, lives: 3 });
+                session.restart();
                 transitionTo('title');
               }}
-              onBack={() => {
-                window.location.href = '/mini-games';
-              }}
+              onBack={session.exit}
             />
           );
         }
@@ -109,20 +133,31 @@ export default function PetalSamuraiGameWrapper({ mode, difficulty = 'normal' }:
         if (state === 'playing') {
           return (
             <>
-              <GameUI
-                score={gameStats.score}
-                combo={gameStats.combo}
-                timer={gameStats.timer}
-                lives={gameStats.lives}
+              <GamePlatformHud
+                metrics={[
+                  { label: 'Score', value: gameStats.score.toLocaleString() },
+                  ...(gameStats.combo > 0
+                    ? [{ label: 'Combo', value: `${gameStats.combo}x`, emphasis: 'selected' as const }]
+                    : []),
+                  { label: 'Time', value: gameStats.timer },
+                  { label: 'Lives', value: gameStats.lives },
+                ]}
                 progress={gameStats.progress}
-                milestone="Slice those petals!"
+                progressLabel="Run progress"
+                session={session}
               />
               <Game
                 mode={mode}
                 difficulty={difficulty}
-                onGameEnd={handleGameEnd}
+                paused={session.phase === 'paused'}
+                onGameEnd={(results) => {
+                  handleGameEnd(results);
+                  transitionTo('results');
+                }}
                 onStatsUpdate={handleGameStatsUpdate}
               />
+              <GamePlatformPause session={session} title="Petal Samurai" />
+              <GameSessionAnnouncement session={session} />
             </>
           );
         }

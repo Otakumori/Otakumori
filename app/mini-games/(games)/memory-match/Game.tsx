@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
+import {
+  GamePlatformControls,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
 import MemoryMatchGame from './MemoryMatchGame';
 import { MemoryDefragResultsScreen, MemoryDefragTitleScreen } from './MemoryDefragScreens';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
@@ -20,17 +27,23 @@ const MEMORY_KEEPER_CRITICAL_IMAGES = [
 
 const RESULT_HANDOFF_MS = 1100;
 
+type MemoryMatchResult = GameSessionResult & {
+  outcome: 'completed';
+  score: number;
+  matches: number;
+  moves: number;
+  timeElapsed: number;
+  didWin: boolean;
+  perfectClear?: boolean;
+  lowMoveClear?: boolean;
+};
+
 export default function MemoryMatchGameWrapper() {
-  const [_gameState, setGameState] = useState<GameState>('loading');
-  const [gameResults, setGameResults] = useState<{
-    score: number;
-    matches: number;
-    moves: number;
-    timeElapsed: number;
-    didWin: boolean;
-    perfectClear?: boolean;
-    lowMoveClear?: boolean;
-  } | null>(null);
+  const router = useRouter();
+  const session = useGameSession<MemoryMatchResult>({
+    onExit: () => router.push('/mini-games'),
+  });
+  const [gameResults, setGameResults] = useState<MemoryMatchResult | null>(null);
   const resultTimeoutRef = useRef<number | null>(null);
 
   const gameAssets: AssetManifest = {
@@ -55,14 +68,25 @@ export default function MemoryMatchGameWrapper() {
       didWin: boolean;
       rewardIntent?: { facts?: { perfectClear?: boolean; lowMoveClear?: boolean } } | null;
     }) => {
-      setGameResults({
+      const completed: MemoryMatchResult = {
         ...results,
+        outcome: 'completed',
         perfectClear: results.rewardIntent?.facts?.perfectClear,
         lowMoveClear: results.rewardIntent?.facts?.lowMoveClear,
-      });
-      setGameState('results');
+      };
+      setGameResults(completed);
+      session.complete(completed);
     },
-    [],
+    [session.complete],
+  );
+
+  const syncSession = useCallback(
+    (state: GameState) => {
+      if (state === 'loading' || state === 'boot') session.prepare();
+      if (state === 'title') session.ready();
+      if (state === 'playing') session.start();
+    },
+    [session.prepare, session.ready, session.start],
   );
 
   return (
@@ -74,7 +98,7 @@ export default function MemoryMatchGameWrapper() {
           ? gameAssets
           : undefined
       }
-      onStateChange={setGameState}
+      onStateChange={syncSession}
     >
       {(state, transitionTo) => {
         if (state === 'title') {
@@ -93,28 +117,34 @@ export default function MemoryMatchGameWrapper() {
               lowMoveClear={gameResults.lowMoveClear}
               onRestart={() => {
                 setGameResults(null);
+                session.restart();
                 transitionTo('title');
               }}
-              onBack={() => {
-                window.location.href = '/mini-games';
-              }}
+              onBack={session.exit}
             />
           );
         }
 
         if (state === 'playing') {
           return (
-            <MemoryMatchGame
-              onGameEnd={(results) => {
-                handleGameEnd(results);
-                if (resultTimeoutRef.current !== null) {
-                  window.clearTimeout(resultTimeoutRef.current);
-                }
-                resultTimeoutRef.current = window.setTimeout(() => {
-                  transitionTo('results');
-                }, RESULT_HANDOFF_MS);
-              }}
-            />
+            <>
+              <MemoryMatchGame
+                paused={session.phase === 'paused'}
+                onPauseChange={(paused) => (paused ? session.pause() : session.resume())}
+                onGameEnd={(results) => {
+                  handleGameEnd(results);
+                  if (resultTimeoutRef.current !== null) {
+                    window.clearTimeout(resultTimeoutRef.current);
+                  }
+                  resultTimeoutRef.current = window.setTimeout(() => {
+                    transitionTo('results');
+                  }, RESULT_HANDOFF_MS);
+                }}
+              />
+              <GamePlatformControls session={session} showPause={false} />
+              <GamePlatformPause session={session} title="Memory Keeper" />
+              <GameSessionAnnouncement session={session} />
+            </>
           );
         }
 
