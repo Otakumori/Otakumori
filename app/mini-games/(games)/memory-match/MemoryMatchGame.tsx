@@ -29,6 +29,8 @@ interface MemoryMatchGameProps {
   difficulty?: MemoryDefragDifficulty;
   seed?: string;
   player?: MemoryDefragPlayerPresentation;
+  paused?: boolean;
+  onPauseChange?: (paused: boolean) => void;
   onGameEnd?: (results: {
     score: number;
     matches: number;
@@ -103,9 +105,12 @@ export default function MemoryMatchGame({
   difficulty = 'keeper',
   seed,
   player,
+  paused,
+  onPauseChange,
   onGameEnd,
   onStatsUpdate,
 }: MemoryMatchGameProps) {
+  const isPauseControlled = paused !== undefined;
   const reducedMotion = usePrefersReducedMotion();
   const [selectedDifficulty, setSelectedDifficulty] = useState<MemoryDefragDifficulty>(difficulty);
   const [game, setGame] = useState(() =>
@@ -218,6 +223,31 @@ export default function MemoryMatchGame({
     setAnnouncement('Memory defrag resumed.');
   }, []);
 
+  const requestPause = useCallback(() => {
+    if (isPauseControlled) {
+      onPauseChange?.(true);
+      return;
+    }
+    pauseGame();
+  }, [isPauseControlled, onPauseChange, pauseGame]);
+
+  const requestResume = useCallback(() => {
+    if (isPauseControlled) {
+      onPauseChange?.(false);
+      return;
+    }
+    resumeGame();
+  }, [isPauseControlled, onPauseChange, resumeGame]);
+
+  useEffect(() => {
+    if (!isPauseControlled) return;
+    if (paused && (game.phase === 'playing' || game.phase === 'resolving')) {
+      pauseGame();
+    } else if (!paused && game.phase === 'paused') {
+      resumeGame();
+    }
+  }, [game.phase, isPauseControlled, pauseGame, paused, resumeGame]);
+
   useEffect(() => {
     const interval = window.setInterval(() => {
       const now = performance.now();
@@ -262,6 +292,8 @@ export default function MemoryMatchGame({
   }, [feedback.kind, feedback.nonce, game.streak, reducedMotion]);
 
   useEffect(() => {
+    if (isPauseControlled) return;
+
     const onVisibilityChange = () => {
       const now = performance.now();
       setClockMs(now);
@@ -285,13 +317,17 @@ export default function MemoryMatchGame({
 
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => document.removeEventListener('visibilitychange', onVisibilityChange);
-  }, []);
+  }, [isPauseControlled]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && (game.phase === 'playing' || game.phase === 'resolving')) {
+      if (
+        !isPauseControlled &&
+        event.key === 'Escape' &&
+        (game.phase === 'playing' || game.phase === 'resolving')
+      ) {
         event.preventDefault();
-        pauseGame();
+        requestPause();
       }
 
       if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.metaKey) {
@@ -302,7 +338,7 @@ export default function MemoryMatchGame({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [game.difficulty, game.phase, pauseGame, startNewGame]);
+  }, [game.difficulty, game.phase, isPauseControlled, requestPause, startNewGame]);
 
   useEffect(() => {
     onStatsUpdate?.({
@@ -485,14 +521,14 @@ export default function MemoryMatchGame({
           </button>
 
           {game.phase === 'paused' ? (
-            <button type="button" className={styles.controlButton} onClick={resumeGame}>
+            <button type="button" className={styles.controlButton} onClick={requestResume}>
               Resume
             </button>
           ) : (
             <button
               type="button"
               className={styles.controlButton}
-              onClick={pauseGame}
+              onClick={requestPause}
               disabled={game.phase === 'ready' || game.phase === 'won'}
             >
               Pause
@@ -595,7 +631,7 @@ export default function MemoryMatchGame({
         </div>
       </div>
 
-      {game.phase === 'paused' && (
+      {!isPauseControlled && game.phase === 'paused' && (
         <div
           className={styles.pauseOverlay}
           role="dialog"
@@ -606,7 +642,7 @@ export default function MemoryMatchGame({
             <h2 id="memory-pause-title">Run paused</h2>
             <p>The board is held in place until you resume.</p>
             <div className={styles.overlayActions}>
-              <button type="button" onClick={resumeGame}>
+              <button type="button" onClick={requestResume}>
                 Resume
               </button>
               <button type="button" onClick={() => startNewGame(game.difficulty)}>

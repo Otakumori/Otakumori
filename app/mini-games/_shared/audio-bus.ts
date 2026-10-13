@@ -6,6 +6,7 @@ const ctx =
     : null;
 let musicGain: GainNode | null = null;
 let isMuted = false;
+const activeSources = new Set<AudioBufferSourceNode>();
 
 export async function play(url: string, volumeDb = -12) {
   if (!ctx || isMuted) return;
@@ -15,6 +16,8 @@ export async function play(url: string, volumeDb = -12) {
   const src = ctx.createBufferSource();
   const gain = ctx.createGain();
   src.buffer = audio;
+  activeSources.add(src);
+  src.addEventListener('ended', () => activeSources.delete(src), { once: true });
   gain.gain.value = dbToGain(volumeDb);
   src.connect(gain).connect(ctx.destination);
   src.start();
@@ -22,8 +25,34 @@ export async function play(url: string, volumeDb = -12) {
 
 export function setMusic(node: AudioBufferSourceNode) {
   if (!ctx) return;
+  activeSources.add(node);
+  node.addEventListener('ended', () => activeSources.delete(node), { once: true });
   musicGain = ctx.createGain();
   node.connect(musicGain).connect(ctx.destination);
+}
+
+export async function pauseGameAudio() {
+  if (!ctx || ctx.state !== 'running') return;
+  await ctx.suspend();
+}
+
+export async function resumeGameAudio() {
+  if (!ctx || isMuted || ctx.state !== 'suspended') return;
+  await ctx.resume();
+}
+
+export function stopGameAudio() {
+  for (const source of activeSources) {
+    try {
+      source.stop();
+    } catch {
+      // A source may already have ended between iteration and cleanup.
+    }
+    source.disconnect();
+  }
+  activeSources.clear();
+  musicGain?.disconnect();
+  musicGain = null;
 }
 
 export function duck(ms = 300, targetDb = -24) {
