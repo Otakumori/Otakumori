@@ -16,7 +16,7 @@ interface Obstacle {
   type: 'low' | 'high' | 'wide';
   speed: number;
   warningTime: number; // Time remaining for warning (0 = no warning, >0 = warning active)
-  }
+}
 
 interface Powerup {
   id: number;
@@ -24,15 +24,24 @@ interface Powerup {
   y: number;
   type: 'speed' | 'shield' | 'points';
   collected: boolean;
-  }
+}
 
 export default function ThighChaseGame({
   onGameEnd,
   onStatsUpdate,
+  paused,
 }: {
   onGameEnd?: (score: number, didWin: boolean) => void;
-  onStatsUpdate?: (stats: { score: number; lives: number; stage: number; progress?: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    lives: number;
+    stage: number;
+    progress?: number;
+  }) => void;
+  paused?: boolean;
 } = {}) {
+  const controlledPause = paused !== undefined;
+  const isPaused = paused ?? false;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(800);
@@ -111,7 +120,7 @@ export default function ThighChaseGame({
     if (!canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
-    
+
     // Size canvas based on container with DPR scaling
     const { ctx, cssWidth, cssHeight } = sizeCanvasFromContainer(canvas, containerRef.current);
     if (!ctx) return;
@@ -214,7 +223,7 @@ export default function ThighChaseGame({
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.key.toLowerCase());
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !controlledPause) {
         setGameState((prev) => (prev === 'playing' ? 'paused' : prev));
       }
 
@@ -234,7 +243,7 @@ export default function ThighChaseGame({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameState]);
+  }, [controlledPause, gameState]);
 
   // Jump action
   const jump = useCallback(() => {
@@ -295,7 +304,7 @@ export default function ThighChaseGame({
 
   // Game loop
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
 
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
@@ -577,7 +586,7 @@ export default function ThighChaseGame({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, stage, player, pursuer, lives, spawnObstacle, spawnPowerup]);
+  }, [gameState, stage, player, pursuer, lives, spawnObstacle, spawnPowerup, isPaused]);
 
   // Auto-save progress
   useEffect(() => {
@@ -617,9 +626,12 @@ export default function ThighChaseGame({
     if (!ctx) return;
 
     // Clear canvas using design system background
-    const bgColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim() || '#1b1a17'
-      : '#1b1a17';
+    const bgColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-background')
+            .trim() || '#1b1a17'
+        : '#1b1a17';
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -630,9 +642,12 @@ export default function ThighChaseGame({
     ctx.translate(-cameraX, 0);
 
     // Draw background using design system colors
-    const surfaceColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-surface-primary').trim() || '#413f4f'
-      : '#413f4f';
+    const surfaceColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-surface-primary')
+            .trim() || '#413f4f'
+        : '#413f4f';
     const bgGradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
     bgGradient.addColorStop(0, bgColor);
     bgGradient.addColorStop(0.5, surfaceColor);
@@ -861,7 +876,12 @@ export default function ThighChaseGame({
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-red-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-6">‍<span role="img" aria-label="emoji">️</span></div>
+          <div className="text-6xl mb-6">
+            ‍
+            <span role="img" aria-label="emoji">
+              ️
+            </span>
+          </div>
           <h2 className="text-3xl font-bold mb-4">Thigh Colosseum</h2>
           <p className="text-gray-300 mb-8 max-w-md">
             Enter the arena. Win rounds and advance the bracket.

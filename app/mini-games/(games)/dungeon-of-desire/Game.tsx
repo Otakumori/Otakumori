@@ -1,21 +1,33 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
 import { GameResultsScreen } from '../../_shared/GameResultsScreen';
-import { GameUI } from '../../_shared/GameUI';
+import {
+  GamePlatformHud,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
 import DungeonGame from './DungeonGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 
+type DungeonResult = GameSessionResult & {
+  outcome: 'completed';
+  score: number;
+  floor: number;
+  didWin: boolean;
+};
+
 export default function DungeonOfDesireGameWrapper() {
-  const [gameState, setGameState] = useState<GameState>('loading');
-  const [gameResults, setGameResults] = useState<{
-    score: number;
-    floor: number;
-    didWin: boolean;
-  } | null>(null);
+  const router = useRouter();
+  const session = useGameSession<DungeonResult>({
+    onExit: () => router.push('/mini-games'),
+  });
+  const [gameResults, setGameResults] = useState<DungeonResult | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
     health: 100,
@@ -37,27 +49,53 @@ export default function DungeonOfDesireGameWrapper() {
     ].filter(Boolean),
   };
 
-  const handleGameEnd = useCallback((score: number, didWin: boolean, floor: number) => {
-    setGameResults({ score, floor, didWin });
-    setGameState('results');
-  }, []);
+  const handleGameEnd = useCallback(
+    (score: number, didWin: boolean, floor: number) => {
+      const result: DungeonResult = { outcome: 'completed', score, floor, didWin };
+      setGameResults(result);
+      session.complete(result);
+    },
+    [session.complete],
+  );
 
-  const handleGameStatsUpdate = useCallback((stats: { score: number; health: number; maxHealth: number; floor: number; progress?: number }) => {
-    setGameStats({
-      score: stats.score,
-      health: stats.health,
-      maxHealth: stats.maxHealth,
-      floor: stats.floor,
-      progress: stats.progress || 0,
-    });
-  }, []);
+  const handleGameStatsUpdate = useCallback(
+    (stats: {
+      score: number;
+      health: number;
+      maxHealth: number;
+      floor: number;
+      progress?: number;
+    }) => {
+      setGameStats({
+        score: stats.score,
+        health: stats.health,
+        maxHealth: stats.maxHealth,
+        floor: stats.floor,
+        progress: stats.progress || 0,
+      });
+    },
+    [],
+  );
+
+  const syncSession = useCallback(
+    (state: GameState) => {
+      if (state === 'loading' || state === 'boot') session.prepare();
+      if (state === 'title') session.ready();
+      if (state === 'playing') session.start();
+    },
+    [session.prepare, session.ready, session.start],
+  );
 
   return (
     <GameStateMachine
       gameId="dungeon-of-desire"
       gameTitle="Dungeon of Desire"
-      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
-      onStateChange={setGameState}
+      assets={
+        (gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0
+          ? gameAssets
+          : undefined
+      }
+      onStateChange={syncSession}
     >
       {(state, transitionTo) => {
         if (state === 'title') {
@@ -91,11 +129,10 @@ export default function DungeonOfDesireGameWrapper() {
               onRestart={() => {
                 setGameResults(null);
                 setGameStats({ score: 0, health: 100, maxHealth: 100, floor: 1, progress: 0 });
+                session.restart();
                 transitionTo('title');
               }}
-              onBack={() => {
-                window.location.href = '/mini-games';
-              }}
+              onBack={session.exit}
             />
           );
         }
@@ -103,16 +140,26 @@ export default function DungeonOfDesireGameWrapper() {
         if (state === 'playing') {
           return (
             <>
-              <GameUI
-                score={gameStats.score}
-                lives={gameStats.health}
+              <GamePlatformHud
+                metrics={[
+                  { label: 'Score', value: gameStats.score.toLocaleString() },
+                  { label: 'Health', value: `${gameStats.health}/${gameStats.maxHealth}` },
+                  { label: 'Floor', value: gameStats.floor },
+                ]}
                 progress={gameStats.progress}
-                milestone={`Floor ${gameStats.floor}`}
+                progressLabel="Dungeon progress"
+                session={session}
               />
               <DungeonGame
-                onGameEnd={(score, didWin) => handleGameEnd(score, didWin, gameStats.floor)}
+                paused={session.phase === 'paused'}
+                onGameEnd={(score, didWin) => {
+                  handleGameEnd(score, didWin, gameStats.floor);
+                  transitionTo('results');
+                }}
                 onStatsUpdate={handleGameStatsUpdate}
               />
+              <GamePlatformPause session={session} title="Dungeon of Desire" />
+              <GameSessionAnnouncement session={session} />
             </>
           );
         }
@@ -122,4 +169,3 @@ export default function DungeonOfDesireGameWrapper() {
     </GameStateMachine>
   );
 }
-
