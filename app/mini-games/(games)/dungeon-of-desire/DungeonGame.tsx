@@ -27,7 +27,7 @@ interface Enemy {
   attackCooldown: number;
   telegraphTime: number; // Time remaining in telegraph state
   state: 'idle' | 'telegraph' | 'attacking';
-  }
+}
 
 interface Spell {
   id: number;
@@ -37,7 +37,7 @@ interface Spell {
   vy: number;
   damage: number;
   lifetime: number;
-  }
+}
 
 interface Particle {
   id: number;
@@ -48,15 +48,25 @@ interface Particle {
   life: number;
   size: number;
   color: string;
-  }
+}
 
 export default function DungeonGame({
   onGameEnd,
   onStatsUpdate,
+  paused,
 }: {
   onGameEnd?: (score: number, didWin: boolean) => void;
-  onStatsUpdate?: (stats: { score: number; health: number; maxHealth: number; floor: number; progress?: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    health: number;
+    maxHealth: number;
+    floor: number;
+    progress?: number;
+  }) => void;
+  paused?: boolean;
 } = {}) {
+  const controlledPause = paused !== undefined;
+  const isPaused = paused ?? false;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(800);
@@ -202,7 +212,7 @@ export default function DungeonGame({
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.key.toLowerCase());
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !controlledPause) {
         setGameState((prev) =>
           prev === 'playing' ? 'paused' : prev === 'paused' ? 'playing' : prev,
         );
@@ -231,7 +241,7 @@ export default function DungeonGame({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameState]);
+  }, [controlledPause, gameState]);
 
   // Jump action
   const jump = useCallback(() => {
@@ -355,7 +365,7 @@ export default function DungeonGame({
 
   // Game loop (moved after generateRoomLayout)
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isPaused) return;
 
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
@@ -685,7 +695,16 @@ export default function DungeonGame({
     nextParticleId,
     roomEnemiesSpawned,
     generateRoomLayout,
+    isPaused,
   ]);
+
+  useEffect(
+    () => () => {
+      enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
+      enemyRenderersRef.current.clear();
+    },
+    [],
+  );
 
   // Initialize canvas with DPI scaling
   useEffect(() => {
@@ -694,7 +713,7 @@ export default function DungeonGame({
     if (!canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
-    
+
     // Size canvas based on container with DPR scaling
     const { ctx, cssWidth, cssHeight } = sizeCanvasFromContainer(canvas, containerRef.current);
     if (!ctx) return;
@@ -720,13 +739,17 @@ export default function DungeonGame({
       drawDungeonBackground(ctx, camera.x);
 
       // Enhanced background gradient overlay using CSS variables
-      const accentColor = typeof window !== 'undefined'
-        ? getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#db2777'
-        : '#db2777';
-      const bgColor = typeof window !== 'undefined'
-        ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() || '#1a1816'
-        : '#1a1816';
-      
+      const accentColor =
+        typeof window !== 'undefined'
+          ? getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() ||
+            '#db2777'
+          : '#db2777';
+      const bgColor =
+        typeof window !== 'undefined'
+          ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() ||
+            '#1a1816'
+          : '#1a1816';
+
       const bgGradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
       bgGradient.addColorStop(0, `${accentColor}1A`); // 10% opacity
       bgGradient.addColorStop(1, `${bgColor}4D`); // 30% opacity
@@ -738,13 +761,18 @@ export default function DungeonGame({
       ctx.translate(-camera.x, -camera.y);
 
       // Draw ground using CSS variables
-      const groundBgColor = typeof window !== 'undefined'
-        ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() || '#1a1816'
-        : '#1a1816';
-      const borderColor = typeof window !== 'undefined'
-        ? getComputedStyle(document.documentElement).getPropertyValue('--om-border-soft').trim() || 'rgba(229, 224, 216, 0.15)'
-        : 'rgba(229, 224, 216, 0.15)';
-      
+      const groundBgColor =
+        typeof window !== 'undefined'
+          ? getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() ||
+            '#1a1816'
+          : '#1a1816';
+      const borderColor =
+        typeof window !== 'undefined'
+          ? getComputedStyle(document.documentElement)
+              .getPropertyValue('--om-border-soft')
+              .trim() || 'rgba(229, 224, 216, 0.15)'
+          : 'rgba(229, 224, 216, 0.15)';
+
       ctx.fillStyle = groundBgColor;
       ctx.fillRect(0, GROUND_Y, WORLD_WIDTH, canvasHeight - GROUND_Y);
 
@@ -1398,7 +1426,7 @@ export default function DungeonGame({
 
       {/* Pause Screen */}
       <AnimatePresence>
-        {gameState === 'paused' && (
+        {gameState === 'paused' && !controlledPause && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
