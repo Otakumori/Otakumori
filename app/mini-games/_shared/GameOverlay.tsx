@@ -19,6 +19,7 @@ export interface GameOverlayProps {
   onRestart?: () => void;
   onResume?: () => void;
   onPause?: () => void;
+  onBack?: () => void;
   className?: string;
 }
 
@@ -36,7 +37,8 @@ export function GameOverlay({
   achievements,
   onRestart,
   onResume,
-  onPause,
+  onPause: _onPause,
+  onBack,
   className = '',
 }: GameOverlayProps) {
   const palette = getOtakumoriPalette('hub');
@@ -150,16 +152,24 @@ export function GameOverlay({
                   Play Again
                 </button>
               )}
-              <Link
-                href="/mini-games"
-                className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
-                style={{
-                  backgroundColor: palette.deepPurple,
-                  color: '#ffffff',
-                }}
-              >
-                Back to Arcade
-              </Link>
+              {onBack ? (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
+                  style={{ backgroundColor: palette.deepPurple, color: '#ffffff' }}
+                >
+                  Back to Arcade
+                </button>
+              ) : (
+                <Link
+                  href="/mini-games"
+                  className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
+                  style={{ backgroundColor: palette.deepPurple, color: '#ffffff' }}
+                >
+                  Back to Arcade
+                </Link>
+              )}
             </div>
           </div>
         )}
@@ -193,16 +203,24 @@ export function GameOverlay({
                   Retry
                 </button>
               )}
-              <Link
-                href="/mini-games"
-                className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
-                style={{
-                  backgroundColor: palette.deepPurple,
-                  color: '#ffffff',
-                }}
-              >
-                Return to Arcade
-              </Link>
+              {onBack ? (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
+                  style={{ backgroundColor: palette.deepPurple, color: '#ffffff' }}
+                >
+                  Return to Arcade
+                </button>
+              ) : (
+                <Link
+                  href="/mini-games"
+                  className="flex-1 py-3 rounded-xl font-semibold transition-all hover:scale-105 text-center"
+                  style={{ backgroundColor: palette.deepPurple, color: '#ffffff' }}
+                >
+                  Return to Arcade
+                </Link>
+              )}
             </div>
           </div>
         )}

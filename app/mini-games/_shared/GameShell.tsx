@@ -45,12 +45,14 @@ export default function GameShell({
   gameKey,
   title,
   children,
+  pauseAuthority = 'shell',
   returnTo = '/mini-games',
   resultsExtra,
 }: {
   gameKey: string;
   title?: string;
   children: React.ReactNode;
+  pauseAuthority?: 'shell' | 'external';
   returnTo?: string;
   resultsExtra?: React.ReactNode;
 }) {
@@ -79,19 +81,21 @@ export default function GameShell({
 
   // Hotkeys
   useEffect(() => {
+    if (pauseAuthority === 'external') return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setPaused((p) => !p);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [pauseAuthority]);
 
   // Expose hooks for scenes
   useEffect(() => {
+    if (pauseAuthority === 'external') return;
     (window as any).__gameEnd = (p: GameEndPayload) => setEnded(p);
     (window as any).__gamePause = () => setPaused(true);
     (window as any).__gameResume = () => setPaused(false);
-  }, []);
+  }, [pauseAuthority]);
 
   // Play UI sounds on open
   useEffect(() => {

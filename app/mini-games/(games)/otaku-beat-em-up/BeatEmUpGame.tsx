@@ -78,12 +78,14 @@ interface BeatIndicator {
 
 interface Props {
   mode: GameMode;
+  paused?: boolean;
   onGameEnd?: (score: number, didWin: boolean) => void;
   onStatsUpdate?: (stats: { score: number; health: number; maxHealth: number; combo: number; wavesCleared: number; progress?: number }) => void;
 }
 
 export default function BeatEmUpGame({
   mode,
+  paused,
   onGameEnd,
   onStatsUpdate,
 }: Props) {
@@ -112,6 +114,27 @@ export default function BeatEmUpGame({
     timeElapsed: 0,
     startTime: 0,
   });
+  const isPausedRef = useRef(false);
+  const previousControlledPauseRef = useRef(paused);
+  isPausedRef.current = gameState.isPaused;
+
+  useEffect(() => {
+    if (paused === undefined) return;
+
+    isPausedRef.current = paused;
+    if (paused) keysRef.current.clear();
+    setGameState((current) =>
+      current.isPaused === paused ? current : { ...current, isPaused: paused },
+    );
+
+    const wasPaused = previousControlledPauseRef.current;
+    previousControlledPauseRef.current = paused;
+    const audioContext = audioContextRef.current;
+    if (audioContext) {
+      if (paused) void audioContext.suspend();
+      else if (wasPaused === true) void audioContext.resume();
+    }
+  }, [paused]);
 
   const playerRef = useRef<Player>({
     x: 200,
@@ -260,6 +283,14 @@ export default function BeatEmUpGame({
   // Keyboard input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'escape') {
+        if (paused === undefined) {
+          setGameState((prev) => ({ ...prev, isPaused: !prev.isPaused }));
+        }
+        return;
+      }
+
+      if (isPausedRef.current) return;
       keysRef.current.add(e.key.toLowerCase());
 
       // Light attack on spacebar
@@ -280,10 +311,6 @@ export default function BeatEmUpGame({
         playerRef.current.blockCooldown = 500;
       }
 
-      // Pause on escape
-      if (e.key === 'escape') {
-        setGameState((prev) => ({ ...prev, isPaused: !prev.isPaused }));
-      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -303,7 +330,7 @@ export default function BeatEmUpGame({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [paused]);
 
   // Perform player attack
   const performAttack = useCallback(
@@ -1385,7 +1412,7 @@ export default function BeatEmUpGame({
       </div>
 
       {/* Pause Screen */}
-      {gameState.isPaused && (
+      {paused === undefined && gameState.isPaused && (
         <motion.div
           className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
           initial={{ opacity: 0 }}

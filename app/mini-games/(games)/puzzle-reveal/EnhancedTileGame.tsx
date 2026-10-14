@@ -5,7 +5,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
@@ -89,12 +88,14 @@ export default function EnhancedTileGame({
   onScoreChange,
   onComboChange,
   onGameEnd,
+  paused,
   physicsAvatarRef,
 }: {
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
+  paused?: boolean;
   physicsAvatarRef?: React.RefObject<{
     applyImpact: (force: { x: number; y: number }, part: string) => void;
   }>;
@@ -105,6 +106,10 @@ export default function EnhancedTileGame({
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(Date.now());
   const lastClickTimeRef = useRef<number>(0);
+  const pausedRef = useRef(paused ?? false);
+  const previousPausedRef = useRef(paused);
+  const pauseStartedAtRef = useRef<number | null>(null);
+  const resumeLoopRef = useRef<() => void>(() => {});
 
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
@@ -125,6 +130,29 @@ export default function EnhancedTileGame({
     opacity: number;
   }>({ active: false, scale: 1, opacity: 0 });
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
+
+  useEffect(() => {
+    if (paused === undefined) return;
+
+    const wasPaused = previousPausedRef.current;
+    previousPausedRef.current = paused;
+    pausedRef.current = paused;
+    setGameState((current) =>
+      current.isPaused === paused ? current : { ...current, isPaused: paused },
+    );
+
+    if (paused) {
+      pauseStartedAtRef.current = Date.now();
+      if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    } else if (wasPaused === true) {
+      if (pauseStartedAtRef.current !== null) {
+        startTimeRef.current += Date.now() - pauseStartedAtRef.current;
+        pauseStartedAtRef.current = null;
+      }
+      resumeLoopRef.current();
+    }
+  }, [paused]);
 
   // Initialize game
   useEffect(() => {
@@ -461,39 +489,6 @@ export default function EnhancedTileGame({
       onGameEnd(finalScore, true); // didWin = true (completed puzzle)
     }
 
-    // Submit score
-    submitScore(finalScore);
-  };
-
-  // Submit score to leaderboard
-  const submitScore = async (finalScore: number) => {
-    const petalReward = Math.floor(finalScore / 100);
-
-    try {
-      // Award petals
-      if (petalReward > 0) {
-        await fetch('/api/v1/petals/collect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: petalReward,
-            source: 'game_reward',
-          }),
-        });
-      }
-
-      // Submit to leaderboard
-      await fetch('/api/v1/leaderboards/puzzle-reveal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: Math.max(0, Math.round(finalScore)),
-          metadata: { mode, maxCombo: gameState.maxCombo },
-        }),
-      });
-    } catch (error) {
-      logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    }
   };
 
   // Game loop
@@ -648,13 +643,14 @@ export default function EnhancedTileGame({
         });
       }
 
-      if (!gameState.isPaused) {
+      if (!pausedRef.current) {
         animationRef.current = requestAnimationFrame(render);
       }
     };
 
     render();
   };
+  resumeLoopRef.current = startGameLoop;
 
   // Calculate reveal percentage
   const revealPercent =

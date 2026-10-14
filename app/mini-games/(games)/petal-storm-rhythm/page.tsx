@@ -18,6 +18,7 @@ import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../../_shared/GameOverlay';
@@ -36,6 +37,17 @@ import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { createPetalBurst, updatePetalParticles, type PetalParticle } from '../../_shared/vfx';
 import PetalStormRhythmGameWrapper from './Game';
+import {
+  GamePlatformControls,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
+
+type PetalStormResult = GameSessionResult & {
+  outcome: 'completed' | 'failed';
+  score: number;
+};
 
 interface Note {
   id: string;
@@ -90,6 +102,11 @@ const SAMPLE_TRACKS: Track[] = [
 ];
 
 export default function PetalStormRhythm() {
+  const router = useRouter();
+  const session = useGameSession<PetalStormResult>({
+    initialPhase: 'idle',
+    onExit: () => router.push('/mini-games'),
+  });
   // Game configuration - difficulty tuning parameters (must be declared before state)
   const GAME_CONFIG = {
     LANE_COUNT: 5, // Guitar Hero-style: 5 lanes
@@ -166,7 +183,36 @@ export default function PetalStormRhythm() {
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
+  const pauseStartedAtRef = useRef<number | null>(null);
   const _audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const unregister = session.registerLifecycle({
+        pause: () => {
+          pauseStartedAtRef.current = Date.now();
+          setGameState('paused');
+        },
+        resume: () => {
+          if (pauseStartedAtRef.current !== null) {
+            const pauseDuration = Date.now() - pauseStartedAtRef.current;
+            startTimeRef.current += pauseDuration;
+            setGameStartTime((startedAt) => startedAt + pauseDuration);
+            pauseStartedAtRef.current = null;
+          }
+          setGameState('playing');
+        },
+        cleanup: () => {
+          if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+        },
+      });
+    return () => {
+      unregister();
+    };
+  }, [session.registerLifecycle]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && session.phase === 'idle') session.start();
+  }, [gameState, session.phase, session.start]);
 
   // Visual profile and HUD
   const visualProfile = getGameVisualProfile('petal-storm-rhythm');
@@ -291,11 +337,12 @@ export default function PetalStormRhythm() {
   // End game (game over)
   const endGame = useCallback(() => {
     setGameState('lose');
+    session.complete({ outcome: 'failed', score });
 
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current);
     }
-  }, []);
+  }, [score, session.complete]);
 
   // Complete game
   const completeGame = useCallback(async () => {
@@ -316,6 +363,7 @@ export default function PetalStormRhythm() {
     const fullComboBonus = accuracy.miss === 0 && totalNotes > 0 ? 5000 : 0; // Full combo bonus
     const finalScoreValue = score + comboBonus + accuracyBonus + healthBonus + fullComboBonus;
     setFinalScore(finalScoreValue);
+    session.complete({ outcome: 'completed', score: finalScoreValue });
 
     // Record game result using progress system
     if (!hasAwardedPetals) {
@@ -369,7 +417,7 @@ export default function PetalStormRhythm() {
     } catch (error) {
       logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
-  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, hasAwardedPetals, gameStartTime]);
+  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, hasAwardedPetals, gameStartTime, session.complete]);
 
   // Game loop
   useEffect(() => {
@@ -636,14 +684,15 @@ export default function PetalStormRhythm() {
           break;
         case ' ':
           e.preventDefault();
-          setGameState((prev) => (prev === 'playing' ? 'paused' : 'playing'));
+          if (session.phase === 'running') session.pause();
+          else if (session.phase === 'paused') session.resume();
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, hitNote]);
+  }, [gameState, hitNote, session.pause, session.phase, session.resume]);
 
   // Cleanup
   useEffect(() => {
@@ -666,9 +715,10 @@ export default function PetalStormRhythm() {
   });
 
   const handleRestart = useCallback(() => {
+    session.restart();
     startGame();
     setGameState('playing');
-  }, [startGame]);
+  }, [session.restart, startGame]);
 
   const handleStart = useCallback(() => {
     // Check if avatar choice is needed
@@ -684,16 +734,6 @@ export default function PetalStormRhythm() {
       setGameState('playing');
     }
   }, [startGame, avatarUsage, avatarChoice, gameState]);
-
-  // Update startGame to check avatar choice and transition properly
-  const handleStartGame = useCallback(() => {
-    if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
-      setShowAvatarChoice(true);
-    } else {
-      // Transition from menu to instructions
-      setGameState('instructions');
-    }
-  }, [avatarUsage, avatarChoice]);
 
   const displayName = getGameDisplayName('petal-storm-rhythm');
 
@@ -796,6 +836,7 @@ export default function PetalStormRhythm() {
               <div className="mt-8 text-center">
                 <button
                   onClick={() => {
+                    startGame();
                     setGameState('playing');
                   }}
                   className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-pink-400 hover:to-purple-500 transition-all"
@@ -838,6 +879,10 @@ export default function PetalStormRhythm() {
         {/* Game Wrapper - uses GameStateMachine */}
         {gameState === 'playing' && selectedTrack && (
           <PetalStormRhythmGameWrapper track={selectedTrack} />
+        )}
+
+        {(gameState === 'playing' || gameState === 'paused') && (
+          <GamePlatformControls session={session} />
         )}
 
         {/* Legacy Game UI - kept for backward compatibility during transition */}
@@ -1031,9 +1076,7 @@ export default function PetalStormRhythm() {
                 ? 'win'
                 : gameState === 'lose'
                   ? 'lose'
-                  : gameState === 'paused'
-                    ? 'paused'
-                    : 'playing'
+                  : 'playing'
           }
           instructions={[
             'Press A, S, D, F to hit notes in each lane',
@@ -1051,7 +1094,10 @@ export default function PetalStormRhythm() {
             setGameState('playing');
           }}
           onResume={handleStart}
+          onBack={session.exit}
         />
+        <GamePlatformPause session={session} title={displayName} />
+        <GameSessionAnnouncement session={session} />
 
         {/* Completion Screen (Legacy - will be replaced by GameOverlay) */}
         {gameState === 'win' && false && (

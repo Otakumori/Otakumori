@@ -16,15 +16,22 @@
 
 import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import GlassCard from '@/app/components/ui/GlassCard';
 import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../../_shared/PhysicsAvatarCanvas';
 import { GameOverlay } from '../../_shared/GameOverlay';
 import { useGameHud } from '../../_shared/useGameHud';
-import { usePetalEarn } from '../../_shared/usePetalEarn';
+import {
+  GamePlatformControls,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
+import { useGameProgress } from '@/app/lib/games/progress';
 import {
   getGameVisualProfile,
   applyVisualProfile,
@@ -52,6 +59,7 @@ const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
 export default function PuzzleRevealPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<GameMode>('medium');
   const [key, setKey] = useState(0); // Force remount on mode change
   const [gameState, setGameState] = useState<
@@ -61,7 +69,12 @@ export default function PuzzleRevealPage() {
   const [combo, setCombo] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
-  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const resultSubmittedRef = useRef(false);
+  const gameStartedAtRef = useRef(Date.now());
+  const session = useGameSession<GameSessionResult>({
+    initialPhase: 'idle',
+    onExit: () => router.push('/mini-games'),
+  });
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -85,7 +98,21 @@ export default function PuzzleRevealPage() {
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('puzzle-reveal');
   const { balance: petalBalance } = usePetalBalance();
-  const { earnPetals } = usePetalEarn();
+  const { beginResultSession, recordResult } = useGameProgress();
+
+  useEffect(() => {
+    const unregister = session.registerLifecycle({
+        pause: () => setGameState('paused'),
+        resume: () => setGameState('playing'),
+      });
+    return () => {
+      unregister();
+    };
+  }, [session.registerLifecycle]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && session.phase === 'idle') session.start();
+  }, [gameState, session.phase, session.start]);
 
   // Game configuration - reserved for future game logic tuning
   // const GAME_CONFIG = {
@@ -122,29 +149,44 @@ export default function PuzzleRevealPage() {
       setShowAvatarChoice(true);
       return;
     }
+    beginResultSession('puzzle-reveal');
+    gameStartedAtRef.current = Date.now();
+    resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
-    setHasAwardedPetals(false);
   };
 
   const handleRestart = () => {
     setKey((prev) => prev + 1);
+    session.restart();
+    beginResultSession('puzzle-reveal');
+    gameStartedAtRef.current = Date.now();
+    resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
-    setHasAwardedPetals(false);
   };
 
   const handleGameEnd = useCallback(
     async (finalScoreValue: number, didWin: boolean) => {
       setFinalScore(finalScoreValue);
       setGameState(didWin ? 'win' : 'lose');
+      session.complete({
+        outcome: didWin ? 'completed' : 'failed',
+        score: finalScoreValue,
+        stats: [
+          { label: 'Difficulty', value: mode },
+          { label: 'Best combo', value: combo },
+        ],
+      });
 
-      // Award petals using hook
-      if (!hasAwardedPetals) {
-        setHasAwardedPetals(true);
-        const result = await earnPetals({
+      if (!resultSubmittedRef.current) {
+        resultSubmittedRef.current = true;
+        const result = await recordResult({
           gameId: 'puzzle-reveal',
           score: finalScoreValue,
+          difficulty: mode,
+          durationMs: Math.max(0, Date.now() - gameStartedAtRef.current),
+          didWin,
           metadata: {
             mode,
             didWin,
@@ -152,9 +194,7 @@ export default function PuzzleRevealPage() {
           },
         });
 
-        if (result.success) {
-          setPetalReward(result.earned);
-        }
+        if (result.success) setPetalReward(result.petalReward?.earned ?? null);
       }
 
       // Submit to leaderboard
@@ -175,7 +215,7 @@ export default function PuzzleRevealPage() {
         logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
-    [mode, combo, earnPetals, hasAwardedPetals],
+    [combo, mode, recordResult, session.complete],
   );
 
   const displayName = getGameDisplayName('puzzle-reveal');
@@ -296,14 +336,18 @@ export default function PuzzleRevealPage() {
               onScoreChange={setScore}
               onComboChange={setCombo}
               onGameEnd={handleGameEnd}
+              paused={session.phase === 'paused'}
               physicsAvatarRef={physicsAvatarRef}
             />
+            {(session.phase === 'running' || session.phase === 'paused') && (
+              <GamePlatformControls session={session} showPause={session.phase === 'running'} />
+            )}
           </GlassCard>
 
           {/* Game Overlay */}
           {!showAvatarChoice && (
             <GameOverlay
-              state={gameState}
+              state={gameState === 'paused' ? 'playing' : gameState}
               instructions={[
                 'Click tiles to reveal the hidden artwork',
                 'Click tiles quickly (within 0.5s) to build combos',
@@ -317,8 +361,11 @@ export default function PuzzleRevealPage() {
               petalReward={petalReward}
               onRestart={handleRestart}
               onResume={handleStart}
+              onBack={session.exit}
             />
           )}
+          <GamePlatformPause session={session} title={displayName} />
+          <GameSessionAnnouncement session={session} />
 
           {/* Game Instructions */}
           <GlassCard className="mt-6 p-6">
