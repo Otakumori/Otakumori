@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
     warn: vi.fn(),
   },
   tx: {
+    idempotencyKey: { create: vi.fn() },
     petalLedger: { create: vi.fn() },
     petalTransaction: { create: vi.fn() },
     petalWallet: { upsert: vi.fn() },
@@ -18,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   },
   db: {
     $transaction: vi.fn(),
+    idempotencyKey: { findUnique: vi.fn() },
     petalTransaction: { aggregate: vi.fn() },
     petalWallet: { findUnique: vi.fn() },
   },
@@ -47,10 +49,53 @@ describe('grantPetals local user persistence', () => {
     mocks.checkRateLimit.mockResolvedValue({ success: true });
     mocks.getClientIdentifier.mockReturnValue('client-id');
     mocks.db.petalTransaction.aggregate.mockResolvedValue({ _sum: { amount: 0 } });
+    mocks.db.idempotencyKey.findUnique.mockResolvedValue(null);
     mocks.db.$transaction.mockImplementation(async (callback: (tx: typeof mocks.tx) => Promise<unknown>) =>
       callback(mocks.tx),
     );
     mocks.tx.petalWallet.upsert.mockResolvedValue({ balance: 7, lifetimeEarned: 7 });
+  });
+
+  it('claims a scoped idempotency key in the same transaction as the wallet grant', async () => {
+    const { grantPetals } = await import('@/app/lib/petals/grant');
+    const result = await grantPetals({
+      userId: 'local_user_123',
+      amount: 7,
+      source: 'mini_game',
+      idempotencyKey: 'petal-storm-rhythm:session-123',
+      req: new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn'),
+    });
+
+    expect(result).toMatchObject({ success: true, granted: 7, duplicate: false });
+    expect(mocks.tx.idempotencyKey.create).toHaveBeenCalledWith({
+      data: {
+        key: expect.stringMatching(/^petal_grant:[a-f0-9]{64}$/),
+        purpose: 'petal_grant:mini_game',
+      },
+    });
+  });
+
+  it('returns the current wallet without a second mutation for duplicate sessions', async () => {
+    mocks.db.idempotencyKey.findUnique.mockResolvedValue({ key: 'existing' });
+    mocks.db.petalWallet.findUnique.mockResolvedValue({ balance: 42, lifetimeEarned: 84 });
+
+    const { grantPetals } = await import('@/app/lib/petals/grant');
+    const result = await grantPetals({
+      userId: 'local_user_123',
+      amount: 7,
+      source: 'mini_game',
+      idempotencyKey: 'petal-storm-rhythm:session-123',
+      req: new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn'),
+    });
+
+    expect(result).toEqual({
+      success: true,
+      granted: 0,
+      newBalance: 42,
+      lifetimeEarned: 84,
+      duplicate: true,
+    });
+    expect(mocks.db.$transaction).not.toHaveBeenCalled();
   });
 
   it('writes petal records and balance sync using the local User.id', async () => {

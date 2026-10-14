@@ -172,7 +172,7 @@ export default function PetalStormRhythm() {
   const visualProfile = getGameVisualProfile('petal-storm-rhythm');
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-storm-rhythm');
-  const { recordResult } = useGameProgress();
+  const { beginResultSession, recordResult } = useGameProgress();
 
   // Lane positions (4 lanes)
   const LANE_COUNT = GAME_CONFIG.LANE_COUNT;
@@ -433,6 +433,7 @@ export default function PetalStormRhythm() {
     setMultiplier(1);
     setPetalReward(null);
     setHasAwardedPetals(false);
+    beginResultSession('petal-storm-rhythm');
     setAchievements([]);
 
     // Set start time for game loop and tracking
@@ -441,7 +442,7 @@ export default function PetalStormRhythm() {
     setGameStartTime(startTime);
 
     // Start game loop - it will run when gameState is 'playing'
-  }, [selectedTrack, generateNotes]);
+  }, [beginResultSession, selectedTrack, generateNotes]);
 
   // Handle note hit
   const hitNote = useCallback(

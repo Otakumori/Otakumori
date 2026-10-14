@@ -13,6 +13,7 @@ import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 
 export interface PetalEarnRequest {
   gameId: string;
+  sessionId?: string;
   score: number;
   didWin?: boolean; // Whether player won/completed the run
   metadata?: {
@@ -32,6 +33,8 @@ export interface PetalEarnResult {
   lifetimePetalsEarned: number;
   isGuest: boolean;
   dailyCapReached?: boolean;
+  duplicate?: boolean;
+  status: 'awarded' | 'duplicate' | 'unavailable';
   error?: string;
 }
 
@@ -51,6 +54,7 @@ export function usePetalEarn() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             gameId: request.gameId,
+            sessionId: request.sessionId,
             score: request.score,
             didWin: request.didWin ?? true, // Default to win for backward compatibility
             metadata: request.metadata,
@@ -66,6 +70,7 @@ export function usePetalEarn() {
             balance: 0,
             lifetimePetalsEarned: 0,
             isGuest: data.data?.isGuest ?? isGuest,
+            status: 'unavailable',
             error: data.error || 'Failed to earn petals',
             dailyCapReached: data.data?.dailyCapReached ?? false,
           };
@@ -78,6 +83,8 @@ export function usePetalEarn() {
           lifetimePetalsEarned: data.data?.lifetimePetalsEarned ?? 0,
           isGuest: data.data?.isGuest ?? false,
           dailyCapReached: data.data?.dailyCapReached ?? false,
+          duplicate: data.data?.duplicate ?? false,
+          status: data.data?.duplicate ? 'duplicate' : 'awarded',
         };
 
         // Handle guest persistence
@@ -160,6 +167,7 @@ export function usePetalEarn() {
           balance: 0,
           lifetimePetalsEarned: 0,
           isGuest,
+          status: 'unavailable',
           error: error instanceof Error ? error.message : 'Unknown error',
         };
       }

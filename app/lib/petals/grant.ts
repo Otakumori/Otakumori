@@ -24,8 +24,10 @@
  * - Admin grants: (future)
  */
 
-import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
+import { createHash } from 'node:crypto';
 import type { NextRequest } from 'next/server';
+
+import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
 
 /**
  * Petal source types - all petal grants must specify a source
@@ -129,6 +131,7 @@ export interface GrantPetalsInput {
   description?: string; // Human-readable description
   requestId?: string; // For tracing
   req?: NextRequest; // For rate limiting (IP-based for guests)
+  idempotencyKey?: string; // Stable game-session key; scoped and hashed before persistence.
 }
 
 /**
@@ -149,12 +152,18 @@ export interface GrantPetalsResult {
     | 'INTERNAL_ERROR';
   limited?: boolean; // True if amount was capped by daily limit
   dailyRemaining?: number; // Remaining daily allowance for this source
+  duplicate?: boolean; // True when this grant was already committed.
 }
 
 /**
  * Maximum petals that can be granted in a single call (safety limit)
  */
 const MAX_PETALS_PER_GRANT = 1000;
+
+function getGrantIdempotencyKey(userId: string, source: PetalSource, key: string) {
+  const digest = createHash('sha256').update(`${userId}:${source}:${key}`).digest('hex');
+  return `petal_grant:${digest}`;
+}
 
 /**
  * Centralized function to grant petals
@@ -169,7 +178,16 @@ const MAX_PETALS_PER_GRANT = 1000;
  */
 export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsResult> {
   const { logger } = await import('@/app/lib/logger');
-  const { userId, amount, source, metadata: _metadata, description, requestId, req } = input;
+  const {
+    userId,
+    amount,
+    source,
+    metadata: _metadata,
+    description,
+    requestId,
+    req,
+    idempotencyKey,
+  } = input;
   // metadata is stored in PetalTransaction but not used in validation logic
 
   // Validation: amount must be finite, integer, positive, within max
@@ -299,6 +317,29 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
   try {
     const { db } = await import('@/lib/db');
+    const storedIdempotencyKey =
+      userId && idempotencyKey ? getGrantIdempotencyKey(userId, source, idempotencyKey) : null;
+
+    if (storedIdempotencyKey) {
+      const existing = await db.idempotencyKey.findUnique({
+        where: { key: storedIdempotencyKey },
+        select: { key: true },
+      });
+
+      if (existing) {
+        const wallet = await db.petalWallet.findUnique({
+          where: { userId },
+          select: { balance: true, lifetimeEarned: true },
+        });
+        return {
+          success: true,
+          granted: 0,
+          newBalance: wallet?.balance || 0,
+          lifetimeEarned: wallet?.lifetimeEarned || 0,
+          duplicate: true,
+        };
+      }
+    }
 
     // Check daily limit if defined
     let finalAmount = clampedAmount;
@@ -349,6 +390,15 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
     // Use transaction to update balance + log record
     const result = await db.$transaction(async (tx) => {
+      if (storedIdempotencyKey) {
+        await tx.idempotencyKey.create({
+          data: {
+            key: storedIdempotencyKey,
+            purpose: `petal_grant:${source}`,
+          },
+        });
+      }
+
       // Upsert PetalWallet (primary storage)
       const wallet = await tx.petalWallet.upsert({
         where: { userId },
@@ -416,9 +466,30 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
       lifetimeEarned: result.lifetimeEarned,
       limited: finalAmount < clampedAmount,
       dailyRemaining,
+      duplicate: false,
     };
   } catch (error) {
     const { isMissingSchemaError } = await import('@/app/lib/auth/viewer');
+
+    const errorCode =
+      error && typeof error === 'object' && 'code' in error
+        ? String((error as { code?: unknown }).code)
+        : undefined;
+
+    if (errorCode === 'P2002' && userId && idempotencyKey) {
+      const { db } = await import('@/lib/db');
+      const wallet = await db.petalWallet.findUnique({
+        where: { userId },
+        select: { balance: true, lifetimeEarned: true },
+      });
+      return {
+        success: true,
+        granted: 0,
+        newBalance: wallet?.balance || 0,
+        lifetimeEarned: wallet?.lifetimeEarned || 0,
+        duplicate: true,
+      };
+    }
 
     if (isMissingSchemaError(error)) {
       logger.warn('[Petals] Grant schema unavailable', undefined, {
@@ -439,10 +510,6 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
     // Log error without leaking sensitive data
     const errorName = error instanceof Error ? error.name : typeof error;
-    const errorCode =
-      error && typeof error === 'object' && 'code' in error
-        ? String((error as { code?: unknown }).code)
-        : undefined;
     logger.error(
       '[Petals] Grant failed',
       {

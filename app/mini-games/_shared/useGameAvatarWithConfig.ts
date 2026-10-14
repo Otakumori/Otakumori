@@ -17,6 +17,8 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import { avatarConfigToProfile, normalizeAvatarConfiguration } from './characterConverter';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+import { useGameAvatar as useActiveGameAvatar } from '@/app/lib/avatar/useGameAvatar';
+import { toGameAvatarProfile } from './game-avatar-bridge';
 
 const GUEST_AVATAR_KEY = 'otm-guest-avatar';
 
@@ -89,6 +91,10 @@ export function useGameAvatar(
 
   // Use the avatar-engine hook
   const result = useAvatarEngineAvatar(gameId, restOptions);
+  const activeAvatar = useActiveGameAvatar();
+  const activeAvatarProfile = toGameAvatarProfile(activeAvatar);
+  const shouldResolveActiveAvatar =
+    avatarsEnabled && !forcePreset && !avatarProfile && !avatarConfiguration && !guestAvatar;
 
   // Determine which avatar to use
   let finalAvatar: AvatarProfile | null = null;
@@ -106,6 +112,9 @@ export function useGameAvatar(
   } else if (avatarsEnabled && guestAvatar) {
     // Use guest avatar from localStorage
     finalAvatar = guestAvatar;
+  } else if (avatarsEnabled && activeAvatarProfile) {
+    // Use the authenticated user's canonical, read-only game avatar.
+    finalAvatar = activeAvatarProfile;
   } else {
     // Fallback to engine result (preset)
     finalAvatar = result.avatarConfig;
@@ -135,8 +144,11 @@ export function useGameAvatar(
   return {
     avatarConfig: finalAvatar,
     representationConfig,
-    isLoading: result.isLoading || !loadedGuestAvatar,
-    error: result.error,
+    isLoading:
+      result.isLoading ||
+      !loadedGuestAvatar ||
+      (shouldResolveActiveAvatar && !activeAvatar.ready),
+    error: result.error || (shouldResolveActiveAvatar ? activeAvatar.error : null),
   };
 }
 

@@ -70,6 +70,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ok: true,
         data: {
+          avatarId: null,
+          displayName: user.displayName || user.username,
           config: defaultConfig,
           model3dUrl: null,
           spritesheetUrl: null,
@@ -104,6 +106,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       data: {
+        avatarId: avatarConfig.id,
+        displayName: user.displayName || user.username,
         config: filteredConfig,
         model3dUrl,
         spritesheetUrl,
