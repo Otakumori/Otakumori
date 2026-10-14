@@ -215,7 +215,12 @@ describe('petal hotfix route contracts', () => {
     const response = await POST(
       new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
         method: 'POST',
-        body: JSON.stringify({ gameId: 'mori_runner', score: 100, didWin: true }),
+        body: JSON.stringify({
+          gameId: 'mori_runner',
+          sessionId: 'session-123',
+          score: 100,
+          didWin: true,
+        }),
       }),
     );
     const body = await response.json();
@@ -245,7 +250,12 @@ describe('petal hotfix route contracts', () => {
     const response = await POST(
       new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
         method: 'POST',
-        body: JSON.stringify({ gameId: 'mori_runner', score: 100, didWin: true }),
+        body: JSON.stringify({
+          gameId: 'mori_runner',
+          sessionId: 'session-123',
+          score: 100,
+          didWin: true,
+        }),
       }),
     );
 
@@ -255,6 +265,7 @@ describe('petal hotfix route contracts', () => {
         userId: 'local_user_123',
         amount: 12,
         source: 'mini_game',
+        idempotencyKey: 'mori_runner:session-123',
       }),
     );
     expect(mocks.grantPetals).not.toHaveBeenCalledWith(

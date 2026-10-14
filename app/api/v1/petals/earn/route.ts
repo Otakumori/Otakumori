@@ -17,6 +17,7 @@ export const runtime = 'nodejs';
 
 const EarnPetalsSchema = z.object({
   gameId: z.string().min(1),
+  sessionId: z.string().min(8).max(128).optional(),
   score: z.number().int().nonnegative(),
   didWin: z.boolean().optional(), // Whether player won/completed the run
   metadata: z
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { gameId, score, didWin, metadata } = validation.data;
+    const { gameId, sessionId, score, didWin, metadata } = validation.data;
 
     // Calculate petal reward using tuned config
     // Default to win=true if not specified (for backward compatibility)
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
       description: `Game reward: ${gameId}`,
       requestId,
       req,
+      idempotencyKey: sessionId ? `${gameId}:${sessionId}` : undefined,
     });
 
     if (!result.success) {
@@ -134,6 +136,7 @@ export async function POST(req: NextRequest) {
         source: 'game',
         dailyCapReached: result.limited || false,
         dailyRemaining: result.dailyRemaining,
+        duplicate: result.duplicate || false,
       },
       requestId,
     });

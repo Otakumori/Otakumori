@@ -2,12 +2,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
-import { AvatarConfig, DEFAULT_AVATAR_CONFIG, filterNSFWParts } from './schema';
+import { DEFAULT_AVATAR_CONFIG, filterNSFWParts } from './schema';
+import type { AvatarConfig } from './schema';
 
 /**
  * Avatar data returned by useGameAvatar hook
  */
 export interface GameAvatarData {
+  avatarId: string | null;
+  displayName: string | null;
   config: AvatarConfig;
   model3dUrl: string | null;
   spritesheetUrl: string | null;
@@ -18,6 +21,8 @@ export interface GameAvatarData {
  * Result of useGameAvatar hook
  */
 export interface UseGameAvatarResult {
+  avatarId: string | null;
+  displayName: string | null;
   config: AvatarConfig;
   model3dUrl: string | null;
   spritesheetUrl: string | null;
@@ -73,6 +78,8 @@ export function useGameAvatar(): UseGameAvatarResult {
       // If user is not authenticated, return default avatar
       if (!user?.id || !isLoaded) {
         return {
+          avatarId: null,
+          displayName: null,
           config: DEFAULT_AVATAR_CONFIG,
           model3dUrl: null,
           spritesheetUrl: null,
@@ -92,6 +99,8 @@ export function useGameAvatar(): UseGameAvatarResult {
           // If load fails, return default avatar
           console.warn('Failed to load avatar, using default:', response.statusText);
           return {
+            avatarId: null,
+            displayName: user.fullName || user.username || null,
             config: DEFAULT_AVATAR_CONFIG,
             model3dUrl: null,
             spritesheetUrl: null,
@@ -105,6 +114,8 @@ export function useGameAvatar(): UseGameAvatarResult {
           // If API returns error, return default avatar
           console.warn('Avatar load returned error, using default:', result.error);
           return {
+            avatarId: null,
+            displayName: user.fullName || user.username || null,
             config: DEFAULT_AVATAR_CONFIG,
             model3dUrl: null,
             spritesheetUrl: null,
@@ -114,6 +125,8 @@ export function useGameAvatar(): UseGameAvatarResult {
 
         // Return the loaded avatar data
         return {
+          avatarId: result.data.avatarId ?? null,
+          displayName: result.data.displayName ?? user.fullName ?? user.username ?? null,
           config: result.data.config,
           model3dUrl: result.data.model3dUrl,
           spritesheetUrl: result.data.spritesheetUrl,
@@ -123,6 +136,8 @@ export function useGameAvatar(): UseGameAvatarResult {
         // On any error, return default avatar
         console.error('Error loading avatar:', err);
         return {
+          avatarId: null,
+          displayName: user.fullName || user.username || null,
           config: DEFAULT_AVATAR_CONFIG,
           model3dUrl: null,
           spritesheetUrl: null,
@@ -138,6 +153,8 @@ export function useGameAvatar(): UseGameAvatarResult {
 
   // Always return a valid config (default if loading/error)
   const config = data?.config || DEFAULT_AVATAR_CONFIG;
+  const avatarId = data?.avatarId || null;
+  const displayName = data?.displayName || null;
   const model3dUrl = data?.model3dUrl || null;
   const spritesheetUrl = data?.spritesheetUrl || null;
   const version = data?.version || 1;
@@ -146,6 +163,8 @@ export function useGameAvatar(): UseGameAvatarResult {
   const filteredConfig = config.nsfwEnabled ? config : filterNSFWParts(config);
 
   return {
+    avatarId,
+    displayName,
     config: filteredConfig,
     model3dUrl,
     spritesheetUrl,

@@ -8,6 +8,8 @@
 
 'use client';
 
+import { useCallback, useRef } from 'react';
+
 import { calculateGameReward } from '@/app/config/petalTuning';
 import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
 
@@ -24,16 +26,17 @@ export interface GameResultMetadata {
   difficulty?: string;
   mode?: string;
   [key: string]: unknown;
-  }
+}
 
 export interface GameResult {
   gameId: string;
+  sessionId?: string;
   score: number;
   difficulty: string;
   durationMs: number;
   didWin: boolean;
   metadata?: GameResultMetadata;
-  }
+}
 
 export interface PetalRewardResult {
   earned: number;
@@ -41,7 +44,9 @@ export interface PetalRewardResult {
   lifetimePetalsEarned: number;
   isGuest: boolean;
   dailyCapReached?: boolean;
-  }
+  duplicate?: boolean;
+  status: 'awarded' | 'duplicate' | 'unavailable';
+}
 
 export interface AchievementCheckResult {
   unlocked: string[]; // Achievement codes that were unlocked
@@ -51,13 +56,20 @@ export interface AchievementCheckResult {
     rewardType?: string;
     rewardAmount?: number;
   }>;
-  }
+}
 
 export interface RecordGameResultResponse {
   success: boolean;
   petalReward?: PetalRewardResult;
   achievements?: AchievementCheckResult;
   error?: string;
+}
+
+export function createGameResultSessionId(gameId: string): string {
+  const randomId =
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  return `${gameId}:${randomId}`;
 }
 
 /**
@@ -177,6 +189,7 @@ export async function recordGameResult(
   result: GameResult,
   earnPetalsFn: (request: {
     gameId: string;
+    sessionId?: string;
     score: number;
     didWin?: boolean;
     metadata?: GameResultMetadata;
@@ -187,22 +200,16 @@ export async function recordGameResult(
     lifetimePetalsEarned: number;
     isGuest: boolean;
     dailyCapReached?: boolean;
+    duplicate?: boolean;
+    status: 'awarded' | 'duplicate' | 'unavailable';
     error?: string;
   }>,
 ): Promise<RecordGameResultResponse> {
   try {
-    // Calculate expected petal reward (for display purposes)
-    const expectedReward = calculatePetalReward(
-      result.gameId,
-      result.score,
-      result.difficulty,
-      result.metadata,
-      result.didWin,
-    );
-
     // Earn petals via the API
     const petalResult = await earnPetalsFn({
       gameId: result.gameId,
+      sessionId: result.sessionId,
       score: result.score,
       didWin: result.didWin,
       metadata: result.metadata,
@@ -230,6 +237,8 @@ export async function recordGameResult(
         lifetimePetalsEarned: petalResult.lifetimePetalsEarned,
         isGuest: petalResult.isGuest,
         dailyCapReached: petalResult.dailyCapReached,
+        duplicate: petalResult.duplicate,
+        status: petalResult.status,
       },
       achievements: achievementResult,
     };
@@ -255,12 +264,25 @@ export async function recordGameResult(
  */
 export function useGameProgress() {
   const { earnPetals } = usePetalEarn();
+  const sessionIdRef = useRef(createGameResultSessionId('game'));
 
-  const recordResult = async (result: GameResult): Promise<RecordGameResultResponse> => {
-    return recordGameResult(result, earnPetals);
-  };
+  const beginResultSession = useCallback((gameId: string) => {
+    const sessionId = createGameResultSessionId(gameId);
+    sessionIdRef.current = sessionId;
+    return sessionId;
+  }, []);
+
+  const recordResult = useCallback(
+    async (result: GameResult): Promise<RecordGameResultResponse> =>
+      recordGameResult(
+        { ...result, sessionId: result.sessionId ?? sessionIdRef.current },
+        earnPetals,
+      ),
+    [earnPetals],
+  );
 
   return {
+    beginResultSession,
     recordResult,
     calculatePetalReward: (
       gameId: string,
