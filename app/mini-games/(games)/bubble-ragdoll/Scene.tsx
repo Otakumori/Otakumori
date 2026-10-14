@@ -26,13 +26,22 @@ type Pt = { x: number; y: number; px: number; py: number }; // Verlet point
 type Stick = { a: number; b: number; len: number; stiff: number }; // constraint
 
 interface BubbleRagdollProps {
-  onGameEnd?: (results: { score: number }) => void;
+  paused?: boolean;
+  onGameEnd?: (results: {
+    score: number;
+    durationMs: number;
+    combo: number;
+    misses: number;
+    pops: number;
+  }) => void;
   onStatsUpdate?: (stats: { score: number; combo: number; timer: number; progress: number }) => void;
 }
 
-export default function BubbleRagdoll({ onGameEnd, onStatsUpdate }: BubbleRagdollProps = {}) {
+export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate }: BubbleRagdollProps = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
 
   // assets
   const bgUrl = getAsset('bubble-ragdoll', 'bg') ?? '';
@@ -89,8 +98,8 @@ export default function BubbleRagdoll({ onGameEnd, onStatsUpdate }: BubbleRagdol
       combo = 0,
       bestCombo = 0,
       misses = 0;
-    const startAt = performance.now();
-    const endAt = startAt + ROUND_MS;
+    let startAt = performance.now();
+    let endAt = startAt + ROUND_MS;
 
     // ragdoll: 2-point torso + 1 head
     const pts: Pt[] = [];
@@ -118,6 +127,7 @@ export default function BubbleRagdoll({ onGameEnd, onStatsUpdate }: BubbleRagdol
 
     // input (pop and shove)
     function onPointerDown(e: PointerEvent) {
+      if (pausedRef.current) return;
       const rect = c.getBoundingClientRect();
       const x = e.clientX - rect.left,
         y = e.clientY - rect.top;
@@ -333,8 +343,26 @@ export default function BubbleRagdoll({ onGameEnd, onStatsUpdate }: BubbleRagdol
 
     // main loop
     let raf = 0,
-      last = performance.now();
+      last = performance.now(),
+      wasPaused = pausedRef.current,
+      pauseStartedAt = wasPaused ? last : 0;
     function loop(now: number) {
+      if (pausedRef.current) {
+        if (!wasPaused) pauseStartedAt = now;
+        wasPaused = true;
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+
+      if (wasPaused) {
+        const pausedFor = Math.max(0, now - pauseStartedAt);
+        startAt += pausedFor;
+        endAt += pausedFor;
+        wasPaused = false;
+        last = now;
+      }
+
       const dt = Math.min(32, now - last);
       last = now;
 
@@ -378,32 +406,17 @@ export default function BubbleRagdoll({ onGameEnd, onStatsUpdate }: BubbleRagdol
     raf = requestAnimationFrame(loop);
 
     let hasEnded = false;
-    async function end(now: number) {
+    function end(now: number) {
       if (hasEnded) return;
       hasEnded = true;
       const duration = Math.round(Math.min(now - startAt, ROUND_MS));
       
-      // Notify parent component
-      if (onGameEnd) {
-        onGameEnd({ score });
-      }
-      
-      try {
-        await fetch('/api/games/finish', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            game: 'bubble-ragdoll',
-            score,
-            durationMs: duration,
-            stats: { combo: bestCombo, misses, pops: Math.floor(score / 100) },
-          }),
-        });
-      } catch {}
-      (window as any).__gameEnd?.({
+      onGameEnd?.({
         score,
         durationMs: duration,
-        stats: { combo: bestCombo, misses, pops: Math.floor(score / 100) },
+        combo: bestCombo,
+        misses,
+        pops: Math.floor(score / 100),
       });
     }
 
