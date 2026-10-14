@@ -165,7 +165,7 @@ function Trampoline({ isPressed }: { isPressed: boolean }) {
   );
 }
 
-export default function BlossomBounce({ onComplete, _onFail, _duration }: GameProps) {
+export default function BlossomBounce({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const [bounceCount, setBounceCount] = useState(0);
   const [isBouncing, setIsBouncing] = useState(false);
   const [showElements, setShowElements] = useState(false);
@@ -174,20 +174,22 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
   const lastBounceTime = useRef(0);
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowElements(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
-    if (bounceCount >= 15) {
-      setTimeout(() => {
+    if (!paused && bounceCount >= 15) {
+      const timer = setTimeout(() => {
         onComplete(100 + combo * 5, 35); // Bonus petals for combo
       }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [bounceCount, combo, onComplete]);
+  }, [bounceCount, combo, onComplete, paused]);
 
   const handleBounce = useCallback(() => {
-    if (isBouncing || bounceCount >= 15) return;
+    if (paused || isBouncing || bounceCount >= 15) return;
 
     const now = Date.now();
     const timeSinceLastBounce = now - lastBounceTime.current;
@@ -208,7 +210,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
     setTimeout(() => {
       setIsBouncing(false);
     }, 800);
-  }, [isBouncing, bounceCount]);
+  }, [isBouncing, bounceCount, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -221,9 +223,10 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-b from-purple-900 via-pink-900 to-purple-950 overflow-hidden">
@@ -323,7 +326,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleBounce}
-        disabled={bounceCount >= 15}
+        disabled={paused || bounceCount >= 15}
         aria-label="Bounce the cherry blossom petals on the trampoline"
       />
     </div>

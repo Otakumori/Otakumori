@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function ChokeTheController({ onComplete, _onFail, _duration }: GameProps) {
+export default function ChokeTheController({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const [vibration, setVibration] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [mashCount, setMashCount] = useState(0);
@@ -12,35 +12,36 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
   const [particleEffect, setParticleEffect] = useState(false);
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowController(true), 300);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   // Decay vibration over time
   useEffect(() => {
-    if (isComplete || vibration === 0) return;
+    if (paused || isComplete || vibration === 0) return;
 
     const decayInterval = setInterval(() => {
       setVibration((prev) => Math.max(prev - 1, 0));
     }, 100);
 
     return () => clearInterval(decayInterval);
-  }, [vibration, isComplete]);
+  }, [vibration, isComplete, paused]);
 
   useEffect(() => {
-    if (vibration >= 100 && !isComplete) {
+    if (!paused && vibration >= 100 && !isComplete) {
       setIsComplete(true);
       setParticleEffect(true);
       onComplete(100, 20);
     }
-  }, [vibration, isComplete, onComplete]);
+  }, [vibration, isComplete, onComplete, paused]);
 
   const handleMash = useCallback(() => {
-    if (isComplete) return;
+    if (paused || isComplete) return;
 
     setMashCount((prev) => prev + 1);
     setVibration((prev) => Math.min(prev + 6, 100));
-  }, [isComplete]);
+  }, [isComplete, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -53,9 +54,10 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-purple-950 via-pink-950 to-black overflow-hidden">
@@ -224,7 +226,7 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleMash}
-        disabled={isComplete}
+        disabled={paused || isComplete}
         aria-label="Mash to increase controller vibration pressure"
       />
     </div>

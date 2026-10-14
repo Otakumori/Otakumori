@@ -59,7 +59,7 @@ function MenacingText() {
 }
 
 // Character with dynamic poses
-export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps) {
+export default function JoJoThrust({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const [thrustCount, setThrustCount] = useState(0);
   const [currentPose, setCurrentPose] = useState(0);
   const [isThrusting, setIsThrusting] = useState(false);
@@ -79,20 +79,22 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
   const activePose = poses[currentPose] ?? fallbackPose;
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowCharacter(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
-    if (thrustCount >= 20) {
-      setTimeout(() => {
+    if (!paused && thrustCount >= 20) {
+      const timer = setTimeout(() => {
         onComplete(100, 30);
       }, 800);
+      return () => clearTimeout(timer);
     }
-  }, [thrustCount, onComplete]);
+  }, [thrustCount, onComplete, paused]);
 
   const handleThrust = useCallback(() => {
-    if (isThrusting || thrustCount >= 20) return;
+    if (paused || isThrusting || thrustCount >= 20) return;
 
     setIsThrusting(true);
     setThrustCount((prev) => prev + 1);
@@ -103,7 +105,7 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
       setIsThrusting(false);
       setActionIntensity(0);
     }, 400);
-  }, [isThrusting, thrustCount]);
+  }, [isThrusting, thrustCount, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -116,9 +118,10 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-purple-950 via-black to-yellow-950 overflow-hidden">
@@ -220,7 +223,7 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleThrust}
-        disabled={thrustCount >= 20}
+        disabled={paused || thrustCount >= 20}
         aria-label="Strike JoJo poses to unleash your Stand power"
       />
     </div>

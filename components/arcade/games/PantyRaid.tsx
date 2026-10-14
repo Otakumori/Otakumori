@@ -124,7 +124,7 @@ function Clothesline() {
   );
 }
 
-export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) {
+export default function PantyRaid({ onComplete, onFail, paused = false, _duration }: GameProps) {
   const [pantyPosition, setPantyPosition] = useState({ x: 50, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [isCaught, setIsCaught] = useState(false);
@@ -146,6 +146,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
   );
 
   useEffect(() => {
+    if (paused) return;
     const startTimer = setTimeout(() => setGameStarted(true), 300);
     const showTimer = setTimeout(() => setShowPanty(true), 800);
     const crowTimer = setTimeout(() => setCrowsApproaching(true), 2500);
@@ -155,19 +156,19 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
       clearTimeout(showTimer);
       clearTimeout(crowTimer);
     };
-  }, []);
+  }, [paused]);
 
   const handlePointerDown = useCallback(
     (_event: ReactPointerEvent) => {
-      if (!showPanty || isCaught) return;
+      if (paused || !showPanty || isCaught) return;
       setIsDragging(true);
     },
-    [showPanty, isCaught],
+    [showPanty, isCaught, paused],
   );
 
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent) => {
-      if (!isDragging || !gameRef.current) return;
+      if (paused || !isDragging || !gameRef.current) return;
 
       const rect = gameRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
@@ -176,7 +177,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
       setPantyPosition({ x, y });
       checkForCatch(x, y);
     },
-    [isDragging, checkForCatch],
+    [isDragging, checkForCatch, paused],
   );
 
   const handlePointerUp = useCallback(() => {
@@ -185,7 +186,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
 
   const handleKeyboardControl = useCallback(
     (event: KeyboardEvent) => {
-      if (!showPanty || isCaught) {
+      if (paused || !showPanty || isCaught) {
         return;
       }
 
@@ -224,22 +225,23 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
         return { x: nextX, y: nextY };
       });
     },
-    [checkForCatch, showPanty, isCaught],
+    [checkForCatch, showPanty, isCaught, paused],
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyboardControl);
     return () => window.removeEventListener('keydown', handleKeyboardControl);
-  }, [handleKeyboardControl]);
+  }, [handleKeyboardControl, paused]);
 
   useEffect(() => {
-    if (crowsApproaching && !isCaught) {
+    if (!paused && crowsApproaching && !isCaught) {
       const timer = setTimeout(() => {
         onFail();
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [crowsApproaching, isCaught, onFail]);
+  }, [crowsApproaching, isCaught, onFail, paused]);
 
   return (
     <div

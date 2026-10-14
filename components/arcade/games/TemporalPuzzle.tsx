@@ -58,7 +58,7 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
   },
 ];
 
-export default function TemporalPuzzle({ onComplete, onFail, duration }: GameProps) {
+export default function TemporalPuzzle({ onComplete, onFail, duration, paused = false }: GameProps) {
   const [availableEvents, setAvailableEvents] = useState<TimelineEvent[]>(TIMELINE_EVENTS);
   const [selectedSequence, setSelectedSequence] = useState<TimelineEvent[]>([]);
   const [attempts, setAttempts] = useState(0);
@@ -73,7 +73,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
 
   // Countdown timer
   useEffect(() => {
-    if (isComplete || timeRemaining <= 0) return;
+    if (paused || isComplete || timeRemaining <= 0) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -86,7 +86,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining, isComplete, onFail]);
+  }, [timeRemaining, isComplete, onFail, paused]);
 
   // Show hint after 2 failed attempts
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
 
   const handleEventClick = useCallback(
     (event: TimelineEvent) => {
-      if (isComplete) return;
+      if (paused || isComplete) return;
 
       // Check if event is already in sequence
       const isSelected = selectedSequence.some((e) => e.id === event.id);
@@ -113,21 +113,21 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
       // Clear feedback when making changes
       setFeedback({ type: null, message: '' });
     },
-    [selectedSequence, isComplete],
+    [selectedSequence, isComplete, paused],
   );
 
   const handleRemoveFromSequence = useCallback(
     (eventId: string) => {
-      if (isComplete) return;
+      if (paused || isComplete) return;
       setSelectedSequence((prev) => prev.filter((e) => e.id !== eventId));
       setFeedback({ type: null, message: '' });
     },
-    [isComplete],
+    [isComplete, paused],
   );
 
   const handleMoveInSequence = useCallback(
     (index: number, direction: 'up' | 'down') => {
-      if (isComplete) return;
+      if (paused || isComplete) return;
 
       const newSequence = [...selectedSequence];
       const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -143,11 +143,11 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
       setSelectedSequence(newSequence);
       setFeedback({ type: null, message: '' });
     },
-    [selectedSequence, isComplete],
+    [selectedSequence, isComplete, paused],
   );
 
   const handleConfirm = useCallback(() => {
-    if (isComplete || selectedSequence.length === 0) return;
+    if (paused || isComplete || selectedSequence.length === 0) return;
 
     setAttempts((prev) => prev + 1);
 
@@ -199,13 +199,13 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
         wrongIndices,
       });
     }
-  }, [selectedSequence, attempts, timeRemaining, isComplete, onComplete]);
+  }, [selectedSequence, attempts, timeRemaining, isComplete, onComplete, paused]);
 
   const handleReset = useCallback(() => {
-    if (isComplete) return;
+    if (paused || isComplete) return;
     setSelectedSequence([]);
     setFeedback({ type: null, message: '' });
-  }, [isComplete]);
+  }, [isComplete, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-purple-950 via-pink-950 to-black overflow-auto p-4">
@@ -238,7 +238,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
                   }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={isComplete}
+                  disabled={paused || isComplete}
                 >
                   <div className="font-mono text-xs text-pink-400 mb-1">{event.time}</div>
                   <div className="font-semibold">{event.label}</div>
@@ -262,7 +262,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
               <button
                 onClick={handleReset}
                 className="text-xs px-3 py-1 bg-red-500/30 hover:bg-red-500/50 text-red-200 rounded transition-colors"
-                disabled={isComplete}
+                disabled={paused || isComplete}
               >
                 Reset
               </button>
@@ -304,21 +304,21 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
                       <div className="flex flex-col gap-1 ml-2">
                         <button
                           onClick={() => handleMoveInSequence(index, 'up')}
-                          disabled={index === 0 || isComplete}
+                          disabled={paused || index === 0 || isComplete}
                           className="px-2 py-1 bg-purple-500/30 hover:bg-purple-500/50 text-purple-200 rounded text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           ↑
                         </button>
                         <button
                           onClick={() => handleRemoveFromSequence(event.id)}
-                          disabled={isComplete}
+                          disabled={paused || isComplete}
                           className="px-2 py-1 bg-red-500/30 hover:bg-red-500/50 text-red-200 rounded text-xs"
                         >
                           ×
                         </button>
                         <button
                           onClick={() => handleMoveInSequence(index, 'down')}
-                          disabled={index === selectedSequence.length - 1 || isComplete}
+                          disabled={paused || index === selectedSequence.length - 1 || isComplete}
                           className="px-2 py-1 bg-purple-500/30 hover:bg-purple-500/50 text-purple-200 rounded text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           ↓
@@ -336,7 +336,7 @@ export default function TemporalPuzzle({ onComplete, onFail, duration }: GamePro
             <div className="mt-4">
               <motion.button
                 onClick={handleConfirm}
-                disabled={isComplete || selectedSequence.length !== TIMELINE_EVENTS.length}
+                disabled={paused || isComplete || selectedSequence.length !== TIMELINE_EVENTS.length}
                 className={`w-full py-3 rounded-lg font-semibold transition-all ${
                   selectedSequence.length === TIMELINE_EVENTS.length && !isComplete
                     ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white'
