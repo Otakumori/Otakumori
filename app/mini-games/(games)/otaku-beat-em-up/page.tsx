@@ -14,7 +14,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -28,13 +27,11 @@ import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../../_shared/GameOverlay';
 import { useGameHud } from '../../_shared/useGameHud';
-import { usePetalEarn } from '../../_shared/usePetalEarn';
 import {
   getGameVisualProfile,
   applyVisualProfile,
   getGameDisplayName,
 } from '../../_shared/gameVisuals';
-import { useGameProgress } from '@/app/lib/games/progress';
 import { MiniGameFrame } from '../../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../../_shared/AvatarPresetChoice';
@@ -46,17 +43,12 @@ type GameMode = 'story' | 'arcade' | 'survival';
 
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
-  const [score, setScore] = useState(0);
-  const [health, setHealth] = useState(100);
-  const [combo, setCombo] = useState(0);
+  const [score] = useState(0);
+  const [health] = useState(100);
+  const [combo] = useState(0);
   const [gameState, setGameState] = useState<
     'instructions' | 'playing' | 'win' | 'lose' | 'paused'
   >('instructions');
-  const [finalScore, setFinalScore] = useState(0);
-  const [petalReward, setPetalReward] = useState<number | null>(null);
-  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
-  const [wavesCleared, setWavesCleared] = useState(0);
-  const [achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -79,8 +71,6 @@ export default function RhythmBeatEmUpPage() {
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('otaku-beat-em-up');
   const { balance: petalBalance } = usePetalBalance();
-  const { earnPetals } = usePetalEarn();
-  const { recordResult } = useGameProgress();
 
   // Game configuration
   const GAME_CONFIG = {
@@ -102,64 +92,6 @@ export default function RhythmBeatEmUpPage() {
       setGameState('instructions');
     }
   }, [selectedMode]);
-
-  const handleGameEnd = useCallback(
-    async (finalScoreValue: number, didWin: boolean) => {
-      setFinalScore(finalScoreValue);
-      setGameState(didWin ? 'win' : 'lose');
-
-      // Record game result using progress system
-      if (!hasAwardedPetals && selectedMode) {
-        setHasAwardedPetals(true);
-        
-        // Calculate duration (approximate - could be improved with actual start time tracking)
-        const durationMs = 60000; // Default 1 minute, could be tracked better
-        
-        const result = await recordResult({
-          gameId: 'otaku-beat-em-up',
-          score: finalScoreValue,
-          difficulty: selectedMode,
-          durationMs,
-          didWin,
-          metadata: {
-            mode: selectedMode,
-            combo,
-            wavesCleared: wavesCleared,
-            beatAccuracy: 100, // Could be tracked from game state
-          },
-        });
-
-        if (result.success) {
-          if (result.petalReward) {
-            setPetalReward(result.petalReward.earned);
-          }
-          if (result.achievements && result.achievements.unlocked.length > 0) {
-            setAchievements(result.achievements.rewards);
-          }
-        }
-      }
-
-      // Submit to leaderboard
-      try {
-        await fetch('/api/v1/leaderboards/otaku-beat-em-up', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            score: finalScoreValue,
-            metadata: {
-              mode: selectedMode,
-              didWin,
-              combo,
-              wavesCleared,
-            },
-          }),
-        });
-      } catch (error) {
-        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-      }
-    },
-    [selectedMode, combo, wavesCleared, recordResult, hasAwardedPetals],
-  );
 
   const displayName = getGameDisplayName('otaku-beat-em-up');
 
@@ -195,7 +127,11 @@ export default function RhythmBeatEmUpPage() {
 
           {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
           {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 left-1/2 z-30 -translate-x-1/2"
+              inert
+            >
               <div className="relative w-96 h-96">
                 <AvatarRenderer
                   profile={avatarConfig}
@@ -219,7 +155,11 @@ export default function RhythmBeatEmUpPage() {
             />
           )}
 
-          <GameShell title={displayName} gameKey="rhythm-beat-em-up">
+          <GameShell
+            title={displayName}
+            gameKey="rhythm-beat-em-up"
+            pauseAuthority="external"
+          >
             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-4">
               <div className="mb-4">
                 <button
@@ -247,15 +187,11 @@ export default function RhythmBeatEmUpPage() {
             ]}
             winMessage="Rhythm Master! You've conquered the beat!"
             loseMessage="Health reached zero. Try again and stay on beat!"
-            score={finalScore || score}
-            petalReward={petalReward}
+            score={score}
+            petalReward={null}
             onRestart={() => {
               setSelectedMode(null);
               setGameState('instructions');
-              setPetalReward(null);
-              setHasAwardedPetals(false);
-              setWavesCleared(0);
-              setAchievements([]);
             }}
             onResume={() => {
               if (gameState === 'instructions') {
@@ -263,8 +199,6 @@ export default function RhythmBeatEmUpPage() {
               } else if (gameState === 'paused') {
                 setGameState('playing');
               }
-              setPetalReward(null);
-              setHasAwardedPetals(false);
             }}
             onPause={() => {
               if (gameState === 'playing') {
