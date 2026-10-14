@@ -12,6 +12,7 @@ test.describe('ready-game shared-platform adoption', () => {
     await page.getByRole('button', { name: 'Start Playing' }).click();
     const controls = page.getByRole('navigation', { name: 'Game session controls' });
     await expect(controls).toBeVisible();
+    await expect(controls).toHaveAttribute('data-game-session-phase', 'running');
 
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog', { name: /Petal Hero paused/i })).toBeVisible();
@@ -35,6 +36,7 @@ test.describe('ready-game shared-platform adoption', () => {
 
     const controls = page.getByRole('navigation', { name: 'Game session controls' });
     await expect(controls).toBeVisible();
+    await expect(controls).toHaveAttribute('data-game-session-phase', 'running');
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog', { name: /Otaku Beat-em-up paused/i })).toBeVisible();
     await page.getByRole('button', { name: 'Resume' }).click();

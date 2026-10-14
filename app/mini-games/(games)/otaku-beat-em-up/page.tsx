@@ -127,7 +127,7 @@ export default function RhythmBeatEmUpPage() {
 
           {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
           {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+            <div className="pointer-events-none absolute bottom-0 left-1/2 z-30 -translate-x-1/2 [&_*]:pointer-events-none">
               <div className="relative w-96 h-96">
                 <AvatarRenderer
                   profile={avatarConfig}
