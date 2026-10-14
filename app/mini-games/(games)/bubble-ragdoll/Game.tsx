@@ -1,23 +1,42 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+import { useGameProgress } from '@/app/lib/games/progress';
+
+import { getAsset } from '../../_shared/assets-resolver';
+import {
+  GamePlatformControls,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
+import { GameResultsScreen } from '../../_shared/GameResultsScreen';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
-import { GameResultsScreen } from '../../_shared/GameResultsScreen';
 import { GameUI } from '../../_shared/GameUI';
 import BubbleRagdollScene from './Scene';
-import { getAsset } from '../../_shared/assets-resolver';
-import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+
+type BubbleRagdollResult = GameSessionResult & {
+  outcome: 'completed';
+  score: number;
+  durationMs: number;
+  combo: number;
+  misses: number;
+  pops: number;
+};
 
 export default function BubbleRagdollGame() {
-  const [gameState, setGameState] = useState<GameState>('loading');
-  const [gameResults, setGameResults] = useState<{ score: number } | null>(null);
-  const [gameStats, setGameStats] = useState({
-    score: 0,
-    combo: 0,
-    timer: 60,
-    progress: 0,
+  const router = useRouter();
+  const session = useGameSession<BubbleRagdollResult>({
+    onExit: () => router.push('/mini-games'),
   });
+  const { beginResultSession, recordResult } = useGameProgress();
+  const resultSubmittedRef = useRef(false);
+  const [gameResults, setGameResults] = useState<BubbleRagdollResult | null>(null);
+  const [gameStats, setGameStats] = useState({ score: 0, combo: 0, timer: 60, progress: 0 });
 
   const gameAssets: AssetManifest = {
     images: [
@@ -31,21 +50,57 @@ export default function BubbleRagdollGame() {
     ].filter(Boolean),
   };
 
-  const handleGameEnd = useCallback((results: { score: number }) => {
-    setGameResults(results);
-    setGameState('results');
-  }, []);
+  const handleGameEnd = useCallback(
+    (facts: Omit<BubbleRagdollResult, 'outcome'>) => {
+      const result: BubbleRagdollResult = { ...facts, outcome: 'completed' };
+      setGameResults(result);
+      session.complete(result);
 
-  const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer: number; progress: number }) => {
-    setGameStats(stats);
-  }, []);
+      if (!resultSubmittedRef.current) {
+        resultSubmittedRef.current = true;
+        void recordResult({
+          gameId: 'bubble-ragdoll',
+          score: result.score,
+          difficulty: 'default',
+          durationMs: result.durationMs,
+          didWin: result.score > 0,
+          metadata: { combo: result.combo, misses: result.misses, pops: result.pops },
+        });
+      }
+    },
+    [recordResult, session.complete],
+  );
+
+  const handleGameStatsUpdate = useCallback(
+    (stats: { score: number; combo: number; timer: number; progress: number }) => {
+      setGameStats(stats);
+    },
+    [],
+  );
+
+  const syncSession = useCallback(
+    (state: GameState) => {
+      if (state === 'loading' || state === 'boot') session.prepare();
+      if (state === 'title') session.ready();
+      if (state === 'playing') {
+        beginResultSession('bubble-ragdoll');
+        resultSubmittedRef.current = false;
+        session.start();
+      }
+    },
+    [beginResultSession, session.prepare, session.ready, session.start],
+  );
 
   return (
     <GameStateMachine
       gameId="bubble-ragdoll"
       gameTitle="Bubble Ragdoll"
-      assets={(gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0 ? gameAssets : undefined}
-      onStateChange={setGameState}
+      assets={
+        (gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0
+          ? gameAssets
+          : undefined
+      }
+      onStateChange={syncSession}
     >
       {(state, transitionTo) => {
         if (state === 'title') {
@@ -71,16 +126,16 @@ export default function BubbleRagdollGame() {
               score={gameResults.score}
               isWin={gameResults.score > 0}
               stats={[
-                { label: 'Final Score', value: gameResults.score },
+                { label: 'Best combo', value: gameResults.combo },
+                { label: 'Bubbles popped', value: gameResults.pops },
               ]}
               onRestart={() => {
                 setGameResults(null);
                 setGameStats({ score: 0, combo: 0, timer: 60, progress: 0 });
+                session.restart();
                 transitionTo('title');
               }}
-              onBack={() => {
-                window.location.href = '/mini-games';
-              }}
+              onBack={session.exit}
             />
           );
         }
@@ -95,10 +150,17 @@ export default function BubbleRagdollGame() {
                 progress={gameStats.progress}
                 milestone="Pop those bubbles!"
               />
+              <GamePlatformControls session={session} />
               <BubbleRagdollScene
-                onGameEnd={handleGameEnd}
+                paused={session.phase === 'paused'}
+                onGameEnd={(result) => {
+                  handleGameEnd(result);
+                  transitionTo('results');
+                }}
                 onStatsUpdate={handleGameStatsUpdate}
               />
+              <GamePlatformPause session={session} title="Bubble Ragdoll" />
+              <GameSessionAnnouncement session={session} />
             </>
           );
         }
@@ -108,4 +170,3 @@ export default function BubbleRagdollGame() {
     </GameStateMachine>
   );
 }
-
