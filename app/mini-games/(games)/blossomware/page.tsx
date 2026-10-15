@@ -14,50 +14,97 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { GAMES } from '@/components/arcade/registry';
 import Engine from '@/components/arcade/Engine';
+import type {
+  BlossomwareOrchestratorState,
+  BlossomwareRunResult,
+} from '@/components/arcade/types';
 import {
   getGameVisualProfile,
   applyVisualProfile,
   getGameDisplayName,
 } from '../../_shared/gameVisuals';
 import { MiniGameFrame } from '../../_shared/MiniGameFrame';
-// Shared UI components - imported for QA validation (Engine component handles its own UI)
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { useGameHud } from '../../_shared/useGameHud';
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { GameOverlay } from '../../_shared/GameOverlay';
+import {
+  GamePlatformHud,
+  GamePlatformPause,
+  GameSessionAnnouncement,
+} from '../../_shared/GamePlatform';
+import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
+import { GameResultsScreen } from '../../_shared/GameResultsScreen';
+
+type BlossomwareResult = GameSessionResult & BlossomwareRunResult & {
+  outcome: 'completed';
+};
+
+const INITIAL_ORCHESTRATOR_STATE: BlossomwareOrchestratorState = {
+  activeGameId: null,
+  activeGameLabel: null,
+  failures: 0,
+  phase: 'preparing',
+  roundIndex: 0,
+  roundsCompleted: 0,
+  score: 0,
+  successes: 0,
+  totalRounds: GAMES.length,
+};
 
 export default function BlossomwarePage() {
-  const [_gameCompletionCount, setGameCompletionCount] = useState(0);
+  const router = useRouter();
+  const session = useGameSession<BlossomwareResult>({
+    initialPhase: 'idle',
+    onExit: () => router.push('/mini-games'),
+  });
+  const [runKey, setRunKey] = useState(0);
+  const [orchestrator, setOrchestrator] = useState(INITIAL_ORCHESTRATOR_STATE);
 
-  // Handle game completion
-  const handleGameComplete = useCallback((success: boolean, score: number, streak: number) => {
-    if (success) {
-      setGameCompletionCount((prev) => {
-        const newCount = prev + 1;
-        // Track completion milestone every 5 games (for future analytics)
-        if (newCount % 5 === 0) {
-          // Milestone reached - could be used for achievements or analytics
-          void newCount; // Explicitly mark as used for future implementation
-        }
-        return newCount;
-      });
-    }
-  }, []);
+  useEffect(() => {
+    session.start();
+  }, [session.start]);
+
+  const handleRunComplete = useCallback(
+    (result: BlossomwareRunResult) => {
+      session.complete({ outcome: 'completed', ...result });
+    },
+    [session.complete],
+  );
 
   // Visual profile
   const visualProfile = getGameVisualProfile('blossomware');
   const { backgroundStyle } = applyVisualProfile(visualProfile);
 
-  // Restart handler - Engine component handles restart logic internally
-  const _handleRestart = useCallback(() => {
-    // Engine manages its own restart state
-  }, []);
+  const handleRestart = useCallback(() => {
+    setOrchestrator(INITIAL_ORCHESTRATOR_STATE);
+    setRunKey((value) => value + 1);
+    session.restart();
+    window.requestAnimationFrame(session.start);
+  }, [session.restart, session.start]);
 
   const displayName = getGameDisplayName('blossomware');
+
+  if (session.phase === 'completed' && session.result) {
+    return (
+      <MiniGameFrame gameId="blossomware">
+        <GameResultsScreen
+          title={displayName}
+          score={session.result.score}
+          isWin
+          stats={[
+            { label: 'Microgames cleared', value: session.result.successes },
+            { label: 'Microgames missed', value: session.result.failures },
+            { label: 'Rounds completed', value: session.result.roundsCompleted },
+          ]}
+          onRestart={handleRestart}
+          onBack={session.exit}
+        />
+        <GameSessionAnnouncement session={session} />
+      </MiniGameFrame>
+    );
+  }
 
   return (
     <MiniGameFrame gameId="blossomware">
@@ -80,7 +127,34 @@ export default function BlossomwarePage() {
           </div>
 
           <div className="rounded-2xl bg-white/5 backdrop-blur p-4 ring-1 ring-white/10">
-            <Engine playlist={GAMES} mode="long" autoplay onGameComplete={handleGameComplete} />
+            <GamePlatformHud
+              metrics={[
+                { label: 'Score', value: orchestrator.score.toLocaleString() },
+                {
+                  label: 'Round',
+                  value: `${Math.min(orchestrator.roundIndex + 1, orchestrator.totalRounds)}/${orchestrator.totalRounds}`,
+                },
+                { label: 'Streak', value: orchestrator.successes },
+              ]}
+              progress={
+                orchestrator.totalRounds > 0
+                  ? orchestrator.roundsCompleted / orchestrator.totalRounds
+                  : 0
+              }
+              progressLabel="Blossomware run progress"
+              session={session}
+            />
+            <Engine
+              key={runKey}
+              playlist={GAMES}
+              mode="long"
+              autoplay
+              paused={session.phase === 'paused'}
+              onRunComplete={handleRunComplete}
+              onStateChange={setOrchestrator}
+            />
+            <GamePlatformPause session={session} title={displayName} />
+            <GameSessionAnnouncement session={session} />
           </div>
         </div>
       </div>

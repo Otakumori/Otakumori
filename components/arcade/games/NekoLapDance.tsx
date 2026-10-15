@@ -20,7 +20,7 @@ interface Particle {
   type: 'heart' | 'sparkle' | 'note';
 }
 
-export default function NekoLapDance({ onComplete, _onFail, _duration }: GameProps) {
+export default function NekoLapDance({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -35,15 +35,17 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
   const [eyeExpression, setEyeExpression] = useState<'normal' | 'happy' | 'blush'>('normal');
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowNeko(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
-    if (happiness >= 100) {
-      setTimeout(() => onComplete(100 + petCount * 5, 18), 800);
+    if (!paused && happiness >= 100) {
+      const timer = setTimeout(() => onComplete(100 + petCount * 5, 18), 800);
+      return () => clearTimeout(timer);
     }
-  }, [happiness, petCount, onComplete]);
+  }, [happiness, petCount, onComplete, paused]);
 
   // Update expressions based on happiness
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
   }, [happiness]);
 
   const handlePet = useCallback(() => {
-    if (isPetting || happiness >= 100) return;
+    if (paused || isPetting || happiness >= 100) return;
     setIsPetting(true);
     setHappiness((prev) => Math.min(prev + 12, 100));
     setPetCount((prev) => prev + 1);
@@ -88,7 +90,7 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
     }
 
     setTimeout(() => setIsPetting(false), 400);
-  }, [isPetting, happiness]);
+  }, [isPetting, happiness, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -101,13 +103,14 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   // Canvas rendering
   useEffect(() => {
-    if (!canvasRef.current || !showNeko) return;
+    if (paused || !canvasRef.current || !showNeko) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
@@ -395,7 +398,7 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [showNeko, isPetting, happiness, eyeExpression, blushIntensity]);
+  }, [showNeko, isPetting, happiness, eyeExpression, blushIntensity, paused]);
 
   return (
     <div className="w-full h-full relative overflow-hidden">

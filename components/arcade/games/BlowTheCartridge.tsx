@@ -142,7 +142,7 @@ function BreathParticles({ active }: { active: boolean }) {
   );
 }
 
-export default function BlowTheCartridge({ onComplete, _onFail, _duration }: GameProps) {
+export default function BlowTheCartridge({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const [isBlowing, setIsBlowing] = useState(false);
   const [showCartridge, setShowCartridge] = useState(false);
   const [cleanliness, setCleanliness] = useState(0);
@@ -150,20 +150,22 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
   const breathPhase = useRef(0);
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowCartridge(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
-    if (cleanliness >= 100) {
-      setTimeout(() => {
+    if (!paused && cleanliness >= 100) {
+      const timer = setTimeout(() => {
         onComplete(100, 22);
       }, 800);
+      return () => clearTimeout(timer);
     }
-  }, [cleanliness, onComplete]);
+  }, [cleanliness, onComplete, paused]);
 
   const handleBlow = useCallback(() => {
-    if (isBlowing || cleanliness >= 100) return;
+    if (paused || isBlowing || cleanliness >= 100) return;
 
     setIsBlowing(true);
     breathPhase.current += 1;
@@ -176,7 +178,7 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
     setTimeout(() => {
       setIsBlowing(false);
     }, 600);
-  }, [isBlowing, cleanliness]);
+  }, [isBlowing, cleanliness, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -189,9 +191,10 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-gray-800 via-gray-900 to-black overflow-hidden">
@@ -314,7 +317,7 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleBlow}
-        disabled={cleanliness >= 100}
+        disabled={paused || cleanliness >= 100}
         aria-label="Blow on the game cartridge to clean the connector pins"
       />
     </div>

@@ -155,7 +155,7 @@ function CharacterWithTongue({ tongueExtended }: { tongueExtended: boolean }) {
   );
 }
 
-export default function PetalLick({ onComplete, onFail, _duration }: GameProps) {
+export default function PetalLick({ onComplete, onFail, paused = false, _duration }: GameProps) {
   const [petalY, setPetalY] = useState(-10);
   const [tongueExtended, setTongueExtended] = useState(false);
   const [isCaught, setIsCaught] = useState(false);
@@ -164,13 +164,14 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
   const dropSpeed = useRef(1.5);
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowElements(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   // Petal falling logic
   useEffect(() => {
-    if (!showElements || isCaught) return;
+    if (paused || !showElements || isCaught) return;
 
     const dropTimer = setInterval(() => {
       setPetalY((prev) => {
@@ -185,10 +186,10 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
     }, 30);
 
     return () => clearInterval(dropTimer);
-  }, [showElements, isCaught, onFail]);
+  }, [showElements, isCaught, onFail, paused]);
 
   const handleLick = useCallback(() => {
-    if (isCaught || tongueExtended) return;
+    if (paused || isCaught || tongueExtended) return;
 
     setTongueExtended(true);
 
@@ -208,7 +209,7 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
         setTongueExtended(false);
       }, 100);
     }, 150);
-  }, [isCaught, tongueExtended, petalY, onComplete]);
+  }, [isCaught, tongueExtended, petalY, onComplete, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -221,9 +222,10 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-b from-purple-950 via-pink-950 to-purple-900 overflow-hidden">
@@ -316,7 +318,7 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleLick}
-        disabled={isCaught}
+        disabled={paused || isCaught}
         aria-label="Extend tongue to catch the falling petal"
       />
     </div>

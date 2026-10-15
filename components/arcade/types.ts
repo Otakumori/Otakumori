@@ -11,8 +11,24 @@ export interface GameProps {
   onComplete: (score: number, petals: number) => void;
   onFail: () => void;
   duration: number;
+  paused?: boolean;
   _onFail?: () => void;
   _duration?: number;
+}
+
+export interface BlossomwareRunResult {
+  score: number;
+  successes: number;
+  failures: number;
+  roundsCompleted: number;
+  totalRounds: number;
+}
+
+export interface BlossomwareOrchestratorState extends BlossomwareRunResult {
+  activeGameId: string | null;
+  activeGameLabel: string | null;
+  roundIndex: number;
+  phase: 'preparing' | 'running' | 'transitioning' | 'completed';
 }
 
 export interface ProgressData {

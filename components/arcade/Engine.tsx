@@ -1,14 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { type EngineGame, type Caption } from './types';
+import {
+  type BlossomwareOrchestratorState,
+  type BlossomwareRunResult,
+  type EngineGame,
+  type Caption,
+} from './types';
 import { useProgress } from './useProgress';
 import { useRewards } from './useRewards';
 import { Caption as CaptionComponent } from './ui/Caption';
 import { TimerRing } from './ui/TimerRing';
 import { OverlayPetals } from './ui/OverlayPetals';
 import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
+import { createGameResultSessionId } from '@/app/lib/games/progress';
 // Shared UI components - imported for QA validation (Engine handles its own UI)
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { useGameHud } from '@/app/mini-games/_shared/useGameHud';
@@ -19,14 +25,20 @@ interface EngineProps {
   playlist: EngineGame[];
   mode?: 'short' | 'long';
   autoplay?: boolean;
+  paused?: boolean;
   onGameComplete?: (success: boolean, score: number, streak: number) => void;
+  onRunComplete?: (result: BlossomwareRunResult) => void;
+  onStateChange?: (state: BlossomwareOrchestratorState) => void;
 }
 
 export default function Engine({
   playlist,
   mode: _mode = 'short',
   autoplay = true,
+  paused = false,
   onGameComplete,
+  onRunComplete,
+  onStateChange,
 }: EngineProps) {
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,6 +46,20 @@ export default function Engine({
   const [gameScore, setGameScore] = useState(0);
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [showPetals, setShowPetals] = useState(false);
+  const [runScore, setRunScore] = useState(0);
+  const [successes, setSuccesses] = useState(0);
+  const [failures, setFailures] = useState(0);
+  const [roundsCompleted, setRoundsCompleted] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const completionGuardRef = useRef(false);
+  const runCompletionGuardRef = useRef(false);
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const runSessionIdRef = useRef(createGameResultSessionId('blossomware'));
+  const pendingCompletionRef = useRef<{
+    success: boolean;
+    score: number;
+    petals: number;
+  } | null>(null);
 
   const {
     updateBestScore,
@@ -65,7 +91,9 @@ export default function Engine({
   const startGame = useCallback(() => {
     if (!currentGame) return;
 
+    completionGuardRef.current = false;
     setIsPlaying(true);
+    setIsTransitioning(false);
     setTimeRemaining(currentGame.durationSec);
     setGameScore(0);
     setCaptions([]);
@@ -73,13 +101,28 @@ export default function Engine({
 
   const endGame = useCallback(
     (success: boolean, score: number, petals: number) => {
+      if (paused) {
+        pendingCompletionRef.current = { success, score, petals };
+        return;
+      }
       const game = currentGame;
-      if (!game) {
+      if (!game || completionGuardRef.current) {
         setIsPlaying(false);
         return;
       }
 
+      completionGuardRef.current = true;
       setIsPlaying(false);
+      setIsTransitioning(true);
+
+      const nextScore = runScore + Math.max(0, score);
+      const nextSuccesses = successes + (success ? 1 : 0);
+      const nextFailures = failures + (success ? 0 : 1);
+      const nextRoundsCompleted = roundsCompleted + 1;
+      setRunScore(nextScore);
+      setSuccesses(nextSuccesses);
+      setFailures(nextFailures);
+      setRoundsCompleted(nextRoundsCompleted);
 
       if (success) {
         updateBestScore(game.id, score);
@@ -98,6 +141,7 @@ export default function Engine({
         // Award petals using usePetalEarn (supports guests with ephemeral petals)
         earnPetals({
           gameId: 'blossomware',
+          sessionId: `${runSessionIdRef.current}:${currentGameIndex}:${game.id}`,
           score: score,
           metadata: {
             microGameId: game.id,
@@ -123,6 +167,7 @@ export default function Engine({
           const milestoneReward = Math.floor(newStreak / 5) * 10; // 10 petals per 5-game milestone
           earnPetals({
             gameId: 'blossomware',
+            sessionId: `${runSessionIdRef.current}:streak:${newStreak}`,
             score: milestoneReward * 10,
             metadata: {
               milestoneType: 'streak',
@@ -143,6 +188,7 @@ export default function Engine({
           const dailyMilestoneReward = Math.floor(progressData.dailyStreak / 5) * 20;
           earnPetals({
             gameId: 'blossomware',
+            sessionId: `${runSessionIdRef.current}:daily:${progressData.dailyStreak}`,
             score: dailyMilestoneReward * 10,
             metadata: {
               milestoneType: 'daily_streak',
@@ -161,13 +207,22 @@ export default function Engine({
         }
       }
 
-      // Move to next game after delay (increased from 1500ms for better pacing)
-      setTimeout(() => {
-        setCurrentGameIndex((prev) => {
-          if (playlist.length === 0) return prev;
-          return (prev + 1) % playlist.length;
-        });
-      }, 1500);
+      const isFinalRound = nextRoundsCompleted >= playlist.length;
+      if (isFinalRound) {
+        if (!runCompletionGuardRef.current) {
+          runCompletionGuardRef.current = true;
+          setIsTransitioning(false);
+          onRunComplete?.({
+            score: nextScore,
+            successes: nextSuccesses,
+            failures: nextFailures,
+            roundsCompleted: nextRoundsCompleted,
+            totalRounds: playlist.length,
+          });
+        }
+        return;
+      }
+
     },
     [
       currentGame,
@@ -183,12 +238,26 @@ export default function Engine({
       lastStreakMilestone,
       progressData.dailyStreak,
       lastDailyStreakMilestone,
+      currentGameIndex,
+      runScore,
+      successes,
+      failures,
+      roundsCompleted,
+      onRunComplete,
+      paused,
     ],
   );
 
+  useEffect(() => {
+    if (paused || !pendingCompletionRef.current) return;
+    const pending = pendingCompletionRef.current;
+    pendingCompletionRef.current = null;
+    endGame(pending.success, pending.score, pending.petals);
+  }, [endGame, paused]);
+
   // Timer countdown
   useEffect(() => {
-    if (!isPlaying || timeRemaining <= 0) return;
+    if (!isPlaying || paused || timeRemaining <= 0) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -201,15 +270,68 @@ export default function Engine({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isPlaying, timeRemaining, gameScore, endGame]);
+  }, [isPlaying, paused, timeRemaining, gameScore, endGame]);
 
   // Auto-start games
   useEffect(() => {
-    if (autoplay && !isPlaying) {
+    if (autoplay && !paused && !isPlaying && !isTransitioning && !runCompletionGuardRef.current) {
       const timer = setTimeout(startGame, 1000);
       return () => clearTimeout(timer);
     }
-  }, [autoplay, isPlaying, startGame]);
+  }, [autoplay, paused, isPlaying, isTransitioning, startGame]);
+
+  useEffect(
+    () => () => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!isTransitioning || runCompletionGuardRef.current) return;
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    if (paused) return;
+
+    transitionTimerRef.current = setTimeout(() => {
+      setIsTransitioning(false);
+      setCurrentGameIndex((prev) => prev + 1);
+    }, 1500);
+
+    return () => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    };
+  }, [isTransitioning, paused]);
+
+  useEffect(() => {
+    onStateChange?.({
+      activeGameId: currentGame?.id ?? null,
+      activeGameLabel: currentGame?.label ?? null,
+      failures,
+      phase: runCompletionGuardRef.current
+        ? 'completed'
+        : isTransitioning
+          ? 'transitioning'
+          : isPlaying
+            ? 'running'
+            : 'preparing',
+      roundIndex: currentGameIndex,
+      roundsCompleted,
+      score: runScore,
+      successes,
+      totalRounds: playlist.length,
+    });
+  }, [
+    currentGame,
+    currentGameIndex,
+    failures,
+    isPlaying,
+    isTransitioning,
+    onStateChange,
+    playlist.length,
+    roundsCompleted,
+    runScore,
+    successes,
+  ]);
 
   const GameComponent = currentGame?.component;
 
@@ -229,6 +351,7 @@ export default function Engine({
           onComplete={(score, petals) => endGame(true, score, petals)}
           onFail={() => endGame(false, gameScore, 0)}
           duration={currentGame.durationSec}
+          paused={paused}
         />
       </div>
 

@@ -71,7 +71,7 @@ function ThighTrapVisual({ progress }: { progress: number }) {
   );
 }
 
-export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) {
+export default function ThighTrap({ onComplete, onFail, paused = false, _duration }: GameProps) {
   const [escapeProgress, setEscapeProgress] = useState(0);
   const [isMashing, setIsMashing] = useState(false);
   const [showGame, setShowGame] = useState(false);
@@ -83,7 +83,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
 
   // Trap closes over time
   useEffect(() => {
-    if (escapeProgress >= 100) return;
+    if (paused || escapeProgress >= 100) return;
 
     const interval = setInterval(() => {
       setTrapPressure((prev) => {
@@ -96,23 +96,24 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
     }, 50);
 
     return () => clearInterval(interval);
-  }, [escapeProgress, onFail]);
+  }, [escapeProgress, onFail, paused]);
 
   useEffect(() => {
-    if (escapeProgress >= 100) {
-      setTimeout(() => onComplete(100, 28), 600);
+    if (!paused && escapeProgress >= 100) {
+      const timer = setTimeout(() => onComplete(100, 28), 600);
+      return () => clearTimeout(timer);
     }
-  }, [escapeProgress, onComplete]);
+  }, [escapeProgress, onComplete, paused]);
 
   const handleMash = useCallback(() => {
-    if (isMashing || escapeProgress >= 100) return;
+    if (paused || isMashing || escapeProgress >= 100) return;
 
     setIsMashing(true);
     setEscapeProgress((prev) => Math.min(prev + 8, 100));
     setTrapPressure((prev) => Math.max(0, prev - 3)); // Reduce pressure when mashing
 
     setTimeout(() => setIsMashing(false), 100);
-  }, [isMashing, escapeProgress]);
+  }, [isMashing, escapeProgress, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -125,9 +126,10 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-purple-900 via-pink-900 to-red-900 overflow-hidden">
@@ -216,7 +218,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
       <button
         className="absolute inset-0 bg-transparent border-none cursor-pointer"
         onClick={handleMash}
-        disabled={escapeProgress >= 100 || trapPressure >= 100}
+        disabled={paused || escapeProgress >= 100 || trapPressure >= 100}
         aria-label="Mash to escape the thigh trap before being crushed"
       />
     </div>

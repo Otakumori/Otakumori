@@ -5,7 +5,7 @@ import type { MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps) {
+export default function SlapTheOni({ onComplete, onFail, paused = false, _duration }: GameProps) {
   const [oniPosition, setOniPosition] = useState({ x: 50, y: 50 });
   const [isSlapped, setIsSlapped] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
@@ -13,6 +13,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
   const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (paused) return;
     // Show target after a brief delay
     const showTimer = setTimeout(() => setShowTarget(true), 300);
 
@@ -30,9 +31,10 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
       clearTimeout(showTimer);
       clearInterval(moveTimer);
     };
-  }, [isSlapped]);
+  }, [isSlapped, paused]);
 
   const triggerSuccess = useCallback(() => {
+    if (paused) return;
     setIsSlapped(true);
     const newParticles = Array.from({ length: 12 }, (_, i) => ({
       id: i,
@@ -41,7 +43,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
     }));
     setParticles(newParticles);
     onComplete(100, 20);
-  }, [oniPosition, onComplete]);
+  }, [oniPosition, onComplete, paused]);
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -58,7 +60,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
   );
 
   const handleSlap = (e: ReactMouseEvent) => {
-    if (!showTarget || isSlapped) return;
+    if (paused || !showTarget || isSlapped) return;
 
     // Check if click was near the oni
     const rect = gameRef.current?.getBoundingClientRect();

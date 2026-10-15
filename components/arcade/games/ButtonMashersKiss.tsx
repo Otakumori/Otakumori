@@ -78,7 +78,7 @@ function HeartParticle({ delay, x, y }: { delay: number; x: number; y: number })
   );
 }
 
-export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: GameProps) {
+export default function ButtonMashersKiss({ onComplete, paused = false, _onFail, _duration }: GameProps) {
   const [_isMashing, setIsMashing] = useState(false);
   const [showSilhouettes, setShowSilhouettes] = useState(false);
   const [kissProgress, setKissProgress] = useState(0);
@@ -86,17 +86,19 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
   const [mashSpeed, setMashSpeed] = useState(0);
 
   useEffect(() => {
+    if (paused) return;
     const showTimer = setTimeout(() => setShowSilhouettes(true), 500);
     return () => clearTimeout(showTimer);
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
-    if (kissProgress >= 100) {
-      setTimeout(() => {
+    if (!paused && kissProgress >= 100) {
+      const timer = setTimeout(() => {
         onComplete(100 + mashSpeed * 2, 25); // Bonus for fast mashing
       }, 800);
+      return () => clearTimeout(timer);
     }
-  }, [kissProgress, mashSpeed, onComplete]);
+  }, [kissProgress, mashSpeed, onComplete, paused]);
 
   // Track mash speed for bonus
   const lastMashTime = useCallback(() => {
@@ -107,7 +109,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
   }, []);
 
   const handleMash = useCallback(() => {
-    if (kissProgress >= 100) return;
+    if (paused || kissProgress >= 100) return;
 
     const timeDiff = lastMashTime();
     const speed = Math.max(0, 10 - Math.floor(timeDiff / 100)); // Faster = higher speed
@@ -124,7 +126,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
     setTimeout(() => {
       setIsMashing(false);
     }, 100);
-  }, [kissProgress, lastMashTime]);
+  }, [kissProgress, lastMashTime, paused]);
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
@@ -137,9 +139,10 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
   );
 
   useEffect(() => {
+    if (paused) return;
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, paused]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-pink-400 via-red-400 to-pink-500 overflow-hidden">
@@ -311,7 +314,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
       <button
         className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
         onClick={handleMash}
-        disabled={kissProgress >= 100}
+        disabled={paused || kissProgress >= 100}
         aria-label="Mash to build romantic tension between the characters"
       />
     </div>
