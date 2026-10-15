@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 
+import { getCommonControllerActions } from '../_input/gamepad.safe';
 import { pauseGameAudio, resumeGameAudio, stopGameAudio } from './audio-bus';
+import { useControllerFrames } from './useGameController';
 
 export type GameSessionPhase =
   | 'idle'
@@ -193,6 +195,21 @@ export function useGameSession<TResult extends GameSessionResult>({
       if (action !== 'pause') return;
       event.preventDefault();
       pause();
+    },
+  });
+
+  useControllerFrames({
+    enabled: state.phase !== 'exiting',
+    onFrame: (snapshot) => {
+      if (!snapshot) return;
+      const actions = getCommonControllerActions(snapshot);
+      if (actions.includes('exit')) {
+        exit();
+        return;
+      }
+      if (!actions.includes('pause')) return;
+      if (phaseRef.current === 'running') pause();
+      else if (phaseRef.current === 'paused') resume();
     },
   });
 
