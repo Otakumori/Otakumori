@@ -12,6 +12,7 @@ import {
 import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../../_shared/enhancedTextures';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
+import { useControllerFrames } from '../../_shared/useGameController';
 
 // Dynamically import AnimeRenderer for heavy 3D rendering (only when needed)
 // This will be used for high-fidelity 3D character models in future updates
@@ -489,6 +490,62 @@ export default function BeatEmUpGame({
     [shake],
   );
 
+  useControllerFrames({
+    enabled: !gameState.isGameOver,
+    onFrame: (controller) => {
+      const setDirection = (key: string, active: boolean) => {
+        if (active) keysRef.current.add(key);
+        else keysRef.current.delete(key);
+      };
+      const clearControllerDirections = () => {
+        for (const key of [
+          'controllerleft',
+          'controllerright',
+          'controllerup',
+          'controllerdown',
+        ]) {
+          keysRef.current.delete(key);
+        }
+      };
+
+      if (!controller || isPausedRef.current) {
+        clearControllerDirections();
+        return;
+      }
+
+      const horizontal = controller.axes[0] ?? 0;
+      const vertical = controller.axes[1] ?? 0;
+      setDirection('controllerleft', horizontal < 0 || controller.buttons[14]?.held === true);
+      setDirection('controllerright', horizontal > 0 || controller.buttons[15]?.held === true);
+      setDirection('controllerup', vertical < 0 || controller.buttons[12]?.held === true);
+      setDirection('controllerdown', vertical > 0 || controller.buttons[13]?.held === true);
+
+      if (controller.buttons[0]?.pressed) performAttack('light');
+      if (controller.buttons[2]?.pressed) performAttack('heavy');
+      if (controller.buttons[4]?.pressed && playerRef.current.blockCooldown <= 0) {
+        playerRef.current.state = 'block';
+        playerRef.current.blockCooldown = 500;
+      }
+      if (controller.buttons[4]?.released && playerRef.current.state === 'block') {
+        playerRef.current.state = 'idle';
+      }
+    },
+  });
+
+  useEffect(
+    () => () => {
+      for (const key of [
+        'controllerleft',
+        'controllerright',
+        'controllerup',
+        'controllerdown',
+      ]) {
+        keysRef.current.delete(key);
+      }
+    },
+    [],
+  );
+
   // Spawn enemies
   const spawnEnemy = useCallback((type: Enemy['type'] = 'grunt') => {
     const spawnX = Math.random() > 0.5 ? canvasWidth + 50 : -50;
@@ -645,20 +702,36 @@ export default function BeatEmUpGame({
       player.vy = 0;
 
       if (player.state !== 'attack' && player.state !== 'block') {
-        if (keysRef.current.has('a') || keysRef.current.has('arrowleft')) {
+        if (
+          keysRef.current.has('a') ||
+          keysRef.current.has('arrowleft') ||
+          keysRef.current.has('controllerleft')
+        ) {
           player.vx = -PLAYER_SPEED;
           player.facing = 'left';
           player.state = 'walk';
-        } else if (keysRef.current.has('d') || keysRef.current.has('arrowright')) {
+        } else if (
+          keysRef.current.has('d') ||
+          keysRef.current.has('arrowright') ||
+          keysRef.current.has('controllerright')
+        ) {
           player.vx = PLAYER_SPEED;
           player.facing = 'right';
           player.state = 'walk';
         }
 
-        if (keysRef.current.has('w') || keysRef.current.has('arrowup')) {
+        if (
+          keysRef.current.has('w') ||
+          keysRef.current.has('arrowup') ||
+          keysRef.current.has('controllerup')
+        ) {
           player.vy = -PLAYER_SPEED;
           player.state = 'walk';
-        } else if (keysRef.current.has('s') || keysRef.current.has('arrowdown')) {
+        } else if (
+          keysRef.current.has('s') ||
+          keysRef.current.has('arrowdown') ||
+          keysRef.current.has('controllerdown')
+        ) {
           player.vy = PLAYER_SPEED;
           player.state = 'walk';
         }

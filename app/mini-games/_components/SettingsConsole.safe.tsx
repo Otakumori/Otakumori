@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Volume2, VolumeX, Clock, Gamepad2, Palette, RotateCcw } from 'lucide-react';
+import { useControllerStatus } from '../_shared/useGameController';
 
 interface SettingsConsoleProps {
   onVolumeChange?: (volume: number) => void;
@@ -18,8 +19,7 @@ export default function SettingsConsole({
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [controllerConnected, setControllerConnected] = useState(false);
-  const [controllerIndex, setControllerIndex] = useState(-1);
+  const controller = useControllerStatus();
 
   const volumeRef = useRef<HTMLInputElement>(null);
   const timeIntervalRef = useRef<any>(undefined);
@@ -34,47 +34,6 @@ export default function SettingsConsole({
       if (timeIntervalRef.current) {
         clearInterval(timeIntervalRef.current);
       }
-    };
-  }, []);
-
-  // Check for gamepad connection
-  useEffect(() => {
-    const checkGamepad = () => {
-      const gamepads = navigator.getGamepads();
-      const connected = gamepads.some((pad, index) => {
-        if (pad) {
-          setControllerIndex(index);
-          return true;
-        }
-        return false;
-      });
-      setControllerConnected(connected);
-    };
-
-    const handleGamepadConnected = (e: GamepadEvent) => {
-      setControllerConnected(true);
-      setControllerIndex(e.gamepad.index);
-    };
-
-    const handleGamepadDisconnected = () => {
-      setControllerConnected(false);
-      setControllerIndex(-1);
-    };
-
-    // Check initially
-    checkGamepad();
-
-    // Listen for gamepad events
-    window.addEventListener('gamepadconnected', handleGamepadConnected);
-    window.addEventListener('gamepaddisconnected', handleGamepadDisconnected);
-
-    // Poll for gamepad state
-    const gamepadInterval = setInterval(checkGamepad, 1000);
-
-    return () => {
-      window.removeEventListener('gamepadconnected', handleGamepadConnected);
-      window.removeEventListener('gamepaddisconnected', handleGamepadDisconnected);
-      clearInterval(gamepadInterval);
     };
   }, []);
 
@@ -214,13 +173,13 @@ export default function SettingsConsole({
             <div className="block text-sm font-medium text-gray-300">Controller Status</div>
             <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg">
               <Gamepad2
-                className={`w-5 h-5 ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`}
+                className={`w-5 h-5 ${controller.connected ? 'text-green-400' : 'text-gray-500'}`}
               />
               <span
-                className={`text-sm ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`}
+                className={`text-sm ${controller.connected ? 'text-green-400' : 'text-gray-500'}`}
               >
-                {controllerConnected
-                  ? `Controller ${controllerIndex + 1} Connected`
+                {controller.connected && controller.controllerIndex !== null
+                  ? `Controller ${controller.controllerIndex + 1} Connected`
                   : 'No Controller Detected'}
               </span>
             </div>

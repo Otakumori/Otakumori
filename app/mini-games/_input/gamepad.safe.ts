@@ -1,306 +1,280 @@
-export interface GamepadState {
-  connected: boolean;
+export type ControllerCapability =
+  | 'FULL_GAMEPLAY'
+  | 'GAMEPLAY_PARTIAL'
+  | 'MENUS_ONLY'
+  | 'UNSUPPORTED';
+
+export type ActiveInputDevice = 'keyboard-mouse' | 'touch-pointer' | 'controller';
+
+export type ControllerButtonState = {
+  held: boolean;
+  pressed: boolean;
+  released: boolean;
+  value: number;
+};
+
+export type ControllerSnapshot = {
+  id: string;
   index: number;
-  buttons: {
-    pressed: boolean[];
-    justPressed: boolean[];
-    justReleased: boolean[];
-  };
-  axes: number[];
+  mapping: string;
+  axes: readonly number[];
+  buttons: readonly ControllerButtonState[];
   timestamp: number;
+};
+
+export type ControllerStatus = {
+  activeDevice: ActiveInputDevice;
+  connected: boolean;
+  controllerId: string | null;
+  controllerIndex: number | null;
+};
+
+export type CommonControllerAction =
+  | 'confirm'
+  | 'cancel'
+  | 'pause'
+  | 'exit'
+  | 'menu-up'
+  | 'menu-down'
+  | 'menu-left'
+  | 'menu-right';
+
+type FrameSubscriber = (snapshot: ControllerSnapshot | null) => void;
+type StatusSubscriber = (status: ControllerStatus) => void;
+
+export type ControllerEnvironment = {
+  getGamepads: () => readonly (Gamepad | null)[];
+  requestFrame: (callback: FrameRequestCallback) => number;
+  cancelFrame: (handle: number) => void;
+  addWindowListener: (type: string, listener: EventListener) => void;
+  removeWindowListener: (type: string, listener: EventListener) => void;
+};
+
+const DEFAULT_STATUS: ControllerStatus = {
+  activeDevice: 'keyboard-mouse',
+  connected: false,
+  controllerId: null,
+  controllerIndex: null,
+};
+
+const BUTTON_THRESHOLD = 0.5;
+export const DEFAULT_CONTROLLER_DEADZONE = 0.18;
+
+export function applyRadialDeadzone(
+  x: number,
+  y: number,
+  deadzone = DEFAULT_CONTROLLER_DEADZONE,
+): readonly [number, number] {
+  const magnitude = Math.hypot(x, y);
+  if (magnitude <= deadzone || magnitude === 0) return [0, 0];
+
+  const normalizedMagnitude = Math.min(1, (magnitude - deadzone) / (1 - deadzone));
+  const scale = normalizedMagnitude / magnitude;
+  return [x * scale, y * scale];
 }
 
-export interface GamepadInput {
-  A: boolean;
-  B: boolean;
-  X: boolean;
-  Y: boolean;
-  L1: boolean;
-  R1: boolean;
-  L2: boolean;
-  R2: boolean;
-  SELECT: boolean;
-  START: boolean;
-  L3: boolean;
-  R3: boolean;
-  UP: boolean;
-  DOWN: boolean;
-  LEFT: boolean;
-  RIGHT: boolean;
-  LEFT_STICK_X: number;
-  LEFT_STICK_Y: number;
-  RIGHT_STICK_X: number;
-  RIGHT_STICK_Y: number;
+export function getCommonControllerActions(
+  snapshot: ControllerSnapshot,
+): readonly CommonControllerAction[] {
+  const actions: CommonControllerAction[] = [];
+  const pressed = (index: number) => snapshot.buttons[index]?.pressed === true;
+
+  if (pressed(0)) actions.push('confirm');
+  if (pressed(1)) actions.push('cancel');
+  if (pressed(9)) actions.push('pause');
+  if (pressed(8)) actions.push('exit');
+  if (pressed(12)) actions.push('menu-up');
+  if (pressed(13)) actions.push('menu-down');
+  if (pressed(14)) actions.push('menu-left');
+  if (pressed(15)) actions.push('menu-right');
+  return actions;
 }
 
-export class GamepadManager {
-  private gamepads: Map<number, GamepadState> = new Map();
-  private lastButtonStates: Map<number, boolean[]> = new Map();
-  private listeners: Set<(gamepad: GamepadState) => void> = new Set();
-  private animationFrameId: number | null = null;
-  private isPolling = false;
+function browserEnvironment(): ControllerEnvironment | null {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return null;
+  return {
+    getGamepads: () => navigator.getGamepads?.() ?? [],
+    requestFrame: (callback) => window.requestAnimationFrame(callback),
+    cancelFrame: (handle) => window.cancelAnimationFrame(handle),
+    addWindowListener: (type, listener) => window.addEventListener(type, listener),
+    removeWindowListener: (type, listener) => window.removeEventListener(type, listener),
+  };
+}
 
-  constructor() {
-    this.setupEventListeners();
+export class ControllerService {
+  private readonly frames = new Set<FrameSubscriber>();
+  private readonly statuses = new Set<StatusSubscriber>();
+  private readonly previousButtons = new Map<number, readonly boolean[]>();
+  private readonly environment: ControllerEnvironment | null;
+  private animationFrame: number | null = null;
+  private activeControllerIndex: number | null = null;
+  private status = DEFAULT_STATUS;
+  private listening = false;
+
+  constructor(environment: ControllerEnvironment | null = browserEnvironment()) {
+    this.environment = environment;
   }
 
-  private setupEventListeners() {
-    window.addEventListener('gamepadconnected', (_e) => {
-      // Gamepad connected
-      this.startPolling();
-    });
-
-    window.addEventListener('gamepaddisconnected', (e) => {
-      // Gamepad disconnected
-      this.gamepads.delete(e.gamepad.index);
-      this.lastButtonStates.delete(e.gamepad.index);
-
-      if (this.gamepads.size === 0) {
-        this.stopPolling();
-      }
-    });
+  subscribeFrames(subscriber: FrameSubscriber) {
+    this.frames.add(subscriber);
+    this.start();
+    return () => {
+      this.frames.delete(subscriber);
+      this.stopWhenUnused();
+    };
   }
 
-  private startPolling() {
-    if (this.isPolling) return;
-
-    this.isPolling = true;
-    this.poll();
+  subscribeStatus(subscriber: StatusSubscriber) {
+    this.statuses.add(subscriber);
+    subscriber(this.status);
+    this.start();
+    return () => {
+      this.statuses.delete(subscriber);
+      this.stopWhenUnused();
+    };
   }
 
-  private stopPolling() {
-    this.isPolling = false;
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
+  getStatus() {
+    return this.status;
+  }
+
+  markInputDevice(activeDevice: ActiveInputDevice) {
+    if (this.status.activeDevice === activeDevice) return;
+    this.publishStatus({ ...this.status, activeDevice });
+  }
+
+  destroy() {
+    this.frames.clear();
+    this.statuses.clear();
+    this.stop();
+  }
+
+  private start() {
+    if (this.listening || !this.environment) return;
+    this.listening = true;
+    this.environment.addWindowListener('gamepadconnected', this.handleConnection);
+    this.environment.addWindowListener('gamepaddisconnected', this.handleConnection);
+    this.environment.addWindowListener('keydown', this.handleKeyboard);
+    this.environment.addWindowListener('pointerdown', this.handlePointer);
+    this.animationFrame = this.environment.requestFrame(this.poll);
+  }
+
+  private stopWhenUnused() {
+    if (this.frames.size === 0 && this.statuses.size === 0) this.stop();
+  }
+
+  private stop() {
+    if (!this.listening || !this.environment) return;
+    this.environment.removeWindowListener('gamepadconnected', this.handleConnection);
+    this.environment.removeWindowListener('gamepaddisconnected', this.handleConnection);
+    this.environment.removeWindowListener('keydown', this.handleKeyboard);
+    this.environment.removeWindowListener('pointerdown', this.handlePointer);
+    if (this.animationFrame !== null) this.environment.cancelFrame(this.animationFrame);
+    this.animationFrame = null;
+    this.activeControllerIndex = null;
+    this.previousButtons.clear();
+    this.listening = false;
+  }
+
+  private readonly handleConnection: EventListener = () => this.sample();
+
+  private readonly handleKeyboard: EventListener = () => {
+    this.markInputDevice('keyboard-mouse');
+  };
+
+  private readonly handlePointer: EventListener = (event) => {
+    const pointer = event as PointerEvent;
+    this.markInputDevice(pointer.pointerType === 'touch' ? 'touch-pointer' : 'keyboard-mouse');
+  };
+
+  private readonly poll: FrameRequestCallback = () => {
+    this.sample();
+    if (this.listening && this.environment) {
+      this.animationFrame = this.environment.requestFrame(this.poll);
     }
-  }
+  };
 
-  private poll() {
-    if (!this.isPolling) return;
+  private sample() {
+    if (!this.environment) return;
+    const gamepads = Array.from(this.environment.getGamepads()).filter(
+      (gamepad): gamepad is Gamepad => Boolean(gamepad?.connected),
+    );
 
-    const gamepads = navigator.getGamepads();
-
-    for (let i = 0; i < gamepads.length; i++) {
-      const gamepad = gamepads[i];
-      if (!gamepad) continue;
-
-      const lastButtonState = this.lastButtonStates.get(i) || [];
-      const currentButtonState = Array.from(gamepad.buttons).map((btn) => btn.pressed);
-
-      const justPressed = currentButtonState.map(
-        (pressed, index) => pressed && !lastButtonState[index],
-      );
-
-      const justReleased = currentButtonState.map(
-        (pressed, index) => !pressed && lastButtonState[index],
-      );
-
-      const gamepadState: GamepadState = {
-        connected: true,
-        index: i,
-        buttons: {
-          pressed: currentButtonState,
-          justPressed,
-          justReleased,
-        },
-        axes: Array.from(gamepad.axes),
-        timestamp: gamepad.timestamp,
-      };
-
-      this.gamepads.set(i, gamepadState);
-      this.lastButtonStates.set(i, currentButtonState);
-
-      // Notify listeners
-      this.listeners.forEach((listener) => listener(gamepadState));
+    const connectedIndexes = new Set(gamepads.map((gamepad) => gamepad.index));
+    for (const index of this.previousButtons.keys()) {
+      if (!connectedIndexes.has(index)) this.previousButtons.delete(index);
     }
 
-    this.animationFrameId = requestAnimationFrame(() => this.poll());
+    for (const gamepad of gamepads) {
+      if (this.hasActivity(gamepad)) this.activeControllerIndex = gamepad.index;
+    }
+
+    if (!gamepads.some((gamepad) => gamepad.index === this.activeControllerIndex)) {
+      this.activeControllerIndex = gamepads[0]?.index ?? null;
+    }
+
+    const active = gamepads.find((gamepad) => gamepad.index === this.activeControllerIndex) ?? null;
+    const snapshot = active ? this.toSnapshot(active) : null;
+    this.publishStatus({
+      activeDevice:
+        snapshot && this.hasSnapshotActivity(snapshot) ? 'controller' : this.status.activeDevice,
+      connected: Boolean(snapshot),
+      controllerId: snapshot?.id ?? null,
+      controllerIndex: snapshot?.index ?? null,
+    });
+    for (const subscriber of this.frames) subscriber(snapshot);
   }
 
-  addListener(listener: (gamepad: GamepadState) => void) {
-    this.listeners.add(listener);
+  private hasActivity(gamepad: Gamepad) {
+    return (
+      gamepad.buttons.some((button) => button.pressed || button.value > BUTTON_THRESHOLD) ||
+      gamepad.axes.some((axis) => Math.abs(axis) > DEFAULT_CONTROLLER_DEADZONE)
+    );
   }
 
-  removeListener(listener: (gamepad: GamepadState) => void) {
-    this.listeners.delete(listener);
+  private hasSnapshotActivity(snapshot: ControllerSnapshot) {
+    return (
+      snapshot.buttons.some((button) => button.held) ||
+      snapshot.axes.some((axis) => Math.abs(axis) > DEFAULT_CONTROLLER_DEADZONE)
+    );
   }
 
-  getGamepad(index: number): GamepadState | undefined {
-    return this.gamepads.get(index);
-  }
-
-  getAllGamepads(): GamepadState[] {
-    return Array.from(this.gamepads.values());
-  }
-
-  getConnectedCount(): number {
-    return this.gamepads.size;
-  }
-
-  // Convert gamepad state to input mapping
-  getInput(gamepadIndex: number = 0): GamepadInput | null {
-    const gamepad = this.getGamepad(gamepadIndex);
-    if (!gamepad) return null;
-
-    const { buttons, axes } = gamepad;
-
+  private toSnapshot(gamepad: Gamepad): ControllerSnapshot {
+    const previous = this.previousButtons.get(gamepad.index) ?? [];
+    const held = gamepad.buttons.map(
+      (button) => button.pressed || button.value > BUTTON_THRESHOLD,
+    );
+    const buttons = gamepad.buttons.map((button, index) => ({
+      held: held[index],
+      pressed: held[index] && !previous[index],
+      released: !held[index] && previous[index] === true,
+      value: button.value,
+    }));
+    const [leftX, leftY] = applyRadialDeadzone(gamepad.axes[0] ?? 0, gamepad.axes[1] ?? 0);
+    const [rightX, rightY] = applyRadialDeadzone(gamepad.axes[2] ?? 0, gamepad.axes[3] ?? 0);
+    this.previousButtons.set(gamepad.index, held);
     return {
-      A: buttons.pressed[0] || false,
-      B: buttons.pressed[1] || false,
-      X: buttons.pressed[2] || false,
-      Y: buttons.pressed[3] || false,
-      L1: buttons.pressed[4] || false,
-      R1: buttons.pressed[5] || false,
-      L2: buttons.pressed[6] || false,
-      R2: buttons.pressed[7] || false,
-      SELECT: buttons.pressed[8] || false,
-      START: buttons.pressed[9] || false,
-      L3: buttons.pressed[10] || false,
-      R3: buttons.pressed[11] || false,
-      UP: buttons.pressed[12] || false,
-      DOWN: buttons.pressed[13] || false,
-      LEFT: buttons.pressed[14] || false,
-      RIGHT: buttons.pressed[15] || false,
-      LEFT_STICK_X: axes[0] || 0,
-      LEFT_STICK_Y: axes[1] || 0,
-      RIGHT_STICK_X: axes[2] || 0,
-      RIGHT_STICK_Y: axes[3] || 0,
+      id: gamepad.id,
+      index: gamepad.index,
+      mapping: gamepad.mapping,
+      axes: [leftX, leftY, rightX, rightY, ...gamepad.axes.slice(4)],
+      buttons,
+      timestamp: gamepad.timestamp,
     };
   }
 
-  // Check if a specific button was just pressed
-  isButtonJustPressed(gamepadIndex: number, buttonIndex: number): boolean {
-    const gamepad = this.getGamepad(gamepadIndex);
-    return gamepad?.buttons.justPressed[buttonIndex] || false;
-  }
-
-  // Check if a specific button was just released
-  isButtonJustReleased(gamepadIndex: number, buttonIndex: number): boolean {
-    const gamepad = this.getGamepad(gamepadIndex);
-    return gamepad?.buttons.justReleased[buttonIndex] || false;
-  }
-
-  // Get stick deadzone
-  getStickValue(stick: 'left' | 'right', axis: 'x' | 'y', deadzone: number = 0.1): number {
-    const gamepad = this.getGamepad(0);
-    if (!gamepad) return 0;
-
-    const stickIndex = stick === 'left' ? 0 : 2;
-    const axisIndex = axis === 'x' ? 0 : 1;
-    const value = gamepad.axes[stickIndex + axisIndex] || 0;
-
-    return Math.abs(value) < deadzone ? 0 : value;
-  }
-
-  destroy() {
-    this.stopPolling();
-    this.listeners.clear();
-    this.gamepads.clear();
-    this.lastButtonStates.clear();
+  private publishStatus(next: ControllerStatus) {
+    if (
+      next.activeDevice === this.status.activeDevice &&
+      next.connected === this.status.connected &&
+      next.controllerId === this.status.controllerId &&
+      next.controllerIndex === this.status.controllerIndex
+    ) {
+      return;
+    }
+    this.status = next;
+    for (const subscriber of this.statuses) subscriber(next);
   }
 }
 
-// Singleton instance
-export const gamepadManager = new GamepadManager();
-
-// Keyboard input mapping
-export interface KeyboardInput {
-  keys: Set<string>;
-  justPressed: Set<string>;
-  justReleased: Set<string>;
-}
-
-export class KeyboardManager {
-  private keys = new Set<string>();
-  private justPressed = new Set<string>();
-  private justReleased = new Set<string>();
-  private lastKeys = new Set<string>();
-  private listeners: Set<(input: KeyboardInput) => void> = new Set();
-
-  constructor() {
-    this.setupEventListeners();
-  }
-
-  private setupEventListeners() {
-    window.addEventListener('keydown', (e) => {
-      const key = e.code;
-      if (!this.keys.has(key)) {
-        this.keys.add(key);
-        this.justPressed.add(key);
-      }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      const key = e.code;
-      this.keys.delete(key);
-      this.justReleased.add(key);
-    });
-
-    // Update just pressed/released on each frame
-    const updateFrame = () => {
-      this.justPressed.clear();
-      this.justReleased.clear();
-
-      // Check for just pressed
-      this.keys.forEach((key) => {
-        if (!this.lastKeys.has(key)) {
-          this.justPressed.add(key);
-        }
-      });
-
-      // Check for just released
-      this.lastKeys.forEach((key) => {
-        if (!this.keys.has(key)) {
-          this.justReleased.add(key);
-        }
-      });
-
-      this.lastKeys = new Set(this.keys);
-
-      // Notify listeners
-      const input: KeyboardInput = {
-        keys: new Set(this.keys),
-        justPressed: new Set(this.justPressed),
-        justReleased: new Set(this.justReleased),
-      };
-
-      this.listeners.forEach((listener) => listener(input));
-
-      requestAnimationFrame(updateFrame);
-    };
-
-    requestAnimationFrame(updateFrame);
-  }
-
-  addListener(listener: (input: KeyboardInput) => void) {
-    this.listeners.add(listener);
-  }
-
-  removeListener(listener: (input: KeyboardInput) => void) {
-    this.listeners.delete(listener);
-  }
-
-  isKeyPressed(key: string): boolean {
-    return this.keys.has(key);
-  }
-
-  isKeyJustPressed(key: string): boolean {
-    return this.justPressed.has(key);
-  }
-
-  isKeyJustReleased(key: string): boolean {
-    return this.justReleased.has(key);
-  }
-
-  destroy() {
-    this.listeners.clear();
-    this.keys.clear();
-    this.justPressed.clear();
-    this.justReleased.clear();
-    this.lastKeys.clear();
-  }
-}
-
-// Singleton instance
-export const keyboardManager = new KeyboardManager();
+export const controllerService = new ControllerService();

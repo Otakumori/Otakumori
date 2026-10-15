@@ -43,6 +43,7 @@ import {
   GameSessionAnnouncement,
 } from '../../_shared/GamePlatform';
 import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
+import { useControllerFrames } from '../../_shared/useGameController';
 
 type PetalStormResult = GameSessionResult & {
   outcome: 'completed' | 'failed';
@@ -613,6 +614,16 @@ export default function PetalStormRhythm() {
     },
     [gameState, currentTime, notes, combo, multiplier, score],
   );
+
+  useControllerFrames({
+    enabled: gameState === 'playing',
+    onFrame: (controller) => {
+      if (!controller || session.phase !== 'running') return;
+      for (let lane = 0; lane < GAME_CONFIG.LANE_COUNT; lane += 1) {
+        if (controller.buttons[lane]?.pressed) hitNote(lane);
+      }
+    },
+  });
 
   // Update petal particles
   useEffect(() => {
