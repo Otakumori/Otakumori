@@ -36,7 +36,6 @@ import { getGameAvatarUsage } from '../../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { createPetalBurst, updatePetalParticles, type PetalParticle } from '../../_shared/vfx';
-import PetalStormRhythmGameWrapper from './Game';
 import {
   GamePlatformControls,
   GamePlatformPause,
@@ -141,7 +140,7 @@ export default function PetalStormRhythm() {
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
-  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const completionSubmittedRef = useRef(false);
   const [_achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
 
@@ -337,6 +336,8 @@ export default function PetalStormRhythm() {
 
   // End game (game over)
   const endGame = useCallback(() => {
+    if (completionSubmittedRef.current) return;
+    completionSubmittedRef.current = true;
     setGameState('lose');
     session.complete({ outcome: 'failed', score });
 
@@ -347,6 +348,8 @@ export default function PetalStormRhythm() {
 
   // Complete game
   const completeGame = useCallback(async () => {
+    if (completionSubmittedRef.current) return;
+    completionSubmittedRef.current = true;
     setGameState('win');
 
     if (gameLoopRef.current) {
@@ -367,12 +370,10 @@ export default function PetalStormRhythm() {
     session.complete({ outcome: 'completed', score: finalScoreValue });
 
     // Record game result using progress system
-    if (!hasAwardedPetals) {
-      setHasAwardedPetals(true);
-      
-      const durationMs = gameStartTime > 0 ? Date.now() - gameStartTime : selectedTrack.duration * 1000;
-      
-      const result = await recordResult({
+    const durationMs =
+      gameStartTime > 0 ? Date.now() - gameStartTime : selectedTrack.duration * 1000;
+
+    const result = await recordResult({
         gameId: 'petal-storm-rhythm',
         score: finalScoreValue,
         difficulty: selectedTrack.difficulty,
@@ -388,15 +389,14 @@ export default function PetalStormRhythm() {
           miss: accuracy.miss,
           fullCombo: accuracy.miss === 0 && totalNotes > 0,
         },
-      });
+    });
 
-      if (result.success) {
-        if (result.petalReward) {
-          setPetalReward(result.petalReward.earned);
-        }
-        if (result.achievements && result.achievements.unlocked.length > 0) {
-          setAchievements(result.achievements.rewards);
-        }
+    if (result.success) {
+      if (result.petalReward) {
+        setPetalReward(result.petalReward.earned);
+      }
+      if (result.achievements && result.achievements.unlocked.length > 0) {
+        setAchievements(result.achievements.rewards);
       }
     }
 
@@ -418,7 +418,7 @@ export default function PetalStormRhythm() {
     } catch (error) {
       logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
-  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, hasAwardedPetals, gameStartTime, session.complete]);
+  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, gameStartTime, session.complete]);
 
   // Game loop
   useEffect(() => {
@@ -481,7 +481,7 @@ export default function PetalStormRhythm() {
     setHealth(GAME_CONFIG.INITIAL_HEALTH);
     setMultiplier(1);
     setPetalReward(null);
-    setHasAwardedPetals(false);
+    completionSubmittedRef.current = false;
     beginResultSession('petal-storm-rhythm');
     setAchievements([]);
 
@@ -887,17 +887,11 @@ export default function PetalStormRhythm() {
           </motion.div>
         )}
 
-        {/* Game Wrapper - uses GameStateMachine */}
-        {gameState === 'playing' && selectedTrack && (
-          <PetalStormRhythmGameWrapper track={selectedTrack} />
+        {(gameState === 'playing' || gameState === 'paused') && (
+          <GamePlatformControls belowNavigation session={session} />
         )}
 
         {(gameState === 'playing' || gameState === 'paused') && (
-          <GamePlatformControls session={session} />
-        )}
-
-        {/* Legacy Game UI - kept for backward compatibility during transition */}
-        {(gameState === 'playing' || gameState === 'paused') && !selectedTrack && (
           <div className="h-screen flex flex-col">
             {/* HUD - uses loader for cosmetics */}
             {isQuakeHud ? (

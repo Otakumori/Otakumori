@@ -14,6 +14,7 @@ export const GAME_CONTROLLER_CAPABILITIES = {
   'petal-storm-rhythm': 'GAMEPLAY_PARTIAL',
   'bubble-ragdoll': 'MENUS_ONLY',
   blossomware: 'MENUS_ONLY',
+  'maid-cafe-manager': 'MENUS_ONLY',
 } as const satisfies Readonly<Record<string, ControllerCapability>>;
 
 export function useControllerFrames({

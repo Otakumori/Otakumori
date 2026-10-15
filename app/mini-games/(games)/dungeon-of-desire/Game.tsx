@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
@@ -14,6 +14,7 @@ import { useGameSession, type GameSessionResult } from '../../_shared/GameSessio
 import DungeonGame from './DungeonGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+import { useGameProgress } from '@/app/lib/games/progress';
 
 type DungeonResult = GameSessionResult & {
   outcome: 'completed';
@@ -28,6 +29,9 @@ export default function DungeonOfDesireGameWrapper() {
     onExit: () => router.push('/mini-games'),
   });
   const [gameResults, setGameResults] = useState<DungeonResult | null>(null);
+  const completionSubmittedRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const { beginResultSession, recordResult } = useGameProgress();
   const [gameStats, setGameStats] = useState({
     score: 0,
     health: 100,
@@ -51,11 +55,21 @@ export default function DungeonOfDesireGameWrapper() {
 
   const handleGameEnd = useCallback(
     (score: number, didWin: boolean, floor: number) => {
+      if (completionSubmittedRef.current) return;
+      completionSubmittedRef.current = true;
       const result: DungeonResult = { outcome: 'completed', score, floor, didWin };
       setGameResults(result);
       session.complete(result);
+      void recordResult({
+        gameId: 'dungeon-of-desire',
+        score,
+        difficulty: 'medium',
+        durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
+        didWin,
+        metadata: { floor, wavesCleared: floor },
+      });
     },
-    [session.complete],
+    [recordResult, session.complete],
   );
 
   const handleGameStatsUpdate = useCallback(
@@ -81,9 +95,14 @@ export default function DungeonOfDesireGameWrapper() {
     (state: GameState) => {
       if (state === 'loading' || state === 'boot') session.prepare();
       if (state === 'title') session.ready();
-      if (state === 'playing') session.start();
+      if (state === 'playing') {
+        completionSubmittedRef.current = false;
+        startedAtRef.current = Date.now();
+        beginResultSession('dungeon-of-desire');
+        session.start();
+      }
     },
-    [session.prepare, session.ready, session.start],
+    [beginResultSession, session.prepare, session.ready, session.start],
   );
 
   return (
@@ -128,6 +147,7 @@ export default function DungeonOfDesireGameWrapper() {
               ]}
               onRestart={() => {
                 setGameResults(null);
+                completionSubmittedRef.current = false;
                 setGameStats({ score: 0, health: 100, maxHealth: 100, floor: 1, progress: 0 });
                 session.restart();
                 transitionTo('title');

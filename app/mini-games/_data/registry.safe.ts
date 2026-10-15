@@ -87,7 +87,7 @@ export const GAMES: GameDefinition[] = [
   },
   {
     id: 'bubble-girl',
-    slug: 'bubble-girl',
+    slug: 'bubble-ragdoll',
     title: 'Bubble Ragdoll',
     description: 'Spawn bubbles, float and score. Sandbox or challenge mode.',
     status: 'ready',
