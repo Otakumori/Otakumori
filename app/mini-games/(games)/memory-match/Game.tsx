@@ -12,6 +12,7 @@ import { useGameSession, type GameSessionResult } from '../../_shared/GameSessio
 import MemoryMatchGame from './MemoryMatchGame';
 import { MemoryDefragResultsScreen, MemoryDefragTitleScreen } from './MemoryDefragScreens';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+import { useGameProgress } from '@/app/lib/games/progress';
 
 const MEMORY_DEFRAG_AUDIO = [
   '/assets/sounds/runic-reveal.mp3',
@@ -45,6 +46,9 @@ export default function MemoryMatchGameWrapper() {
   });
   const [gameResults, setGameResults] = useState<MemoryMatchResult | null>(null);
   const resultTimeoutRef = useRef<number | null>(null);
+  const completionSubmittedRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const { beginResultSession, recordResult } = useGameProgress();
 
   const gameAssets: AssetManifest = {
     images: MEMORY_KEEPER_CRITICAL_IMAGES,
@@ -67,7 +71,10 @@ export default function MemoryMatchGameWrapper() {
       timeElapsed: number;
       didWin: boolean;
       rewardIntent?: { facts?: { perfectClear?: boolean; lowMoveClear?: boolean } } | null;
+      achievementIntent?: { facts?: string[] } | null;
     }) => {
+      if (completionSubmittedRef.current) return;
+      completionSubmittedRef.current = true;
       const completed: MemoryMatchResult = {
         ...results,
         outcome: 'completed',
@@ -76,17 +83,37 @@ export default function MemoryMatchGameWrapper() {
       };
       setGameResults(completed);
       session.complete(completed);
+      void recordResult({
+        gameId: 'memory-match',
+        score: results.score,
+        difficulty: 'memory-defrag',
+        durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
+        didWin: results.didWin,
+        metadata: {
+          matches: results.matches,
+          moves: results.moves,
+          timeElapsed: results.timeElapsed,
+          perfectClear: results.rewardIntent?.facts?.perfectClear,
+          lowMoveClear: results.rewardIntent?.facts?.lowMoveClear,
+          achievementFacts: results.achievementIntent?.facts ?? [],
+        },
+      });
     },
-    [session.complete],
+    [recordResult, session.complete],
   );
 
   const syncSession = useCallback(
     (state: GameState) => {
       if (state === 'loading' || state === 'boot') session.prepare();
       if (state === 'title') session.ready();
-      if (state === 'playing') session.start();
+      if (state === 'playing') {
+        completionSubmittedRef.current = false;
+        startedAtRef.current = Date.now();
+        beginResultSession('memory-match');
+        session.start();
+      }
     },
-    [session.prepare, session.ready, session.start],
+    [beginResultSession, session.prepare, session.ready, session.start],
   );
 
   return (
@@ -117,6 +144,7 @@ export default function MemoryMatchGameWrapper() {
               lowMoveClear={gameResults.lowMoveClear}
               onRestart={() => {
                 setGameResults(null);
+                completionSubmittedRef.current = false;
                 session.restart();
                 transitionTo('title');
               }}

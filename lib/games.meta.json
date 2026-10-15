@@ -32,7 +32,7 @@
       "difficulty": "easy",
       "estimatedTime": "3-10 min",
       "ageRating": "E",
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["saves", "petals"],
       "tooltips": {
         "hint": "Remember each relic fragment and restore matching pairs.",
         "levels": "Progress through increasingly difficult board sizes.",
@@ -67,14 +67,14 @@
     },
     {
       "id": "bubble-girl",
-      "slug": "bubble-girl",
+      "slug": "bubble-ragdoll",
       "title": "Bubble Ragdoll",
       "description": "Spawn bubbles, float and score. Sandbox or challenge mode.",
       "category": "physics",
       "difficulty": "medium",
       "estimatedTime": "5-20 min",
       "ageRating": "E",
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["petals", "avatars"],
       "tooltips": {
         "hint": "Bounce on bubbles! Physics-based ragdoll gameplay with airtime scoring.",
         "chains": "Build combo chains for massive petal rewards",
@@ -94,7 +94,7 @@
       "difficulty": "medium",
       "estimatedTime": "10-20 min",
       "ageRating": "E",
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["saves"],
       "tooltips": {
         "hint": "Balance orders, guest moods, and a busy café floor.",
         "shifts": "Good shifts unlock the next day’s scenarios.",
@@ -114,7 +114,7 @@
       "difficulty": "hard",
       "estimatedTime": "5-15 min",
       "ageRating": "E",
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["scoreboard", "petals", "avatars"],
       "tooltips": {
         "hint": "Slice petals as laser beams! Beat Saber-style rhythm gameplay.",
         "weapons": "Unlock different weapons and slicing styles",
@@ -134,7 +134,7 @@
       "difficulty": "medium",
       "estimatedTime": "2-10 min",
       "ageRating": "E",
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["petals"],
       "tooltips": {
         "hint": "WarioWare-style microgames! Cute companion explains each challenge.",
         "companion": "Unique tooltip sequences guide you through each microgame",
@@ -155,7 +155,7 @@
       "estimatedTime": "15-45 min",
       "ageRating": "M",
       "nsfw": true,
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["saves", "petals"],
       "tooltips": {
         "hint": "Succubus side-scroller with funny anime/game references!",
         "references": "Spot the anime and gaming easter eggs throughout",
@@ -176,7 +176,7 @@
       "estimatedTime": "10-30 min",
       "ageRating": "M",
       "nsfw": true,
-      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "features": ["saves", "petals"],
       "tooltips": {
         "hint": "Chaotic side-scroller with physics-based crush hazards!",
         "physics": "Survive against giant thigh-crushers with humor-driven gameplay",

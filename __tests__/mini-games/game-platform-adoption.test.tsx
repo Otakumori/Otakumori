@@ -5,7 +5,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import DungeonOfDesireGameWrapper from '@/app/mini-games/(games)/dungeon-of-desire/Game';
 import ThighColiseumGameWrapper from '@/app/mini-games/(games)/thigh-coliseum/Game';
 
-const { routerPush } = vi.hoisted(() => ({ routerPush: vi.fn() }));
+const { beginResultSession, recordResult, routerPush } = vi.hoisted(() => ({
+  beginResultSession: vi.fn(),
+  recordResult: vi.fn().mockResolvedValue({ success: true }),
+  routerPush: vi.fn(),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: routerPush }),
@@ -19,6 +23,10 @@ vi.mock('@/app/mini-games/_shared/audio-bus', () => ({
 
 vi.mock('@/app/mini-games/_shared/assets-resolver', () => ({
   getAsset: () => null,
+}));
+
+vi.mock('@/app/lib/games/progress', () => ({
+  useGameProgress: () => ({ beginResultSession, recordResult }),
 }));
 
 vi.mock('@/app/mini-games/_shared/GameStateMachine', async () => {
@@ -106,6 +114,7 @@ vi.mock('@/app/mini-games/(games)/dungeon-of-desire/DungeonGame', () => ({
         onClick={() => {
           onStatsUpdate({ score: 1200, health: 42, maxHealth: 100, floor: 4 });
           onGameEnd(1200, false);
+          onGameEnd(1200, false);
         }}
       >
         Finish dungeon
@@ -130,6 +139,7 @@ vi.mock('@/app/mini-games/(games)/thigh-coliseum/ThighChaseGame', () => ({
         onClick={() => {
           onStatsUpdate({ score: 800, lives: 1, stage: 3 });
           onGameEnd(800, false);
+          onGameEnd(800, false);
         }}
       >
         Finish chase
@@ -139,6 +149,8 @@ vi.mock('@/app/mini-games/(games)/thigh-coliseum/ThighChaseGame', () => ({
 }));
 
 afterEach(() => {
+  beginResultSession.mockClear();
+  recordResult.mockClear();
   routerPush.mockClear();
 });
 
@@ -171,6 +183,10 @@ describe.each([
     expect(screen.getByRole('region', { name: runtime })).toHaveAttribute('data-paused', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: finish }));
+    expect(recordResult).toHaveBeenCalledTimes(1);
+    expect(recordResult).toHaveBeenCalledWith(
+      expect.objectContaining({ score: Number(score) }),
+    );
     expect(screen.getByRole('status', { name: 'Final score' })).toHaveTextContent(score);
 
     fireEvent.click(screen.getByRole('button', { name: 'Return to games' }));

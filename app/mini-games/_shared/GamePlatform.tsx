@@ -38,14 +38,16 @@ export function GamePlatformHud<TResult extends GameSessionResult>({
 export function GamePlatformControls<TResult extends GameSessionResult>({
   session,
   showPause = true,
+  belowNavigation = false,
 }: {
   session: GameSessionController<TResult>;
   showPause?: boolean;
+  belowNavigation?: boolean;
 }) {
   return (
     <nav
       aria-label="Game session controls"
-      className="game-platform-controls game-platform-controls--standalone"
+      className={`game-platform-controls game-platform-controls--standalone${belowNavigation ? ' game-platform-controls--below-navigation' : ''}`}
       data-game-session-phase={session.phase}
     >
       {showPause ? (

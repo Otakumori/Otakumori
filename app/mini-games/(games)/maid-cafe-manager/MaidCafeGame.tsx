@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useGameSave } from '../../_shared/SaveSystem';
 import { RUNTIME_FLAGS } from '@/constants.client';
 
@@ -45,9 +45,18 @@ interface Order {
 interface MaidCafeGameProps {
   onGameEnd?: (results: { score: number; money: number; level: number }) => void;
   onStatsUpdate?: (stats: { score: number; combo: number; timer?: number; progress: number }) => void;
+  paused?: boolean;
+  onPauseChange?: (paused: boolean) => void;
+  onExitSaveReady?: (save: () => void) => void;
 }
 
-export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameProps = {}) {
+export default function MaidCafeGame({
+  onGameEnd,
+  onStatsUpdate,
+  paused,
+  onPauseChange,
+  onExitSaveReady,
+}: MaidCafeGameProps = {}) {
   // Game state
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameOver'>('playing');
   const [score, setScore] = useState(0);
@@ -60,7 +69,7 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
-  const [selectedAvatar, setSelectedAvatar] = useState<'classic' | 'gothic' | 'modern'>('classic');
+  const [selectedAvatar] = useState<'classic' | 'gothic' | 'modern'>('classic');
 
   // Player state
   const [playerX, setPlayerX] = useState(400);
@@ -72,6 +81,47 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
   const [nextCustomerId, setNextCustomerId] = useState(1);
 
   const { saveOnExit, autoSave } = useGameSave('maid-cafe-manager');
+  const timeoutIdsRef = useRef<Set<number>>(new Set());
+
+  const schedule = useCallback((callback: () => void, delayMs: number) => {
+    const timeoutId = window.setTimeout(() => {
+      timeoutIdsRef.current.delete(timeoutId);
+      callback();
+    }, delayMs);
+    timeoutIdsRef.current.add(timeoutId);
+  }, []);
+
+  useEffect(
+    () => () => {
+      for (const timeoutId of timeoutIdsRef.current) window.clearTimeout(timeoutId);
+      timeoutIdsRef.current.clear();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (paused === undefined) return;
+    setGameState(paused ? 'paused' : 'playing');
+  }, [paused]);
+
+  const saveCurrentShift = useCallback(() => {
+    void saveOnExit({
+      score,
+      level,
+      progress: Math.min(1.0, score / 2000),
+      stats: {
+        finalMoney: money,
+        gameTime,
+        avatar: selectedAvatar,
+        customersServed: nextCustomerId - 1,
+        lastPlayed: Date.now(),
+      },
+    });
+  }, [gameTime, level, money, nextCustomerId, saveOnExit, score, selectedAvatar]);
+
+  useEffect(() => {
+    onExitSaveReady?.(saveCurrentShift);
+  }, [onExitSaveReady, saveCurrentShift]);
 
   // Menu items
   const menuItems: MenuItem[] = [
@@ -277,7 +327,7 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
       );
 
       // Customer leaves after eating
-      setTimeout(() => {
+      schedule(() => {
         setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
         setOrders((prev) => prev.filter((o) => o.customerId !== customer.id));
         setTables((prev) =>
@@ -289,7 +339,7 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
         );
       }, 3000);
     },
-    [orders, customers, gameTime],
+    [orders, customers, gameTime, schedule],
   );
 
   const cleanTable = useCallback((tableId: number) => {
@@ -303,12 +353,12 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
   useEffect(() => {
     const leavingCustomers = customers.filter((c) => c.status === 'leaving');
     leavingCustomers.forEach((customer) => {
-      setTimeout(() => {
+      schedule(() => {
         setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
         setOrders((prev) => prev.filter((o) => o.customerId !== customer.id));
       }, 1000);
     });
-  }, [customers]);
+  }, [customers, schedule]);
 
   // Update stats via callback
   useEffect(() => {
@@ -324,25 +374,14 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
   // Save on game end
   useEffect(() => {
     if (gameState === 'gameOver') {
-      saveOnExit({
-        score,
-        level,
-        progress: Math.min(1.0, score / 2000),
-        stats: {
-          finalMoney: money,
-          gameTime,
-          avatar: selectedAvatar,
-          customersServed: nextCustomerId - 1,
-          lastPlayed: Date.now(),
-        },
-      }).catch(console.error);
+      saveCurrentShift();
       
       // Notify parent component
       if (onGameEnd) {
         onGameEnd({ score, money, level });
       }
     }
-  }, [gameState, score, level, money, gameTime, selectedAvatar, nextCustomerId, saveOnExit, onGameEnd]);
+  }, [gameState, score, money, level, saveCurrentShift, onGameEnd]);
 
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000) % 60;
@@ -355,13 +394,13 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
     return null;
   }
 
-  if (gameState === 'paused') {
+  if (gameState === 'paused' && paused === undefined) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-black/80">
         <div className="text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Paused</h2>
           <button
-            onClick={() => setGameState('playing')}
+            onClick={() => (onPauseChange ? onPauseChange(false) : setGameState('playing'))}
             className="px-6 py-3 bg-pink-600 hover:bg-pink-700 rounded-xl transition-colors"
           >
             Resume Shift
@@ -422,7 +461,7 @@ export default function MaidCafeGame({ onGameEnd, onStatsUpdate }: MaidCafeGameP
           )}
         </div>
         <button
-          onClick={() => setGameState('paused')}
+          onClick={() => (onPauseChange ? onPauseChange(true) : setGameState('paused'))}
           className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors"
         >
           Pause
