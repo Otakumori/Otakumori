@@ -226,7 +226,7 @@ export default function RhythmBeatEmUpPage() {
             </div>
           )}
 
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-8">
+          <div className="flex min-h-screen w-full items-start justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 px-4 pb-8 pt-28 md:items-center md:p-8">
             <div className="max-w-4xl w-full">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -256,7 +256,7 @@ export default function RhythmBeatEmUpPage() {
                       setGameState('instructions');
                     }
                   }}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-pink-500/50 rounded-2xl p-6 text-white transition-all"
+                  className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-pink-500/50 rounded-2xl p-6 text-white transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   initial={{ opacity: 0, y: 20 }}
@@ -292,7 +292,7 @@ export default function RhythmBeatEmUpPage() {
                       setGameState('instructions');
                     }
                   }}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-purple-500/50 rounded-2xl p-6 text-white transition-all"
+                  className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-purple-500/50 rounded-2xl p-6 text-white transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   initial={{ opacity: 0, y: 20 }}
@@ -328,7 +328,7 @@ export default function RhythmBeatEmUpPage() {
                       setGameState('instructions');
                     }
                   }}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-red-500/50 rounded-2xl p-6 text-white transition-all"
+                  className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-red-500/50 rounded-2xl p-6 text-white transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   initial={{ opacity: 0, y: 20 }}
