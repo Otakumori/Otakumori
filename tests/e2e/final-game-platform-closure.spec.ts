@@ -22,7 +22,7 @@ test.describe('final game platform closure', () => {
     await page.getByRole('button', { name: 'Resume' }).click();
     await expect(page.getByRole('dialog', { name: /Petal Hero paused/i })).toBeHidden();
     await controls.getByRole('button', { name: 'Exit' }).click();
-    await expect(controls).toHaveAttribute('data-game-session-phase', 'exiting');
+    await expect(page).toHaveURL(/\/mini-games\/?$/);
   });
 
   test('Maid Café shared pause resumes and exits through the canonical path', async ({ page }) => {
