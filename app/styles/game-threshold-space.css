@@ -297,6 +297,11 @@
   z-index: 18;
 }
 
+.game-platform-controls--below-navigation {
+  inset-block-start: max(12rem, env(safe-area-inset-top));
+  z-index: 60;
+}
+
 @keyframes game-threshold-settle {
   from {
     opacity: 0;
@@ -328,6 +333,10 @@
 
   .game-platform-controls--standalone {
     inset-block-start: max(4.75rem, env(safe-area-inset-top));
+  }
+
+  .game-platform-controls--below-navigation {
+    inset-block-start: max(8rem, env(safe-area-inset-top));
   }
 
   .game-threshold-screen,

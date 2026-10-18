@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
@@ -14,6 +14,7 @@ import { useGameSession, type GameSessionResult } from '../../_shared/GameSessio
 import ThighChaseGame from './ThighChaseGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+import { useGameProgress } from '@/app/lib/games/progress';
 
 type ThighColiseumResult = GameSessionResult & {
   outcome: 'completed';
@@ -28,6 +29,9 @@ export default function ThighColiseumGameWrapper() {
     onExit: () => router.push('/mini-games'),
   });
   const [gameResults, setGameResults] = useState<ThighColiseumResult | null>(null);
+  const completionSubmittedRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const { beginResultSession, recordResult } = useGameProgress();
   const [gameStats, setGameStats] = useState({
     score: 0,
     lives: 3,
@@ -50,11 +54,21 @@ export default function ThighColiseumGameWrapper() {
 
   const handleGameEnd = useCallback(
     (score: number, didWin: boolean, stage: number) => {
+      if (completionSubmittedRef.current) return;
+      completionSubmittedRef.current = true;
       const result: ThighColiseumResult = { outcome: 'completed', score, stage, didWin };
       setGameResults(result);
       session.complete(result);
+      void recordResult({
+        gameId: 'thigh-coliseum',
+        score,
+        difficulty: 'hard',
+        durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
+        didWin,
+        metadata: { stage, wavesCleared: stage },
+      });
     },
-    [session.complete],
+    [recordResult, session.complete],
   );
 
   const handleGameStatsUpdate = useCallback(
@@ -73,9 +87,14 @@ export default function ThighColiseumGameWrapper() {
     (state: GameState) => {
       if (state === 'loading' || state === 'boot') session.prepare();
       if (state === 'title') session.ready();
-      if (state === 'playing') session.start();
+      if (state === 'playing') {
+        completionSubmittedRef.current = false;
+        startedAtRef.current = Date.now();
+        beginResultSession('thigh-coliseum');
+        session.start();
+      }
     },
-    [session.prepare, session.ready, session.start],
+    [beginResultSession, session.prepare, session.ready, session.start],
   );
 
   return (
@@ -120,6 +139,7 @@ export default function ThighColiseumGameWrapper() {
               ]}
               onRestart={() => {
                 setGameResults(null);
+                completionSubmittedRef.current = false;
                 setGameStats({ score: 0, lives: 3, stage: 1, progress: 0 });
                 session.restart();
                 transitionTo('title');

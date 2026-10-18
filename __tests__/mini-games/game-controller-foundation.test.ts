@@ -168,6 +168,7 @@ describe('shared controller foundation', () => {
       'petal-storm-rhythm': 'GAMEPLAY_PARTIAL',
       'bubble-ragdoll': 'MENUS_ONLY',
       blossomware: 'MENUS_ONLY',
+      'maid-cafe-manager': 'MENUS_ONLY',
     });
   });
 });

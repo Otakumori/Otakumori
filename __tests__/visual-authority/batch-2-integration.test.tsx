@@ -27,7 +27,7 @@ describe('approved visual assets batch 2', () => {
 
     expect(bubbleGame).toMatchObject({
       id: 'bubble-girl',
-      slug: 'bubble-girl',
+      slug: 'bubble-ragdoll',
       title: 'Bubble Ragdoll',
       image: approvedVisualAssets.games['bubble-ragdoll'].cover,
     });
