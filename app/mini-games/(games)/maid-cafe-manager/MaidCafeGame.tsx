@@ -78,7 +78,7 @@ export default function MaidCafeGame({
 
   // Game timing
   const [customerSpawnTimer, setCustomerSpawnTimer] = useState(0);
-  const [nextCustomerId, setNextCustomerId] = useState(1);
+  const nextCustomerIdRef = useRef(1);
 
   const { saveOnExit, autoSave } = useGameSave('maid-cafe-manager');
   const timeoutIdsRef = useRef<Set<number>>(new Set());
@@ -113,11 +113,11 @@ export default function MaidCafeGame({
         finalMoney: money,
         gameTime,
         avatar: selectedAvatar,
-        customersServed: nextCustomerId - 1,
+        customersServed: nextCustomerIdRef.current - 1,
         lastPlayed: Date.now(),
       },
     });
-  }, [gameTime, level, money, nextCustomerId, saveOnExit, score, selectedAvatar]);
+  }, [gameTime, level, money, saveOnExit, score, selectedAvatar]);
 
   useEffect(() => {
     onExitSaveReady?.(saveCurrentShift);
@@ -166,7 +166,7 @@ export default function MaidCafeGame({
     setCustomers([]);
     setOrders([]);
     setCustomerSpawnTimer(0);
-    setNextCustomerId(1);
+    nextCustomerIdRef.current = 1;
     setPlayerX(400);
     setPlayerY(300);
 
@@ -189,8 +189,10 @@ export default function MaidCafeGame({
     const basePatience = 30000; // 30 seconds base
     const levelAdjustment = Math.max(15000, basePatience - (level - 1) * 2000);
 
+    const customerId = nextCustomerIdRef.current;
+    nextCustomerIdRef.current += 1;
     const newCustomer: Customer = {
-      id: nextCustomerId,
+      id: customerId,
       tableId: availableTable.id,
       patience: levelAdjustment,
       maxPatience: levelAdjustment,
@@ -204,8 +206,7 @@ export default function MaidCafeGame({
     setTables((prev) =>
       prev.map((table) => (table.id === availableTable.id ? { ...table, occupied: true } : table)),
     );
-    setNextCustomerId((prev) => prev + 1);
-  }, [tables, nextCustomerId, gameTime, level]);
+  }, [tables, gameTime, level]);
 
   // Game loop
   useEffect(() => {
@@ -445,8 +446,8 @@ export default function MaidCafeGame({
   return (
     <div className="w-full h-full bg-gradient-to-br from-pink-100 via-purple-50 to-blue-50 relative overflow-hidden">
       {/* UI Header */}
-      <div className="absolute top-0 left-0 right-0 bg-black/80 text-white p-4 flex justify-between items-center z-10">
-        <div className="flex items-center gap-6">
+      <div className="absolute top-40 md:top-24 left-0 right-0 bg-black/80 text-white p-3 sm:p-4 flex justify-between items-center z-10">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:text-base">
           <div>Score: {score.toLocaleString()}</div>
           <div>Money: ${money}</div>
           <div>Level: {level}</div>
@@ -460,16 +461,18 @@ export default function MaidCafeGame({
             </>
           )}
         </div>
-        <button
-          onClick={() => (onPauseChange ? onPauseChange(true) : setGameState('paused'))}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors"
-        >
-          Pause
-        </button>
       </div>
 
+      <button
+        type="button"
+        onClick={() => setGameState('gameOver')}
+        className="fixed bottom-4 left-4 z-20 min-h-11 px-4 py-2 border border-amber-300/50 bg-amber-950/90 text-amber-100 rounded transition-colors hover:bg-amber-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+      >
+        End Shift
+      </button>
+
       {/* Game Area */}
-      <div className="pt-20 p-4 relative h-full">
+      <div className="pt-64 md:pt-40 p-4 relative h-full">
         {/* Kitchen/Order Area */}
         <div className="absolute top-24 right-4 bg-gray-800 text-white p-4 rounded-xl w-64">
           <h3 className="font-bold mb-2">Kitchen Orders</h3>

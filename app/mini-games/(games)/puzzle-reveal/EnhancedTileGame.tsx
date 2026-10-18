@@ -64,23 +64,20 @@ const GRID_SIZES: Record<GameMode, { cols: number; rows: number; timeBonus: numb
   expert: { cols: 10, rows: 8, timeBonus: 20000 },
 };
 
-// Curated art collection - uses Otaku-mori art assets
-// TODO: Add actual Otaku-mori artwork (including spicier ones as content library grows)
-// Current placeholders will be replaced with real assets
+// Curated art collection - uses approved Otaku-mori game art assets.
 const ART_COLLECTION: ArtPiece[] = [
   {
-    url: '/assets/reveal/anime-landscape-1.jpg',
-    title: 'Cherry Blossom Shrine',
+    url: '/assets/games/covers/game-puzzle-reveal-cover.webp',
+    title: 'Puzzle Reveal — Cover',
     artist: 'Otaku-mori Studios',
     category: 'sfw',
   },
   {
-    url: '/assets/reveal/anime-character-1.jpg',
-    title: 'Sakura Guardian',
+    url: '/assets/games/hub/game-puzzle-reveal-hub.webp',
+    title: 'Puzzle Reveal — Hub',
     artist: 'Otaku-mori Studios',
     category: 'sfw',
   },
-  // Add more art pieces here - including spicier ones as content library grows
 ];
 
 export default function EnhancedTileGame({

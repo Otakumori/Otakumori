@@ -58,6 +58,13 @@ const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
+const DIFFICULTY_LABELS: Record<GameMode, string> = {
+  easy: 'Easy (4×3)',
+  medium: 'Medium (6×5)',
+  hard: 'Hard (8×6)',
+  expert: 'Expert (10×8)',
+};
+
 export default function PuzzleRevealPage() {
   const router = useRouter();
   const [mode, setMode] = useState<GameMode>('medium');
@@ -255,10 +262,7 @@ export default function PuzzleRevealPage() {
                       : 'bg-black/30 border border-white/20 text-zinc-300 hover:bg-black/50 hover:border-white/40'
                   }`}
                 >
-                  {difficulty === 'easy' && '<span role="img" aria-label="emoji">�</span>� Easy (4×3)'}
-                  {difficulty === 'medium' && '<span role="img" aria-label="emoji">�</span>� Medium (6×5)'}
-                  {difficulty === 'hard' && '<span role="img" aria-label="emoji">�</span>� Hard (8×6)'}
-                  {difficulty === 'expert' && '<span role="img" aria-label="emoji">�</span>� Expert (10×8)'}
+                  {DIFFICULTY_LABELS[difficulty]}
                 </button>
               ))}
             </div>
