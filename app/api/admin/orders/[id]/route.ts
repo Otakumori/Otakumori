@@ -44,6 +44,7 @@ export async function GET(
             },
           },
         },
+        PrintifyOrderSync: true,
       },
     });
     

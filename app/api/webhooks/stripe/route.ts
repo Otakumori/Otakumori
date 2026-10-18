@@ -2,6 +2,7 @@ import { logger } from '@/app/lib/logger';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import type { Prisma } from '@prisma/client';
 import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
@@ -14,29 +15,54 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   typescript: true,
 });
 
-async function saveEventOnce(id: string, type: string, payload: any) {
+type EventProcessingStatus = 'processing' | 'completed' | 'failed';
+
+function eventPayload(
+  status: EventProcessingStatus,
+  object: unknown,
+  details: Record<string, Prisma.InputJsonValue> = {},
+): Prisma.InputJsonObject {
+  return { processingStatus: status, object: object as Prisma.InputJsonValue, ...details };
+}
+
+async function claimEvent(event: Stripe.Event) {
   try {
-    await prisma.webhookEvent.create({ data: { id, type, payload } });
-    return true;
-  } catch {
-    return false;
+    await prisma.webhookEvent.create({
+      data: {
+        id: event.id,
+        type: event.type,
+        payload: eventPayload('processing', event.data?.object ?? {}),
+      },
+    });
+    return 'claimed' as const;
+  } catch (error) {
+    const existing = await prisma.webhookEvent.findUnique({ where: { id: event.id } });
+    if (!existing) throw error;
+    const payload = existing.payload as { processingStatus?: EventProcessingStatus } | null;
+    if (payload?.processingStatus === 'completed') return 'completed' as const;
+    if (
+      payload?.processingStatus === 'processing' &&
+      Date.now() - existing.updatedAt.getTime() < 5 * 60 * 1000
+    ) {
+      return 'processing' as const;
+    }
+    await prisma.webhookEvent.update({
+      where: { id: event.id },
+      data: { payload: eventPayload('processing', event.data?.object ?? {}, { retry: true }) },
+    });
+    return 'claimed' as const;
   }
 }
 
-async function resolveUser(session: Stripe.Checkout.Session) {
-  if (session.customer && typeof session.customer === 'string') {
-    const sc = await prisma.stripeCustomer.findUnique({
-      where: { customerId: session.customer },
-      include: { User: true },
-    });
-    if (sc?.User) return sc.User;
-  }
-
-  if (session.client_reference_id) {
-    return prisma.user.findFirst({ where: { clerkId: session.client_reference_id } });
-  }
-
-  return null;
+async function finishEvent(
+  event: Stripe.Event,
+  status: Exclude<EventProcessingStatus, 'processing'>,
+  details: Record<string, Prisma.InputJsonValue> = {},
+) {
+  await prisma.webhookEvent.update({
+    where: { id: event.id },
+    data: { payload: eventPayload(status, event.data?.object ?? {}, details) },
+  });
 }
 
 async function readRawBody(req: Request) {
@@ -61,72 +87,131 @@ export async function POST(req: Request) {
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
-  const firstTime = await saveEventOnce(event.id, event.type, event.data?.object ?? {});
-  if (!firstTime) return NextResponse.json({ ok: true, duplicate: true });
-
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
-
-      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['line_items.data.price.product'],
-      });
-
-      const user = await resolveUser(fullSession);
-      if (!user) return NextResponse.json({ ok: true, note: 'no-user' });
-
-      const total = fullSession.amount_total ?? 0;
-      const currency = fullSession.currency ?? 'usd';
-      const paymentIntentId = typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
-
-      const updateData: any = {
-        status: 'pending_fulfillment',
-        totalAmount: total,
-        currency: currency.toUpperCase(),
-        paidAt: new Date(),
-      };
-
-      const createData: any = {
-        id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        userId: user.id,
-        stripeId: fullSession.id,
-        totalAmount: total,
-        currency: currency.toUpperCase(),
-        status: 'pending_fulfillment',
-        paidAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      if (paymentIntentId) {
-        updateData.paymentIntentId = paymentIntentId;
-        createData.paymentIntentId = paymentIntentId;
-      }
-
-      const order = await prisma.order.upsert({
-        where: { stripeId: fullSession.id },
-        update: updateData,
-        create: createData,
-      });
-
-      try {
-        const result = await createPrintifyOrder(order.id, fullSession);
-
-        if (!result.ok) {
-          logger.error('Printify fulfillment failed', undefined, undefined, new Error(result.error || 'unknown'));
-        } else {
-          logger.info('Printify fulfillment success', undefined, {
-            orderId: order.id,
-            printifyOrderId: result.printifyOrderId,
-          });
-        }
-      } catch (err) {
-        logger.error('Printify fulfillment exception', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
-      }
-
-      return NextResponse.json({ ok: true });
+  try {
+    const claim = await claimEvent(event);
+    if (claim === 'completed') return NextResponse.json({ ok: true, duplicate: true });
+    if (claim === 'processing') {
+      return NextResponse.json(
+        { ok: false, retry: true, error: 'Webhook event is already processing.' },
+        { status: 409 },
+      );
     }
 
-    default:
-      return NextResponse.json({ ok: true, ignored: event.type });
+    const outcome: Record<string, Prisma.InputJsonValue> = {};
+    if (
+      event.type === 'checkout.session.completed' ||
+      event.type === 'checkout.session.async_payment_succeeded'
+    ) {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items.data.price.product', 'payment_intent.latest_charge'],
+      });
+
+      if (fullSession.payment_status !== 'paid') {
+        outcome.paymentPending = true;
+      } else {
+        const order = await prisma.order.findUnique({
+          where: { stripeId: fullSession.id },
+          include: { User: { select: { clerkId: true } } },
+        });
+        if (!order) {
+          throw new Error(`No pre-created order exists for Stripe session ${fullSession.id}`);
+        }
+        if (
+          fullSession.client_reference_id &&
+          order.User.clerkId !== fullSession.client_reference_id
+        ) {
+          throw new Error(`Stripe session ownership mismatch for order ${order.id}`);
+        }
+
+        const paymentIntent = fullSession.payment_intent;
+        const paymentIntentId =
+          typeof paymentIntent === 'string' ? paymentIntent : (paymentIntent?.id ?? null);
+        const latestCharge =
+          paymentIntent && typeof paymentIntent !== 'string' ? paymentIntent.latest_charge : null;
+        const chargeId =
+          typeof latestCharge === 'string' ? latestCharge : (latestCharge?.id ?? null);
+        const totalDetails = fullSession.total_details;
+
+        await prisma.order.update({
+          where: { id: order.id },
+          data: {
+            status: 'pending_mapping',
+            totalAmount: fullSession.amount_total ?? order.totalAmount,
+            subtotalCents: fullSession.amount_subtotal ?? order.subtotalCents,
+            currency: (fullSession.currency ?? order.currency).toUpperCase(),
+            taxAmount: totalDetails?.amount_tax ?? order.taxAmount,
+            shippingAmount: totalDetails?.amount_shipping ?? order.shippingAmount,
+            discountAmount: Math.max(
+              order.discountAmount ?? 0,
+              totalDetails?.amount_discount ?? 0,
+            ),
+            paymentIntentId: paymentIntentId ?? order.paymentIntentId,
+            chargeId: chargeId ?? order.chargeId,
+            paidAt: order.paidAt ?? new Date(),
+            notes: null,
+          },
+        });
+
+        const result = await createPrintifyOrder(order.id, fullSession);
+        if (!result.ok) {
+          await prisma.order.update({
+            where: { id: order.id },
+            data: {
+              status: 'pending_mapping',
+              notes: `Fulfillment requires operator review: ${result.error ?? 'unknown error'}`.slice(
+                0,
+                1000,
+              ),
+            },
+          });
+          outcome.fulfillment = 'operator_review';
+        } else {
+          outcome.fulfillment = 'accepted';
+          if (result.printifyOrderId) outcome.printifyOrderId = result.printifyOrderId;
+        }
+      }
+    } else if (event.type === 'charge.refunded') {
+      const charge = event.data.object as Stripe.Charge;
+      const paymentIntentId =
+        typeof charge.payment_intent === 'string'
+          ? charge.payment_intent
+          : charge.payment_intent?.id;
+      if (!paymentIntentId) throw new Error(`Refunded charge ${charge.id} has no PaymentIntent`);
+
+      const order = await prisma.order.findFirst({ where: { paymentIntentId } });
+      if (!order) throw new Error(`No local order exists for refunded charge ${charge.id}`);
+
+      const fullyRefunded = charge.amount_refunded >= order.totalAmount;
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          chargeId: charge.id,
+          refundAmount: charge.amount_refunded,
+          refundedAt: new Date(),
+          status: fullyRefunded ? 'cancelled' : order.status,
+          notes: fullyRefunded
+            ? 'Payment fully refunded in Stripe.'
+            : 'Payment partially refunded in Stripe.',
+        },
+      });
+      outcome.refundRecorded = true;
+    } else {
+      outcome.ignored = event.type;
+    }
+
+    await finishEvent(event, 'completed', outcome);
+    return NextResponse.json({ ok: true, ...outcome });
+  } catch (error) {
+    logger.error(
+      'Stripe webhook processing failed',
+      undefined,
+      { eventId: event.id, eventType: event.type },
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    await finishEvent(event, 'failed', {
+      error: error instanceof Error ? error.message.slice(0, 500) : 'unknown',
+    }).catch(() => undefined);
+    return NextResponse.json({ ok: false, retry: true }, { status: 500 });
   }
 }

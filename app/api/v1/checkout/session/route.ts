@@ -2,6 +2,7 @@ export const runtime = 'nodejs';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createHash } from 'node:crypto';
 import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { prisma } from '@/app/lib/prisma';
@@ -58,9 +59,9 @@ export async function POST(req: NextRequest) {
 
       stage = 'idempotency_header';
       const idempotencyKey = req.headers.get('x-idempotency-key');
-      if (!idempotencyKey) {
+      if (!idempotencyKey || idempotencyKey.length > 255) {
         return NextResponse.json(
-          { ok: false, error: 'Missing idempotency key', requestId, stage },
+          { ok: false, error: 'Missing or invalid idempotency key', requestId, stage },
           { status: 400 },
         );
       }
@@ -68,8 +69,12 @@ export async function POST(req: NextRequest) {
       stage = 'idempotency_check';
       const idempotencyResult = await checkIdempotency(idempotencyKey);
       if (!idempotencyResult.isNew && idempotencyResult.response) {
-        return idempotencyResult.response;
+        return NextResponse.json(idempotencyResult.response);
       }
+
+      const durableIdempotencyKey = `checkout:${createHash('sha256')
+        .update(`${viewer.localUserId}:${idempotencyKey}`)
+        .digest('hex')}`;
 
       stage = 'parse_request';
       const json = await req.json();
@@ -254,18 +259,68 @@ export async function POST(req: NextRequest) {
       }
 
       stage = 'create_order';
+      try {
+        await prisma.idempotencyKey.create({
+          data: { key: durableIdempotencyKey, purpose: 'checkout:processing' },
+        });
+      } catch (error) {
+        if ((error as { code?: string })?.code !== 'P2002') throw error;
+        const existingClaim = await prisma.idempotencyKey.findUnique({
+          where: { key: durableIdempotencyKey },
+        });
+        const existingOrderId = existingClaim?.purpose.startsWith('checkout:order:')
+          ? existingClaim.purpose.slice('checkout:order:'.length)
+          : null;
+        const existingOrder = existingOrderId
+          ? await prisma.order.findUnique({ where: { id: existingOrderId } })
+          : null;
+
+        if (existingOrder && !existingOrder.stripeId.startsWith('temp_')) {
+          const existingSession = await stripe.checkout.sessions.retrieve(existingOrder.stripeId);
+          const replayBody = {
+            ok: true,
+            data: {
+              url: existingSession.url,
+              orderId: existingOrder.id,
+              orderNumber: existingOrder.displayNumber,
+            },
+            requestId,
+            replayed: true,
+          };
+          await storeIdempotencyResponse(idempotencyKey, replayBody);
+          return NextResponse.json(replayBody);
+        }
+
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'This checkout attempt is already processing or requires operator recovery.',
+            requestId,
+            stage,
+          },
+          { status: 409 },
+        );
+      }
+
       const order = await prisma.order.create({
         data: {
           User: { connect: { id: user.id } },
           stripeId: `temp_${Date.now()}`,
           totalAmount: subtotalCents,
           subtotalCents,
+          discountAmount: discountTotalCents,
+          shippingAmount: 0,
+          taxAmount: 0,
           currency: 'USD',
           status: 'pending',
           primaryItemName: safeItems[0]?.name ?? 'Order',
           label: `Order for ${shippingInfo?.firstName ?? user.displayName ?? user.username}`,
           appliedCouponCodes: appliedCodes,
         },
+      });
+      await prisma.idempotencyKey.update({
+        where: { key: durableIdempotencyKey },
+        data: { purpose: `checkout:order:${order.id}` },
       });
 
       stage = 'create_order_items';
@@ -350,7 +405,6 @@ export async function POST(req: NextRequest) {
 
       stage = 'create_stripe_session';
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
-        payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
         success_url:
@@ -363,6 +417,7 @@ export async function POST(req: NextRequest) {
           allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'],
         },
         metadata: {
+          local_order_id: order.id,
           coupon_codes: appliedCodes.join(','),
           discount_total_cents: String(discountTotalCents),
           request_id: requestId,
@@ -371,7 +426,9 @@ export async function POST(req: NextRequest) {
 
       if (shippingOptions) sessionParams.shipping_options = shippingOptions as any;
 
-      const session = await stripe.checkout.sessions.create(sessionParams);
+      const session = await stripe.checkout.sessions.create(sessionParams, {
+        idempotencyKey: durableIdempotencyKey,
+      });
 
       stage = 'update_order';
       await prisma.order.update({ where: { id: order.id }, data: { stripeId: session.id } });

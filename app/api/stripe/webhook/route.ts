@@ -16,9 +16,13 @@ import { env } from '@/env';
 import { petalService } from '@/app/lib/petals';
 import { resolveCatalogProvider } from '@/lib/catalog/provider';
 
+// Compatibility endpoint only. All Stripe events use the canonical verified,
+// deduplicated payment and fulfillment handler.
+export { POST } from '@/app/api/webhooks/stripe/route';
+
 export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
+async function _legacyPOSTDisabled(req: NextRequest) {
   const body = await req.text();
   const signature = req.headers.get('stripe-signature');
 
@@ -96,6 +100,8 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+void _legacyPOSTDisabled;
 
 async function handleCheckoutCompleted(session: any) {
   try {

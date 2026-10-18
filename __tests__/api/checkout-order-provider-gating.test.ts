@@ -74,7 +74,7 @@ function validBody(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('Printify checkout provider gating', () => {
+describe('legacy direct Printify checkout gating', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(auth).mockResolvedValue({ userId: 'user_1' } as never);
@@ -103,28 +103,18 @@ describe('Printify checkout provider gating', () => {
     } as never);
   });
 
-  it('accepts valid Printify line items', async () => {
+  it('fails closed even for valid-looking direct fulfillment requests', async () => {
     const mod = await import('../../app/api/v1/checkout/order/route');
 
     const response = await mod.POST(request(validBody()));
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.ok).toBe(true);
-    expect(createPrintifyOrder).toHaveBeenCalledWith(
-      'shop_123',
-      expect.objectContaining({
-        line_items: [
-          expect.objectContaining({
-            product_id: 'printify_product_1',
-            variant_id: 101,
-          }),
-        ],
-      }),
-    );
+    expect(response.status).toBe(410);
+    expect(json.error).toMatch(/Direct fulfillment is disabled/i);
+    expect(createPrintifyOrder).not.toHaveBeenCalled();
   });
 
-  it('rejects Merchize/provider-neutral items before Printify fulfillment', async () => {
+  it('does not allow Merchize/provider-neutral items to reach direct fulfillment', async () => {
     const mod = await import('../../app/api/v1/checkout/order/route');
 
     const response = await mod.POST(
@@ -143,12 +133,12 @@ describe('Printify checkout provider gating', () => {
     );
     const json = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(json.error).toMatch(/Unsupported fulfillment provider/i);
+    expect(response.status).toBe(410);
+    expect(json.error).toMatch(/Direct fulfillment is disabled/i);
     expect(createPrintifyOrder).not.toHaveBeenCalled();
   });
 
-  it('continues to require Printify product and variant IDs for Printify items', async () => {
+  it('does not expose a direct fallback for incomplete Printify mappings', async () => {
     vi.mocked(db.product.findUnique).mockResolvedValue({
       id: 'product_1',
       name: 'Printify Product',
@@ -186,12 +176,12 @@ describe('Printify checkout provider gating', () => {
     );
     const json = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(json.error).toMatch(/not eligible for Printify fulfillment/i);
+    expect(response.status).toBe(410);
+    expect(json.error).toMatch(/Direct fulfillment is disabled/i);
     expect(createPrintifyOrder).not.toHaveBeenCalled();
   });
 
-  it('rejects DB-resolved non-Printify products even when the browser claims Printify', async () => {
+  it('does not trust a browser-supplied provider claim', async () => {
     vi.mocked(db.product.findUnique).mockResolvedValue({
       id: 'product_1',
       name: 'Merchize Product',
@@ -217,8 +207,8 @@ describe('Printify checkout provider gating', () => {
     const response = await mod.POST(request(validBody()));
     const json = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(json.error).toMatch(/not eligible for Printify fulfillment/i);
+    expect(response.status).toBe(410);
+    expect(json.error).toMatch(/Direct fulfillment is disabled/i);
     expect(createPrintifyOrder).not.toHaveBeenCalled();
   });
 });

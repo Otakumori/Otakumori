@@ -16,11 +16,15 @@ vi.mock('@/lib/db', () => ({
       findMany: vi.fn(),
     },
     printifyOrderSync: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
       upsert: vi.fn(),
     },
     order: {
       update: vi.fn(),
     },
+    $transaction: vi.fn(async (operations: Promise<unknown>[]) => Promise.all(operations)),
   },
 }));
 
@@ -70,6 +74,10 @@ function orderItem(overrides: Record<string, unknown> = {}) {
 describe('Printify fulfillment safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue(null);
+    vi.mocked(db.printifyOrderSync.create).mockResolvedValue({} as never);
+    vi.mocked(db.printifyOrderSync.update).mockResolvedValue({} as never);
+    vi.mocked(db.order.update).mockResolvedValue({} as never);
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -114,9 +122,6 @@ describe('Printify fulfillment safety', () => {
 
   it('keeps existing mapped Printify fulfillment path intact', async () => {
     vi.mocked(db.orderItem.findMany).mockResolvedValue([orderItem()] as never);
-    vi.mocked(db.order.update).mockResolvedValue({} as never);
-    vi.mocked(db.printifyOrderSync.upsert).mockResolvedValue({} as never);
-
     const result = await createPrintifyOrder('order_1', stripeSession());
 
     expect(result.ok).toBe(true);
@@ -126,5 +131,44 @@ describe('Printify fulfillment safety', () => {
         data: expect.objectContaining({ printifyId: 'printify_order_1' }),
       }),
     );
+  });
+
+  it('returns an existing provider submission without calling Printify again', async () => {
+    vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue({
+      localOrderId: 'order_1',
+      printifyOrderId: 'printify_order_existing',
+      status: 'in_production',
+    } as never);
+
+    const result = await createPrintifyOrder('order_1', stripeSession());
+
+    expect(result).toMatchObject({
+      ok: true,
+      printifyOrderId: 'printify_order_existing',
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('blocks automatic retries after an uncertain provider response', async () => {
+    vi.mocked(db.orderItem.findMany).mockResolvedValue([orderItem()] as never);
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('provider timeout')));
+
+    const first = await createPrintifyOrder('order_1', stripeSession());
+    expect(first.ok).toBe(false);
+    expect(db.printifyOrderSync.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ status: 'submission_uncertain' }) }),
+    );
+
+    vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue({
+      localOrderId: 'order_1',
+      printifyOrderId: 'pending_order_1',
+      status: 'submission_uncertain',
+    } as never);
+    vi.mocked(fetch).mockClear();
+
+    const replay = await createPrintifyOrder('order_1', stripeSession(), { allowRetry: true });
+    expect(replay.ok).toBe(false);
+    expect(replay.error).toMatch(/reconcile/i);
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

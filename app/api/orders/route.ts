@@ -44,6 +44,13 @@ export async function GET(req: NextRequest) {
             ProductVariant: true,
           },
         },
+        PrintifyOrderSync: {
+          select: {
+            status: true,
+            error: true,
+            lastSyncAt: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -61,6 +68,13 @@ export async function GET(req: NextRequest) {
       trackingUrl: order.trackingUrl,
       carrier: order.carrier,
       trackingNumber: order.trackingNumber,
+      subtotal: order.subtotalCents / 100,
+      discount: (order.discountAmount ?? 0) / 100,
+      shipping: (order.shippingAmount ?? 0) / 100,
+      tax: (order.taxAmount ?? 0) / 100,
+      refund: (order.refundAmount ?? 0) / 100,
+      refundedAt: order.refundedAt,
+      fulfillment: order.PrintifyOrderSync,
       items: order.OrderItem.map((item) => ({
         id: item.id,
         name: item.name,
