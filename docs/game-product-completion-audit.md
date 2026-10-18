@@ -225,3 +225,18 @@ or Maid Café until their encounter/scenario grammars have a bounded production 
 - Durable PB/rank presentation should reuse current leaderboard/save authorities after per-game
   product specifications are approved.
 - Home Lighthouse performance/CLS debt is unrelated to game product completion and remains separate.
+
+## Otaku Beat-em-up flagship delta
+
+- **Previous classification:** LAUNCH READY.
+- **Implemented:** Story Wave 10 now uses a deterministic two-movement climax: a controlled
+  ninja/brute vanguard, a deliberate breathing interval, then the existing boss with restrained
+  support. Pending spawns are lifecycle-owned so the run cannot complete between movements, and
+  random ambient reinforcements are disabled only for this authored Story encounter.
+- **Results:** The shared result screen now presents a deterministic, per-mode **Run Grade** from
+  existing score facts. This is intentionally not described as a leaderboard rank or personal
+  best. Existing score and progression submission remain unchanged.
+- **Current recommendation:** FLAGSHIP GAMEPLAY READY — ART PRODUCTION REMAINS.
+- **Remaining debt:** bespoke production-quality fighter/enemy silhouettes and authored combat
+  audio remain necessary for full visual flagship closure. Durable per-mode PB presentation is
+  deferred until a read authority exists that does not create a second score/reward submission.

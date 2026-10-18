@@ -55,9 +55,22 @@ vi.mock('@/app/mini-games/_shared/GameTitleScreen', () => ({
 }));
 
 vi.mock('@/app/mini-games/_shared/GameResultsScreen', () => ({
-  GameResultsScreen: ({ score, onBack }: { score: number; onBack: () => void }) => (
+  GameResultsScreen: ({
+    score,
+    stats = [],
+    onBack,
+  }: {
+    score: number;
+    stats?: Array<{ label: string; value: string | number }>;
+    onBack: () => void;
+  }) => (
     <section aria-label="Results">
       <output aria-label="Final score">{score}</output>
+      {stats.map((stat) => (
+        <p key={stat.label}>
+          {stat.label}: {stat.value}
+        </p>
+      ))}
       <button type="button" onClick={onBack}>
         Return to games
       </button>
@@ -129,6 +142,8 @@ describe('ready-game shared-platform adoption', () => {
       expect.objectContaining({ gameId: 'otaku-beat-em-up', score: 2400, didWin: true }),
     );
     expect(screen.getByRole('status', { name: 'Final score' })).toHaveTextContent('2400');
+    expect(screen.getByText(/Run Grade: C/)).toBeInTheDocument();
+    expect(screen.queryByText(/personal best/i)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Return to games' }));
     expect(routerPush).toHaveBeenCalledWith('/mini-games');

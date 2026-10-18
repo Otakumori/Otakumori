@@ -13,6 +13,12 @@ import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer
 import { createGlowEffect } from '../../_shared/enhancedTextures';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
 import { useControllerFrames } from '../../_shared/useGameController';
+import {
+  getWaveEncounterPlan,
+  isStoryClimaxWave,
+  shouldCompleteStoryRun,
+  type BeatEmUpEnemyType,
+} from './beatEmUpProduct';
 
 // Dynamically import AnimeRenderer for heavy 3D rendering (only when needed)
 // This will be used for high-fidelity 3D character models in future updates
@@ -53,7 +59,7 @@ interface Player {
 
 interface Enemy {
   id: string;
-  type: 'grunt' | 'brute' | 'ninja' | 'boss';
+  type: BeatEmUpEnemyType;
   x: number;
   y: number;
   vx: number;
@@ -97,6 +103,7 @@ export default function BeatEmUpGame({
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatIntervalRef = useRef<number | null>(null);
   const gameLoopRef = useRef<number | null>(null);
+  const scheduledEnemySpawnsRef = useRef<Array<{ type: Enemy['type']; remainingMs: number }>>([]);
 
   // Physics renderers
   const playerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
@@ -592,9 +599,21 @@ export default function BeatEmUpGame({
     enemiesRef.current.push(newEnemy);
   }, []);
 
+  const clearScheduledSpawns = useCallback(() => {
+    scheduledEnemySpawnsRef.current = [];
+  }, []);
+
+  const scheduleEnemySpawns = useCallback(
+    (spawns: ReadonlyArray<{ type: Enemy['type']; delayMs: number }>) => {
+      scheduledEnemySpawnsRef.current.push(
+        ...spawns.map(({ type, delayMs }) => ({ type, remainingMs: delayMs })),
+      );
+    },
+    [],
+  );
+
   // Mode-specific constants
   const SURVIVAL_TIME_LIMIT = 180000; // 3 minutes in milliseconds
-  const STORY_MAX_WAVES = 10;
 
   // Initialize game on mount
   useEffect(() => {
@@ -636,18 +655,18 @@ export default function BeatEmUpGame({
     };
 
     // Clear enemies
+    clearScheduledSpawns();
     enemiesRef.current = [];
     enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
     enemyRenderersRef.current.clear();
 
     // Spawn initial wave
-    const initialEnemyCount = 3;
-    for (let i = 0; i < initialEnemyCount; i++) {
-      setTimeout(() => {
-        spawnEnemy('grunt');
-      }, i * 500);
-    }
-  }, [mode, spawnEnemy]);
+    scheduleEnemySpawns(
+      Array.from({ length: 3 }, (_, index) => ({ type: 'grunt' as const, delayMs: index * 500 })),
+    );
+
+    return clearScheduledSpawns;
+  }, [clearScheduledSpawns, mode, scheduleEnemySpawns]);
 
   // Initialize canvas with DPI scaling
   useEffect(() => {
@@ -679,6 +698,15 @@ export default function BeatEmUpGame({
       const now = Date.now();
       const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
       lastTime = now;
+
+      const readySpawns: Enemy['type'][] = [];
+      scheduledEnemySpawnsRef.current = scheduledEnemySpawnsRef.current.filter((spawn) => {
+        spawn.remainingMs -= deltaTime * 1000;
+        if (spawn.remainingMs > 0) return true;
+        readySpawns.push(spawn.type);
+        return false;
+      });
+      readySpawns.forEach(spawnEnemy);
 
       // Update time elapsed for survival mode
       if (mode === 'survival' && gameState.startTime) {
@@ -893,12 +921,17 @@ export default function BeatEmUpGame({
       const currentWave = gameState.wave;
       
       // Check for wave completion (only if we have enemies and they're all dead)
-      if (enemiesRef.current.length > 0 && aliveEnemies.length === 0 && enemySpawnTimer > 1000) {
+      if (
+        enemiesRef.current.length > 0 &&
+        aliveEnemies.length === 0 &&
+        scheduledEnemySpawnsRef.current.length === 0 &&
+        enemySpawnTimer > 1000
+      ) {
         // Wave cleared! Advance to next wave
         const nextWave = currentWave + 1;
         
         // Check mode-specific win conditions
-        if (mode === 'story' && nextWave > STORY_MAX_WAVES) {
+        if (shouldCompleteStoryRun(mode, currentWave)) {
           // Story mode: Win after completing all waves
           setGameState((prev) => ({ ...prev, isGameOver: true }));
           if (onGameEnd) {
@@ -914,29 +947,7 @@ export default function BeatEmUpGame({
         // Wave change handled via onStatsUpdate
         enemySpawnTimer = 0;
 
-        // Spawn wave enemies (more enemies per wave)
-        const waveEnemyCount = Math.min(3 + nextWave, 8);
-        const waveTypes: Enemy['type'][] = [];
-
-        // Mix enemy types based on wave
-        for (let i = 0; i < waveEnemyCount; i++) {
-          if (nextWave % 5 === 0 && i === waveEnemyCount - 1) {
-            waveTypes.push('boss'); // Boss every 5 waves
-          } else if (nextWave % 3 === 0 && Math.random() < 0.3) {
-            waveTypes.push('brute');
-          } else if (Math.random() < 0.4) {
-            waveTypes.push('ninja');
-          } else {
-            waveTypes.push('grunt');
-          }
-        }
-
-        // Spawn enemies with slight delay
-        waveTypes.forEach((type, index) => {
-          setTimeout(() => {
-            spawnEnemy(type);
-          }, index * 300);
-        });
+        scheduleEnemySpawns(getWaveEncounterPlan(mode, nextWave));
       }
 
       // Spawn enemies during wave (only if we have enemies in the wave)
@@ -946,7 +957,12 @@ export default function BeatEmUpGame({
         mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL / (1 + currentWave * 0.1); // Faster spawning as waves progress
 
       // Only spawn if we have less than max and there are enemies in the current wave
-      if (enemySpawnTimer > spawnInterval && aliveEnemies.length < maxEnemiesPerWave && enemiesRef.current.length > 0) {
+      if (
+        !isStoryClimaxWave(mode, currentWave) &&
+        enemySpawnTimer > spawnInterval &&
+        aliveEnemies.length < maxEnemiesPerWave &&
+        enemiesRef.current.length > 0
+      ) {
         const types: Enemy['type'][] =
           currentWave >= 5
             ? ['grunt', 'grunt', 'ninja', 'brute', 'brute']
@@ -959,7 +975,11 @@ export default function BeatEmUpGame({
       }
       
       // If no enemies exist and timer is ready, spawn initial wave
-      if (enemiesRef.current.length === 0 && enemySpawnTimer > 1000) {
+      if (
+        enemiesRef.current.length === 0 &&
+        scheduledEnemySpawnsRef.current.length === 0 &&
+        enemySpawnTimer > 1000
+      ) {
         const initialCount = 3;
         for (let i = 0; i < initialCount; i++) {
           setTimeout(() => {
@@ -1005,7 +1025,7 @@ export default function BeatEmUpGame({
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameState.isGameOver, gameState.isPaused, mode, spawnEnemy]);
+  }, [gameState.isGameOver, gameState.isPaused, mode, scheduleEnemySpawns, spawnEnemy]);
 
   // Render function
   const render = (ctx: CanvasRenderingContext2D) => {
@@ -1432,6 +1452,20 @@ export default function BeatEmUpGame({
           aria-label="Rhythm Beat-Em-Up game area"
         />
       </div>
+
+      {isStoryClimaxWave(mode, gameState.wave) && !gameState.isGameOver && (
+        <motion.div
+          data-testid="story-climax-banner"
+          className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-lg border border-amber-300/45 bg-stone-950/88 px-5 py-2 text-center shadow-xl backdrop-blur-sm"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-amber-300">
+            Final movement
+          </p>
+          <p className="text-sm font-bold text-stone-100">Shogun&apos;s Last Stand</p>
+        </motion.div>
+      )}
 
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 space-y-2">

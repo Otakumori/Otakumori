@@ -16,6 +16,7 @@ import BeatEmUpGame from './BeatEmUpGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 import { useGameProgress } from '@/app/lib/games/progress';
+import { getBeatEmUpRunGrade } from './beatEmUpProduct';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
@@ -149,13 +150,14 @@ export default function OtakuBeatEmUpGameWrapper({ mode }: OtakuBeatEmUpGameWrap
         }
 
         if (state === 'results' && gameResults) {
+          const runGrade = getBeatEmUpRunGrade(mode, gameResults.score);
           return (
             <GameResultsScreen
               title={`Otaku Beat-Em-Up - ${modeTitle}`}
               score={gameResults.score}
               isWin={gameResults.didWin}
               stats={[
-                { label: 'Final Score', value: gameResults.score },
+                { label: 'Run Grade', value: runGrade },
                 { label: 'Waves Cleared', value: gameResults.wavesCleared },
                 { label: 'Result', value: gameResults.didWin ? 'Victory!' : 'Defeated' },
               ]}
@@ -180,7 +182,9 @@ export default function OtakuBeatEmUpGameWrapper({ mode }: OtakuBeatEmUpGameWrap
                 progress={gameStats.progress}
                 milestone={`Wave ${gameStats.wavesCleared}`}
               />
-              <GamePlatformControls session={session} />
+              <div className="beat-em-up-platform-controls">
+                <GamePlatformControls session={session} belowNavigation />
+              </div>
               <BeatEmUpGame
                 mode={mode}
                 paused={session.phase === 'paused'}
@@ -192,6 +196,13 @@ export default function OtakuBeatEmUpGameWrapper({ mode }: OtakuBeatEmUpGameWrap
               />
               <GamePlatformPause session={session} title="Otaku Beat-em-up" />
               <GameSessionAnnouncement session={session} />
+              <style>{`
+                @media (max-width: 767px) {
+                  .beat-em-up-platform-controls .game-platform-controls--below-navigation {
+                    inset-block-start: max(11rem, env(safe-area-inset-top));
+                  }
+                }
+              `}</style>
             </>
           );
         }
