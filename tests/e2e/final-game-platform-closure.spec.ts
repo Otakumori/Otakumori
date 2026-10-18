@@ -38,6 +38,6 @@ test.describe('final game platform closure', () => {
     await page.getByRole('button', { name: 'Resume', exact: true }).click();
     await expect(page.getByRole('dialog', { name: /Maid Café Manager paused/i })).toBeHidden();
     await controls.getByRole('button', { name: 'Exit' }).click();
-    await expect(controls).toHaveAttribute('data-game-session-phase', 'exiting');
+    await expect(page).toHaveURL(/\/mini-games\/?$/);
   });
 });
