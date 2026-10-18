@@ -28,5 +28,5 @@ test('adopted dungeon session pauses, resumes, and exits behind the existing age
   await expect(page.getByText('Press ESC to continue')).toBeHidden();
 
   await controls.getByRole('button', { name: 'Exit' }).click();
-  await expect(page.locator('[data-game-session-phase="exiting"]')).toBeAttached();
+  await expect(page).toHaveURL(/\/mini-games\/?$/);
 });
