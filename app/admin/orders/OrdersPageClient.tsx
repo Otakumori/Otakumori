@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AdminLayout } from '@/components/admin/AdminNav';
 import { Package, Search, Download, Eye } from 'lucide-react';
 
@@ -47,6 +48,27 @@ interface Order {
     error?: string | null;
     lastSyncAt?: string | null;
   } | null;
+  FinancialTransaction: Array<{
+    id: string;
+    type: string;
+    category?: string | null;
+    amount: number;
+    currency: string;
+    description: string;
+    stripeChargeId?: string | null;
+    stripeRefundId?: string | null;
+    createdAt: string;
+  }>;
+  reconciliation: {
+    reconciled: boolean;
+    financialScope: string;
+    ledgerRevenue: number;
+    ledgerRefund: number;
+    cogsAmount: number | null;
+    provider: string;
+    providerOrderId: string | null;
+    issues: string[];
+  };
 }
 
 interface FinancialSummary {
@@ -68,9 +90,9 @@ const formatCurrency = (cents: number) => {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
@@ -78,13 +100,15 @@ const formatDate = (dateString: string) => {
 };
 
 export default function OrdersPageClient() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [filters, setFilters] = useState({
-    status: 'all',
+    status: searchParams.get('status') || 'all',
     dateRange: '30days',
-    search: '',
+    search: searchParams.get('search') || '',
+    attention: searchParams.get('attention') || 'all',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,27 +121,28 @@ export default function OrdersPageClient() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         status: filters.status,
         dateRange: filters.dateRange,
+        attention: filters.attention,
         ...(filters.search && { search: filters.search }),
       });
-      
+
       const [ordersRes, summaryRes] = await Promise.all([
         fetch(`/api/admin/orders?${params}`),
         fetch('/api/admin/orders/summary'),
       ]);
-      
+
       const ordersData = await ordersRes.json();
       const summaryData = await summaryRes.json();
-      
+
       if (ordersData.ok) {
         setOrders(ordersData.data);
       } else {
         setError(ordersData.error?.message || 'Failed to load orders');
       }
-      
+
       if (summaryData.ok) {
         setSummary(summaryData.data);
       }
@@ -137,7 +162,7 @@ export default function OrdersPageClient() {
         format: 'csv',
         ...(filters.search && { search: filters.search }),
       });
-      
+
       const res = await fetch(`/api/admin/orders/export?${params}`);
       if (res.ok) {
         const blob = await res.blob();
@@ -222,6 +247,19 @@ export default function OrdersPageClient() {
             <option value="cancelled">Cancelled</option>
           </select>
           <select
+            value={filters.attention}
+            onChange={(e) => setFilters({ ...filters, attention: e.target.value })}
+            className="px-4 py-2 bg-black/40 border border-white/20 rounded text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+            aria-label="Operational attention"
+          >
+            <option value="all">All attention states</option>
+            <option value="pending-payment">Pending payment</option>
+            <option value="pending-fulfillment">Pending fulfillment</option>
+            <option value="fulfillment-error">Fulfillment errors</option>
+            <option value="submission-uncertain">Submission uncertain</option>
+            <option value="cancelled-refunded">Cancelled / refunded</option>
+          </select>
+          <select
             value={filters.dateRange}
             onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
             className="px-4 py-2 bg-black/40 border border-white/20 rounded text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -290,12 +328,17 @@ export default function OrdersPageClient() {
                         {formatCurrency(order.totalAmount)}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-xs border ${
-                          order.status === 'shipped' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
-                          order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
-                          order.status === 'cancelled' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                          'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded text-xs border ${
+                            order.status === 'shipped'
+                              ? 'bg-green-500/20 text-green-300 border-green-500/30'
+                              : order.status === 'pending'
+                                ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                                : order.status === 'cancelled'
+                                  ? 'bg-red-500/20 text-red-300 border-red-500/30'
+                                  : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                          }`}
+                        >
                           {order.status.replace('_', ' ')}
                         </span>
                       </td>
@@ -408,10 +451,18 @@ function OrderDetailModal({
   const discount = order.discountAmount || 0;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-gradient-to-br from-purple-900 to-black border border-white/20 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <dialog
+      open
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      aria-labelledby="order-detail-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+      <div className="bg-gradient-to-br from-purple-900 to-black border border-white/20 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-gradient-to-br from-purple-900 to-black z-10">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 id="order-detail-title" className="text-2xl font-bold text-white">
             Order #{order.displayNumber}
           </h2>
           <button
@@ -446,7 +497,9 @@ function OrderDetailModal({
                 <div key={item.id} className="p-4 flex justify-between items-center">
                   <div>
                     <div className="text-white">{item.name}</div>
-                    <div className="text-gray-400 text-sm">SKU: {item.sku} • Qty: {item.quantity}</div>
+                    <div className="text-gray-400 text-sm">
+                      SKU: {item.sku} • Qty: {item.quantity}
+                    </div>
                   </div>
                   <div className="text-white font-semibold">
                     {formatCurrency(item.unitAmount * item.quantity)}
@@ -507,6 +560,12 @@ function OrderDetailModal({
                   {order.PrintifyOrderSync.error}
                 </div>
               )}
+              {order.PrintifyOrderSync?.status === 'submission_uncertain' && (
+                <div className="rounded border border-amber-400/40 bg-amber-500/10 p-3 text-amber-100">
+                  Provider submission may have succeeded. Automatic retry is blocked until the
+                  Printify order is reconciled.
+                </div>
+              )}
               {['failed', 'mapping_failed', 'no_items'].includes(
                 order.PrintifyOrderSync?.status ?? '',
               ) && (
@@ -522,12 +581,91 @@ function OrderDetailModal({
             </div>
           </section>
 
+          <section>
+            <h3 className="text-white font-semibold mb-3">Payment &amp; Finance Authority</h3>
+            <div className="bg-black/50 rounded-lg p-4 space-y-3 text-sm">
+              <dl className="grid gap-2 sm:grid-cols-2">
+                <div>
+                  <dt className="text-gray-500">Stripe Session</dt>
+                  <dd className="break-all font-mono text-gray-200">{order.stripeId}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">PaymentIntent</dt>
+                  <dd className="break-all font-mono text-gray-200">
+                    {order.paymentIntentId ?? 'Unavailable'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Charge</dt>
+                  <dd className="break-all font-mono text-gray-200">
+                    {order.chargeId ?? 'Unavailable'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Printify order</dt>
+                  <dd className="break-all font-mono text-gray-200">
+                    {order.reconciliation.providerOrderId ?? 'Not submitted'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Ledger revenue</dt>
+                  <dd className="text-gray-200">
+                    {formatCurrency(order.reconciliation.ledgerRevenue)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">Immutable COGS</dt>
+                  <dd className="text-gray-200">
+                    {order.reconciliation.cogsAmount == null
+                      ? 'Unknown'
+                      : formatCurrency(order.reconciliation.cogsAmount)}
+                  </dd>
+                </div>
+              </dl>
+              <div
+                className={`rounded border p-3 ${order.reconciliation.reconciled ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200' : 'border-amber-400/40 bg-amber-500/10 text-amber-100'}`}
+              >
+                {order.reconciliation.financialScope === 'CHECKOUT_ONLY'
+                  ? 'Checkout-only record; no paid financial event.'
+                  : order.reconciliation.reconciled
+                    ? 'Order reconciles to the canonical ledger.'
+                    : `Reconciliation required: ${order.reconciliation.issues.join(', ')}`}
+              </div>
+              {order.FinancialTransaction.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-xs">
+                    <thead className="text-gray-500">
+                      <tr>
+                        <th className="p-2">Time</th>
+                        <th className="p-2">Fact</th>
+                        <th className="p-2">Amount</th>
+                        <th className="p-2">Source</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {order.FinancialTransaction.map((entry) => (
+                        <tr key={entry.id} className="border-t border-white/10">
+                          <td className="p-2 text-gray-400">{formatDate(entry.createdAt)}</td>
+                          <td className="p-2 text-gray-200">{entry.category ?? entry.type}</td>
+                          <td className="p-2 text-gray-200">{formatCurrency(entry.amount)}</td>
+                          <td className="p-2 text-gray-400">{entry.description}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </section>
+
           {/* Tracking Info */}
           <section>
             <h3 className="text-white font-semibold mb-3">Tracking Information</h3>
             <div className="bg-black/50 rounded-lg p-4 space-y-4">
               <div>
-                <label htmlFor="tracking-number" className="block text-gray-300 text-sm mb-1">Tracking Number</label>
+                <label htmlFor="tracking-number" className="block text-gray-300 text-sm mb-1">
+                  Tracking Number
+                </label>
                 <input
                   id="tracking-number"
                   type="text"
@@ -537,7 +675,9 @@ function OrderDetailModal({
                 />
               </div>
               <div>
-                <label htmlFor="tracking-carrier" className="block text-gray-300 text-sm mb-1">Carrier</label>
+                <label htmlFor="tracking-carrier" className="block text-gray-300 text-sm mb-1">
+                  Carrier
+                </label>
                 <input
                   id="tracking-carrier"
                   type="text"
@@ -548,7 +688,9 @@ function OrderDetailModal({
                 />
               </div>
               <div>
-                <label htmlFor="tracking-url" className="block text-gray-300 text-sm mb-1">Tracking URL</label>
+                <label htmlFor="tracking-url" className="block text-gray-300 text-sm mb-1">
+                  Tracking URL
+                </label>
                 <input
                   id="tracking-url"
                   type="url"
@@ -598,13 +740,15 @@ function OrderDetailModal({
               <div>Stripe ID: {order.stripeId}</div>
               <div>PaymentIntent: {order.paymentIntentId || 'not recorded'}</div>
               <div>Charge: {order.chargeId || 'not recorded'}</div>
-              <div>Printify: {order.printifyId || order.PrintifyOrderSync?.printifyOrderId || 'not submitted'}</div>
+              <div>
+                Printify:{' '}
+                {order.printifyId || order.PrintifyOrderSync?.printifyOrderId || 'not submitted'}
+              </div>
               <div>Order ID: {order.id}</div>
             </div>
           </section>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }
-
