@@ -18,6 +18,76 @@ export type FinanceExportDataset = (typeof FINANCE_EXPORT_DATASETS)[number];
 
 export type FinancePeriod = { from: Date; to: Date; label: string };
 
+type ReconciliationOrder = {
+  id: string;
+  displayNumber: number;
+  createdAt: Date;
+  paidAt: Date | null;
+  status: string;
+  stripeId: string;
+  paymentIntentId: string | null;
+  chargeId: string | null;
+  printifyId: string | null;
+  totalAmount: number;
+  refundAmount: number | null;
+  PrintifyOrderSync: {
+    printifyOrderId: string;
+    status: string;
+    error: string | null;
+  } | null;
+};
+
+type ReconciliationLedgerRow = {
+  amount: number;
+  category: string | null;
+};
+
+export function reconcileOrderFinancials(
+  order: ReconciliationOrder,
+  rows: ReconciliationLedgerRow[],
+) {
+  const ledgerRevenue = rows
+    .filter((row) =>
+      ['product_sale', 'discount', 'shipping_income', 'tax_collected'].includes(row.category ?? ''),
+    )
+    .reduce((sum, row) => sum + row.amount, 0);
+  const ledgerRefund = Math.abs(
+    rows.filter((row) => row.category === 'refund').reduce((sum, row) => sum + row.amount, 0),
+  );
+  const cogsRow = rows.find((row) =>
+    ['provider_cogs', 'provider_cogs_unknown'].includes(row.category ?? ''),
+  );
+  const issues: string[] = [];
+  if (order.paidAt && ledgerRevenue !== order.totalAmount) issues.push('LEDGER_TOTAL_MISMATCH');
+  if (ledgerRefund !== (order.refundAmount ?? 0)) issues.push('REFUND_MISMATCH');
+  if (order.paidAt && !cogsRow) issues.push('COGS_NOT_CAPTURED');
+  if (cogsRow?.category === 'provider_cogs_unknown') issues.push('COGS_UNKNOWN');
+  if (order.paidAt && !order.paymentIntentId) issues.push('PAYMENT_INTENT_MISSING');
+  if (order.status === 'pending_mapping' || order.PrintifyOrderSync?.error) {
+    issues.push('FULFILLMENT_REVIEW');
+  }
+  return {
+    orderId: order.id,
+    orderNumber: order.displayNumber,
+    createdAt: order.createdAt,
+    paidAt: order.paidAt,
+    status: order.status,
+    provider: order.PrintifyOrderSync ? 'printify' : 'unknown',
+    stripeSessionId: order.stripeId,
+    paymentIntentId: order.paymentIntentId,
+    chargeId: order.chargeId,
+    providerOrderId: order.printifyId ?? order.PrintifyOrderSync?.printifyOrderId ?? null,
+    localTotal: order.totalAmount,
+    ledgerRevenue,
+    refundAmount: order.refundAmount ?? 0,
+    ledgerRefund,
+    cogsAmount: cogsRow?.category === 'provider_cogs' ? Math.abs(cogsRow.amount) : null,
+    issues,
+    financialScope: order.paidAt ? 'PAID_ORDER' : 'CHECKOUT_ONLY',
+    reconciled: order.paidAt ? issues.length === 0 : true,
+  };
+}
+
 export function parseFinancePeriod(params: URLSearchParams, now = new Date()): FinancePeriod {
   const year = Number(params.get('year') ?? now.getUTCFullYear());
   const defaultFrom = new Date(Date.UTC(year, 0, 1));
@@ -58,51 +128,9 @@ export async function loadFinanceReport(period: FinancePeriod) {
     byOrder.set(row.orderId, list);
   }
 
-  const reconciliation = orders.map((order) => {
-    const rows = byOrder.get(order.id) ?? [];
-    const ledgerRevenue = rows
-      .filter((row) =>
-        ['product_sale', 'discount', 'shipping_income', 'tax_collected'].includes(
-          row.category ?? '',
-        ),
-      )
-      .reduce((sum, row) => sum + row.amount, 0);
-    const ledgerRefund = Math.abs(
-      rows.filter((row) => row.category === 'refund').reduce((sum, row) => sum + row.amount, 0),
-    );
-    const cogsRow = rows.find((row) =>
-      ['provider_cogs', 'provider_cogs_unknown'].includes(row.category ?? ''),
-    );
-    const issues: string[] = [];
-    if (order.paidAt && ledgerRevenue !== order.totalAmount) issues.push('LEDGER_TOTAL_MISMATCH');
-    if (ledgerRefund !== (order.refundAmount ?? 0)) issues.push('REFUND_MISMATCH');
-    if (order.paidAt && !cogsRow) issues.push('COGS_NOT_CAPTURED');
-    if (cogsRow?.category === 'provider_cogs_unknown') issues.push('COGS_UNKNOWN');
-    if (order.paidAt && !order.paymentIntentId) issues.push('PAYMENT_INTENT_MISSING');
-    if (order.status === 'pending_mapping' || order.PrintifyOrderSync?.error) {
-      issues.push('FULFILLMENT_REVIEW');
-    }
-    return {
-      orderId: order.id,
-      orderNumber: order.displayNumber,
-      createdAt: order.createdAt,
-      paidAt: order.paidAt,
-      status: order.status,
-      provider: order.PrintifyOrderSync ? 'printify' : 'unknown',
-      stripeSessionId: order.stripeId,
-      paymentIntentId: order.paymentIntentId,
-      chargeId: order.chargeId,
-      providerOrderId: order.printifyId ?? order.PrintifyOrderSync?.printifyOrderId ?? null,
-      localTotal: order.totalAmount,
-      ledgerRevenue,
-      refundAmount: order.refundAmount ?? 0,
-      ledgerRefund,
-      cogsAmount: cogsRow?.category === 'provider_cogs' ? Math.abs(cogsRow.amount) : null,
-      issues,
-      financialScope: order.paidAt ? 'PAID_ORDER' : 'CHECKOUT_ONLY',
-      reconciled: order.paidAt ? issues.length === 0 : true,
-    };
-  });
+  const reconciliation = orders.map((order) =>
+    reconcileOrderFinancials(order, byOrder.get(order.id) ?? []),
+  );
 
   const sumCategory = (category: string) =>
     ledger.filter((row) => row.category === category).reduce((sum, row) => sum + row.amount, 0);
