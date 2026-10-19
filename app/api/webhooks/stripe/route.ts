@@ -6,6 +6,7 @@ import type { Prisma } from '@prisma/client';
 import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
+import { capturePaidOrderLedger, reconcileRefundLedger } from '@/lib/finance/ledger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -83,7 +84,12 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
   } catch (err) {
-    logger.error('Invalid Stripe signature', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+    logger.error(
+      'Invalid Stripe signature',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -104,7 +110,10 @@ export async function POST(req: Request) {
     ) {
       const session = event.data.object as Stripe.Checkout.Session;
       const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['line_items.data.price.product', 'payment_intent.latest_charge'],
+        expand: [
+          'line_items.data.price.product',
+          'payment_intent.latest_charge.balance_transaction',
+        ],
       });
 
       if (fullSession.payment_status !== 'paid') {
@@ -131,6 +140,17 @@ export async function POST(req: Request) {
           paymentIntent && typeof paymentIntent !== 'string' ? paymentIntent.latest_charge : null;
         const chargeId =
           typeof latestCharge === 'string' ? latestCharge : (latestCharge?.id ?? null);
+        const balanceTransaction =
+          latestCharge && typeof latestCharge !== 'string'
+            ? latestCharge.balance_transaction
+            : null;
+        const stripeFee =
+          balanceTransaction && typeof balanceTransaction !== 'string'
+            ? {
+                amount: balanceTransaction.fee,
+                balanceTransactionId: balanceTransaction.id,
+              }
+            : null;
         const totalDetails = fullSession.total_details;
 
         await prisma.order.update({
@@ -142,10 +162,7 @@ export async function POST(req: Request) {
             currency: (fullSession.currency ?? order.currency).toUpperCase(),
             taxAmount: totalDetails?.amount_tax ?? order.taxAmount,
             shippingAmount: totalDetails?.amount_shipping ?? order.shippingAmount,
-            discountAmount: Math.max(
-              order.discountAmount ?? 0,
-              totalDetails?.amount_discount ?? 0,
-            ),
+            discountAmount: Math.max(order.discountAmount ?? 0, totalDetails?.amount_discount ?? 0),
             paymentIntentId: paymentIntentId ?? order.paymentIntentId,
             chargeId: chargeId ?? order.chargeId,
             paidAt: order.paidAt ?? new Date(),
@@ -153,16 +170,32 @@ export async function POST(req: Request) {
           },
         });
 
+        const shippingAddress = (fullSession as any).shipping_details?.address;
+        const ledgerResult = await capturePaidOrderLedger({
+          orderId: order.id,
+          stripeSessionId: fullSession.id,
+          chargeId,
+          paymentIntentId,
+          jurisdiction: {
+            country: shippingAddress?.country ?? null,
+            state: shippingAddress?.state ?? null,
+          },
+          stripeFee,
+        });
+        outcome.financialLedger = 'captured';
+        outcome.cogsStatus = ledgerResult.cogsStatus;
+
         const result = await createPrintifyOrder(order.id, fullSession);
         if (!result.ok) {
           await prisma.order.update({
             where: { id: order.id },
             data: {
               status: 'pending_mapping',
-              notes: `Fulfillment requires operator review: ${result.error ?? 'unknown error'}`.slice(
-                0,
-                1000,
-              ),
+              notes:
+                `Fulfillment requires operator review: ${result.error ?? 'unknown error'}`.slice(
+                  0,
+                  1000,
+                ),
             },
           });
           outcome.fulfillment = 'operator_review';
@@ -194,6 +227,13 @@ export async function POST(req: Request) {
             ? 'Payment fully refunded in Stripe.'
             : 'Payment partially refunded in Stripe.',
         },
+      });
+      await reconcileRefundLedger({
+        orderId: order.id,
+        chargeId: charge.id,
+        amountRefunded: charge.amount_refunded,
+        currency: charge.currency,
+        occurredAt: new Date(event.created * 1000),
       });
       outcome.refundRecorded = true;
     } else {
