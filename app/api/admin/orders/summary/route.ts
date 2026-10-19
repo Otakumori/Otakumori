@@ -7,7 +7,7 @@ import { OrderStatus } from '@prisma/client';
 
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const requestId = generateRequestId();
   
   try {
@@ -86,15 +86,12 @@ export async function GET(req: NextRequest) {
       }),
     ]);
     
-    // Calculate total refunds from FinancialTransaction
-    const refunds = await db.financialTransaction.aggregate({
-      where: {
-        type: 'refund',
-      },
-      _sum: { amount: true },
+    // Order.refundAmount is the canonical Stripe-refund reconciliation value.
+    const refunds = await db.order.aggregate({
+      _sum: { refundAmount: true },
     });
     
-    const totalRefunds = Math.abs(refunds._sum.amount || 0);
+    const totalRefunds = refunds._sum.refundAmount || 0;
     
     return NextResponse.json({
       ok: true,

@@ -38,6 +38,18 @@ export interface PrintifyOrderResult {
   response?: unknown;
 }
 
+export interface PrintifyFulfillmentOptions {
+  /** Failed, provider-rejected submissions may only be retried by an explicit operator action. */
+  allowRetry?: boolean;
+}
+
+const TERMINAL_SYNC_STATUSES = new Set(['accepted', 'in_production', 'fulfilled', 'shipped']);
+const RETRYABLE_SYNC_STATUSES = new Set(['failed', 'mapping_failed', 'no_items']);
+
+function isPendingProviderId(value: string) {
+  return /^(pending|failed)_/.test(value);
+}
+
 function extractNameParts(fullName?: string | null) {
   const safe = (fullName || '').trim();
   if (!safe) {
@@ -112,7 +124,33 @@ export async function loadPrintifyOrderItems(localOrderId: string) {
 export async function createPrintifyOrder(
   localOrderId: string,
   session: any,
+  options: PrintifyFulfillmentOptions = {},
 ): Promise<PrintifyOrderResult> {
+  const existingSync = await prisma.printifyOrderSync.findUnique({
+    where: { localOrderId },
+  });
+
+  if (existingSync) {
+    if (
+      TERMINAL_SYNC_STATUSES.has(existingSync.status) ||
+      !isPendingProviderId(existingSync.printifyOrderId)
+    ) {
+      return {
+        ok: true,
+        printifyOrderId: existingSync.printifyOrderId,
+        status: existingSync.status,
+      };
+    }
+
+    if (existingSync.status === 'submitting' || existingSync.status === 'submission_uncertain') {
+      return {
+        ok: false,
+        error:
+          'Printify submission is already in progress or has an uncertain provider outcome; reconcile before retrying.',
+      };
+    }
+  }
+
   const { lineItems, missingMappings } = await loadPrintifyOrderItems(localOrderId);
 
   if (missingMappings.length > 0) {
@@ -147,6 +185,43 @@ export async function createPrintifyOrder(
     return { ok: false, error };
   }
 
+  if (existingSync) {
+    if (!options.allowRetry || !RETRYABLE_SYNC_STATUSES.has(existingSync.status)) {
+      return {
+        ok: false,
+        error: 'Printify fulfillment requires an explicit operator retry.',
+      };
+    }
+
+    await prisma.printifyOrderSync.update({
+      where: { localOrderId },
+      data: {
+        status: 'submitting',
+        error: null,
+        lastSyncAt: new Date(),
+      },
+    });
+  } else {
+    try {
+      await prisma.printifyOrderSync.create({
+        data: {
+          localOrderId,
+          printifyOrderId: `pending_${localOrderId}`,
+          status: 'submitting',
+          lastSyncAt: new Date(),
+        },
+      });
+    } catch (error) {
+      if ((error as { code?: string })?.code === 'P2002') {
+        return {
+          ok: false,
+          error: 'Printify submission is already owned by another request.',
+        };
+      }
+      throw error;
+    }
+  }
+
   const payload: PrintifyOrderPayload = {
     external_id: localOrderId,
     line_items: lineItems,
@@ -157,14 +232,34 @@ export async function createPrintifyOrder(
 
   const endpoint = `${env.PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/orders.json`;
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Printify submission outcome is uncertain';
+    await prisma.printifyOrderSync.update({
+      where: { localOrderId },
+      data: {
+        status: 'submission_uncertain',
+        error: message.slice(0, 500),
+        lastSyncAt: new Date(),
+      },
+    });
+    return {
+      ok: false,
+      error:
+        'Printify did not return a definitive response; automatic retry is blocked pending reconciliation.',
+      payload,
+    };
+  }
 
   const responseText = await response.text();
   let parsed: any = null;
@@ -179,16 +274,9 @@ export async function createPrintifyOrder(
       typeof parsed?.message === 'string'
         ? parsed.message
         : `Printify order creation failed with ${response.status}`;
-    await prisma.printifyOrderSync.upsert({
+    await prisma.printifyOrderSync.update({
       where: { localOrderId },
-      update: { status: 'failed', error, lastSyncAt: new Date() },
-      create: {
-        localOrderId,
-        printifyOrderId: `failed_${localOrderId}`,
-        status: 'failed',
-        error,
-        lastSyncAt: new Date(),
-      },
+      data: { status: 'failed', error, lastSyncAt: new Date() },
     });
     return { ok: false, error, payload, response: parsed };
   }
@@ -196,29 +284,41 @@ export async function createPrintifyOrder(
   const printifyOrderId = String(parsed?.id || '');
   const status = String(parsed?.status || 'in_production');
 
-  await prisma.order.update({
-    where: { id: localOrderId },
-    data: {
-      printifyId: printifyOrderId || undefined,
-      status: 'in_production',
-    },
-  });
+  if (!printifyOrderId) {
+    await prisma.printifyOrderSync.update({
+      where: { localOrderId },
+      data: {
+        status: 'submission_uncertain',
+        error: 'Printify accepted the request without returning an order ID.',
+        lastSyncAt: new Date(),
+      },
+    });
+    return {
+      ok: false,
+      error: 'Printify response did not include an order ID; reconcile before retrying.',
+      payload,
+      response: parsed,
+    };
+  }
 
-  await prisma.printifyOrderSync.upsert({
-    where: { localOrderId },
-    update: {
-      printifyOrderId: printifyOrderId || `accepted_${localOrderId}`,
-      status,
-      error: null,
-      lastSyncAt: new Date(),
-    },
-    create: {
-      localOrderId,
-      printifyOrderId: printifyOrderId || `accepted_${localOrderId}`,
-      status,
-      lastSyncAt: new Date(),
-    },
-  });
+  await prisma.$transaction([
+    prisma.order.update({
+      where: { id: localOrderId },
+      data: {
+        printifyId: printifyOrderId,
+        status: 'in_production',
+      },
+    }),
+    prisma.printifyOrderSync.update({
+      where: { localOrderId },
+      data: {
+        printifyOrderId,
+        status,
+        error: null,
+        lastSyncAt: new Date(),
+      },
+    }),
+  ]);
 
   return {
     ok: true,

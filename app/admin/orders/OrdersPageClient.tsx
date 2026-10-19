@@ -8,12 +8,18 @@ interface Order {
   id: string;
   displayNumber: number;
   stripeId: string;
+  paymentIntentId?: string | null;
+  chargeId?: string | null;
+  printifyId?: string | null;
   status: string;
   totalAmount: number;
   subtotalCents: number;
   taxAmount?: number | null;
   shippingAmount?: number | null;
   discountAmount?: number | null;
+  refundAmount?: number | null;
+  refundedAt?: string | null;
+  notes?: string | null;
   currency: string;
   createdAt: string;
   paidAt?: string | null;
@@ -35,6 +41,12 @@ interface Order {
     unitAmount: number;
     sku: string;
   }>;
+  PrintifyOrderSync?: {
+    printifyOrderId: string;
+    status: string;
+    error?: string | null;
+    lastSyncAt?: string | null;
+  } | null;
 }
 
 interface FinancialSummary {
@@ -335,6 +347,7 @@ function OrderDetailModal({
     url: order.trackingUrl || '',
   });
   const [saving, setSaving] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   const handleUpdateTracking = async () => {
     try {
@@ -357,6 +370,34 @@ function OrderDetailModal({
       console.error(err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRetryFulfillment = async () => {
+    if (!window.confirm('Retry Printify fulfillment for this paid order?')) return;
+    try {
+      setRetrying(true);
+      const res = await fetch(`/api/admin/orders/${order.id}/fulfillment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'retry',
+          confirmation: 'RETRY PRINTIFY FULFILLMENT',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.error || 'Fulfillment retry failed closed.');
+        return;
+      }
+      alert('Fulfillment retry accepted.');
+      onUpdate();
+      onClose();
+    } catch (err) {
+      alert('Fulfillment retry failed closed.');
+      console.error(err);
+    } finally {
+      setRetrying(false);
     }
   };
 
@@ -445,6 +486,39 @@ function OrderDetailModal({
                 <span>Total:</span>
                 <span>{formatCurrency(order.totalAmount)}</span>
               </div>
+              {(order.refundAmount ?? 0) > 0 && (
+                <div className="flex justify-between text-amber-300">
+                  <span>Refunded:</span>
+                  <span>{formatCurrency(order.refundAmount ?? 0)}</span>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-3">Fulfillment Reconciliation</h3>
+            <div className="bg-black/50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="flex justify-between text-gray-300">
+                <span>Provider state:</span>
+                <span>{order.PrintifyOrderSync?.status ?? 'not submitted'}</span>
+              </div>
+              {order.PrintifyOrderSync?.error && (
+                <div className="rounded border border-red-500/40 bg-red-500/10 p-3 text-red-200">
+                  {order.PrintifyOrderSync.error}
+                </div>
+              )}
+              {['failed', 'mapping_failed', 'no_items'].includes(
+                order.PrintifyOrderSync?.status ?? '',
+              ) && (
+                <button
+                  onClick={handleRetryFulfillment}
+                  disabled={retrying}
+                  className="w-full rounded border border-amber-400/50 bg-amber-500/10 px-4 py-2 text-amber-100 disabled:opacity-50"
+                >
+                  {retrying ? 'Retrying...' : 'Confirm fulfillment retry'}
+                </button>
+              )}
+              {order.notes && <div className="text-gray-300">{order.notes}</div>}
             </div>
           </section>
 
@@ -522,6 +596,9 @@ function OrderDetailModal({
             <h3 className="text-white font-semibold mb-3">Reference IDs</h3>
             <div className="bg-black/50 rounded-lg p-4 space-y-2 text-xs font-mono text-gray-400">
               <div>Stripe ID: {order.stripeId}</div>
+              <div>PaymentIntent: {order.paymentIntentId || 'not recorded'}</div>
+              <div>Charge: {order.chargeId || 'not recorded'}</div>
+              <div>Printify: {order.printifyId || order.PrintifyOrderSync?.printifyOrderId || 'not submitted'}</div>
               <div>Order ID: {order.id}</div>
             </div>
           </section>

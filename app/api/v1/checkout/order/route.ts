@@ -42,7 +42,18 @@ const CheckoutOrderSchema = z.object({
  * Submit an order to Printify for fulfillment
  * Requires authentication
  */
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: 'Direct fulfillment is disabled. Paid orders are fulfilled by the verified Stripe webhook.',
+      canonicalPath: '/api/v1/checkout/session',
+    },
+    { status: 410 },
+  );
+}
+
+async function _legacyDirectFulfillmentDisabled(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -195,6 +206,8 @@ export async function POST(req: NextRequest) {
   }
 }
 
+void _legacyDirectFulfillmentDisabled;
+
 /**
  * GET /api/v1/checkout/order?orderId=xxx
  * Get sync status for an order
@@ -213,8 +226,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Order ID required' }, { status: 400 });
     }
 
-    const syncRecord = await db.printifyOrderSync.findUnique({
-      where: { localOrderId: orderId },
+    const syncRecord = await db.printifyOrderSync.findFirst({
+      where: {
+        localOrderId: orderId,
+        Order: { User: { clerkId: userId } },
+      },
     });
 
     if (!syncRecord) {

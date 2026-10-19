@@ -66,6 +66,7 @@ export async function GET(req: NextRequest) {
             sku: true,
           },
         },
+        PrintifyOrderSync: true,
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
