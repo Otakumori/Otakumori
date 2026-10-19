@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   orderFindFirst: vi.fn(),
   orderUpdate: vi.fn(),
   createPrintifyOrder: vi.fn(),
+  capturePaidOrderLedger: vi.fn(),
+  reconcileRefundLedger: vi.fn(),
 }));
 
 vi.mock('next/headers', () => ({
@@ -42,6 +44,10 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/fulfillment/printify', () => ({
   createPrintifyOrder: mocks.createPrintifyOrder,
 }));
+vi.mock('@/lib/finance/ledger', () => ({
+  capturePaidOrderLedger: mocks.capturePaidOrderLedger,
+  reconcileRefundLedger: mocks.reconcileRefundLedger,
+}));
 
 import { POST } from '@/app/api/webhooks/stripe/route';
 
@@ -71,6 +77,8 @@ describe('Stripe webhook closure', () => {
       ok: true,
       printifyOrderId: 'printify_order_1',
     });
+    mocks.capturePaidOrderLedger.mockResolvedValue({ rows: 3, cogsStatus: 'KNOWN' });
+    mocks.reconcileRefundLedger.mockResolvedValue({});
     mocks.retrieveSession.mockResolvedValue({
       id: 'cs_test_1',
       payment_status: 'paid',
@@ -114,6 +122,14 @@ describe('Stripe webhook closure', () => {
       }),
     );
     expect(mocks.createPrintifyOrder).toHaveBeenCalledTimes(1);
+    expect(mocks.capturePaidOrderLedger).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order_1',
+        stripeSessionId: 'cs_test_1',
+        paymentIntentId: 'pi_1',
+        chargeId: 'ch_1',
+      }),
+    );
   });
 
   it('does not replay a completed Stripe event', async () => {
@@ -147,5 +163,37 @@ describe('Stripe webhook closure', () => {
         notes: expect.stringMatching(/operator review/i),
       }),
     });
+  });
+
+  it('reconciles cumulative refunds into the canonical finance ledger', async () => {
+    mocks.event = {
+      id: 'evt_refund_1',
+      type: 'charge.refunded',
+      created: 1_799_000_000,
+      data: {
+        object: {
+          id: 'ch_1',
+          payment_intent: 'pi_1',
+          amount_refunded: 1200,
+          currency: 'usd',
+        },
+      },
+    };
+    mocks.orderFindFirst.mockResolvedValue({
+      id: 'order_1',
+      status: 'in_production',
+      totalAmount: 4200,
+    });
+
+    const response = await POST(request());
+    expect(response.status).toBe(200);
+    expect(mocks.reconcileRefundLedger).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order_1',
+        chargeId: 'ch_1',
+        amountRefunded: 1200,
+        currency: 'usd',
+      }),
+    );
   });
 });

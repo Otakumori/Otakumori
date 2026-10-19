@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   FileText,
   SlidersHorizontal,
+  Landmark,
 } from 'lucide-react';
 
 type AdminRoute = {
@@ -37,6 +38,12 @@ const adminGroups: AdminGroup[] = [
       { path: '/admin', name: 'Dashboard', icon: Home, description: 'Operational overview' },
       { path: '/admin/users', name: 'Users & Profiles', icon: Users, description: 'Accounts and player state' },
       { path: '/admin/orders', name: 'Orders', icon: ShoppingBag, description: 'Order operations and tracking' },
+      {
+        path: '/admin/finance',
+        name: 'Finance & Tax',
+        icon: Landmark,
+        description: 'Reconciliation, tax readiness, exports',
+      },
     ],
   },
   {
