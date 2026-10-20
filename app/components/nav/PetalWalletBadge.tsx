@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import PetalWalletIcon from '@/app/components/icons/PetalWalletIcon';
+import Image from 'next/image';
+
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/runtime/petal-wallet-satchel.webp';
 
 type PetalWalletBadgeProps = {
   balance?: number | null;
@@ -28,10 +30,7 @@ export default function PetalWalletBadge({
   state = 'idle',
   pulsing = false,
 }: PetalWalletBadgeProps) {
-  const isMobile = variant === 'mobile';
   const showBalance = typeof balance === 'number';
-  const iconSize = isMobile ? 'lg' : 'md';
-
   return (
     <span
       className={`inline-flex items-center justify-center gap-2 ${
@@ -43,11 +42,20 @@ export default function PetalWalletBadge({
       data-petal-pulse={pulsing ? 'true' : 'false'}
     >
       {icon ?? (
-        <PetalWalletIcon
-          compact={!showBalance}
-          size={iconSize}
-          className="text-[#f6b7c6] transition group-hover:text-[#ffd6df]"
-        />
+        <span
+          className="relative grid h-9 w-9 shrink-0 place-items-center"
+          data-petal-wallet-source="approved-home-ui-v1"
+        >
+          <Image
+            src={PETAL_WALLET_EMBLEM_SOURCE}
+            alt=""
+            width={36}
+            height={36}
+            sizes="36px"
+            className="h-9 w-9 object-contain drop-shadow-[0_3px_5px_rgba(0,0,0,0.5)] transition-transform duration-150 group-hover:-translate-y-px group-focus-visible:-translate-y-px motion-reduce:transition-none"
+          />
+          <span className="sr-only">Petal Wallet</span>
+        </span>
       )}
       {showLabel && <span className="text-sm font-medium">Petals</span>}
       {isLoading && (

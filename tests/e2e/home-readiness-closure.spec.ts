@@ -104,6 +104,22 @@ test.describe('Home readiness closure', () => {
     await expect(shell).toHaveAttribute('data-scene-bucket', 'night');
   });
 
+  test('renders the distinct approved night master for the night bucket', async ({ page }) => {
+    await page.addInitScript(() => {
+      Date.prototype.getHours = () => 21;
+      Date.prototype.getDate = () => 2;
+    });
+
+    await page.goto('/');
+
+    const shell = page.getByTestId('mori-home-scene-shell');
+    await expect(shell).toHaveAttribute('data-scene-bucket', 'night');
+    await expect(shell).toHaveAttribute('data-world-status', 'ready');
+    await expect(
+      page.getByRole('img', { name: /Otakumori sakura shoreline and root cavern at night/i }),
+    ).toHaveAttribute('src', /om-home-world-05-night-wide\.png/);
+  });
+
   test('keeps approved world geometry bounded across launch viewports', async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },

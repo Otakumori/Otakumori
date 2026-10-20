@@ -40,9 +40,13 @@
 }
 
 .title {
+  color: #fff7ed;
+  font-weight: 680;
+  letter-spacing: -0.02em;
   text-shadow:
-    0 2px 10px rgba(18, 7, 10, 0.78),
-    0 8px 22px rgba(0, 0, 0, 0.34);
+    0 2px 3px rgba(7, 3, 6, 0.96),
+    0 3px 12px rgba(18, 7, 10, 0.86),
+    0 9px 24px rgba(0, 0, 0, 0.42);
 }
 
 .primaryAction {

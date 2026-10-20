@@ -2,13 +2,15 @@
   position: relative;
   width: min(100%, 14.75rem);
   overflow: hidden;
-  border: 1px solid rgba(196, 157, 127, 0.48);
-  border-radius: 0.78rem;
-  background: rgba(35, 24, 24, 0.64);
+  border: 1px solid rgba(196, 157, 127, 0.42);
+  border-radius: 0.38rem 0.6rem 0.34rem 0.52rem;
+  background: rgba(25, 17, 17, 0.44);
   box-shadow:
-    inset 0 1px 0 rgba(255, 231, 214, 0.12),
-    0 8px 20px rgba(0, 0, 0, 0.2);
+    inset 0 1px 0 rgba(255, 231, 214, 0.08),
+    inset 0 -8px 18px rgba(9, 5, 6, 0.28),
+    0 7px 16px rgba(0, 0, 0, 0.18);
   color: #fff1e4;
+  transform: rotate(-0.35deg);
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -22,7 +24,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.82;
+  opacity: 0.9;
+  filter: saturate(0.82) contrast(1.06);
 }
 
 .triggerContent {
@@ -42,13 +45,15 @@
   height: 1.55rem;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(223, 183, 149, 0.48);
-  border-radius: 0.35rem;
-  background: rgba(25, 16, 17, 0.54);
+  border: 1px solid rgba(223, 183, 149, 0.36);
+  border-radius: 50% 44% 48% 42%;
+  background: rgba(19, 12, 13, 0.34);
   color: rgba(255, 225, 203, 0.92);
   font-family: serif;
   font-size: 1rem;
   line-height: 1;
+  text-shadow: 0 0 8px rgba(233, 173, 151, 0.28);
+  transform: rotate(4deg);
 }
 
 .triggerEyebrow,
@@ -60,22 +65,32 @@
   color: rgba(255, 218, 196, 0.72);
   font-family: serif;
   font-size: 0.55rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
 }
 
 .triggerLabel {
   margin-top: 0.1rem;
   font-family: var(--font-ui, sans-serif);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 650;
+  letter-spacing: 0.025em;
 }
 
 .soapstoneTrigger:hover {
   border-color: rgba(236, 193, 159, 0.76);
   box-shadow:
-    inset 0 1px 0 rgba(255, 231, 214, 0.2),
-    0 11px 24px rgba(52, 27, 24, 0.28);
-  transform: translateY(-1px);
+    inset 0 1px 0 rgba(255, 231, 214, 0.16),
+    inset 0 -9px 20px rgba(9, 5, 6, 0.22),
+    0 10px 22px rgba(52, 27, 24, 0.24);
+  transform: translateY(-1px) rotate(-0.35deg);
+}
+
+.soapstoneTrigger:hover .runeMark,
+.soapstoneTrigger:focus-visible .runeMark {
+  color: #ffe1cb;
+  text-shadow:
+    0 0 7px rgba(241, 180, 155, 0.68),
+    0 0 15px rgba(227, 145, 176, 0.28);
 }
 
 .soapstoneTrigger:focus-visible {
@@ -153,6 +168,6 @@
   }
 
   .soapstoneTrigger:hover {
-    transform: none;
+    transform: rotate(-0.35deg);
   }
 }

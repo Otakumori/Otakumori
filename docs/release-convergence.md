@@ -15,16 +15,16 @@ This ledger records immutable merged baselines, the active bounded phase, and in
 
 ## Active phase
 
-Home Flagship Closure is technically ready from Admin Operations Closure v1 on
-`codex/home-flagship-closure`. Its Draft PR remains gated by independent asset work and owner visual
-review; it is not approved or merged.
+Home Flagship Closure remains technically ready from Admin Operations Closure v1 on
+`codex/home-flagship-closure`. Its owner visual correction pass is bounded to Draft PR #114. The
+Draft remains blocked by missing portrait masters and owner review; it is not approved or merged.
 
 ## Phase queue
 
 | Priority | Phase                                      | State                                  |
 | -------: | ------------------------------------------ | -------------------------------------- |
 |        1 | Admin Operations Closure                   | Closed — v1                            |
-|        2 | Home Flagship Closure                      | Owner review — technical gate complete |
+|        2 | Home Flagship Closure                      | Blocked — portrait assets + owner review |
 |        3 | Production Asset Authority                 | Pending                                |
 |        4 | Avatar Creator Production Closure          | Pending                                |
 |        5 | Commander Integration Closure              | Pending                                |
@@ -48,7 +48,7 @@ review; it is not approved or merged.
 
 | Surface                | Function | Visual       | Assets     | Interaction | Responsive | Performance | Accessibility | Persistence | Failure states | Integration | Security | Owner review |
 | ---------------------- | -------- | ------------ | ---------- | ----------- | ---------- | ----------- | ------------- | ----------- | -------------- | ----------- | -------- | ------------ |
-| Home                   | VERIFIED | OWNER REVIEW | ASSET WORK | VERIFIED    | VERIFIED   | VERIFIED    | VERIFIED      | VERIFIED    | VERIFIED       | VERIFIED    | N/A      | REQUIRED     |
+| Home                   | VERIFIED | BLOCKED      | BLOCKED    | VERIFIED    | VERIFIED   | VERIFIED    | VERIFIED      | VERIFIED    | VERIFIED       | VERIFIED    | N/A      | REQUIRED     |
 | Avatar Creator         | OPEN     | OWNER REVIEW | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Shop / PDP             | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Commander              | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
