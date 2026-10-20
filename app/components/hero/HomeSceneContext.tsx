@@ -4,9 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -19,8 +19,13 @@ import {
 
 const INITIAL_SCENE_DATE = new Date(2026, 0, 1, 12);
 
+export type HomeWorldStatus = 'resolving' | 'loading' | 'ready' | 'fallback';
+
 type HomeSceneContextValue = {
   scene: HomeSceneState;
+  sceneResolved: boolean;
+  worldStatus: HomeWorldStatus;
+  setWorldStatus: (status: HomeWorldStatus) => void;
   projection: HomeSceneProjection | null;
   reducedMotion: boolean;
   surfaceRef: (node: HTMLDivElement | null) => void;
@@ -31,6 +36,8 @@ const HomeSceneContext = createContext<HomeSceneContextValue | null>(null);
 export function HomeSceneProvider({ children }: { children: ReactNode }) {
   const [surfaceNode, setSurfaceNode] = useState<HTMLDivElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [sceneResolved, setSceneResolved] = useState(false);
+  const [worldStatus, setWorldStatus] = useState<HomeWorldStatus>('resolving');
   const [scene, setScene] = useState<HomeSceneState>(() => ({
     ...resolveHomeScene(INITIAL_SCENE_DATE, false),
     timezone: 'local',
@@ -38,22 +45,46 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
   const [projection, setProjection] = useState<HomeSceneProjection | null>(null);
   const surfaceRef = useCallback((node: HTMLDivElement | null) => setSurfaceNode(node), []);
 
-  useEffect(() => {
+  const sceneTimerRef = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(query.matches);
+    const syncScene = () => {
+      const nextReducedMotion = query.matches;
+      setReducedMotion(nextReducedMotion);
+      setScene(resolveHomeScene(new Date(), nextReducedMotion));
+      setSceneResolved(true);
+    };
+    const scheduleNextMinute = () => {
+      if (sceneTimerRef.current !== null) window.clearTimeout(sceneTimerRef.current);
+      const now = new Date();
+      const elapsedInMinute = now.getSeconds() * 1_000 + now.getMilliseconds();
+      sceneTimerRef.current = window.setTimeout(() => {
+        syncScene();
+        scheduleNextMinute();
+      }, 60_025 - elapsedInMinute);
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncScene();
+        scheduleNextMinute();
+      }
+    };
 
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
+    syncScene();
+    scheduleNextMinute();
+    query.addEventListener('change', syncScene);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', syncScene);
+
+    return () => {
+      query.removeEventListener('change', syncScene);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', syncScene);
+      if (sceneTimerRef.current !== null) window.clearTimeout(sceneTimerRef.current);
+      sceneTimerRef.current = null;
+    };
   }, []);
-
-  useEffect(() => {
-    const update = () => setScene(resolveHomeScene(new Date(), reducedMotion));
-
-    update();
-    const interval = window.setInterval(update, 60_000);
-    return () => window.clearInterval(interval);
-  }, [reducedMotion]);
 
   useLayoutEffect(() => {
     if (!surfaceNode) return;
@@ -83,8 +114,16 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
   }, [surfaceNode]);
 
   const value = useMemo(
-    () => ({ scene, projection, reducedMotion, surfaceRef }),
-    [projection, reducedMotion, scene, surfaceRef],
+    () => ({
+      scene,
+      sceneResolved,
+      worldStatus,
+      setWorldStatus,
+      projection,
+      reducedMotion,
+      surfaceRef,
+    }),
+    [projection, reducedMotion, scene, sceneResolved, surfaceRef, worldStatus],
   );
 
   return <HomeSceneContext.Provider value={value}>{children}</HomeSceneContext.Provider>;

@@ -11,33 +11,36 @@ This ledger records immutable merged baselines, the active bounded phase, and in
 | Otaku Beat-em-up Flagship Gameplay v1 | `1e9bac75113acb95e9dd485ef02e3eaf050b2062` | Closed |
 | Commerce Production Closure v1        | `47603b081a33f558d00dccce957f80a8c4a4c36f` | Closed |
 | Finance + Tax Operations v1           | `d6c4863bb133ca11b71bb48cb003472a80611db5` | Closed |
+| Admin Operations Closure v1           | `6620e9cc4f12ae54c63c57da6dc1cbf79b532c5c` | Closed |
 
 ## Active phase
 
-Admin Operations Closure is published in Draft PR #113 from `codex/admin-operations-closure`. It remains open until its exact-head required gates pass and the merge commit is recorded here.
+Home Flagship Closure is technically ready from Admin Operations Closure v1 on
+`codex/home-flagship-closure`. Its Draft PR remains gated by independent asset work and owner visual
+review; it is not approved or merged.
 
 ## Phase queue
 
-| Priority | Phase                                      | State                  |
-| -------: | ------------------------------------------ | ---------------------- |
-|        1 | Admin Operations Closure                   | Active — Draft PR #113 |
-|        2 | Home Flagship Closure                      | Pending                |
-|        3 | Production Asset Authority                 | Pending                |
-|        4 | Avatar Creator Production Closure          | Pending                |
-|        5 | Commander Integration Closure              | Pending                |
-|        6 | Flagship Game Presentation/Content Closure | Pending                |
-|        7 | Site-wide Experience Uniformity            | Pending                |
-|        8 | Loading/Empty/Error State Closure          | Pending                |
-|        9 | Communications + Support                   | Pending                |
-|       10 | Privacy / UGC / Account Lifecycle          | Pending                |
-|       11 | SEO / Analytics                            | Pending                |
-|       12 | Security / Performance / Accessibility     | Pending                |
-|       13 | Production Environment / Backup / Rollback | Pending                |
-|       14 | Launch Content                             | Pending                |
-|       15 | Full Launch Rehearsal                      | Pending                |
-|       16 | Owner Acceptance                           | Pending                |
-|       17 | Production Candidate Freeze                | Pending                |
-|       18 | Final Launch Certification                 | Pending                |
+| Priority | Phase                                      | State                                  |
+| -------: | ------------------------------------------ | -------------------------------------- |
+|        1 | Admin Operations Closure                   | Closed — v1                            |
+|        2 | Home Flagship Closure                      | Owner review — technical gate complete |
+|        3 | Production Asset Authority                 | Pending                                |
+|        4 | Avatar Creator Production Closure          | Pending                                |
+|        5 | Commander Integration Closure              | Pending                                |
+|        6 | Flagship Game Presentation/Content Closure | Pending                                |
+|        7 | Site-wide Experience Uniformity            | Pending                                |
+|        8 | Loading/Empty/Error State Closure          | Pending                                |
+|        9 | Communications + Support                   | Pending                                |
+|       10 | Privacy / UGC / Account Lifecycle          | Pending                                |
+|       11 | SEO / Analytics                            | Pending                                |
+|       12 | Security / Performance / Accessibility     | Pending                                |
+|       13 | Production Environment / Backup / Rollback | Pending                                |
+|       14 | Launch Content                             | Pending                                |
+|       15 | Full Launch Rehearsal                      | Pending                                |
+|       16 | Owner Acceptance                           | Pending                                |
+|       17 | Production Candidate Freeze                | Pending                                |
+|       18 | Final Launch Certification                 | Pending                                |
 
 ## Tier-0 quality ledger
 
@@ -45,7 +48,7 @@ Admin Operations Closure is published in Draft PR #113 from `codex/admin-operati
 
 | Surface                | Function | Visual       | Assets     | Interaction | Responsive | Performance | Accessibility | Persistence | Failure states | Integration | Security | Owner review |
 | ---------------------- | -------- | ------------ | ---------- | ----------- | ---------- | ----------- | ------------- | ----------- | -------------- | ----------- | -------- | ------------ |
-| Home                   | OPEN     | OWNER REVIEW | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | N/A         | OPEN           | OPEN        | OPEN     | REQUIRED     |
+| Home                   | VERIFIED | OWNER REVIEW | ASSET WORK | VERIFIED    | VERIFIED   | VERIFIED    | VERIFIED      | VERIFIED    | VERIFIED       | VERIFIED    | N/A      | REQUIRED     |
 | Avatar Creator         | OPEN     | OWNER REVIEW | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Shop / PDP             | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Commander              | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |

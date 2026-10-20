@@ -1,6 +1,17 @@
 .heroRoot {
   --mori-hero-viewport-height: 100svh;
-  --mori-world-scroll-height: var(--mori-scene-world-height, 142svh);
+  --mori-projected-world-height: max(89.584906vw, 142svh);
+  --mori-projected-world-width: max(100vw, 158.508846svh);
+  --mori-projected-footer-top: max(62.037736vw, 98.335299svh);
+  --mori-scene-world-left: max(
+    calc(100vw - var(--mori-projected-world-width)),
+    min(0px, calc(30vw - max(28.830189vw, 45.698399svh)))
+  );
+  --mori-scene-world-top: 0px;
+  --mori-scene-world-width: var(--mori-projected-world-width);
+  --mori-scene-world-height: var(--mori-projected-world-height);
+  --mori-world-scroll-height: var(--mori-scene-world-height, var(--mori-projected-world-height));
+  --mori-root-content-top: var(--mori-projected-footer-top);
   min-height: var(--mori-world-scroll-height);
 }
 
@@ -9,6 +20,12 @@
   height: var(--mori-world-scroll-height);
   min-height: var(--mori-world-scroll-height);
   overflow: hidden;
+}
+
+.heroSurface[data-world-status='resolving'] > :not([data-testid='mori-hero-scene']),
+.heroSurface[data-world-status='loading'] > :not([data-testid='mori-hero-scene']) {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .heroContent,
@@ -31,8 +48,7 @@
 .primaryAction {
   border: 1px solid rgba(255, 227, 202, 0.52);
   background:
-    linear-gradient(135deg, rgba(247, 194, 191, 0.22), rgba(99, 58, 49, 0.2)),
-    rgba(16, 9, 12, 0.32);
+    linear-gradient(135deg, rgba(247, 194, 191, 0.22), rgba(99, 58, 49, 0.2)), rgba(16, 9, 12, 0.32);
   box-shadow:
     inset 0 1px 0 rgba(255, 244, 232, 0.14),
     0 12px 28px rgba(0, 0, 0, 0.24);

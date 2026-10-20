@@ -20,7 +20,7 @@ type SceneShellStyle = CSSProperties & {
 };
 
 function HomeSceneShellInner({ children }: { children: ReactNode }) {
-  const { projection, scene, surfaceRef } = useHomeSceneContext();
+  const { projection, scene, sceneResolved, surfaceRef, worldStatus } = useHomeSceneContext();
   const style = useMemo<SceneShellStyle | undefined>(() => {
     if (!projection) return undefined;
 
@@ -40,7 +40,9 @@ function HomeSceneShellInner({ children }: { children: ReactNode }) {
       className={`${layoutStyles.heroRoot} relative isolate w-full overflow-x-clip bg-[#080611]`}
       aria-labelledby="home-hero-title"
       data-home-scene-shell
-      data-scene-bucket={scene.bucket}
+      data-scene-bucket={sceneResolved ? scene.bucket : 'pending'}
+      data-scene-ready={sceneResolved ? 'true' : 'false'}
+      data-world-status={worldStatus}
       data-scene-surface-family={projection?.family ?? 'pending'}
       data-scene-projection-contract="combined-world-master"
       data-testid="mori-home-scene-shell"
@@ -49,7 +51,13 @@ function HomeSceneShellInner({ children }: { children: ReactNode }) {
       style={style}
     >
       <PetalCollectionProvider>
-        <div ref={surfaceRef} className={layoutStyles.heroSurface} data-testid="mori-scene-surface">
+        <div
+          ref={surfaceRef}
+          className={layoutStyles.heroSurface}
+          data-testid="mori-scene-surface"
+          data-world-status={worldStatus}
+          aria-busy={worldStatus === 'resolving' || worldStatus === 'loading'}
+        >
           <HeroScene />
           <HomeDesktopCursor />
           <PetalSystem />
