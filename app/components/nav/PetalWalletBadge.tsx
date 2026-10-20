@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
 
-const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/runtime/petal-wallet-satchel.webp';
+const PETAL_WALLET_EMBLEM_SOURCE = '/assets/home/ui/sakura-petal-wallet-emblem.webp';
 
 type PetalWalletBadgeProps = {
   balance?: number | null;
@@ -43,16 +43,16 @@ export default function PetalWalletBadge({
     >
       {icon ?? (
         <span
-          className="relative grid h-9 w-9 shrink-0 place-items-center"
-          data-petal-wallet-source="approved-home-ui-v1"
+          className="relative grid h-7 w-7 shrink-0 place-items-center"
+          data-petal-wallet-source="approved-blossom-emblem-v1"
         >
           <Image
             src={PETAL_WALLET_EMBLEM_SOURCE}
             alt=""
-            width={36}
-            height={36}
-            sizes="36px"
-            className="h-9 w-9 object-contain drop-shadow-[0_3px_5px_rgba(0,0,0,0.5)] transition-transform duration-150 group-hover:-translate-y-px group-focus-visible:-translate-y-px motion-reduce:transition-none"
+            width={28}
+            height={28}
+            sizes="28px"
+            className="h-7 w-7 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.52)] transition-transform duration-150 group-hover:-translate-y-px group-focus-visible:-translate-y-px motion-reduce:transition-none"
           />
           <span className="sr-only">Petal Wallet</span>
         </span>

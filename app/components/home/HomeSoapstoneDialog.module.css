@@ -34,9 +34,17 @@
   display: flex;
   min-height: 3.4rem;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
   padding: 0.55rem 0.7rem;
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.72);
+}
+
+.runeSeal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .runeMark {
@@ -56,24 +64,15 @@
   transform: rotate(4deg);
 }
 
-.triggerEyebrow,
-.triggerLabel {
-  display: block;
-}
-
-.triggerEyebrow {
+.triggerRunes {
   color: rgba(255, 218, 196, 0.72);
   font-family: serif;
-  font-size: 0.55rem;
-  letter-spacing: 0.18em;
-}
-
-.triggerLabel {
-  margin-top: 0.1rem;
-  font-family: var(--font-ui, sans-serif);
-  font-size: 0.8rem;
-  font-weight: 650;
-  letter-spacing: 0.025em;
+  font-size: 0.67rem;
+  letter-spacing: 0.24em;
+  transition:
+    color 180ms ease,
+    letter-spacing 180ms ease,
+    text-shadow 180ms ease;
 }
 
 .soapstoneTrigger:hover {
@@ -91,6 +90,15 @@
   text-shadow:
     0 0 7px rgba(241, 180, 155, 0.68),
     0 0 15px rgba(227, 145, 176, 0.28);
+}
+
+.soapstoneTrigger:hover .triggerRunes,
+.soapstoneTrigger:focus-visible .triggerRunes {
+  color: rgba(255, 229, 202, 0.96);
+  letter-spacing: 0.27em;
+  text-shadow:
+    0 0 8px rgba(231, 174, 136, 0.56),
+    0 0 17px rgba(221, 139, 171, 0.2);
 }
 
 .soapstoneTrigger:focus-visible {
@@ -162,6 +170,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .soapstoneTrigger,
+  .triggerRunes,
   .dormantRunes,
   .decodedCopy {
     transition: none;

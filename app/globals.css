@@ -235,12 +235,17 @@ html {
 }
 
 [data-mori-navbar='home'] .mori-home-nav-link:hover,
-[data-mori-navbar='home'] .mori-home-nav-link:focus-visible,
-[data-mori-navbar='home'] .mori-home-nav-active {
-  color: #fff4e8;
-  background: radial-gradient(circle at 50% 100%, rgba(241, 167, 190, 0.15), transparent 72%);
-  box-shadow: inset 0 -1px rgba(238, 197, 158, 0.18);
+[data-mori-navbar='home'] .mori-home-nav-link:focus-visible {
+  color: #eac187 !important;
+  background: radial-gradient(circle at 50% 100%, rgba(222, 159, 108, 0.15), transparent 72%);
+  box-shadow: inset 0 -1px rgba(238, 190, 125, 0.22);
   transform: translateY(-1px);
+}
+
+[data-mori-navbar='home'] .mori-home-nav-active {
+  color: #f2cc94 !important;
+  background: radial-gradient(circle at 50% 100%, rgba(222, 159, 108, 0.18), transparent 72%);
+  box-shadow: inset 0 -1px rgba(242, 194, 129, 0.28);
 }
 
 [data-mori-navbar='home'] .mori-home-nav-link:hover::after,

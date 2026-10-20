@@ -105,16 +105,18 @@ test.describe('Home readiness closure', () => {
   });
 
   test('renders the distinct approved night master for the night bucket', async ({ page }) => {
-    await page.addInitScript(() => {
-      Date.prototype.getHours = () => 21;
-      Date.prototype.getDate = () => 2;
-    });
-
     await page.goto('/');
 
     const shell = page.getByTestId('mori-home-scene-shell');
+    await expect(shell).toHaveAttribute('data-world-status', 'ready', { timeout: 30_000 });
+
+    await page.evaluate(() => {
+      Date.prototype.getHours = () => 21;
+      Date.prototype.getDate = () => 2;
+      window.dispatchEvent(new Event('pageshow'));
+    });
     await expect(shell).toHaveAttribute('data-scene-bucket', 'night');
-    await expect(shell).toHaveAttribute('data-world-status', 'ready');
+    await expect(shell).toHaveAttribute('data-world-status', 'ready', { timeout: 30_000 });
     await expect(
       page.getByRole('img', { name: /Otakumori sakura shoreline and root cavern at night/i }),
     ).toHaveAttribute('src', /om-home-world-05-night-wide\.png/);

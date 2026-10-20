@@ -49,6 +49,14 @@ describe('PetalWalletNavLink', () => {
       'data-petal-wallet-state',
       'ready',
     );
+    expect(screen.getByAltText('')).toHaveAttribute(
+      'src',
+      '/assets/home/ui/sakura-petal-wallet-emblem.webp',
+    );
+    expect(screen.getByAltText('').closest('[data-petal-wallet-source]')).toHaveAttribute(
+      'data-petal-wallet-source',
+      'approved-blossom-emblem-v1',
+    );
   });
 
   it('reserves compact loading geometry while a signed-in balance is pending', () => {
