@@ -16,8 +16,21 @@ describe('production asset registry', () => {
 
     expect(result.errors).toEqual([]);
     expect(result.counts.INTEGRATED).toBe(6);
-    expect(result.counts.CANDIDATE).toBe(1);
+    expect(result.counts.CANDIDATE).toBe(2);
     expect(result.counts.MISSING).toBe(5);
+  });
+
+  it('keeps the legacy avatar base as an unapproved candidate despite runtime references', () => {
+    const registry = loadProductionAssetRegistry();
+    const candidate = registry.assets.find(
+      (asset) => asset.id === 'avatar.base.legacy-human-male-female-v1',
+    );
+
+    expect(candidate?.state).toBe('CANDIDATE');
+    expect(candidate?.ownerApproval.approved).toBe(false);
+    expect(candidate?.runtime?.integrated).toBe(false);
+    expect(candidate?.technical?.morphTargetNames).toEqual([]);
+    expect(candidate?.technical?.jointsPerSkin).toEqual([707, 701]);
   });
 
   it('keeps the late-afternoon portrait candidate unapproved and inactive', () => {

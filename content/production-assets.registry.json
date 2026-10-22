@@ -279,6 +279,42 @@
       "state": "MISSING",
       "ownerApproval": { "required": true, "approved": false },
       "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "avatar.base.legacy-human-male-female-v1",
+      "family": "avatar.base.legacy-v1",
+      "surface": "Avatar Creator / Commander",
+      "purpose": "Legacy rigged male/female base candidate pending production-base acceptance",
+      "state": "CANDIDATE",
+      "format": "glb",
+      "technical": {
+        "bytes": 898536,
+        "triangles": 37324,
+        "nodes": 1419,
+        "skins": 2,
+        "jointsPerSkin": [707, 701],
+        "materials": 2,
+        "animations": 0,
+        "morphTargetNames": [],
+        "compression": ["KHR_draco_mesh_compression"]
+      },
+      "source": {
+        "path": "public/assets/external/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "availability": "LOCAL",
+        "sha256": "DB5D80674B88B5D96143EA7536C8E06F7DAC448F746BCF95F8FEACCFB90AED44",
+        "provenance": "Sketchfab Human Male/Female Basemesh Rigged by Niclas Schoepe",
+        "licenseStatus": "LICENSED",
+        "licenseReference": "CC-BY-4.0; attribution and source are embedded in the GLB asset metadata"
+      },
+      "runtime": {
+        "path": "public/assets/optimized/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "sha256": "52FB89AB876D7779FC5B355EAE1EDD548FBC3A166C6B823344346192C10C76D0",
+        "integrated": false,
+        "integrationReferences": ["public/assets/manifest.json", "packages/avatar/src/serialize.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Legacy declarations describe male/female morph targets, but the inspected source and optimized GLBs contain no morph targets or animation clips. Runtime references do not constitute production approval. The two high-joint-count skins and node count require DCC/runtime suitability review before either launch base can be derived from this candidate."
     }
   ]
 }

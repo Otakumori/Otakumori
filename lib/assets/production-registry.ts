@@ -42,6 +42,17 @@ export interface ProductionAssetRecord {
   state: ProductionAssetState;
   format?: string;
   dimensions?: { width: number; height: number };
+  technical?: {
+    bytes?: number;
+    triangles?: number;
+    nodes?: number;
+    skins?: number;
+    jointsPerSkin?: number[];
+    materials?: number;
+    animations?: number;
+    morphTargetNames?: string[];
+    compression?: string[];
+  };
   source?: ProductionAssetSource;
   runtime?: ProductionAssetRuntime;
   ownerApproval: {
