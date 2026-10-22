@@ -1,0 +1,30 @@
+{
+  "assetId": "home.world.late-afternoon.portrait-v1",
+  "status": "CANDIDATE",
+  "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-04-late-afternoon-portrait.png",
+  "sourceDimensions": {
+    "width": 853,
+    "height": 1844
+  },
+  "format": "png",
+  "sizeBytes": 3043991,
+  "sha256": "0A1632EB872DC9B97797A923852A8961811BF5BC9B0D54D7B024DA0E8E035014",
+  "productionMethod": "Controlled AI-assisted portrait recomposition using the approved combined late-afternoon wide master as the sole visual source.",
+  "provenance": {
+    "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-04-late-afternoon-wide.png",
+    "wideAuthoritySha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
+    "toolMode": "built-in image generation edit",
+    "ownerApproval": false
+  },
+  "safeZoneReference": {
+    "primaryViewport": "390x844",
+    "qaEnvelope": ["360x800", "390x844", "412x915", "430x932"]
+  },
+  "runtimePreparation": {
+    "activated": false,
+    "intendedSelection": "portrait source below the future approved mobile breakpoint",
+    "wideFallback": "om-home-world-04-late-afternoon-wide.png",
+    "preserveDecodedImageReadiness": true,
+    "preserveTimeStateMapping": true
+  }
+}
