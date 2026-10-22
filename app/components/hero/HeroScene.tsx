@@ -20,6 +20,7 @@ import {
   resolveHomePetalVariant,
   resolveNextHomeSceneBucket,
   type HomeSceneProjection,
+  type HomeSceneAssetVariant,
   type HomeSceneState,
 } from './homeScene';
 import styles from './HeroScene.module.css';
@@ -41,11 +42,11 @@ type SceneLayer = {
 const HOME_SCENE_IMAGE_SIZES = '(min-width: 1200px) 1200px, 100vw';
 const HOME_SCENE_PRELOAD_WIDTHS = [640, 750, 828, 1080, 1200] as const;
 
-function createSceneLayer(scene: HomeSceneState): SceneLayer {
-  const image = resolveHomeSceneImageSrc(scene.asset);
+function createSceneLayer(scene: HomeSceneState, assetVariant: HomeSceneAssetVariant): SceneLayer {
+  const image = resolveHomeSceneImageSrc(scene.asset, assetVariant);
 
   return {
-    key: `${scene.bucket}-${image.src}`,
+    key: `${scene.bucket}-${assetVariant}-${image.src}`,
     src: image.src,
     fallback: image.fallback,
     alt: scene.asset.alt,
@@ -80,7 +81,7 @@ function TreePetalEmitter({
   projection: HomeSceneProjection | null;
   scene: HomeSceneState;
 }) {
-  const artboard = HOME_SCENE_MANIFEST.world.artboard;
+  const artboard = projection?.artboard ?? HOME_SCENE_MANIFEST.world.artboard;
   const scale = projection?.scale ?? 1;
   const petals = useMemo(
     () =>
@@ -137,13 +138,24 @@ function TreePetalEmitter({
 }
 
 export default function HeroScene() {
-  const { projection, reducedMotion, scene, sceneResolved, setWorldStatus, worldStatus } =
-    useHomeSceneContext();
-  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() => createSceneLayer(scene));
+  const {
+    assetVariant,
+    projection,
+    reducedMotion,
+    scene,
+    sceneResolved,
+    setWorldStatus,
+    worldStatus,
+  } = useHomeSceneContext();
+  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() =>
+    createSceneLayer(scene, 'wide'),
+  );
   const [incomingLayer, setIncomingLayer] = useState<SceneLayer | null>(null);
   const [incomingReady, setIncomingReady] = useState(false);
   const hasResolvedSceneRef = useRef(false);
-  const resolvedLayer = hasResolvedSceneRef.current ? displayedLayer : createSceneLayer(scene);
+  const resolvedLayer = hasResolvedSceneRef.current
+    ? displayedLayer
+    : createSceneLayer(scene, assetVariant);
 
   const decodeImage = useCallback(async (image: HTMLImageElement) => {
     if (typeof image.decode === 'function') await image.decode();
@@ -186,7 +198,7 @@ export default function HeroScene() {
   useLayoutEffect(() => {
     if (!sceneResolved) return;
 
-    const nextLayer = createSceneLayer(scene);
+    const nextLayer = createSceneLayer(scene, assetVariant);
     if (!hasResolvedSceneRef.current) {
       hasResolvedSceneRef.current = true;
       setWorldStatus('loading');
@@ -199,7 +211,7 @@ export default function HeroScene() {
 
     setIncomingLayer(nextLayer);
     setIncomingReady(false);
-  }, [displayedLayer.key, scene, sceneResolved, setWorldStatus]);
+  }, [assetVariant, displayedLayer.key, scene, sceneResolved, setWorldStatus]);
 
   useEffect(() => {
     if (!incomingLayer || !incomingReady) return;
@@ -224,12 +236,12 @@ export default function HeroScene() {
     if (!sceneResolved) return;
 
     const nextBucket = resolveNextHomeSceneBucket(scene.bucket);
-    const currentImage = resolveHomeSceneImageSrc(scene.asset);
-    const nextImage = resolveHomeSceneImageSrc(HOME_SCENE_ASSETS[nextBucket]);
+    const currentImage = resolveHomeSceneImageSrc(scene.asset, assetVariant);
+    const nextImage = resolveHomeSceneImageSrc(HOME_SCENE_ASSETS[nextBucket], assetVariant);
 
     preloadImage(currentImage.src);
     preloadImage(nextImage.src);
-  }, [scene.asset, scene.bucket, sceneResolved]);
+  }, [assetVariant, scene.asset, scene.bucket, sceneResolved]);
 
   const ambientTransitionClass = reducedMotion
     ? 'transition-none'
@@ -244,6 +256,7 @@ export default function HeroScene() {
       data-scene-timezone={scene.timezone}
       data-scene-surface-family={projection?.family ?? 'combined'}
       data-scene-art-source="combined-world-master"
+      data-scene-asset-variant={assetVariant}
       data-testid="mori-hero-scene"
     >
       <div className={styles.worldExtension} data-testid="mori-world-extension">

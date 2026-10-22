@@ -95,6 +95,24 @@ describe('homepage hero scene client island', () => {
     });
   });
 
+  it('uses the matching portrait master on portrait-class viewports', async () => {
+    vi.spyOn(Date.prototype, 'getHours').mockReturnValue(21);
+    vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
+    stubMatchMedia(false);
+    vi.stubGlobal('innerWidth', 390);
+    vi.stubGlobal('innerHeight', 844);
+
+    await renderHeroScene();
+
+    const scene = await screen.findByTestId('mori-hero-scene');
+    await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'night'));
+    expect(scene).toHaveAttribute('data-scene-asset-variant', 'portrait');
+    expect(screen.getByRole('img', { name: /Otakumori sakura shoreline/i })).toHaveAttribute(
+      'src',
+      '/assets/home/world/combined/om-home-world-05-night-portrait.webp',
+    );
+  });
+
   it('keeps reduced-motion petal density bounded', async () => {
     vi.spyOn(Date.prototype, 'getHours').mockReturnValue(12);
     vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);

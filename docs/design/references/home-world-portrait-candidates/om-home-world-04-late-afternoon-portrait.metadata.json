@@ -1,6 +1,6 @@
 {
   "assetId": "home.world.late-afternoon.portrait-v1",
-  "status": "CANDIDATE",
+  "status": "OWNER_APPROVED",
   "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-04-late-afternoon-portrait.png",
   "sourceDimensions": {
     "width": 853,
@@ -14,15 +14,17 @@
     "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-04-late-afternoon-wide.png",
     "wideAuthoritySha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
     "toolMode": "built-in image generation edit",
-    "ownerApproval": false
+    "ownerApproval": true,
+    "approvalScope": "Canonical portrait geometry authority; final integrated Home visual review remains pending."
   },
   "safeZoneReference": {
     "primaryViewport": "390x844",
     "qaEnvelope": ["360x800", "390x844", "412x915", "430x932"]
   },
   "runtimePreparation": {
-    "activated": false,
-    "intendedSelection": "portrait source below the future approved mobile breakpoint",
+    "activated": true,
+    "runtimePath": "public/assets/home/world/combined/om-home-world-04-late-afternoon-portrait.webp",
+    "intendedSelection": "portrait source on portrait-class viewports at or below 820px",
     "wideFallback": "om-home-world-04-late-afternoon-wide.png",
     "preserveDecodedImageReadiness": true,
     "preserveTimeStateMapping": true

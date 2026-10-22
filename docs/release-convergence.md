@@ -17,30 +17,31 @@ This ledger records immutable merged baselines, the active bounded phase, and in
 
 Home Flagship Closure remains technically ready from Admin Operations Closure v1 on
 `codex/home-flagship-closure`. Its owner visual correction pass is bounded to Draft PR #114. The
-Draft remains blocked by missing portrait masters and owner review; it is not approved or merged.
+The six-state portrait family is integrated for review. The Draft remains blocked by owner visual
+review and is not approved or merged.
 
 ## Phase queue
 
-| Priority | Phase                                      | State                                  |
-| -------: | ------------------------------------------ | -------------------------------------- |
-|        1 | Admin Operations Closure                   | Closed — v1                            |
-|        2 | Home Flagship Closure                      | Blocked — portrait assets + owner review |
-|        3 | Production Asset Authority                 | Pending                                |
-|        4 | Avatar Creator Production Closure          | Pending                                |
-|        5 | Commander Integration Closure              | Pending                                |
-|        6 | Flagship Game Presentation/Content Closure | Pending                                |
-|        7 | Site-wide Experience Uniformity            | Pending                                |
-|        8 | Loading/Empty/Error State Closure          | Pending                                |
-|        9 | Communications + Support                   | Pending                                |
-|       10 | Privacy / UGC / Account Lifecycle          | Pending                                |
-|       11 | SEO / Analytics                            | Pending                                |
-|       12 | Security / Performance / Accessibility     | Pending                                |
-|       13 | Production Environment / Backup / Rollback | Pending                                |
-|       14 | Launch Content                             | Pending                                |
-|       15 | Full Launch Rehearsal                      | Pending                                |
-|       16 | Owner Acceptance                           | Pending                                |
-|       17 | Production Candidate Freeze                | Pending                                |
-|       18 | Final Launch Certification                 | Pending                                |
+| Priority | Phase                                      | State                                   |
+| -------: | ------------------------------------------ | --------------------------------------- |
+|        1 | Admin Operations Closure                   | Closed — v1                             |
+|        2 | Home Flagship Closure                      | Technically ready — owner visual review |
+|        3 | Production Asset Authority                 | Pending                                 |
+|        4 | Avatar Creator Production Closure          | Pending                                 |
+|        5 | Commander Integration Closure              | Pending                                 |
+|        6 | Flagship Game Presentation/Content Closure | Pending                                 |
+|        7 | Site-wide Experience Uniformity            | Pending                                 |
+|        8 | Loading/Empty/Error State Closure          | Pending                                 |
+|        9 | Communications + Support                   | Pending                                 |
+|       10 | Privacy / UGC / Account Lifecycle          | Pending                                 |
+|       11 | SEO / Analytics                            | Pending                                 |
+|       12 | Security / Performance / Accessibility     | Pending                                 |
+|       13 | Production Environment / Backup / Rollback | Pending                                 |
+|       14 | Launch Content                             | Pending                                 |
+|       15 | Full Launch Rehearsal                      | Pending                                 |
+|       16 | Owner Acceptance                           | Pending                                 |
+|       17 | Production Candidate Freeze                | Pending                                 |
+|       18 | Final Launch Certification                 | Pending                                 |
 
 ## Tier-0 quality ledger
 
@@ -48,7 +49,7 @@ Draft remains blocked by missing portrait masters and owner review; it is not ap
 
 | Surface                | Function | Visual       | Assets     | Interaction | Responsive | Performance | Accessibility | Persistence | Failure states | Integration | Security | Owner review |
 | ---------------------- | -------- | ------------ | ---------- | ----------- | ---------- | ----------- | ------------- | ----------- | -------------- | ----------- | -------- | ------------ |
-| Home                   | VERIFIED | BLOCKED      | BLOCKED    | VERIFIED    | VERIFIED   | VERIFIED    | VERIFIED      | VERIFIED    | VERIFIED       | VERIFIED    | N/A      | REQUIRED     |
+| Home                   | VERIFIED | OWNER REVIEW | VERIFIED   | VERIFIED    | VERIFIED   | VERIFIED    | VERIFIED      | VERIFIED    | VERIFIED       | VERIFIED    | N/A      | REQUIRED     |
 | Avatar Creator         | OPEN     | OWNER REVIEW | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Shop / PDP             | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |
 | Commander              | OPEN     | OPEN         | OPEN       | OPEN        | OPEN       | OPEN        | OPEN          | OPEN        | OPEN           | OPEN        | OPEN     | REQUIRED     |

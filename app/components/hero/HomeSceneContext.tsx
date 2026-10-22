@@ -12,7 +12,9 @@ import {
 } from 'react';
 import {
   resolveHomeScene,
+  resolveHomeSceneAssetVariant,
   resolveHomeSceneProjection,
+  type HomeSceneAssetVariant,
   type HomeSceneProjection,
   type HomeSceneState,
 } from './homeScene';
@@ -28,6 +30,7 @@ type HomeSceneContextValue = {
   setWorldStatus: (status: HomeWorldStatus) => void;
   projection: HomeSceneProjection | null;
   reducedMotion: boolean;
+  assetVariant: HomeSceneAssetVariant;
   surfaceRef: (node: HTMLDivElement | null) => void;
 };
 
@@ -36,6 +39,7 @@ const HomeSceneContext = createContext<HomeSceneContextValue | null>(null);
 export function HomeSceneProvider({ children }: { children: ReactNode }) {
   const [surfaceNode, setSurfaceNode] = useState<HTMLDivElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [assetVariant, setAssetVariant] = useState<HomeSceneAssetVariant>('wide');
   const [sceneResolved, setSceneResolved] = useState(false);
   const [worldStatus, setWorldStatus] = useState<HomeWorldStatus>('resolving');
   const [scene, setScene] = useState<HomeSceneState>(() => ({
@@ -51,6 +55,12 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     const syncScene = () => {
       const nextReducedMotion = query.matches;
+      setAssetVariant(
+        resolveHomeSceneAssetVariant({
+          width: window.innerWidth,
+          height: window.visualViewport?.height ?? window.innerHeight,
+        }),
+      );
       setReducedMotion(nextReducedMotion);
       setScene(resolveHomeScene(new Date(), nextReducedMotion));
       setSceneResolved(true);
@@ -100,6 +110,9 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
           height: viewportHeight,
         }),
       );
+      setAssetVariant(
+        resolveHomeSceneAssetVariant({ width: bounds.width, height: viewportHeight }),
+      );
     };
 
     update();
@@ -121,9 +134,10 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
       setWorldStatus,
       projection,
       reducedMotion,
+      assetVariant,
       surfaceRef,
     }),
-    [projection, reducedMotion, scene, sceneResolved, surfaceRef, worldStatus],
+    [assetVariant, projection, reducedMotion, scene, sceneResolved, surfaceRef, worldStatus],
   );
 
   return <HomeSceneContext.Provider value={value}>{children}</HomeSceneContext.Provider>;

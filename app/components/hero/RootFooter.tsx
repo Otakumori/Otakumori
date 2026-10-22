@@ -82,7 +82,7 @@ export default function RootFooter() {
       aria-labelledby="home-root-footer-title"
       data-testid="mori-root-footer"
       data-root-footer-contract="combined-world-overlay"
-      data-portrait-root-master="missing"
+      data-portrait-root-master="integrated-for-owner-review"
     >
       <div className={`${styles.contentShell} mx-auto w-full max-w-7xl px-5 pb-8 sm:px-7 md:px-8`}>
         <div className="grid gap-8 md:grid-cols-[1.05fr_1.15fr] md:items-end">

@@ -133,9 +133,20 @@ test.describe('Home readiness closure', () => {
 
       const shell = page.getByTestId('mori-home-scene-shell');
       await expect(shell).toHaveAttribute('data-scene-ready', 'true');
-      await expect(
-        page.getByRole('img', { name: /Otakumori sakura shoreline and root cavern/i }),
-      ).toBeVisible();
+      const activeWorld = page.getByRole('img', {
+        name: /Otakumori sakura shoreline and root cavern/i,
+      });
+      await expect(activeWorld).toBeVisible();
+
+      const expectsPortrait = viewport.width <= 820 && viewport.height > viewport.width;
+      await expect(shell).toHaveAttribute(
+        'data-scene-asset-variant',
+        expectsPortrait ? 'portrait' : 'wide',
+      );
+      await expect(activeWorld).toHaveAttribute(
+        'src',
+        expectsPortrait ? /-portrait\.webp/ : /-wide\.png/,
+      );
 
       const geometry = await page.evaluate(() => ({
         viewportWidth: window.innerWidth,

@@ -44,6 +44,7 @@ function HomeSceneShellInner({ children }: { children: ReactNode }) {
       data-scene-ready={sceneResolved ? 'true' : 'false'}
       data-world-status={worldStatus}
       data-scene-surface-family={projection?.family ?? 'pending'}
+      data-scene-asset-variant={projection?.assetVariant ?? 'pending'}
       data-scene-projection-contract="combined-world-master"
       data-testid="mori-home-scene-shell"
       data-scene-master-width={projection?.artboard.width ?? 'pending'}
