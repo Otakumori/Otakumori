@@ -11,18 +11,21 @@ This ledger records immutable merged baselines, the active bounded phase, and in
 | Otaku Beat-em-up Flagship Gameplay v1 | `1e9bac75113acb95e9dd485ef02e3eaf050b2062` | Closed |
 | Commerce Production Closure v1        | `47603b081a33f558d00dccce957f80a8c4a4c36f` | Closed |
 | Finance + Tax Operations v1           | `d6c4863bb133ca11b71bb48cb003472a80611db5` | Closed |
+| Admin Operations Closure v1           | `6620e9cc4f12ae54c63c57da6dc1cbf79b532c5c` | Closed |
 
 ## Active phase
 
-Admin Operations Closure is published in Draft PR #113 from `codex/admin-operations-closure`. It remains open until its exact-head required gates pass and the merge commit is recorded here.
+Home Flagship Closure remains in Draft PR #114 at the owner-review gate. Production Asset Authority
+documentation is isolated in Draft PR #115; registry implementation is stacked separately so neither
+owner-gated Home work nor unmerged authority documents are silently treated as canonical `main`.
 
 ## Phase queue
 
 | Priority | Phase                                      | State                  |
 | -------: | ------------------------------------------ | ---------------------- |
-|        1 | Admin Operations Closure                   | Active — Draft PR #113 |
-|        2 | Home Flagship Closure                      | Pending                |
-|        3 | Production Asset Authority                 | Pending                |
+|        1 | Admin Operations Closure                   | Closed                 |
+|        2 | Home Flagship Closure                      | Owner review — PR #114 |
+|        3 | Production Asset Authority                 | Active — stacked Draft |
 |        4 | Avatar Creator Production Closure          | Pending                |
 |        5 | Commander Integration Closure              | Pending                |
 |        6 | Flagship Game Presentation/Content Closure | Pending                |
@@ -38,6 +41,13 @@ Admin Operations Closure is published in Draft PR #113 from `codex/admin-operati
 |       16 | Owner Acceptance                           | Pending                |
 |       17 | Production Candidate Freeze                | Pending                |
 |       18 | Final Launch Certification                 | Pending                |
+
+Production Asset Authority implementation checkpoint:
+
+- implementation commit: `450c831f4509179480cd9219e05ac8dc4726d594`;
+- completed gate: canonical state model, source/runtime checksum validation, and explicit legacy-manifest reconciliation;
+- remaining blocker: Home portrait geometry still requires owner approval and PR #115 remains unmerged;
+- next dependency: publish the stacked registry PR, then perform the bounded Avatar production-base audit.
 
 ## Tier-0 quality ledger
 
