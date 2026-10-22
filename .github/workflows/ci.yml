@@ -58,6 +58,9 @@ jobs:
       - name: Mini-Games QA Validation
         run: pnpm run mini-games:qa
 
+      - name: Production Asset Registry Validation
+        run: pnpm run assets:production:validate
+
       - name: Run unit tests
         run: pnpm run test
 
