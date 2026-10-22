@@ -12,14 +12,14 @@ Canonical approved wide master directory:
 
 Canonical approved files:
 
-| Period | Approved master | Measured dimensions |
-| --- | --- | ---: |
-| Early morning | `om-home-world-01-early-morning-wide.png` | 1325 x 1187 |
-| Morning | `om-home-world-02-morning-wide.png` | 1325 x 1187 |
-| Afternoon | `om-home-world-03-afternoon-wide.png` | 1325 x 1187 |
-| Late afternoon | `om-home-world-04-late-afternoon-wide.png` | 1325 x 1187 |
-| Night | `om-home-world-05-night-wide.png` | 1325 x 1187 |
-| Special twilight | `om-home-world-06-special-twilight-wide.png` | 1325 x 1187 |
+| Period           | Approved master                              | Measured dimensions |
+| ---------------- | -------------------------------------------- | ------------------: |
+| Early morning    | `om-home-world-01-early-morning-wide.png`    |         1325 x 1187 |
+| Morning          | `om-home-world-02-morning-wide.png`          |         1325 x 1187 |
+| Afternoon        | `om-home-world-03-afternoon-wide.png`        |         1325 x 1187 |
+| Late afternoon   | `om-home-world-04-late-afternoon-wide.png`   |         1325 x 1187 |
+| Night            | `om-home-world-05-night-wide.png`            |         1325 x 1187 |
+| Special twilight | `om-home-world-06-special-twilight-wide.png` |         1325 x 1187 |
 
 All six approved masters share the same pixel dimensions and aspect ratio. They are treated as the
 same authored location with different lighting/time states.
@@ -69,6 +69,18 @@ The live homepage shell exposes:
 - `data-scene-projection-contract="combined-world-master"`
 - `data-testid="mori-root-footer"`
 - `data-root-footer-contract="combined-world-overlay"`
+
+Before browser-local time is resolved, the shell exposes `data-scene-bucket="pending"` and renders
+the reserved charcoal world geometry without asserting a false environmental time. The first
+authoritative image is selected in a layout-safe client pass. Scene authority is refreshed on local
+minute boundaries, browser visibility restoration, and page-cache restoration so sleep/wake cannot
+leave a stale time state.
+
+`data-world-status` exposes the active asset contract: `resolving`, `loading`, `ready`, or `fallback`.
+The shell withholds foreground presentation until the active optimized image is decoded. A scene
+boundary retains the current decoded image while its successor loads; it does not crossfade into an
+unavailable asset. Primary and approved adjacent-scene fallback failure resolves to an authored dark
+substrate rather than a broken image or blank viewport.
 
 ## Petals
 

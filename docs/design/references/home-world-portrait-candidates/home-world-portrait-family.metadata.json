@@ -1,0 +1,76 @@
+{
+  "familyId": "home.world.portrait-v1",
+  "geometryAuthority": "home.world.late-afternoon.portrait-v1",
+  "sourceDimensions": { "width": 853, "height": 1844 },
+  "runtimeDimensions": { "width": 853, "height": 1844 },
+  "productionMethod": "Controlled AI-assisted lighting transfer from each approved wide master onto the owner-approved late-afternoon portrait geometry.",
+  "ownerReviewStatus": "REQUIRED",
+  "assets": [
+    {
+      "assetId": "home.world.early-morning.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-01-early-morning-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-01-early-morning-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-01-early-morning-wide.png",
+      "sourceSha256": "B54F80B77C550F958DE74460AFD5B119B5A855C6A11D36740B4C943652DCDBAF",
+      "runtimeSha256": "25A9765A17D5058BCF706D1A2DDEAD7DC04ED436C52BBDC948AE49270B506A06",
+      "status": "CANDIDATE",
+      "ownerApproval": false,
+      "runtimeActivatedForReview": true
+    },
+    {
+      "assetId": "home.world.morning.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-02-morning-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-02-morning-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-02-morning-wide.png",
+      "sourceSha256": "899F19940F613876560F21165D1CE07664B8A22BCB86287756E1D2EA7C5BF71A",
+      "runtimeSha256": "09D259604FCB8F75F5BB3D01A9C0B89B9090B977D95D708700FD6935508AD0CF",
+      "status": "CANDIDATE",
+      "ownerApproval": false,
+      "runtimeActivatedForReview": true
+    },
+    {
+      "assetId": "home.world.afternoon.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-03-afternoon-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-03-afternoon-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-03-afternoon-wide.png",
+      "sourceSha256": "408EC4C63E2C08C9ACC60F15A0BC4111A82EBC6D585D75F152E4963C223858DC",
+      "runtimeSha256": "217044B74DE0831F538ED161F2262C7912B0726B253D4D46DB7A6DD8D82CBCF1",
+      "status": "CANDIDATE",
+      "ownerApproval": false,
+      "runtimeActivatedForReview": true
+    },
+    {
+      "assetId": "home.world.late-afternoon.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-04-late-afternoon-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-04-late-afternoon-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-04-late-afternoon-wide.png",
+      "sourceSha256": "0A1632EB872DC9B97797A923852A8961811BF5BC9B0D54D7B024DA0E8E035014",
+      "runtimeSha256": "AC9331CDBFE654BF5D4C384A98A975FF74D2D103937F4BB6C2D4E1A3A1B675EB",
+      "status": "OWNER_APPROVED",
+      "ownerApproval": true,
+      "runtimeActivatedForReview": true
+    },
+    {
+      "assetId": "home.world.night.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-05-night-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-05-night-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-05-night-wide.png",
+      "sourceSha256": "9427FC8ADDF322B1826EE643CEDEE03D9A77533906547544A568F61F44E97B0B",
+      "runtimeSha256": "C34ADB74DE568EEDD8EE6E9F984D5A085E8FCAB5E1FC44EC2F0373106422060F",
+      "status": "CANDIDATE",
+      "ownerApproval": false,
+      "runtimeActivatedForReview": true
+    },
+    {
+      "assetId": "home.world.special-twilight.portrait-v1",
+      "sourcePath": "docs/design/references/home-world-portrait-candidates/om-home-world-06-special-twilight-portrait.png",
+      "runtimePath": "public/assets/home/world/combined/om-home-world-06-special-twilight-portrait.webp",
+      "wideAuthority": "docs/design/references/home-world-wide-approved/om-home-world-06-special-twilight-wide.png",
+      "sourceSha256": "2D8EA43134DC2C99826FD5A2EF5ECBF80C51D95F6DC1AC3335366DA913D2192B",
+      "runtimeSha256": "7BD4086A45C05B7326A5AFC8B6D96B7F30EE2277B78E8020B4E6919FF8AF92BC",
+      "status": "CANDIDATE",
+      "ownerApproval": false,
+      "runtimeActivatedForReview": true
+    }
+  ]
+}

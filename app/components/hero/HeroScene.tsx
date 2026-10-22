@@ -1,7 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import { useHomeSceneContext } from './HomeSceneContext';
 import {
   HOME_SCENE_ASSETS,
@@ -12,6 +20,7 @@ import {
   resolveHomePetalVariant,
   resolveNextHomeSceneBucket,
   type HomeSceneProjection,
+  type HomeSceneAssetVariant,
   type HomeSceneState,
 } from './homeScene';
 import styles from './HeroScene.module.css';
@@ -30,11 +39,14 @@ type SceneLayer = {
   alt: string;
 };
 
-function createSceneLayer(scene: HomeSceneState): SceneLayer {
-  const image = resolveHomeSceneImageSrc(scene.asset);
+const HOME_SCENE_IMAGE_SIZES = '(min-width: 1200px) 1200px, 100vw';
+const HOME_SCENE_PRELOAD_WIDTHS = [640, 750, 828, 1080, 1200] as const;
+
+function createSceneLayer(scene: HomeSceneState, assetVariant: HomeSceneAssetVariant): SceneLayer {
+  const image = resolveHomeSceneImageSrc(scene.asset, assetVariant);
 
   return {
-    key: `${scene.bucket}-${image.src}`,
+    key: `${scene.bucket}-${assetVariant}-${image.src}`,
     src: image.src,
     fallback: image.fallback,
     alt: scene.asset.alt,
@@ -44,14 +56,21 @@ function createSceneLayer(scene: HomeSceneState): SceneLayer {
 function preloadImage(src: string) {
   const alreadyPreloaded = Array.from(
     document.head.querySelectorAll<HTMLLinkElement>('link[rel="preload"]'),
-  ).some((link) => link.href.endsWith(src));
+  ).some((link) => link.dataset.homeSceneSrc === src);
 
   if (alreadyPreloaded) return;
 
   const link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'image';
-  link.href = src;
+  link.dataset.homeSceneSrc = src;
+  link.setAttribute(
+    'imagesrcset',
+    HOME_SCENE_PRELOAD_WIDTHS.map(
+      (width) => `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75 ${width}w`,
+    ).join(', '),
+  );
+  link.setAttribute('imagesizes', HOME_SCENE_IMAGE_SIZES);
   document.head.appendChild(link);
 }
 
@@ -62,7 +81,7 @@ function TreePetalEmitter({
   projection: HomeSceneProjection | null;
   scene: HomeSceneState;
 }) {
-  const artboard = HOME_SCENE_MANIFEST.world.artboard;
+  const artboard = projection?.artboard ?? HOME_SCENE_MANIFEST.world.artboard;
   const scale = projection?.scale ?? 1;
   const petals = useMemo(
     () =>
@@ -119,39 +138,110 @@ function TreePetalEmitter({
 }
 
 export default function HeroScene() {
-  const { projection, reducedMotion, scene } = useHomeSceneContext();
+  const {
+    assetVariant,
+    projection,
+    reducedMotion,
+    scene,
+    sceneResolved,
+    setWorldStatus,
+    worldStatus,
+  } = useHomeSceneContext();
   const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() =>
-    createSceneLayer(scene),
+    createSceneLayer(scene, 'wide'),
   );
   const [incomingLayer, setIncomingLayer] = useState<SceneLayer | null>(null);
+  const [incomingReady, setIncomingReady] = useState(false);
+  const hasResolvedSceneRef = useRef(false);
+  const resolvedLayer = hasResolvedSceneRef.current
+    ? displayedLayer
+    : createSceneLayer(scene, assetVariant);
 
-  useEffect(() => {
-    const nextLayer = createSceneLayer(scene);
-    if (nextLayer.key === displayedLayer.key) return;
+  const decodeImage = useCallback(async (image: HTMLImageElement) => {
+    if (typeof image.decode === 'function') await image.decode();
+  }, []);
 
-    if (reducedMotion) {
+  const markDisplayedReady = useCallback(
+    (image: HTMLImageElement) => {
+      void decodeImage(image)
+        .then(() => setWorldStatus('ready'))
+        .catch(() => {
+          if (resolvedLayer.src !== resolvedLayer.fallback) {
+            setDisplayedLayer({ ...resolvedLayer, src: resolvedLayer.fallback });
+            return;
+          }
+          setWorldStatus('fallback');
+        });
+    },
+    [decodeImage, resolvedLayer, setWorldStatus],
+  );
+
+  const markIncomingReady = useCallback(
+    (image: HTMLImageElement) => {
+      void decodeImage(image)
+        .then(() => {
+          setIncomingReady(true);
+          setWorldStatus('ready');
+        })
+        .catch(() => {
+          if (incomingLayer && incomingLayer.src !== incomingLayer.fallback) {
+            setIncomingLayer({ ...incomingLayer, src: incomingLayer.fallback });
+            return;
+          }
+          setIncomingLayer(null);
+          setIncomingReady(false);
+        });
+    },
+    [decodeImage, incomingLayer, setWorldStatus],
+  );
+
+  useLayoutEffect(() => {
+    if (!sceneResolved) return;
+
+    const nextLayer = createSceneLayer(scene, assetVariant);
+    if (!hasResolvedSceneRef.current) {
+      hasResolvedSceneRef.current = true;
+      setWorldStatus('loading');
       setIncomingLayer(null);
+      setIncomingReady(false);
       setDisplayedLayer(nextLayer);
       return;
     }
+    if (nextLayer.key === displayedLayer.key) return;
 
     setIncomingLayer(nextLayer);
-    const timeout = window.setTimeout(() => {
-      setDisplayedLayer(nextLayer);
+    setIncomingReady(false);
+  }, [assetVariant, displayedLayer.key, scene, sceneResolved, setWorldStatus]);
+
+  useEffect(() => {
+    if (!incomingLayer || !incomingReady) return;
+
+    if (reducedMotion) {
+      setDisplayedLayer(incomingLayer);
       setIncomingLayer(null);
+      setIncomingReady(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setDisplayedLayer(incomingLayer);
+      setIncomingLayer(null);
+      setIncomingReady(false);
     }, HOME_SCENE_CROSSFADE_MS);
 
     return () => window.clearTimeout(timeout);
-  }, [displayedLayer.key, reducedMotion, scene]);
+  }, [incomingLayer, incomingReady, reducedMotion]);
 
   useEffect(() => {
+    if (!sceneResolved) return;
+
     const nextBucket = resolveNextHomeSceneBucket(scene.bucket);
-    const currentImage = resolveHomeSceneImageSrc(scene.asset);
-    const nextImage = resolveHomeSceneImageSrc(HOME_SCENE_ASSETS[nextBucket]);
+    const currentImage = resolveHomeSceneImageSrc(scene.asset, assetVariant);
+    const nextImage = resolveHomeSceneImageSrc(HOME_SCENE_ASSETS[nextBucket], assetVariant);
 
     preloadImage(currentImage.src);
     preloadImage(nextImage.src);
-  }, [scene.asset, scene.bucket]);
+  }, [assetVariant, scene.asset, scene.bucket, sceneResolved]);
 
   const ambientTransitionClass = reducedMotion
     ? 'transition-none'
@@ -161,52 +251,68 @@ export default function HeroScene() {
     <div
       className={styles.scene}
       data-scene-bucket={scene.bucket}
+      data-scene-ready={sceneResolved ? 'true' : 'false'}
+      data-world-status={worldStatus}
       data-scene-timezone={scene.timezone}
       data-scene-surface-family={projection?.family ?? 'combined'}
       data-scene-art-source="combined-world-master"
+      data-scene-asset-variant={assetVariant}
       data-testid="mori-hero-scene"
     >
       <div className={styles.worldExtension} data-testid="mori-world-extension">
         <div className={styles.scenePlate} data-testid="mori-scene-plate">
-          <Image
-            key={displayedLayer.key}
-            src={displayedLayer.src}
-            alt={incomingLayer ? '' : displayedLayer.alt}
-            aria-hidden={incomingLayer ? 'true' : undefined}
-            fill
-            priority
-            sizes="100vw"
-            className={`${styles.image} ${styles.imageLayer} ${
-              incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
-            }`}
-            style={{
-              transitionDuration: `${
-                reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS
-              }ms`,
-            }}
-            onError={() => {
-              if (displayedLayer.src !== displayedLayer.fallback) {
-                setDisplayedLayer({ ...displayedLayer, src: displayedLayer.fallback });
-              }
-            }}
-          />
+          {sceneResolved ? (
+            <Image
+              key={resolvedLayer.key}
+              src={resolvedLayer.src}
+              alt={incomingLayer ? '' : resolvedLayer.alt}
+              aria-hidden={incomingLayer ? 'true' : undefined}
+              fill
+              priority
+              sizes={HOME_SCENE_IMAGE_SIZES}
+              className={`${styles.image} ${styles.imageLayer} ${
+                incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
+              }`}
+              style={{
+                transitionDuration: `${
+                  reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS
+                }ms`,
+              }}
+              onError={() => {
+                if (resolvedLayer.src !== resolvedLayer.fallback) {
+                  setDisplayedLayer({ ...resolvedLayer, src: resolvedLayer.fallback });
+                  return;
+                }
+                setWorldStatus('fallback');
+              }}
+              onLoad={(event) => markDisplayedReady(event.currentTarget)}
+            />
+          ) : null}
           {incomingLayer ? (
             <Image
               key={incomingLayer.key}
               src={incomingLayer.src}
               alt={incomingLayer.alt}
               fill
-              sizes="100vw"
-              className={`${styles.image} ${styles.imageLayer} ${styles.imageLayerEntering}`}
+              sizes={HOME_SCENE_IMAGE_SIZES}
+              className={`${styles.image} ${styles.imageLayer} ${
+                incomingReady ? styles.imageLayerEntering : styles.imageLayerPending
+              }`}
               style={{ animationDuration: `${HOME_SCENE_CROSSFADE_MS}ms` }}
               onError={() => {
                 if (incomingLayer.src !== incomingLayer.fallback) {
                   setIncomingLayer({ ...incomingLayer, src: incomingLayer.fallback });
+                  return;
                 }
+                setIncomingLayer(null);
+                setIncomingReady(false);
               }}
+              onLoad={(event) => markIncomingReady(event.currentTarget)}
             />
           ) : null}
-          <TreePetalEmitter projection={projection} scene={scene} />
+          {worldStatus === 'ready' ? (
+            <TreePetalEmitter projection={projection} scene={scene} />
+          ) : null}
         </div>
       </div>
 

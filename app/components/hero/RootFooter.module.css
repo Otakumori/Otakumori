@@ -8,12 +8,7 @@
     calc(var(--mori-scene-world-height, 142svh) - var(--mori-root-content-top, 54rem))
   );
   overflow: visible;
-  background: linear-gradient(
-    180deg,
-    rgba(7, 4, 7, 0),
-    rgba(7, 4, 7, 0.05) 42%,
-    rgba(7, 4, 7, 0.12)
-  );
+  background: transparent;
 }
 
 .rootFooter::before {
@@ -24,17 +19,91 @@
   position: relative;
   z-index: 1;
   padding-top: clamp(2.5rem, 8svh, 7rem);
-  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.86);
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.9);
+}
+
+.contentShell::before {
+  position: absolute;
+  z-index: -1;
+  inset: clamp(1.5rem, 5svh, 4rem) 2% 0;
+  border-radius: 44% 38% 8% 10% / 10% 12% 5% 6%;
+  background: radial-gradient(
+    ellipse at 45% 44%,
+    rgba(12, 7, 10, 0.31),
+    rgba(8, 5, 8, 0.14) 54%,
+    transparent 78%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.eyebrow,
+.groupTitle {
+  color: rgba(247, 205, 219, 0.88);
+}
+
+.footerTitle {
+  color: #fff5e9;
+  letter-spacing: -0.012em;
+  text-shadow:
+    0 2px 3px rgba(4, 2, 4, 0.92),
+    0 5px 18px rgba(0, 0, 0, 0.78);
+}
+
+.footerIntro {
+  color: rgba(255, 237, 229, 0.86);
+  font-weight: 470;
+  text-shadow: 0 2px 8px rgba(5, 2, 5, 0.94);
+}
+
+.rootNavigation {
+  align-items: start;
 }
 
 .linkGroup {
-  border-left: 1px solid rgba(246, 220, 199, 0.12);
-  padding-left: 0.85rem;
+  position: relative;
+  padding: 0.3rem 0 0.5rem 0.8rem;
   text-shadow: 0 3px 12px rgba(0, 0, 0, 0.74);
 }
 
+.linkGroup::before {
+  position: absolute;
+  top: 1.35rem;
+  bottom: 0.15rem;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    rgba(224, 182, 144, 0.34),
+    rgba(242, 181, 202, 0.08),
+    transparent
+  );
+  content: '';
+}
+
+@media (min-width: 640px) {
+  .linkGroup:nth-child(even) {
+    margin-top: 1.15rem;
+  }
+}
+
 .rootLink {
+  border-radius: 0.28rem 0.65rem 0.28rem 0.5rem;
+  color: rgba(255, 244, 232, 0.9);
   gap: 0.38rem;
+  font-weight: 540;
+  text-shadow: 0 2px 7px rgba(4, 2, 4, 0.92);
+}
+
+.rootLink:hover,
+.rootLink:focus-visible {
+  background: linear-gradient(
+    90deg,
+    rgba(239, 176, 197, 0.15),
+    rgba(216, 173, 128, 0.04),
+    transparent
+  );
+  color: #fffaf2;
 }
 
 .rootLinkArt {
@@ -43,6 +112,13 @@
   flex: 0 0 auto;
   object-fit: contain;
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.42));
+}
+
+.legal {
+  border-top: 1px solid rgba(246, 220, 199, 0.18);
+  color: rgba(255, 235, 225, 0.74);
+  font-weight: 480;
+  text-shadow: 0 2px 8px rgba(3, 2, 3, 0.94);
 }
 
 @media (max-width: 767px) {

@@ -13,6 +13,13 @@
   background: #080611;
 }
 
+.scene[data-world-status='fallback'] .worldExtension {
+  background:
+    radial-gradient(circle at 29% 18%, rgba(118, 55, 72, 0.3), transparent 34%),
+    radial-gradient(circle at 74% 46%, rgba(120, 91, 55, 0.16), transparent 38%),
+    linear-gradient(155deg, #17101c 0%, #0d0913 46%, #080611 100%);
+}
+
 .scenePlate {
   position: absolute;
   z-index: 2;
@@ -20,6 +27,17 @@
   top: var(--mori-scene-world-top, 0);
   width: var(--mori-scene-world-width, 100%);
   height: var(--mori-scene-world-height, 100%);
+}
+
+.scene[data-scene-ready='false'] .scenePlate,
+.scene[data-world-status='loading'] .scenePlate,
+.scene[data-world-status='fallback'] .scenePlate {
+  opacity: 0;
+}
+
+.scene[data-world-status='loading'] .mist,
+.scene[data-world-status='loading'] .dappledLight {
+  opacity: 0 !important;
 }
 
 .image {
@@ -45,6 +63,10 @@
   animation-name: moriWorldCrossfadeIn;
   animation-fill-mode: both;
   animation-timing-function: ease-in-out;
+}
+
+.imageLayerPending {
+  opacity: 0;
 }
 
 .petalEmitter {

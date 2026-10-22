@@ -1,6 +1,10 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('next/image', () => ({
+  default: ({ alt = '', ...props }: any) => <img alt={alt} {...props} />,
+}));
+
 import PetalWalletNavLink from '@/app/components/nav/PetalWalletNavLink';
 import PetalWalletBadge from '@/app/components/nav/PetalWalletBadge';
 
@@ -25,11 +29,7 @@ describe('PetalWalletNavLink', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     render(
-      <PetalWalletNavLink
-        isLoaded
-        isSignedIn={false}
-        signInHref="/sign-in?redirect_url=%2Fshop"
-      />,
+      <PetalWalletNavLink isLoaded isSignedIn={false} signInHref="/sign-in?redirect_url=%2Fshop" />,
     );
 
     const link = screen.getByRole('link', { name: /sign in to view petals/i });
@@ -49,10 +49,21 @@ describe('PetalWalletNavLink', () => {
       'data-petal-wallet-state',
       'ready',
     );
+    expect(screen.getByAltText('')).toHaveAttribute(
+      'src',
+      '/assets/home/ui/sakura-petal-wallet-emblem.webp',
+    );
+    expect(screen.getByAltText('').closest('[data-petal-wallet-source]')).toHaveAttribute(
+      'data-petal-wallet-source',
+      'approved-blossom-emblem-v1',
+    );
   });
 
   it('reserves compact loading geometry while a signed-in balance is pending', () => {
-    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => undefined)));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise(() => undefined)),
+    );
 
     render(<PetalWalletNavLink isLoaded isSignedIn signInHref="/sign-in" />);
 
