@@ -30,6 +30,16 @@ Production assets must be intentionally authored or deliberately sourced, proven
 
 Technical readiness does not substitute for presentation approval.
 
+## Repository registry
+
+`content/production-assets.registry.json` is the canonical repository record for production state,
+provenance, checksums, owner approval, runtime integration, and QA evidence. It reconciles the
+existing runtime manifests and credits without replacing their narrower responsibilities.
+
+Run `pnpm assets:production:validate` to verify local source/runtime files, checksums, stable IDs,
+state-transition requirements, and integration references. Pending-merge candidates must carry an
+exact source ref and remain non-runtime until their owning visual gate is approved.
+
 ## Current sequence
 
 1. Finish current Home correction pass.
