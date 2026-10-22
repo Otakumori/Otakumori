@@ -16,8 +16,8 @@ describe('production asset registry', () => {
 
     expect(result.errors).toEqual([]);
     expect(result.counts.INTEGRATED).toBe(6);
-    expect(result.counts.CANDIDATE).toBe(2);
-    expect(result.counts.MISSING).toBe(5);
+    expect(result.counts.CANDIDATE).toBe(7);
+    expect(result.counts.MISSING).toBe(0);
   });
 
   it('keeps the legacy avatar base as an unapproved candidate despite runtime references', () => {
@@ -33,7 +33,7 @@ describe('production asset registry', () => {
     expect(candidate?.technical?.jointsPerSkin).toEqual([707, 701]);
   });
 
-  it('keeps the late-afternoon portrait candidate unapproved and inactive', () => {
+  it('records approved portrait geometry without self-approving final Home art', () => {
     const registry = loadProductionAssetRegistry();
     const candidate = registry.assets.find(
       (asset) => asset.id === 'home.world.late-afternoon.portrait-v1',
@@ -41,9 +41,22 @@ describe('production asset registry', () => {
 
     expect(candidate?.state).toBe('CANDIDATE');
     expect(candidate?.ownerApproval.approved).toBe(false);
-    expect(candidate?.runtime).toBeUndefined();
+    expect(candidate?.ownerApproval.geometryApproved).toBe(true);
+    expect(candidate?.runtime?.integrated).toBe(true);
+    expect(candidate?.runtime?.availability).toBe('PENDING_MERGE');
     expect(candidate?.source?.sourceRef).toBe(
-      'codex/home-flagship-closure@c32ff62dd85ae215d032f42108bf47ce45eb32d0',
+      'codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861',
+    );
+  });
+
+  it('requires an exact ref for pending runtime artifacts', () => {
+    const registry = cloneRegistry(loadProductionAssetRegistry());
+    const candidate = registry.assets.find((asset) => asset.id === 'home.world.night.portrait-v1');
+    if (!candidate?.runtime) throw new Error('Expected pending portrait runtime');
+    candidate.runtime.sourceRef = undefined;
+
+    expect(validateProductionAssetRegistry(registry).errors).toContain(
+      'home.world.night.portrait-v1: PENDING_MERGE runtime requires sourceRef',
     );
   });
 

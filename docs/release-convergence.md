@@ -15,9 +15,11 @@ This ledger records immutable merged baselines, the active bounded phase, and in
 
 ## Active phase
 
-Home Flagship Closure remains in Draft PR #114 at the owner-review gate. Production Asset Authority
-documentation is isolated in Draft PR #115; registry implementation is stacked separately so neither
-owner-gated Home work nor unmerged authority documents are silently treated as canonical `main`.
+Home Flagship Closure remains in Draft PR #114 at the owner-review gate with its six-state portrait
+family integrated for review at `acc131fddd5db5ea5d8e8dccf3e8b51563639861`. Production Asset
+Authority documentation is isolated in Draft PR #115; registry implementation remains stacked so
+neither owner-gated Home work nor unmerged authority documents are silently treated as canonical
+`main`.
 
 ## Phase queue
 
@@ -46,8 +48,10 @@ Production Asset Authority implementation checkpoint:
 
 - implementation commit: `450c831f4509179480cd9219e05ac8dc4726d594`;
 - completed gate: canonical state model, source/runtime checksum validation, and explicit legacy-manifest reconciliation;
-- remaining blocker: Home portrait geometry still requires owner approval and PR #115 remains unmerged;
-- next dependency: publish the stacked registry PR, then perform the bounded Avatar production-base audit.
+- completed gate: the registry now records all six portrait artifacts as exact-head pending sources,
+  distinguishes geometry approval from final visual approval, and runs its validator in CI;
+- remaining blocker: final Home owner visual review and merge authorization for stacked PRs #115/#116;
+- next dependency: merge #114, #115, then #116 in that order after their respective owner gates.
 
 ## Tier-0 quality ledger
 

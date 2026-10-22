@@ -30,6 +30,8 @@ export interface ProductionAssetSource {
 export interface ProductionAssetRuntime {
   path: string;
   sha256: string;
+  availability?: AssetAvailability;
+  sourceRef?: string;
   integrated: boolean;
   integrationReferences: string[];
 }
@@ -58,6 +60,7 @@ export interface ProductionAssetRecord {
   ownerApproval: {
     required: boolean;
     approved: boolean;
+    geometryApproved?: boolean;
     evidence?: string;
   };
   qa: {
@@ -209,7 +212,11 @@ export function validateProductionAssetRegistry(
       errors.push(`${asset.id}: ${asset.state} requires a runtime artifact`);
     }
     if (asset.runtime) {
-      validateFile(root, asset.id, 'runtime', asset.runtime.path, asset.runtime.sha256, errors);
+      if ((asset.runtime.availability ?? 'LOCAL') === 'LOCAL') {
+        validateFile(root, asset.id, 'runtime', asset.runtime.path, asset.runtime.sha256, errors);
+      } else if (!asset.runtime.sourceRef) {
+        errors.push(`${asset.id}: ${asset.runtime.availability} runtime requires sourceRef`);
+      }
       for (const reference of asset.runtime.integrationReferences) {
         const resolved = resolveRepositoryPath(root, reference);
         if (!resolved || !existsSync(resolved)) {
