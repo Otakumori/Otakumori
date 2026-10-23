@@ -268,12 +268,13 @@ function MiniGamesPanel() {
   );
 }
 
-// Trade Hall Panel (stub)
 function TradeHallPanel() {
   return (
     <div className="text-center py-8">
-      <p className="text-gray-600 mb-4">Trade Hall coming soon...</p>
-      <p className="text-sm text-gray-500">Exchange goods with other players</p>
+      <p className="text-gray-700 mb-4">Player-to-player trading is not available.</p>
+      <Link className="text-pink-700 underline" href="/mini-games/trade">
+        Open your persisted Rune Archive
+      </Link>
     </div>
   );
 }

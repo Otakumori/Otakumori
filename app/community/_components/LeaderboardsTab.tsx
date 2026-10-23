@@ -12,7 +12,7 @@ interface LeaderboardEntry {
   avatarUrl: string | null;
   lifetimePetalsEarned: number;
   currentBalance: number;
-  }
+}
 
 interface GameLeaderboardEntry {
   rank: number;
@@ -20,7 +20,7 @@ interface GameLeaderboardEntry {
   displayName: string;
   score: number;
   category: string;
-  }
+}
 
 export function LeaderboardsTab() {
   const { user } = useUser();
@@ -30,15 +30,19 @@ export function LeaderboardsTab() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     async function fetchLeaderboards() {
       try {
         setLoading(true);
+        setError(null);
+        let successfulReads = 0;
 
         // Fetch global petal leaderboard
         const globalResponse = await fetch('/api/v1/leaderboards/global-petals?limit=20');
         if (globalResponse.ok) {
+          successfulReads += 1;
           const globalData = await globalResponse.json();
           if (globalData.ok && globalData.data) {
             setGlobalLeaderboard(globalData.data.leaderboard || []);
@@ -65,28 +69,40 @@ export function LeaderboardsTab() {
               `/api/v1/leaderboards/${gameId}?category=score&limit=10`,
             );
             if (gameResponse.ok) {
+              successfulReads += 1;
               const gameResult = await gameResponse.json();
-              if (gameResult.ok && gameResult.data?.leaderboard) {
+              if (gameResult.ok && gameResult.data?.leaderboard?.length > 0) {
                 gameData[gameId] = gameResult.data.leaderboard.slice(0, 10);
               }
             }
           } catch (err) {
-            logger.warn(`Failed to fetch leaderboard for ${gameId}:`, undefined, { error: err instanceof Error ? err : new Error(String(err)) });
+            logger.warn(`Failed to fetch leaderboard for ${gameId}:`, undefined, {
+              error: err instanceof Error ? err : new Error(String(err)),
+            });
           }
+        }
+
+        if (successfulReads === 0) {
+          throw new Error('No leaderboard source was available');
         }
 
         setGameLeaderboards(gameData);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load leaderboards');
-        logger.error('Error fetching leaderboards:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+        logger.error(
+          'Error fetching leaderboards:',
+          undefined,
+          undefined,
+          err instanceof Error ? err : new Error(String(err)),
+        );
       } finally {
         setLoading(false);
       }
     }
 
     fetchLeaderboards();
-  }, []);
+  }, [reloadKey]);
 
   if (loading) {
     return (
@@ -104,6 +120,13 @@ export function LeaderboardsTab() {
         <div className="text-center py-12">
           <p className="text-red-400 mb-2">Failed to load leaderboards</p>
           <p className="text-sm text-zinc-400">{error}</p>
+          <button
+            type="button"
+            className="mt-4 rounded border border-pink-400/60 px-4 py-2 text-sm text-pink-200 hover:bg-pink-500/10"
+            onClick={() => setReloadKey((value) => value + 1)}
+          >
+            Try again
+          </button>
         </div>
       </div>
     );
