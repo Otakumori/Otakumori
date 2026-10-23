@@ -52,7 +52,7 @@ export default function MiniGamesHome() {
           <h2 id="owned-runes" className="text-sm font-semibold text-white">
             Owned Runes
           </h2>
-          <div className="text-xs text-zinc-300">Trade Center → Fuse</div>
+          <div className="text-xs text-zinc-300">Rune Archive → Fusion status</div>
         </div>
         <OwnedRunesGrid />
       </section>

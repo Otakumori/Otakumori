@@ -114,7 +114,7 @@ export function AdultContentGate() {
           You must verify your age to access adult content and features.
         </p>
         <a
-          href="/adults/verify"
+          href="/safety"
           className="inline-flex items-center px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors font-semibold"
         >
           Verify Age for Adult Content
@@ -220,7 +220,7 @@ export function AdultContentGate() {
             Design your own adult avatars with advanced customization options
           </p>
           <a
-            href="/adults/editor"
+            href="/character-editor"
             className="inline-flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
           >
             Open Adult Avatar Editor

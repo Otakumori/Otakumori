@@ -1,4 +1,3 @@
-
 'use client';
 import { useEffect } from 'react';
 import CubeHub from '../mini-games/components/CubeHub';
@@ -34,7 +33,7 @@ export default function HubPage() {
     if (!isZooming) return;
     const t = setTimeout(() => {
       if (face === 'games') location.assign('/mini-games');
-      if (face === 'trade') location.assign('/trade');
+      if (face === 'trade') location.assign('/mini-games/trade');
       if (face === 'avatar') location.assign('/profile');
       if (face === 'music') location.assign('/music');
       backToIdle();

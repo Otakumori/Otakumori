@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     // Fusion disabled in MVP — respond with friendly stub
     return NextResponse.json(
       { ok: false, code: 'DISABLED', message: 'Fusion is not enabled yet. Coming soon.' },
-      { status: 200 },
+      { status: 503 },
     );
   } catch (err) {
     logger.error(

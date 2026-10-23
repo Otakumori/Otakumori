@@ -1,9 +1,9 @@
 {
   "faces": {
     "up": {
-      "label": "Trade Center",
+      "label": "Rune Archive",
       "action": "route",
-      "href": "/trade"
+      "href": "/mini-games/trade"
     },
     "left": {
       "label": "Mini-Games",

@@ -77,7 +77,9 @@ export default function ConsoleCard({
           ['boot_whoosh', '/sfx/boot_whoosh.mp3'],
         ])
         .catch((error) => {
-          logger.warn('Failed to preload audio files:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+          logger.warn('Failed to preload audio files:', undefined, {
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
         });
       setAudioOn(audioEnabled); // Track audio state
     }
@@ -154,7 +156,9 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+          logger.warn('Failed to play audio:', undefined, {
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
         }
       }
       if (e.key === 'ArrowRight') {
@@ -169,7 +173,9 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+          logger.warn('Failed to play audio:', undefined, {
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
         }
       }
       // Vertical rotation between front/top/bottom
@@ -185,7 +191,9 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+          logger.warn('Failed to play audio:', undefined, {
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
         }
       }
       if (e.key === 'ArrowDown') {
@@ -200,11 +208,13 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+          logger.warn('Failed to play audio:', undefined, {
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
         }
       }
       if (e.key === 'Enter') {
-        if (face === 1) router.push('/mini-games/games/petal-collection');
+        if (face === 1) router.push('/mini-games/petal-collection');
       }
     };
     window.addEventListener('keydown', onKey);
@@ -258,7 +268,7 @@ export default function ConsoleCard({
           }
           // A (0) / B (1)
           if (press(buttons[0], 0)) {
-            if (mode === 'cube' && face === 1) router.push('/mini-games/games/petal-collection');
+            if (mode === 'cube' && face === 1) router.push('/mini-games/petal-collection');
           }
           if (press(buttons[1], 1)) {
             if (mode === 'playingGame') {
@@ -387,10 +397,14 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                logger.warn('Failed to play audio:', undefined, {
+                  error: error instanceof Error ? error : new Error(String(error)),
+                });
               }
             } catch (error) {
-              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+              logger.warn('Failed to play audio:', undefined, {
+                error: error instanceof Error ? error : new Error(String(error)),
+              });
             }
           }}
           aria-label="Go to Mini-Games"
@@ -410,10 +424,14 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                logger.warn('Failed to play audio:', undefined, {
+                  error: error instanceof Error ? error : new Error(String(error)),
+                });
               }
             } catch (error) {
-              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+              logger.warn('Failed to play audio:', undefined, {
+                error: error instanceof Error ? error : new Error(String(error)),
+              });
             }
           }}
           aria-label="Go to Character and Community"
@@ -433,10 +451,14 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                logger.warn('Failed to play audio:', undefined, {
+                  error: error instanceof Error ? error : new Error(String(error)),
+                });
               }
             } catch (error) {
-              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+              logger.warn('Failed to play audio:', undefined, {
+                error: error instanceof Error ? error : new Error(String(error)),
+              });
             }
           }}
           aria-label="Go to Music and Extras"
@@ -456,16 +478,20 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                logger.warn('Failed to play audio:', undefined, {
+                  error: error instanceof Error ? error : new Error(String(error)),
+                });
               }
             } catch (error) {
-              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+              logger.warn('Failed to play audio:', undefined, {
+                error: error instanceof Error ? error : new Error(String(error)),
+              });
             }
           }}
-          aria-label="Go to Trade Center"
+          aria-label="Go to Rune Archive"
         >
-          <div className="text-white font-medium">Trade Center</div>
-          <div className="text-xs text-zinc-300">Fuse and trade runes</div>
+          <div className="text-white font-medium">Rune Archive</div>
+          <div className="text-xs text-zinc-300">Review your persisted runes</div>
         </button>
       </div>
     </div>
@@ -504,9 +530,11 @@ export default function ConsoleCard({
                     }, 10);
                   }
                 } catch (error) {
-                  logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                  logger.warn('Failed to play audio:', undefined, {
+                    error: error instanceof Error ? error : new Error(String(error)),
+                  });
                 }
-                router.push(`/mini-games/games/${g.slug}`);
+                router.push(`/mini-games/${g.slug}`);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -522,9 +550,11 @@ export default function ConsoleCard({
                       }, 10);
                     }
                   } catch (error) {
-                    logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
+                    logger.warn('Failed to play audio:', undefined, {
+                      error: error instanceof Error ? error : new Error(String(error)),
+                    });
                   }
-                  router.push(`/mini-games/games/${g.slug}`);
+                  router.push(`/mini-games/${g.slug}`);
                 }
               }}
               aria-label={`Start ${g.name}`}
@@ -614,9 +644,7 @@ export default function ConsoleCard({
     };
 
     if (loading) {
-      return (
-        <Skeleton />
-      );
+      return <Skeleton />;
     }
 
     return (
@@ -715,71 +743,19 @@ export default function ConsoleCard({
 
   const TradeFace = () => (
     <div className="p-4 space-y-3">
-      <FaceTitle>Trade Center</FaceTitle>
+      <FaceTitle>Rune Archive</FaceTitle>
       <OwnedRunesGrid />
       <FusePanel />
     </div>
   );
 
   const FusePanel = () => {
-    const [selected, setSelected] = useState<string>('rune_a');
-    const [second, setSecond] = useState<string>('rune_b');
-    const [result, setResult] = useState<string | null>(null);
-    const [busy, setBusy] = useState(false);
-    const fuse = async () => {
-      setBusy(true);
-      setResult(null);
-      try {
-        const res = await http.post('/api/trade/fuse', { runeIds: [selected, second] });
-        const body: any = res.data;
-        if (body?.ok) setResult('Fusion complete');
-        else setResult(body?.message || 'Fusion unavailable');
-      } catch (e: any) {
-        setResult(e?.message || 'Error');
-        Sentry.captureMessage('fuse_error', { level: 'error' });
-      } finally {
-        setBusy(false);
-      }
-    };
     return (
       <div className="rounded-lg border border-white/15 bg-white/10 p-3">
-        <div className="mb-2 text-xs text-zinc-300">Runes Fusion (MVP)</div>
-        <div className="flex items-center gap-2">
-          <select
-            className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15"
-            name="runeA"
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <span className="text-zinc-400">+</span>
-          <select
-            className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15"
-            name="runeB"
-            value={second}
-            onChange={(e) => setSecond(e.target.value)}
-          >
-            {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={fuse}
-            className="ml-auto rounded border border-pink-400/40 px-3 py-1 text-sm text-pink-200 hover:bg-pink-500/10 disabled:opacity-50"
-            disabled={busy}
-            data-testid="fuse-submit"
-          >
-            {busy ? 'Fusing…' : 'Fuse'}
-          </button>
-        </div>
-        {result && <div className="mt-2 text-xs text-zinc-300">{result}</div>}
+        <div className="text-xs font-medium text-zinc-200">Rune Fusion</div>
+        <p className="mt-1 text-xs text-zinc-400">
+          Fusion is not enabled. No runes will be consumed.
+        </p>
       </div>
     );
   };
@@ -1003,7 +979,12 @@ export default function ConsoleCard({
         <div>Arrows/Stick: rotate • A/Enter: select • B/Esc: back</div>
         <div className="inline-flex items-center gap-2">
           <span className="material-symbols-outlined">view_in_ar</span>
-          <span className="emoji-noto"><span role="img" aria-label="emoji">�</span>�</span>
+          <span className="emoji-noto">
+            <span role="img" aria-label="emoji">
+              �
+            </span>
+            �
+          </span>
         </div>
       </div>
     </section>
@@ -1072,12 +1053,20 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
     ),
     'puzzle-reveal': dynamic(() => import('../(games)/puzzle-reveal/InCard'), { ssr: false }),
     'petal-samurai': dynamic(() => import('../(games)/petal-samurai/InCard'), { ssr: false }),
-    'petal-storm-rhythm': dynamic(() => import('../(games)/petal-storm-rhythm/InCard'), { ssr: false }),
+    'petal-storm-rhythm': dynamic(() => import('../(games)/petal-storm-rhythm/InCard'), {
+      ssr: false,
+    }),
     'bubble-ragdoll': dynamic(() => import('../(games)/bubble-ragdoll/Scene'), { ssr: false }),
-    'samurai-petal-slice': dynamic(() => import('../(games)/samurai-petal-slice/Scene'), { ssr: false }),
+    'samurai-petal-slice': dynamic(() => import('../(games)/samurai-petal-slice/Scene'), {
+      ssr: false,
+    }),
     blossomware: dynamic(() => import('../(games)/blossomware/InCard'), { ssr: false }),
-    'dungeon-of-desire': dynamic(() => import('../(games)/dungeon-of-desire/InCard'), { ssr: false }),
-    'maid-cafe-manager': dynamic(() => import('../(games)/maid-cafe-manager/InCard'), { ssr: false }),
+    'dungeon-of-desire': dynamic(() => import('../(games)/dungeon-of-desire/InCard'), {
+      ssr: false,
+    }),
+    'maid-cafe-manager': dynamic(() => import('../(games)/maid-cafe-manager/InCard'), {
+      ssr: false,
+    }),
     'thigh-coliseum': dynamic(() => import('../(games)/thigh-coliseum/InCard'), { ssr: false }),
     'anime-arena': dynamic(() => import('../(games)/anime-arena/Scene'), { ssr: false }),
   } as const;
@@ -1288,7 +1277,12 @@ function CommunityFace() {
         // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
-        logger.error('WebSocket connection failed:', undefined, undefined, e instanceof Error ? e : new Error(String(e)));
+        logger.error(
+          'WebSocket connection failed:',
+          undefined,
+          undefined,
+          e instanceof Error ? e : new Error(String(e)),
+        );
         setWsFailures((n) => n + 1);
         setWsDegraded(true);
         bc('ws.disconnect');
@@ -1582,7 +1576,12 @@ function CommunityFace() {
               });
             } catch {}
           } catch (e) {
-            logger.error('Failed to send interaction request:', undefined, undefined, e instanceof Error ? e : new Error(String(e)));
+            logger.error(
+              'Failed to send interaction request:',
+              undefined,
+              undefined,
+              e instanceof Error ? e : new Error(String(e)),
+            );
             setToasts((prev) => [
               ...prev,
               {

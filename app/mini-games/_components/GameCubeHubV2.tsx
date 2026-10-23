@@ -352,7 +352,7 @@ export default function GameCubeHubV2() {
             </div>
 
             {/* Face Buttons - Positioned around the cube like authentic GameCube */}
-            {/* UP - Trade Center */}
+            {/* UP - Rune Archive */}
             <button
               onClick={() => handleFaceAction('up')}
               onTouchStart={() => {}} // Enable touch events
@@ -364,7 +364,7 @@ export default function GameCubeHubV2() {
                         focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
                         ${currentFace === 'up' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
               data-test="gc-face-up"
-              aria-label="Open Trade Center"
+              aria-label="Open Rune Archive"
             >
               <div className="flex flex-col items-center justify-center h-full">
                 {isLoading && currentFace === 'up' ? (
@@ -372,7 +372,7 @@ export default function GameCubeHubV2() {
                 ) : (
                   <>
                     <div className="text-2xl mb-1">
-                      <span role="img" aria-label="Trade Center">
+                      <span role="img" aria-label="Rune Archive">
                         TC
                       </span>
                     </div>
@@ -776,7 +776,7 @@ export default function GameCubeHubV2() {
         <h2>Navigation Menu</h2>
         <ul>
           <li>
-            <button onClick={() => handleFaceAction('up')}>Trade Center</button>
+            <button onClick={() => handleFaceAction('up')}>Rune Archive</button>
           </li>
           <li>
             <button onClick={() => handleFaceAction('left')}>Mini-Games</button>
