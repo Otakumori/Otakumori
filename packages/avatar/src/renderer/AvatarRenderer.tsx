@@ -1,34 +1,89 @@
 'use client';
 
-/**
- * React Three Fiber Avatar Renderer Component
- * Policy-agnostic renderer that receives pre-resolved equipment URLs
- */
-
-import { useEffect, useRef, useState } from 'react';
+import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+
+import { AVATAR_SKELETON_VERSION } from '../productionContract';
 import type { AvatarSpecV15Type, EquipmentSlotType } from '../spec';
+import {
+  applySemanticMaterials,
+  applySemanticMorphs,
+  attachEquipment,
+  cloneOwnedScene,
+  disposeOwnedScene,
+} from './runtime';
 
 export interface ResolvedEquipment {
   id: string;
   url: string;
+  skeletonVersion?: string;
+  attachmentBone?: string;
+  materialPalette?: { hair?: string | undefined; outfit?: string | undefined } | undefined;
 }
 
 export interface AvatarRendererProps {
   spec: AvatarSpecV15Type;
   resolved: Partial<Record<EquipmentSlotType, ResolvedEquipment | null>>;
   reducedMotion?: boolean;
-  onLoad?: () => void;
-  onError?: (error: Error) => void;
+  onLoad?: (() => void) | undefined;
+  onError?: ((error: Error) => void) | undefined;
 }
 
-/**
- * AvatarRenderer - Loads and renders avatar with resolved equipment
- * NO POLICY LOGIC - equipment is already resolved by server
- */
-export function AvatarRenderer({
+class AssetErrorBoundary extends Component<
+  { children: ReactNode; onError?: ((error: Error) => void) | undefined },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error, _info: ErrorInfo) {
+    this.props.onError?.(error);
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+function EquipmentAttachment({
+  base,
+  slot,
+  asset,
+  onError,
+}: {
+  base: THREE.Object3D;
+  slot: EquipmentSlotType;
+  asset: ResolvedEquipment;
+  onError?: ((error: Error) => void) | undefined;
+}) {
+  const { scene } = useGLTF(asset.url);
+  const owned = useMemo(() => cloneOwnedScene(scene), [scene]);
+
+  useEffect(() => {
+    try {
+      if (asset.skeletonVersion && asset.skeletonVersion !== AVATAR_SKELETON_VERSION) {
+        throw new Error(`Unsupported equipment skeleton version: ${asset.skeletonVersion}`);
+      }
+      applySemanticMaterials(owned, asset.materialPalette);
+      attachEquipment(base, owned, slot, asset.attachmentBone);
+    } catch (error) {
+      onError?.(error instanceof Error ? error : new Error(String(error)));
+    }
+    return () => {
+      owned.removeFromParent();
+      disposeOwnedScene(owned);
+    };
+  }, [asset, base, onError, owned, slot]);
+
+  return null;
+}
+
+function AvatarRuntime({
   spec,
   resolved,
   reducedMotion = false,
@@ -36,110 +91,76 @@ export function AvatarRenderer({
   onError,
 }: AvatarRendererProps) {
   const groupRef = useRef<THREE.Group | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+  const { scene, animations } = useGLTF(spec.baseMeshUrl);
+  const base = useMemo(() => cloneOwnedScene(scene), [scene]);
 
-  // Load base mesh (useGLTF suspends on error, no error prop)
-  const { scene: baseScene } = useGLTF(spec.baseMeshUrl);
-
-  // Apply morph targets and design system colors when scene loads
   useEffect(() => {
-    if (!baseScene) return;
+    applySemanticMorphs(base, spec.morphWeights);
+    applySemanticMaterials(base, spec.materialPalette);
 
-    try {
-      // Find skinned meshes with morph targets
-      baseScene.traverse((node) => {
-        if (node instanceof THREE.SkinnedMesh || node instanceof THREE.Mesh) {
-          const mesh = node as THREE.SkinnedMesh | THREE.Mesh;
-          const influences = mesh.morphTargetInfluences;
-          const dictionary = mesh.morphTargetDictionary;
-          if (!influences || !dictionary) {
-            return;
-          }
-
-          Object.entries(spec.morphWeights).forEach(([morphId, weight]) => {
-            const index = dictionary[morphId];
-            if (index !== undefined) {
-              influences[index] = weight;
-            }
-          });
-
-          // Apply design system colors to materials
-          if (mesh.material) {
-            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-            materials.forEach((material) => {
-              if (material instanceof THREE.MeshStandardMaterial) {
-                // Apply palette colors from spec
-                if (spec.palette?.primary) {
-                  // Use primary color as base tint, preserving original material properties
-                  const primaryColor = new THREE.Color(spec.palette.primary);
-                  // Blend with existing color to maintain texture details
-                  if (material.color) {
-                    material.color.lerp(primaryColor, 0.3); // 30% blend
-                  } else {
-                    material.color = primaryColor;
-                  }
-                }
-
-                // Apply secondary color as emissive accent (subtle glow)
-                if (spec.palette?.secondary) {
-                  const secondaryColor = new THREE.Color(spec.palette.secondary);
-                  material.emissive = secondaryColor;
-                  material.emissiveIntensity = 0.1; // Subtle glow
-                }
-
-                // Ensure material is updated
-                material.needsUpdate = true;
-              }
-            });
-          }
-        }
-      });
-
-      setIsLoaded(true);
-      if (onLoad) {
-        onLoad();
-      }
-    } catch (error) {
-      if (onError) {
-        onError(error as Error);
-      }
+    const mixer = animations.length ? new THREE.AnimationMixer(base) : null;
+    mixerRef.current = mixer;
+    if (!reducedMotion && mixer) {
+      const idleName = spec.animationMap.idle;
+      const clip = idleName
+        ? THREE.AnimationClip.findByName(animations, idleName)
+        : animations.find((candidate) => candidate.name.toLowerCase().includes('idle'));
+      if (clip) mixer.clipAction(clip).play();
     }
-  }, [baseScene, spec.morphWeights, spec.palette, onLoad, onError]);
+    onLoad?.();
+    return () => {
+      mixer?.stopAllAction();
+      mixer?.uncacheRoot(base);
+      mixerRef.current = null;
+    };
+  }, [
+    animations,
+    base,
+    onLoad,
+    reducedMotion,
+    spec.animationMap.idle,
+    spec.materialPalette,
+    spec.morphWeights,
+  ]);
 
-  // Idle animation (if not reduced motion)
-  useFrame((state) => {
-    if (!groupRef.current || reducedMotion || !isLoaded) return;
+  useEffect(() => () => disposeOwnedScene(base), [base]);
 
-    // Subtle breathing/idle animation
-    const time = state.clock.getElapsedTime();
-    groupRef.current.position.y = Math.sin(time * 0.5) * 0.01;
+  useFrame((state, delta) => {
+    if (reducedMotion) return;
+    mixerRef.current?.update(delta);
+    if (!groupRef.current) return;
+    groupRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.01;
   });
 
-  // Equipment loading would be handled here in full implementation
-  // For now, we acknowledge the resolved equipment but don't render it yet
-  useEffect(() => {
-    // TODO: Load and attach equipment meshes from resolved URLs
-    // This would involve:
-    // 1. Loading each equipment GLTF
-    // 2. Attaching to appropriate bones
-    // 3. Applying palette colors to materials
-    if (Object.keys(resolved).length > 0) {
-      // Equipment present, would load here
-    }
-  }, [resolved]);
-
   return (
-    <group
-      ref={(group) => {
-        groupRef.current = group ? (group as unknown as THREE.Group) : null;
-      }}
-    >
-      {baseScene && <primitive object={baseScene.clone()} />}
+    <group ref={groupRef}>
+      <primitive object={base} />
+      {Object.entries(resolved).map(([slot, asset]) =>
+        asset ? (
+          <AssetErrorBoundary key={`${slot}:${asset.id}:${asset.url}`} onError={onError}>
+            <EquipmentAttachment
+              base={base}
+              slot={slot as EquipmentSlotType}
+              asset={asset}
+              onError={onError}
+            />
+          </AssetErrorBoundary>
+        ) : null,
+      )}
     </group>
   );
 }
 
-// Preload utility for better performance
+/** Policy-agnostic renderer. Asset authorization and URL resolution remain upstream. */
+export function AvatarRenderer(props: AvatarRendererProps) {
+  return (
+    <AssetErrorBoundary onError={props.onError}>
+      <AvatarRuntime {...props} />
+    </AssetErrorBoundary>
+  );
+}
+
 export function preloadAvatar(baseMeshUrl: string) {
   useGLTF.preload(baseMeshUrl);
 }

@@ -45,15 +45,34 @@ export interface ProductionAssetRecord {
   format?: string;
   dimensions?: { width: number; height: number };
   technical?: {
-    bytes?: number;
-    triangles?: number;
-    nodes?: number;
-    skins?: number;
-    jointsPerSkin?: number[];
-    materials?: number;
-    animations?: number;
+    bytes?: number | null;
+    triangles?: number | null;
+    vertices?: number | null;
+    nodes?: number | null;
+    skins?: number | null;
+    jointsPerSkin?: number[] | null;
+    bones?: number | null;
+    materials?: number | null;
+    animations?: number | null;
     morphTargetNames?: string[];
     compression?: string[];
+  };
+  avatar?: {
+    role: 'base' | 'hair' | 'outfit' | 'accessory';
+    sourceMaster: string | null;
+    author: string | null;
+    licenseStatus: 'OWNER_PROVIDED' | 'LICENSED' | 'CC0' | 'UNKNOWN';
+    checksum: string | null;
+    runtimePath: string | null;
+    skeletonVersion: string;
+    compatibleBases: string[];
+    slot: string;
+    conflicts: string[];
+    textures: Array<{ slot: string; path: string | null; dimensions: string | null }>;
+    lods: string[];
+    morphCoverage: string[];
+    physics: 'NONE' | 'OPTIONAL_SECONDARY' | 'REQUIRED';
+    qaState: 'NOT_RUN' | 'FAILED' | 'PASSED';
   };
   source?: ProductionAssetSource;
   runtime?: ProductionAssetRuntime;
@@ -233,6 +252,39 @@ export function validateProductionAssetRegistry(
     }
     if (asset.qa.passed && asset.state !== 'QA_PASSED') {
       errors.push(`${asset.id}: QA approval must advance the canonical state`);
+    }
+
+    if (asset.avatar) {
+      const requiredAvatarFields = [
+        'role',
+        'sourceMaster',
+        'author',
+        'licenseStatus',
+        'checksum',
+        'runtimePath',
+        'skeletonVersion',
+        'compatibleBases',
+        'slot',
+        'conflicts',
+        'textures',
+        'lods',
+        'morphCoverage',
+        'physics',
+        'qaState',
+      ];
+      for (const field of requiredAvatarFields) {
+        if (!(field in asset.avatar))
+          errors.push(`${asset.id}: avatar metadata is missing ${field}`);
+      }
+      if (asset.state === 'MISSING' && (asset.avatar.sourceMaster || asset.avatar.runtimePath)) {
+        errors.push(`${asset.id}: MISSING asset cannot claim source or runtime availability`);
+      }
+      if (
+        !asset.ownerApproval.approved &&
+        ['OWNER_APPROVED', 'RUNTIME_READY', 'INTEGRATED', 'QA_PASSED'].includes(asset.state)
+      ) {
+        errors.push(`${asset.id}: unapproved avatar asset cannot be promoted to ${asset.state}`);
+      }
     }
   }
 

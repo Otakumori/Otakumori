@@ -1,6 +1,13 @@
 // Export React Three Fiber component
 export { AvatarRenderer, preloadAvatar } from './AvatarRenderer';
 export type { AvatarRendererProps, ResolvedEquipment } from './AvatarRenderer';
+export {
+  applySemanticMaterials,
+  applySemanticMorphs,
+  attachEquipment,
+  cloneOwnedScene,
+  disposeOwnedScene,
+} from './runtime';
 
 // Legacy imperative renderer interface (deprecated)
 import type { AvatarSpecV15Type } from '../spec';

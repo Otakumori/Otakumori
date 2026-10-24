@@ -16,17 +16,39 @@ describe('production asset registry', () => {
 
     expect(result.errors).toEqual([]);
     expect(result.counts.INTEGRATED).toBe(6);
-    expect(result.counts.CANDIDATE).toBe(7);
-    expect(result.counts.MISSING).toBe(0);
+    expect(result.counts.CANDIDATE).toBe(6);
+    expect(result.counts.MISSING).toBe(6);
+    expect(result.counts.REJECTED).toBe(1);
   });
 
-  it('keeps the legacy avatar base as an unapproved candidate despite runtime references', () => {
+  it('registers the six first-slice Avatar IDs without false approval', () => {
+    const registry = loadProductionAssetRegistry();
+    const ids = [
+      'female_base_v1',
+      'male_base_v1',
+      'medium_wolf_01',
+      'short_texture_01',
+      'commander_combat_01',
+      'urban_fantasy_01',
+    ];
+
+    for (const id of ids) {
+      const asset = registry.assets.find((candidate) => candidate.id === id);
+      expect(asset?.state).toBe('MISSING');
+      expect(asset?.ownerApproval.approved).toBe(false);
+      expect(asset?.qa.passed).toBe(false);
+      expect(asset?.runtime).toBeUndefined();
+      expect(asset?.avatar?.qaState).toBe('NOT_RUN');
+    }
+  });
+
+  it('keeps the legacy avatar base rejected and unapproved despite runtime references', () => {
     const registry = loadProductionAssetRegistry();
     const candidate = registry.assets.find(
       (asset) => asset.id === 'avatar.base.legacy-human-male-female-v1',
     );
 
-    expect(candidate?.state).toBe('CANDIDATE');
+    expect(candidate?.state).toBe('REJECTED');
     expect(candidate?.ownerApproval.approved).toBe(false);
     expect(candidate?.runtime?.integrated).toBe(false);
     expect(candidate?.technical?.morphTargetNames).toEqual([]);
