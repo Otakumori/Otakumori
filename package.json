@@ -94,6 +94,8 @@
     "validate:services": "tsx scripts/validate-services.ts",
     "verify": "npm run typecheck && npm run lint && npm run build:test && npm run health",
     "assets:verify": "npx tsx scripts/assets-verify.ts",
+    "assets:production:validate": "tsx scripts/validate-production-asset-registry.ts",
+    "avatar:glb:validate": "tsx scripts/validate-avatar-glb.ts",
     "seo:audit": "npx tsx scripts/seo-audit.ts",
     "check": "tsc --noEmit && eslint .",
     "test": "vitest run",

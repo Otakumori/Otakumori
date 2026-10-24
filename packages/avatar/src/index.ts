@@ -7,6 +7,25 @@ export {
   clampAllMorphs,
 } from './spec';
 export type { AvatarSpecV15Type, EquipmentSlotType } from './spec';
+export {
+  AVATAR_ANIMATION_SEMANTICS,
+  AVATAR_ATTACHMENT_BONES,
+  AVATAR_MATERIAL_SLOTS,
+  AVATAR_MORPH_TARGETS,
+  AVATAR_RIG_ROOT,
+  AVATAR_SKELETON_VERSION,
+  BODY_MORPH_TARGETS,
+  FACE_MORPH_TARGETS,
+  REQUIRED_GLTF_MORPH_TARGETS,
+  REQUIRED_RIG_HIERARCHY,
+  SOURCE_BONE_ALIASES,
+} from './productionContract';
+export type {
+  AvatarAnimationSemantic,
+  AvatarGlbMorphTarget,
+  AvatarMaterialSlot,
+  AvatarSemanticMorph,
+} from './productionContract';
 
 // Serialization
 export { serializeAvatar, deserializeAvatar, createDefaultAvatarSpec } from './serialize';
