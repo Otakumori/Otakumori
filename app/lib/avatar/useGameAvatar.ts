@@ -4,6 +4,50 @@ import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
 import { DEFAULT_AVATAR_CONFIG, filterNSFWParts } from './schema';
 import type { AvatarConfig } from './schema';
+import {
+  CANONICAL_AVATAR_READ_API,
+  normalizeAvatarReadResponse,
+} from './canonical';
+import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
+
+function toGameAvatarConfig(config: CreatorAvatarConfig): AvatarConfig {
+  return {
+    body: {
+      type: config.baseAssetId ?? config.baseModel,
+      height: config.body.height,
+      weight: config.body.weight,
+      proportions: {
+        headSize: config.body.headSize,
+        shoulderWidth: config.body.shoulderWidth,
+        chestSize: config.body.chestSize,
+        waistSize: config.body.waistSize,
+        hipWidth: config.body.hipWidth,
+      },
+    },
+    hair: {
+      style: config.hair.style,
+      length: config.hair.length,
+      color: {
+        primary: config.hair.color.primary,
+        secondary: config.hair.color.secondary,
+      },
+    },
+    outfit: {
+      type: config.parts.OuterWear ?? config.parts.InnerWear ?? 'casual',
+      color: { primary: config.materials.parameters.colorA },
+    },
+    accessories: Object.values(config.parts).filter((value): value is string => !!value),
+    colors: {
+      skin: config.skin.tone,
+      hair: config.hair.color.primary,
+      eyes: config.face.eyeColor,
+      outfit: config.materials.parameters.colorA,
+      accent: config.materials.parameters.colorB,
+    },
+    nsfwEnabled: false,
+    version: Number.parseInt(config.version, 10) || 1,
+  };
+}
 
 /**
  * Avatar data returned by useGameAvatar hook
@@ -88,7 +132,7 @@ export function useGameAvatar(): UseGameAvatarResult {
       }
 
       try {
-        const response = await fetch('/api/v1/avatar/load', {
+        const response = await fetch(CANONICAL_AVATAR_READ_API, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -123,14 +167,25 @@ export function useGameAvatar(): UseGameAvatarResult {
           };
         }
 
-        // Return the loaded avatar data
+        const avatar = normalizeAvatarReadResponse(result);
+        if (!avatar.config) {
+          return {
+            avatarId: null,
+            displayName: user.fullName || user.username || null,
+            config: DEFAULT_AVATAR_CONFIG,
+            model3dUrl: null,
+            spritesheetUrl: null,
+            version: 1,
+          };
+        }
+
         return {
-          avatarId: result.data.avatarId ?? null,
-          displayName: result.data.displayName ?? user.fullName ?? user.username ?? null,
-          config: result.data.config,
-          model3dUrl: result.data.model3dUrl,
-          spritesheetUrl: result.data.spritesheetUrl,
-          version: result.data.version || 1,
+          avatarId: avatar.avatarId,
+          displayName: user.fullName ?? user.username ?? null,
+          config: toGameAvatarConfig(avatar.config),
+          model3dUrl: avatar.model3dUrl,
+          spritesheetUrl: avatar.spritesheetUrl,
+          version: Number.parseInt(avatar.config.version, 10) || 1,
         };
       } catch (err) {
         // On any error, return default avatar

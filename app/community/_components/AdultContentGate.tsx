@@ -220,7 +220,7 @@ export function AdultContentGate() {
             Design your own adult avatars with advanced customization options
           </p>
           <a
-            href="/character-editor"
+            href="/creator"
             className="inline-flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
           >
             Open Adult Avatar Editor

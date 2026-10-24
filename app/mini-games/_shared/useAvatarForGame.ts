@@ -3,6 +3,11 @@
 import { logger } from '@/app/lib/logger';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 interface AvatarForGame {
   config: any;
@@ -25,14 +30,15 @@ export function useAvatarForGame(enabled: boolean = true, gameMode?: string) {
 
       // Try to load user's custom avatar
       try {
-        const response = await fetch('/api/v1/avatar/load');
+        const response = await fetch(CANONICAL_AVATAR_READ_API);
         if (response.ok) {
           const result = await response.json();
-          if (result.ok && result.data?.avatarConfig) {
+          const avatar = normalizeAvatarReadResponse(result);
+          if (result.ok && avatar.config) {
             return {
-              config: result.data.avatarConfig,
-              bundle: result.data.avatarBundle,
-              rendering: result.data.avatarRendering || '3d',
+              config: creatorConfigToAvatarConfiguration(avatar.config),
+              bundle: avatar.config,
+              rendering: avatar.rendering,
               isCustom: true,
             };
           }

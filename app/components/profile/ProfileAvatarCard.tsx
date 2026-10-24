@@ -7,6 +7,10 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { AvatarDisplay } from './AvatarDisplay';
 import { MoriArtifact, MoriConstructedSurface } from '@/app/components/mori/MoriProduction';
+import {
+  CANONICAL_AVATAR_READ_API,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 /**
  * Avatar card for profile left column
@@ -20,15 +24,15 @@ export default function ProfileAvatarCard() {
   const { data: avatarData, isLoading: avatarLoading } = useQuery({
     queryKey: ['user-avatar', user?.id],
     queryFn: async () => {
-      const response = await fetch('/api/v1/avatar/load');
+      const response = await fetch(CANONICAL_AVATAR_READ_API);
       if (!response.ok) return null;
       const result = await response.json();
-      return result.data;
+      return normalizeAvatarReadResponse(result);
     },
     enabled: !!isSignedIn && !!user?.id,
   });
 
-  const hasAvatar = Boolean(avatarData?.avatarConfig);
+  const hasAvatar = Boolean(avatarData?.config);
 
   const handleCopyProfileLink = async () => {
     try {
@@ -85,7 +89,7 @@ export default function ProfileAvatarCard() {
       )}
 
       <div className="commander-profile__actions">
-        <Link href="/community" className="mori-foundation-button text-center">
+        <Link href="/creator" className="mori-foundation-button text-center">
           {hasAvatar ? 'Customize Avatar' : 'Create Avatar'}
         </Link>
 

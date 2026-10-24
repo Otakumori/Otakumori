@@ -8,18 +8,29 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { generateRequestId } from '@/lib/request-id';
-import { checkIdempotency, storeIdempotencyResponse } from '@/lib/idempotency';
-import { createRateLimitMiddleware, RATE_LIMITS } from '@/lib/rate-limit';
+import { generateRequestId } from '@/app/lib/request-id';
+import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
+import { createRateLimitMiddleware, RATE_LIMITS } from '@/app/lib/rate-limit';
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 
 // Simplified schema for CREATOR config (full validation in types)
 const CreatorSaveSchema = z.object({
   id: z.string().optional(),
-  userId: z.string(),
+  userId: z.string().optional(),
   name: z.string(),
   version: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
   baseModel: z.enum(['male', 'female', 'custom']),
+  baseAssetId: z.string().optional(),
+  baseModelUrl: z.string().optional(),
+  animationSetId: z.string().optional(),
+  contentPolicy: z
+    .object({
+      profile: z.enum(['standard', 'adult-requested']),
+      version: z.string(),
+    })
+    .optional(),
   body: z.object({
     height: z.number().min(0.7).max(1.3),
     weight: z.number().min(0.4).max(1.6),
@@ -186,7 +197,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const creatorConfig = validationResult.data as CreatorAvatarConfig;
+    const now = new Date();
+    const creatorConfig: CreatorAvatarConfig = {
+      ...validationResult.data,
+      id: validationResult.data.id || `avatar-${userId}`,
+      userId,
+      createdAt: validationResult.data.createdAt ?? now,
+      updatedAt: now,
+    };
 
     // Check NSFW content
     if (creatorConfig.nsfw?.enabled) {

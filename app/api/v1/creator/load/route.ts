@@ -7,7 +7,7 @@ import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { generateRequestId } from '@/lib/request-id';
+import { generateRequestId } from '@/app/lib/request-id';
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 
 export async function GET(_request: NextRequest) {
@@ -53,13 +53,19 @@ export async function GET(_request: NextRequest) {
     } else if (user.avatarConfig && typeof user.avatarConfig === 'object') {
       // Convert legacy avatarConfig format
       const config = user.avatarConfig as any;
-      creatorConfig = convertLegacyConfig(config, user.id);
+      creatorConfig = convertLegacyConfig(config, user.id, user.updatedAt);
     }
 
-    // Return avatar data
+    // Stable canonical read envelope. Compatibility clients normalize historical envelopes.
     const response = {
       ok: true,
-      data: creatorConfig,
+      data: {
+        config: creatorConfig,
+        avatarId: creatorConfig?.id ?? null,
+        rendering: user.avatarRendering === '2d' ? '2d' : '3d',
+        model3dUrl: null,
+        spritesheetUrl: null,
+      },
       requestId,
     };
 
@@ -79,14 +85,14 @@ export async function GET(_request: NextRequest) {
 }
 
 // Convert legacy avatar config to CREATOR format
-function convertLegacyConfig(config: any, userId: string): CreatorAvatarConfig {
+function convertLegacyConfig(config: any, userId: string, updatedAt: Date): CreatorAvatarConfig {
   return {
-    id: `avatar-${Date.now()}`,
+    id: `avatar-legacy-${userId}`,
     userId,
     name: 'My Avatar',
     version: '1.0.0',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: updatedAt,
+    updatedAt,
     baseModel: config.gender === 'male' ? 'male' : 'female',
     body: {
       height: config.body?.height ?? 1.0,

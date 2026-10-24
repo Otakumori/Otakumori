@@ -6,6 +6,11 @@
 
 import type { FullCharacterConfig } from '@/app/test/character-creator/types';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -83,23 +88,8 @@ export async function saveCharacterConfigForGames(
   userId?: string
 ): Promise<string> {
   try {
-    const avatarConfig = creatorConfigToAvatarConfig(creatorConfig);
-
     if (userId) {
-      // Save to database
-      const response = await fetch('/api/v1/character/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(avatarConfig),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to save character config: ${errorText}`);
-      }
-
-      const result = await response.json();
-      return result.data?.id || 'unknown';
+      throw new Error('Persisted avatar writes must use the canonical Creator save flow.');
     } else {
       // Save to localStorage for guest
       const key = 'otm-creator-character-config';
@@ -123,12 +113,15 @@ export async function loadCharacterConfigForGames(
   try {
     if (userId) {
       // Load from database
-      const response = await fetch('/api/v1/character/config');
+      const response = await fetch(CANONICAL_AVATAR_READ_API);
       if (response.ok) {
         const result = await response.json();
-        if (result.ok && result.data) {
+        const avatar = normalizeAvatarReadResponse(result);
+        if (result.ok && avatar.config) {
           // Convert back from AvatarConfiguration to FullCharacterConfig
-          return avatarConfigToCreatorConfig(result.data);
+          return avatarConfigToCreatorConfig(
+            creatorConfigToAvatarConfiguration(avatar.config),
+          );
         }
       }
       return null;

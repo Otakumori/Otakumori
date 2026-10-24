@@ -179,8 +179,8 @@ export async function getExportStatus(jobId: string): Promise<{
  * @deprecated Use exportAvatar instead
  */
 export async function exportGLB(
-  config?: any,
-  filename?: string
+  _config?: any,
+  _filename?: string
 ): Promise<void> {
   // Call the new export function with GLB format
   await exportAvatar('glb', 'high', false);
@@ -201,7 +201,7 @@ export async function sharePreset(
       timestamp: new Date().toISOString(),
     };
 
-    const shareUrl = `${window.location.origin}/character-editor?preset=${encodeURIComponent(JSON.stringify(presetData))}`;
+    const shareUrl = `${window.location.origin}/creator?preset=${encodeURIComponent(JSON.stringify(presetData))}`;
 
     if (navigator.share) {
       await navigator.share({

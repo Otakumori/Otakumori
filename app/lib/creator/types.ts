@@ -14,7 +14,18 @@ export interface CreatorAvatarConfig {
 
   // Base model
   baseModel: 'male' | 'female' | 'custom';
+  /** Production registry ID. Optional until approved base meshes exist. */
+  baseAssetId?: string;
   baseModelUrl?: string;
+
+  /** Semantic animation-set reference; never a renderer object. */
+  animationSetId?: string;
+
+  /** Saved content preference. This is not proof of adult verification. */
+  contentPolicy?: {
+    profile: 'standard' | 'adult-requested';
+    version: string;
+  };
 
   // Body morphs (0.0 to 1.0, normalized)
   body: {

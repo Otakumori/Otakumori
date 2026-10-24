@@ -10,6 +10,11 @@ import { useUser } from '@clerk/nextjs';
 import Avatar3D from '@/app/components/avatar/Avatar3D';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import { PerformanceOptimizer } from '@/app/lib/3d/performance-optimization';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 interface GameAvatarRendererProps {
   gameId: string;
@@ -251,27 +256,16 @@ export default function GameAvatarRenderer({
 
       try {
         // Try to fetch user's custom avatar
-        const response = await fetch(`/api/v1/character/config?gameId=${gameId}&mode=${gameMode}`);
+        const response = await fetch(CANONICAL_AVATAR_READ_API);
         if (response.ok) {
           const data = await response.json();
-          if (data.ok) {
-            // Transform parts array to object format expected by AvatarConfiguration
-            // API returns: parts: [{ partType: 'head', partId: 'head_001' }, ...]
-            // Expected: parts: { head: 'head_001', body: 'body_001' }
-            const transformedConfig = { ...data.data };
-            if (Array.isArray(transformedConfig.parts)) {
-              transformedConfig.parts = transformedConfig.parts.reduce((acc: Record<string, string>, part: any) => {
-                if (part.partType && part.partId) {
-                  acc[part.partType] = part.partId;
-                }
-                return acc;
-              }, {});
-            }
+          const avatar = normalizeAvatarReadResponse(data);
+          if (data.ok && avatar.config) {
             return {
-              configuration: transformedConfig,
-              isCustom: data.isCustom !== undefined ? data.isCustom : true,
-              fallbackSpriteUrl: data.fallbackSpriteUrl || '/assets/default-avatar.png',
-              glbUrl: data.glbUrl, // Include GLB URL if available
+              configuration: creatorConfigToAvatarConfiguration(avatar.config),
+              isCustom: true,
+              fallbackSpriteUrl: avatar.spritesheetUrl || '/assets/default-avatar.png',
+              glbUrl: avatar.model3dUrl || undefined,
             };
           }
         } else {
@@ -426,10 +420,18 @@ export function useGameAvatar(gameId: string, gameMode?: string) {
       if (!user?.id) return null;
 
       try {
-        const response = await fetch(`/api/v1/character/config?gameId=${gameId}&mode=${gameMode}`);
+        const response = await fetch(CANONICAL_AVATAR_READ_API);
         if (response.ok) {
           const data = await response.json();
-          return data.ok ? data.data : null;
+          const avatar = normalizeAvatarReadResponse(data);
+          return data.ok && avatar.config
+            ? {
+                configuration: creatorConfigToAvatarConfiguration(avatar.config),
+                isCustom: true,
+                fallbackSpriteUrl: avatar.spritesheetUrl || '/assets/default-avatar.png',
+                glbUrl: avatar.model3dUrl || undefined,
+              }
+            : null;
         }
       } catch (error) {
         logger.error('Failed to fetch avatar data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));

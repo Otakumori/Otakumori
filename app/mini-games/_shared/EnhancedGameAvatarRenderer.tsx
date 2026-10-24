@@ -16,7 +16,10 @@ import { logger } from '@/app/lib/logger';
 import { AvatarRenderer } from '@/app/adults/_components/AvatarRenderer.safe';
 import { assetRegistry } from '@/app/lib/3d/asset-registry';
 import { PerformanceOptimizer } from '@/app/lib/3d/performance-optimization';
-import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+import {
+  CANONICAL_AVATAR_READ_API,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 interface EnhancedGameAvatarRendererProps {
   gameId: string;
@@ -53,79 +56,6 @@ const SIZE_PRESETS = {
   fullscreen: { scale: [1.5, 1.5, 1.5] as [number, number, number], position: [0, 0, 0] as [number, number, number] },
 };
 
-// Convert AvatarConfiguration to CREATOR format
-function convertToCreatorFormat(config: AvatarConfiguration | any): any {
-  // If already in CREATOR format, return as-is
-  if ((config as any).format === 'CREATOR' || (config as any).body?.height !== undefined) {
-    return config;
-  }
-
-  // Convert from AvatarConfiguration to CREATOR format
-  return {
-    format: 'CREATOR',
-    gender: config.baseModel || 'female',
-    age: 'young-adult',
-    body: {
-      height: 1.0,
-      weight: 1.0,
-      proportions: {
-        headSize: 1.0,
-        neckLength: 1.0,
-        shoulderWidth: 1.0,
-        chestSize: 1.0,
-        waistSize: 0.8,
-        hipWidth: 1.0,
-        armLength: 1.0,
-        legLength: 1.0,
-      },
-      genderFeatures: {
-        breastSize: config.baseModel === 'female' ? 0.8 : 0,
-        thighGap: config.baseModel === 'female' ? 0.3 : 0,
-      },
-    },
-    face: {
-      faceShape: {
-        jawline: 0.5,
-        cheekbones: 0.5,
-        chin: 0.5,
-      },
-      eyes: {
-        size: 1.0,
-        spacing: 0.5,
-        height: 0.5,
-      },
-    },
-    hair: {
-      style: 'medium',
-      color: {
-        primary: '#3d2817',
-      },
-    },
-    outfit: {
-      primary: {
-        color: '#FF6B9D',
-      },
-    },
-    materials: {
-      parameters: {
-        colorA: '#FFDBAC',
-        metallic: 0.05,
-        roughness: 0.7,
-        rimColor: '#FFD700',
-        rimStrength: 0.1,
-      },
-    },
-    physics: {
-      softBody: {
-        enable: false,
-        stiffness: 0.4,
-        damping: 0.2,
-        maxDisplacement: 0.06,
-      },
-    },
-  };
-}
-
 // Enhanced 3D Avatar Component with animation support
 function EnhancedGameAvatar3D({
   config,
@@ -135,8 +65,8 @@ function EnhancedGameAvatar3D({
   enableAnimations = true,
   animationState = 'idle',
   animationSpeed = 1.0,
-  onLoad,
-  onError,
+  onLoad: _onLoad,
+  onError: _onError,
 }: {
   config: any;
   position?: [number, number, number];
@@ -438,16 +368,17 @@ export default function EnhancedGameAvatarRenderer({
 
       try {
         // Try to fetch user's custom avatar
-        const response = await fetch(`/api/v1/character/config?gameId=${gameId}&mode=${gameMode}`);
+        const response = await fetch(CANONICAL_AVATAR_READ_API);
         if (response.ok) {
           const data = await response.json();
-          if (data.ok) {
+          const avatar = normalizeAvatarReadResponse(data);
+          if (data.ok && avatar.config) {
             // Convert to CREATOR format
-            const creatorConfig = convertToCreatorFormat(data.data);
+            const creatorConfig = avatar.config;
             return {
               configuration: creatorConfig,
-              isCustom: data.isCustom !== undefined ? data.isCustom : true,
-              fallbackSpriteUrl: data.fallbackSpriteUrl || '/assets/default-avatar.png',
+              isCustom: true,
+              fallbackSpriteUrl: avatar.spritesheetUrl || '/assets/default-avatar.png',
             };
           }
         }

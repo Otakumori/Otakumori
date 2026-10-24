@@ -112,7 +112,7 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
 
   const handleCreateTempAvatar = () => {
     // Navigate to character editor to create a character
-    window.location.href = '/character-editor';
+    window.location.href = '/creator';
   };
 
   return (
