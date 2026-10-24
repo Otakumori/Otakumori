@@ -815,7 +815,13 @@ export interface AvatarConfiguration {
 
   // Base configuration
   baseModel: 'male' | 'female' | 'custom';
+  baseAssetId?: string;
   baseModelUrl?: string;
+  animationSetId?: string;
+  contentPolicy?: {
+    profile: 'standard' | 'adult-requested';
+    version: string;
+  };
 
   // Part assignments
   parts: Partial<Record<AvatarPartType, string>>; // part type -> part ID

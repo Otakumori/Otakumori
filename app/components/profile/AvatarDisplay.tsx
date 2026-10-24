@@ -10,6 +10,11 @@ import { getAvatarSizeClasses } from '@/app/lib/avatar-sizes';
 import { AvatarSkeleton } from '@/app/components/avatar/AvatarSkeleton';
 import { AvatarFallback } from '@/app/components/avatar/AvatarFallback';
 import type { AvatarSize } from '@/app/lib/avatar-sizes';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 interface AvatarDisplayProps {
   userId?: string;
@@ -103,14 +108,12 @@ export function AvatarDisplay({
   const { data: avatarData, isLoading } = useQuery({
     queryKey: ['user-avatar', userId || user?.id],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/avatar/load`);
+      const response = await fetch(CANONICAL_AVATAR_READ_API);
       if (!response.ok) {
         throw new Error('Failed to load avatar');
       }
       const result = await response.json();
-      // Fix: API returns { data: { user: { avatarConfig: ... } } }, so we need to return the user object
-      const userData = result.data?.user || result.data;
-      return userData;
+      return normalizeAvatarReadResponse(result);
     },
     enabled: !!userId || !!user?.id,
   });
@@ -119,18 +122,9 @@ export function AvatarDisplay({
 
   const isOwnProfile = !userId || userId === user?.id;
 
-  // After fix: avatarData is already the user object (from result.data?.user), so avatarConfig is directly on avatarData
-  let avatarConfig = avatarData?.avatarConfig;
-
-  // Handle case where avatarConfig might be a JSON string (defensive check)
-  if (typeof avatarConfig === 'string') {
-    try {
-      avatarConfig = JSON.parse(avatarConfig);
-    } catch (e) {
-      console.warn('[AvatarDisplay] Failed to parse avatarConfig string:', e);
-      avatarConfig = null;
-    }
-  }
+  const avatarConfig = avatarData?.config
+    ? creatorConfigToAvatarConfiguration(avatarData.config)
+    : null;
 
   // Validate avatarConfig structure - ensure it's an object, not null/undefined/string
   // Less strict validation - just check if it's a valid object, let AvatarRenderer handle format validation
@@ -147,7 +141,7 @@ export function AvatarDisplay({
         <AvatarFallback size={size} mode="user" className="w-full h-full" />
         {isOwnProfile && showEditButton && (
           <Link
-            href="/character-editor"
+            href="/creator"
             className="mt-2 block text-xs text-pink-400 hover:text-pink-300 transition-colors text-center"
           >
             Create Avatar
@@ -187,7 +181,7 @@ export function AvatarDisplay({
             transition={{ duration: 0.2 }}
           >
             <Link
-              href="/character-editor"
+              href="/creator"
               className="px-3 py-1 bg-pink-500 text-white text-sm rounded-lg hover:bg-pink-600 transition-colors"
             >
               Edit Avatar

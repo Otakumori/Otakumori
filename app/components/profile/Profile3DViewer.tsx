@@ -9,6 +9,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
 import Avatar3D from '@/app/components/avatar/Avatar3D';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 import { PerformanceOptimizer } from '@/app/lib/3d/performance-optimization';
 
 interface Profile3DViewerProps {
@@ -147,10 +152,13 @@ function useProfileAvatar(userId?: string) {
       if (!targetUserId) return null;
 
       try {
-        const response = await fetch(`/api/v1/character/config?userId=${targetUserId}`);
+        const response = await fetch(CANONICAL_AVATAR_READ_API);
         if (response.ok) {
           const data = await response.json();
-          return data.ok ? data.data : null;
+          const avatar = normalizeAvatarReadResponse(data);
+          return data.ok && avatar.config
+            ? creatorConfigToAvatarConfiguration(avatar.config)
+            : null;
         }
       } catch (error) {
         logger.error('Failed to fetch profile avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));

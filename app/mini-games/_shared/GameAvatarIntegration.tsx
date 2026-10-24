@@ -3,6 +3,13 @@
 import { logger } from '@/app/lib/logger';
 import React from 'react';
 import { useGameAvatar, drawGameAvatar } from './GameAvatarRenderer';
+import {
+  CANONICAL_AVATAR_READ_API,
+  CANONICAL_AVATAR_WRITE_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
+import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 
 interface GameAvatarIntegrationProps {
   gameId: string;
@@ -137,19 +144,16 @@ export const GameAvatarUtils = {
   // Get avatar configuration for a specific game
   getAvatarConfig: async (gameId: string, gameMode?: string, userId?: string) => {
     try {
-      const params = new URLSearchParams({
-        gameId,
-        mode: gameMode || 'default',
-      });
-
-      if (userId) {
-        params.set('userId', userId);
-      }
-
-      const response = await fetch(`/api/v1/character/config?${params.toString()}`);
+      void gameId;
+      void gameMode;
+      void userId;
+      const response = await fetch(CANONICAL_AVATAR_READ_API);
       if (response.ok) {
         const data = await response.json();
-        return data.ok ? data.data : null;
+        const avatar = normalizeAvatarReadResponse(data);
+        return data.ok && avatar.config
+          ? creatorConfigToAvatarConfiguration(avatar.config)
+          : null;
       }
     } catch (fetchError) {
       logger.error('Failed to fetch avatar config:', undefined, undefined, fetchError instanceof Error ? fetchError : new Error(String(fetchError)));
@@ -158,12 +162,13 @@ export const GameAvatarUtils = {
   },
 
   // Save avatar configuration
-  saveAvatarConfig: async (config: Record<string, unknown>) => {
+  saveAvatarConfig: async (config: CreatorAvatarConfig, idempotencyKey: string) => {
     try {
-      const response = await fetch('/api/v1/character/config', {
+      const response = await fetch(CANONICAL_AVATAR_WRITE_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-idempotency-key': idempotencyKey,
         },
         body: JSON.stringify(config),
       });

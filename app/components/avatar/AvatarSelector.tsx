@@ -5,6 +5,11 @@ import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AvatarCard } from './AvatarCard';
+import {
+  CANONICAL_AVATAR_READ_API,
+  creatorConfigToAvatarConfiguration,
+  normalizeAvatarReadResponse,
+} from '@/app/lib/avatar/canonical';
 
 interface AvatarSelectorProps {
   onSelect: (config: any) => void;
@@ -26,10 +31,11 @@ export function AvatarSelector({
   const { data: avatarData, isLoading } = useQuery({
     queryKey: ['user-avatar', user?.id],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/avatar/load`);
+      const response = await fetch(CANONICAL_AVATAR_READ_API);
       if (!response.ok) throw new Error('Failed to load avatar');
       const result = await response.json();
-      return result.data;
+      const avatar = normalizeAvatarReadResponse(result);
+      return avatar.config ? creatorConfigToAvatarConfiguration(avatar.config) : null;
     },
     enabled: !!user?.id,
   });
@@ -125,20 +131,20 @@ export function AvatarSelector({
 
       <div className="grid grid-cols-2 gap-4">
         {/* User's Custom Avatar */}
-        {avatarData?.avatarConfig && (
+        {avatarData && (
           <motion.div
             className="cursor-pointer"
-            onClick={() => onSelect(avatarData.avatarConfig)}
+            onClick={() => onSelect(avatarData)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <AvatarCard
-              config={avatarData.avatarConfig}
+              config={avatarData}
               size="large"
               showName={true}
               name="My Avatar"
               className={`border-2 ${
-                selectedConfig === avatarData.avatarConfig ? 'border-pink-500' : 'border-white/20'
+                selectedConfig === avatarData ? 'border-pink-500' : 'border-white/20'
               }`}
             />
           </motion.div>
