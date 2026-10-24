@@ -27,10 +27,32 @@ The review derivative must remain separate:
 
 Neither binary belongs under `public/` or in the production registry before storage policy and owner review are satisfied.
 
+The reversible workspace is prepared with:
+
+- `scripts/avatar/prepare-female-base-v1-workspace.py` for source duplication, fixed stage setup, checkpoint notes, and the immutable `v000` baseline;
+- `scripts/avatar/render-female-base-v1-review.py` for versioned, fixed-camera evidence and metadata;
+- `docs/avatar/female-base-v1-sculpt-priority-guide.md` for region-level sculpt priorities and measurable checkpoint exits.
+
+Prepare the ignored local working source from the verified bundle:
+
+```powershell
+blender --background --factory-startup --python scripts/avatar/prepare-female-base-v1-workspace.py -- --source .cache/avatar-female-v1-candidate-01/raw-source/human-base-meshes-bundle-v1.4.1/human_base_meshes_bundle.blend --output .cache/avatar-female-v1-candidate-01/working-source/female_base_v1_candidate_01_working.blend --baseline-output .cache/avatar-female-v1-candidate-01/working-source/versions/female_base_v1_candidate_01_v000.blend
+```
+
+The resulting file contains a locked hidden `RAW_CC0_REFERENCE`, one editable body in `FEMALE_BASE_V1_CANDIDATE_01`, embedded checkpoint notes A–E, neutral review materials and lighting, and fixed review cameras. Separate source eye specimens remain reference-only because the final eye system is explicitly downstream of visual-direction approval.
+
+After saving a versioned artist revision, generate deterministic evidence with:
+
+```powershell
+blender .cache/avatar-female-v1-candidate-01/working-source/versions/female_base_v1_candidate_01_v001.blend --background --python scripts/avatar/render-female-base-v1-review.py -- --output-root .cache/avatar-female-v1-candidate-01/review --revision v001 --notes "Checkpoint reached and sculpt changes"
+```
+
+The generated `metadata.json` carries the working-source checksum, DCC version, topology counts, registry/review state, camera records, and missing range-state status. Review output remains ignored local evidence until a qualified sculpt exists.
+
 ## Source facts
 
 - Body object: `GEO-body_female_realistic`.
-- Base topology: 10,582 vertices, 10,590 quads, 21,170 edges.
+- Base topology: 10,582 vertices, 10,590 faces (10,570 quads and 20 triangles), 21,170 edges; 21,160 evaluated base triangles before separate eye specimens.
 - Raw body-and-eyes review export: approximately 22,248 triangles.
 - Existing modifier: Multires.
 - No canonical rig, production morphs, semantic production materials, or animation clips.
@@ -149,6 +171,8 @@ Every capture must identify:
 - triangle and vertex counts;
 - viewport, camera, quality tier, DCC version, and active review state;
 - concise list of modifications performed.
+
+The render script records absent review range states as `MISSING` and cannot promote review or registry state. Artists must not change `review_state` from `ARTIST_WORKING_SOURCE` to `CANDIDATE_FOR_OWNER_REVIEW` until checkpoints A–D meet the guide's exit criteria.
 
 ## Promotion boundary
 
