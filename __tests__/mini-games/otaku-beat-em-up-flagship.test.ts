@@ -9,9 +9,7 @@ import {
 
 describe('Otaku Beat-em-up flagship completion', () => {
   it('keeps ordinary wave generation on the existing composition rules', () => {
-    const randomValues = [
-      0.2, 0.5, 0.1, 0.8, 0.9, 0.2, 0.7, 0.8, 0.9, 0.2, 0.7, 0.8, 0.9, 0.9,
-    ];
+    const randomValues = [0.2, 0.5, 0.1, 0.8, 0.9, 0.2, 0.7, 0.8, 0.9, 0.2, 0.7, 0.8, 0.9, 0.9];
     let index = 0;
     const plan = getWaveEncounterPlan('story', 6, () => randomValues[index++] ?? 0.9);
 

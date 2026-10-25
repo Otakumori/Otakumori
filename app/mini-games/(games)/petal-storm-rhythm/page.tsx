@@ -14,7 +14,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -28,7 +27,7 @@ import {
   applyVisualProfile,
   getGameDisplayName,
 } from '../../_shared/gameVisuals';
-import { useGameProgress } from '@/app/lib/games/progress';
+import { useGameProgress, type PersonalBestResult } from '@/app/lib/games/progress';
 import { MiniGameFrame } from '../../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../../_shared/AvatarPresetChoice';
@@ -43,22 +42,18 @@ import {
 } from '../../_shared/GamePlatform';
 import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
 import { useControllerFrames } from '../../_shared/useGameController';
+import {
+  buildPetalStormChart,
+  type PetalStormDifficulty,
+  type PetalStormNote,
+} from './petalStormCharts';
 
 type PetalStormResult = GameSessionResult & {
   outcome: 'completed' | 'failed';
   score: number;
 };
 
-interface Note {
-  id: string;
-  lane: number;
-  time: number;
-  type: 'normal' | 'hold' | 'slide';
-  duration?: number; // For hold notes
-  direction?: 'left' | 'right'; // For slide notes
-  hit?: boolean;
-  accuracy?: 'perfect' | 'great' | 'good' | 'miss';
-  }
+type Note = PetalStormNote;
 
 interface Track {
   id: string;
@@ -66,7 +61,7 @@ interface Track {
   artist: string;
   bpm: number;
   duration: number;
-  difficulty: 'easy' | 'normal' | 'hard' | 'expert';
+  difficulty: PetalStormDifficulty;
   notes: Note[];
   preview?: string;
 }
@@ -140,8 +135,11 @@ export default function PetalStormRhythm() {
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const completionSubmittedRef = useRef(false);
-  const [_achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
+  const [_achievements, setAchievements] = useState<
+    Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>
+  >([]);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
 
   // Hit VFX state
@@ -188,23 +186,23 @@ export default function PetalStormRhythm() {
 
   useEffect(() => {
     const unregister = session.registerLifecycle({
-        pause: () => {
-          pauseStartedAtRef.current = Date.now();
-          setGameState('paused');
-        },
-        resume: () => {
-          if (pauseStartedAtRef.current !== null) {
-            const pauseDuration = Date.now() - pauseStartedAtRef.current;
-            startTimeRef.current += pauseDuration;
-            setGameStartTime((startedAt) => startedAt + pauseDuration);
-            pauseStartedAtRef.current = null;
-          }
-          setGameState('playing');
-        },
-        cleanup: () => {
-          if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-        },
-      });
+      pause: () => {
+        pauseStartedAtRef.current = Date.now();
+        setGameState('paused');
+      },
+      resume: () => {
+        if (pauseStartedAtRef.current !== null) {
+          const pauseDuration = Date.now() - pauseStartedAtRef.current;
+          startTimeRef.current += pauseDuration;
+          setGameStartTime((startedAt) => startedAt + pauseDuration);
+          pauseStartedAtRef.current = null;
+        }
+        setGameState('playing');
+      },
+      cleanup: () => {
+        if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+      },
+    });
     return () => {
       unregister();
     };
@@ -230,108 +228,6 @@ export default function PetalStormRhythm() {
     great: 100,
     good: 150,
     miss: 200,
-  };
-
-  // Generate notes for a track
-  const generateNotes = useCallback((track: Track): Note[] => {
-    const notes: Note[] = [];
-    const noteInterval = 60000 / track.bpm; // ms per beat
-    const totalBeats = Math.floor((track.duration * 1000) / noteInterval);
-    const preparationDelay = GAME_CONFIG.PREPARATION_DELAY;
-
-    // For "Sakura Dreams" specifically, create a structured beat map
-    if (track.id === 'sakura-dreams') {
-      // Create a pattern that follows the music
-      // Strong beats (1, 3) get notes more often
-      // Weak beats (2, 4) get notes less often
-      const pattern = [
-        [0, 2, 4], // Beat 1: lanes 0, 2, 4
-        [1, 3],    // Beat 2: lanes 1, 3
-        [0, 1, 2, 3, 4], // Beat 3: all lanes
-        [2],       // Beat 4: lane 2
-      ];
-
-      for (let beat = 0; beat < totalBeats; beat++) {
-        const beatInMeasure = beat % 4;
-        const patternLanes = pattern[beatInMeasure];
-        const difficultyMultiplier = getDifficulty(track.difficulty);
-
-        // On strong beats (0, 2), always add notes
-        // On weak beats (1, 3), add notes based on difficulty
-        if (beatInMeasure === 0 || beatInMeasure === 2 || Math.random() < difficultyMultiplier) {
-          // Add notes from the pattern
-          patternLanes.forEach((lane) => {
-            if (Math.random() < 0.7) { // 70% chance per lane in pattern
-              const note: Note = {
-                id: `note_${beat}_${lane}_${Math.random()}`,
-                lane,
-                time: beat * noteInterval + preparationDelay,
-                type: 'normal',
-              };
-              notes.push(note);
-            }
-          });
-        }
-
-        // Every 8 beats, add a special pattern
-        if (beat % 8 === 7 && track.difficulty !== 'easy') {
-          // Add a chord (all lanes)
-          for (let lane = 0; lane < LANE_COUNT; lane++) {
-            notes.push({
-              id: `note_${beat}_chord_${lane}_${Math.random()}`,
-              lane,
-              time: beat * noteInterval + preparationDelay,
-              type: 'normal',
-            });
-          }
-        }
-      }
-    } else {
-      // For other tracks, use the original random generation
-      for (let beat = 0; beat < totalBeats; beat++) {
-        const shouldAddNote = Math.random() < getDifficulty(track.difficulty);
-
-        if (shouldAddNote) {
-          const note: Note = {
-            id: `note_${beat}_${Math.random()}`,
-            lane: Math.floor(Math.random() * LANE_COUNT),
-            time: beat * noteInterval + preparationDelay,
-            type: 'normal',
-          };
-
-          // Add special notes based on difficulty
-          if (track.difficulty === 'hard' || track.difficulty === 'expert') {
-            const random = Math.random();
-            if (random < 0.1) {
-              note.type = 'hold';
-              note.duration = noteInterval * 2; // 2 beat hold
-            } else if (random < 0.15) {
-              note.type = 'slide';
-              note.direction = Math.random() < 0.5 ? 'left' : 'right';
-            }
-          }
-
-          notes.push(note);
-        }
-      }
-    }
-
-    return notes.sort((a, b) => a.time - b.time);
-  }, []);
-
-  const getDifficulty = (difficulty: string): number => {
-    switch (difficulty) {
-      case 'easy':
-        return 0.3;
-      case 'normal':
-        return 0.5;
-      case 'hard':
-        return 0.7;
-      case 'expert':
-        return 0.9;
-      default:
-        return 0.5;
-    }
   };
 
   // End game (game over)
@@ -374,21 +270,22 @@ export default function PetalStormRhythm() {
       gameStartTime > 0 ? Date.now() - gameStartTime : selectedTrack.duration * 1000;
 
     const result = await recordResult({
-        gameId: 'petal-storm-rhythm',
-        score: finalScoreValue,
-        difficulty: selectedTrack.difficulty,
-        durationMs,
-        didWin: true,
-        metadata: {
-          accuracy: finalAccuracy,
-          combo: maxCombo,
-          track: selectedTrack.id,
-          perfect: accuracy.perfect,
-          great: accuracy.great,
-          good: accuracy.good,
-          miss: accuracy.miss,
-          fullCombo: accuracy.miss === 0 && totalNotes > 0,
-        },
+      gameId: 'petal-storm-rhythm',
+      resultKey: `${selectedTrack.id}:${selectedTrack.difficulty}`,
+      score: finalScoreValue,
+      difficulty: selectedTrack.difficulty,
+      durationMs,
+      didWin: true,
+      metadata: {
+        accuracy: finalAccuracy,
+        combo: maxCombo,
+        track: selectedTrack.id,
+        perfect: accuracy.perfect,
+        great: accuracy.great,
+        good: accuracy.good,
+        miss: accuracy.miss,
+        fullCombo: accuracy.miss === 0 && totalNotes > 0,
+      },
     });
 
     if (result.success) {
@@ -399,26 +296,17 @@ export default function PetalStormRhythm() {
         setAchievements(result.achievements.rewards);
       }
     }
-
-    // Submit to leaderboard
-    try {
-      await fetch('/api/v1/leaderboards/petal-storm-rhythm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: finalScoreValue,
-          metadata: {
-            accuracy: finalAccuracy,
-            maxCombo,
-            track: selectedTrack.id,
-            difficulty: selectedTrack.difficulty,
-          },
-        }),
-      });
-    } catch (error) {
-      logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    }
-  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, gameStartTime, session.complete]);
+    if (result.personalBest) setPersonalBest(result.personalBest);
+  }, [
+    score,
+    accuracy,
+    maxCombo,
+    health,
+    selectedTrack,
+    recordResult,
+    gameStartTime,
+    session.complete,
+  ]);
 
   // Game loop
   useEffect(() => {
@@ -429,27 +317,27 @@ export default function PetalStormRhythm() {
       const elapsed = now - startTimeRef.current;
       setCurrentTime(elapsed);
 
-    // Check for missed notes
-    setNotes((prev) =>
-      prev.map((note) => {
-        if (!note.hit && elapsed > note.time + TIMING_WINDOWS.miss) {
-          // Missed note
-          setCombo(0);
-          setMultiplier(1);
-          setHealth((h) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
-          setAccuracy((acc) => ({ ...acc, miss: acc.miss + 1 }));
+      // Check for missed notes
+      setNotes((prev) =>
+        prev.map((note) => {
+          if (!note.hit && elapsed > note.time + TIMING_WINDOWS.miss) {
+            // Missed note
+            setCombo(0);
+            setMultiplier(1);
+            setHealth((h) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
+            setAccuracy((acc) => ({ ...acc, miss: acc.miss + 1 }));
 
-          return { ...note, hit: true, accuracy: 'miss' };
-        }
-        return note;
-      }),
-    );
+            return { ...note, hit: true, accuracy: 'miss' };
+          }
+          return note;
+        }),
+      );
 
-    // Check for game over
-    if (health <= 0) {
-      endGame();
-      return;
-    }
+      // Check for game over
+      if (health <= 0) {
+        endGame();
+        return;
+      }
 
       // Check for completion
       if (elapsed > selectedTrack.duration * 1000 + 2000) {
@@ -471,7 +359,10 @@ export default function PetalStormRhythm() {
 
   // Initialize game
   const startGame = useCallback(() => {
-    const trackNotes = generateNotes(selectedTrack);
+    const trackNotes = buildPetalStormChart(selectedTrack, {
+      laneCount: GAME_CONFIG.LANE_COUNT,
+      preparationDelay: GAME_CONFIG.PREPARATION_DELAY,
+    });
     setNotes(trackNotes);
     setCurrentTime(0);
     setScore(0);
@@ -481,6 +372,7 @@ export default function PetalStormRhythm() {
     setHealth(GAME_CONFIG.INITIAL_HEALTH);
     setMultiplier(1);
     setPetalReward(null);
+    setPersonalBest(null);
     completionSubmittedRef.current = false;
     beginResultSession('petal-storm-rhythm');
     setAchievements([]);
@@ -491,7 +383,7 @@ export default function PetalStormRhythm() {
     setGameStartTime(startTime);
 
     // Start game loop - it will run when gameState is 'playing'
-  }, [beginResultSession, selectedTrack, generateNotes]);
+  }, [beginResultSession, selectedTrack]);
 
   // Handle note hit
   const hitNote = useCallback(
@@ -548,7 +440,6 @@ export default function PetalStormRhythm() {
         accuracy = 'miss';
         points = GAME_CONFIG.SCORE_MISS;
       }
-
 
       // Trigger hit VFX
       setLaneFlashes((prev) => ({
@@ -779,17 +670,21 @@ export default function PetalStormRhythm() {
         )}
 
         {/* Avatar Display - Only show in menu/instructions */}
-        {!showAvatarChoice && gameState !== 'playing' && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-          <div className="flex justify-center mb-8">
-            <div className="relative w-80 h-80">
-              <AvatarRenderer
-                profile={avatarConfig}
-                mode={representationConfig.mode}
-                size="large"
-              />
+        {!showAvatarChoice &&
+          gameState !== 'playing' &&
+          isAvatarsEnabled() &&
+          avatarConfig &&
+          !avatarLoading && (
+            <div className="flex justify-center mb-8">
+              <div className="relative w-80 h-80">
+                <AvatarRenderer
+                  profile={avatarConfig}
+                  mode={representationConfig.mode}
+                  size="large"
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Track Selection Menu */}
         {gameState === 'menu' && !showAvatarChoice && (
@@ -800,6 +695,9 @@ export default function PetalStormRhythm() {
           >
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
               <h2 className="text-2xl font-semibold text-white mb-6 text-center">Select Track</h2>
+              <p className="mb-4 text-center text-sm text-amber-200" role="status">
+                Chart preview build — authored track audio is still required for production.
+              </p>
 
               <div className="grid gap-4">
                 {SAMPLE_TRACKS.map((track) => (
@@ -927,17 +825,23 @@ export default function PetalStormRhythm() {
             )}
 
             {/* Game Area */}
-            <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-purple-900/50 to-black">
+            <div
+              className="flex-1 relative overflow-hidden bg-gradient-to-b from-purple-900/50 to-black"
+              style={{ touchAction: 'none', overscrollBehavior: 'contain' }}
+            >
               {/* Full Body Character on Stage - Behind Lanes */}
-              {!showAvatarChoice && gameState === 'playing' && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0 pointer-events-none" style={{ width: '400px', height: '500px' }}>
-                  <AvatarRenderer
-                    profile={avatarConfig}
-                    mode="stageFullBody"
-                    size="large"
-                  />
-                </div>
-              )}
+              {!showAvatarChoice &&
+                gameState === 'playing' &&
+                isAvatarsEnabled() &&
+                avatarConfig &&
+                !avatarLoading && (
+                  <div
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0 pointer-events-none"
+                    style={{ width: '400px', height: '500px' }}
+                  >
+                    <AvatarRenderer profile={avatarConfig} mode="stageFullBody" size="large" />
+                  </div>
+                )}
               {/* Lanes */}
               <div className="h-full flex relative z-10" style={{ perspective: '1000px' }}>
                 {LANES.map((laneIndex) => {
@@ -954,17 +858,25 @@ export default function PetalStormRhythm() {
                           : 300);
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={laneIndex}
-                      className="flex-1 relative border-r border-pink-500/30 bg-gradient-to-b from-transparent via-purple-900/10 to-slate-900/30"
+                      className="flex-1 relative border-r border-pink-500/30 bg-gradient-to-b from-transparent via-purple-900/10 to-slate-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-pink-200"
                       style={{
                         minHeight: '100%',
+                        touchAction: 'none',
                       }}
-                      onClick={() => hitNote(laneIndex)}
-                      onKeyDown={(e) => e.key === 'Enter' && hitNote(laneIndex)}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Hit note in lane ${laneIndex}`}
+                      onPointerDown={(event) => {
+                        event.preventDefault();
+                        hitNote(laneIndex);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          hitNote(laneIndex);
+                        }
+                      }}
+                      aria-label={`Hit note in lane ${laneIndex + 1}`}
                     >
                       {/* Lane Flash VFX */}
                       {flashActive && (
@@ -1010,11 +922,21 @@ export default function PetalStormRhythm() {
                           .map((note) => {
                             // Calculate note position: 0 = top, 1 = hit line
                             const timeUntilHit = note.time - currentTime;
-                            const notePosition = Math.max(0, Math.min(1, (GAME_CONFIG.NOTE_TRAVEL_TIME - timeUntilHit) / GAME_CONFIG.NOTE_TRAVEL_TIME));
+                            const notePosition = Math.max(
+                              0,
+                              Math.min(
+                                1,
+                                (GAME_CONFIG.NOTE_TRAVEL_TIME - timeUntilHit) /
+                                  GAME_CONFIG.NOTE_TRAVEL_TIME,
+                              ),
+                            );
                             const topPercent = (1 - notePosition) * 100;
 
                             // Only show notes that are approaching the hit zone
-                            if (timeUntilHit < -200 || timeUntilHit > GAME_CONFIG.NOTE_TRAVEL_TIME + 200) {
+                            if (
+                              timeUntilHit < -200 ||
+                              timeUntilHit > GAME_CONFIG.NOTE_TRAVEL_TIME + 200
+                            ) {
                               return null;
                             }
 
@@ -1022,8 +944,8 @@ export default function PetalStormRhythm() {
                               <motion.div
                                 key={note.id}
                                 initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ 
-                                  scale: 1, 
+                                animate={{
+                                  scale: 1,
                                   opacity: Math.min(1, Math.max(0.3, notePosition)),
                                 }}
                                 exit={{ scale: 1.2, opacity: 0 }}
@@ -1034,19 +956,27 @@ export default function PetalStormRhythm() {
                                       ? 'bg-purple-500 border-purple-300 shadow-purple-500/50'
                                       : 'bg-blue-500 border-blue-300 shadow-blue-500/50'
                                 }`}
-                                style={{ 
+                                style={{
                                   bottom: `${Math.max(80, Math.min(100, 100 - topPercent))}%`,
                                   zIndex: 10,
                                 }}
                               >
-                                {note.type === 'normal' && <div className="w-3 h-3 bg-white rounded-full" />}
-                                {note.type === 'hold' && <div className="w-full h-1 bg-white rounded" />}
-                                {note.type === 'slide' && <div className="text-white font-bold">{note.direction === 'left' ? '←' : '→'}</div>}
+                                {note.type === 'normal' && (
+                                  <div className="w-3 h-3 bg-white rounded-full" />
+                                )}
+                                {note.type === 'hold' && (
+                                  <div className="w-full h-1 bg-white rounded" />
+                                )}
+                                {note.type === 'slide' && (
+                                  <div className="text-white font-bold">
+                                    {note.direction === 'left' ? '←' : '→'}
+                                  </div>
+                                )}
                               </motion.div>
                             );
                           })}
                       </AnimatePresence>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -1084,7 +1014,7 @@ export default function PetalStormRhythm() {
                   : 'playing'
           }
           instructions={[
-            'Press A, S, D, F to hit notes in each lane',
+            'Press A, S, D, F, G or tap a lane to hit notes',
             'Time your hits with the beat for perfect scores',
             'Build combos for multiplier bonuses',
             'Keep your health above 0 to survive',
@@ -1093,6 +1023,7 @@ export default function PetalStormRhythm() {
           winMessage={`Rhythm Master! You completed ${selectedTrack.title} with ${Math.round(((accuracy.perfect + accuracy.great + accuracy.good) / Math.max(1, accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss)) * 100)}% accuracy and ${maxCombo} max combo!`}
           loseMessage="Your health reached zero. Try again!"
           score={finalScore}
+          personalBest={personalBest}
           petalReward={petalReward}
           onRestart={() => {
             handleRestart();

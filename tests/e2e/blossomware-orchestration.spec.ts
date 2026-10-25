@@ -7,6 +7,8 @@ test('Blossomware disposes one microgame before advancing and keeps shared pause
   await page.goto('/mini-games/blossomware', { waitUntil: 'domcontentloaded' });
 
   await expect(page.getByRole('heading', { level: 1, name: 'Blossomware' })).toBeVisible();
+  await expect(page.getByText('classic-v1')).toBeVisible();
+  await page.getByRole('button', { name: 'Start Classic Circuit' }).click();
   const controls = page.getByRole('navigation', { name: 'Game session controls' });
   const sessionHud = page.locator('.game-platform-hud');
   await expect(controls).toBeVisible();
