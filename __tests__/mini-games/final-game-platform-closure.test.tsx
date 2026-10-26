@@ -82,13 +82,19 @@ vi.mock('@/app/mini-games/_shared/GameUI', () => ({ GameUI: () => null }));
 vi.mock('@/app/mini-games/_shared/GamePlatform', () => ({
   GamePlatformControls: ({ session }: { session: { pause: () => void; exit: () => void } }) => (
     <nav aria-label="Game session controls">
-      <button type="button" onClick={session.pause}>Pause</button>
-      <button type="button" onClick={session.exit}>Exit</button>
+      <button type="button" onClick={session.pause}>
+        Pause
+      </button>
+      <button type="button" onClick={session.exit}>
+        Exit
+      </button>
     </nav>
   ),
   GamePlatformPause: ({ session }: { session: { phase: string; resume: () => void } }) =>
     session.phase === 'paused' ? (
-      <button type="button" onClick={session.resume}>Resume</button>
+      <button type="button" onClick={session.resume}>
+        Resume
+      </button>
     ) : null,
   GameSessionAnnouncement: () => null,
 }));
@@ -129,7 +135,9 @@ vi.mock('@/app/mini-games/(games)/memory-match/MemoryMatchGame', () => ({
           timeElapsed: 12000,
           didWin: true,
           rewardIntent: { facts: { perfectClear: true, lowMoveClear: true } },
-          achievementIntent: { facts: ['memory_defrag_first_clear', 'memory_defrag_perfect_clear'] },
+          achievementIntent: {
+            facts: ['memory_defrag_first_clear', 'memory_defrag_perfect_clear'],
+          },
         };
         onGameEnd(result);
         onGameEnd(result);
@@ -148,9 +156,13 @@ afterEach(() => {
 });
 
 describe('final game platform closure', () => {
-  it('routes the Bubble hub identity to the adopted runtime while retaining its internal id', () => {
-    const bubble = gamesMeta.games.find((game) => game.id === 'bubble-girl');
-    expect(bubble).toMatchObject({ id: 'bubble-girl', slug: 'bubble-ragdoll' });
+  it('routes the canonical Bubble hub identity to the adopted runtime', () => {
+    const bubble = gamesMeta.games.find((game) => game.slug === 'bubble-ragdoll');
+    expect(bubble).toMatchObject({
+      id: 'bubble-ragdoll',
+      title: 'Bubble Ragdoll',
+      slug: 'bubble-ragdoll',
+    });
 
     const legacyRoute = readFileSync(
       join(process.cwd(), 'app/mini-games/(games)/bubble-girl/layout.tsx'),

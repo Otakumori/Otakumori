@@ -14,7 +14,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -22,7 +21,10 @@ import { useRouter } from 'next/navigation';
 import GlassCard from '@/app/components/ui/GlassCard';
 import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../../_shared/PhysicsAvatarCanvas';
+import {
+  PhysicsAvatarCanvas,
+  type PhysicsAvatarCanvasRef,
+} from '../../_shared/PhysicsAvatarCanvas';
 import { GameOverlay } from '../../_shared/GameOverlay';
 import { useGameHud } from '../../_shared/useGameHud';
 import {
@@ -43,6 +45,9 @@ import { AvatarPresetChoice, type AvatarChoice } from '../../_shared/AvatarPrese
 import { getGameAvatarUsage } from '../../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
+import { nextPuzzleContentIndex } from '../../_shared/secondaryGameContracts';
+import { PUZZLE_REVEAL_CONTENT } from './puzzleRevealContent';
 
 const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
   ssr: false,
@@ -76,6 +81,8 @@ export default function PuzzleRevealPage() {
   const [combo, setCombo] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
+  const [contentIndex, setContentIndex] = useState(0);
   const resultSubmittedRef = useRef(false);
   const gameStartedAtRef = useRef(Date.now());
   const session = useGameSession<GameSessionResult>({
@@ -109,9 +116,9 @@ export default function PuzzleRevealPage() {
 
   useEffect(() => {
     const unregister = session.registerLifecycle({
-        pause: () => setGameState('paused'),
-        resume: () => setGameState('playing'),
-      });
+      pause: () => setGameState('paused'),
+      resume: () => setGameState('playing'),
+    });
     return () => {
       unregister();
     };
@@ -147,6 +154,9 @@ export default function PuzzleRevealPage() {
 
   const handleModeChange = (newMode: GameMode) => {
     setMode(newMode);
+    setContentIndex(
+      (current) => nextPuzzleContentIndex(current, key + 1, PUZZLE_REVEAL_CONTENT.length) ?? 0,
+    );
     setKey((prev) => prev + 1); // Restart game with new mode
   };
 
@@ -161,6 +171,7 @@ export default function PuzzleRevealPage() {
     resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
+    setPersonalBest(null);
   };
 
   const handleRestart = () => {
@@ -171,6 +182,10 @@ export default function PuzzleRevealPage() {
     resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
+    setPersonalBest(null);
+    setContentIndex(
+      (current) => nextPuzzleContentIndex(current, key + 1, PUZZLE_REVEAL_CONTENT.length) ?? 0,
+    );
   };
 
   const handleGameEnd = useCallback(
@@ -190,6 +205,7 @@ export default function PuzzleRevealPage() {
         resultSubmittedRef.current = true;
         const result = await recordResult({
           gameId: 'puzzle-reveal',
+          resultKey: mode,
           score: finalScoreValue,
           difficulty: mode,
           durationMs: Math.max(0, Date.now() - gameStartedAtRef.current),
@@ -202,24 +218,7 @@ export default function PuzzleRevealPage() {
         });
 
         if (result.success) setPetalReward(result.petalReward?.earned ?? null);
-      }
-
-      // Submit to leaderboard
-      try {
-        await fetch('/api/v1/leaderboards/puzzle-reveal', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            score: finalScoreValue,
-            metadata: {
-              mode,
-              didWin,
-              combo,
-            },
-          }),
-        });
-      } catch (error) {
-        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        setPersonalBest(result.personalBest ?? null);
       }
     },
     [combo, mode, recordResult, session.complete],
@@ -337,6 +336,7 @@ export default function PuzzleRevealPage() {
             <EnhancedTileGame
               key={key}
               mode={mode}
+              contentIndex={contentIndex}
               onScoreChange={setScore}
               onComboChange={setCombo}
               onGameEnd={handleGameEnd}
@@ -363,6 +363,7 @@ export default function PuzzleRevealPage() {
               loseMessage="Out of energy! Try again and manage your clicks better!"
               score={finalScore || score}
               petalReward={petalReward}
+              personalBest={personalBest}
               onRestart={handleRestart}
               onResume={handleStart}
               onBack={session.exit}

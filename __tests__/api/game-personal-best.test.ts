@@ -65,6 +65,20 @@ describe('reward-free game personal-best authority', () => {
     expect(grantPetals).not.toHaveBeenCalled();
   });
 
+  it('accepts a canonical secondary-game identity without touching Petal rewards', async () => {
+    vi.mocked(db.leaderboardScore.findFirst)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: 'pb-secondary', score: 640 } as never);
+    vi.mocked(db.leaderboardScore.create).mockResolvedValue({ id: 'pb-secondary' } as never);
+
+    const response = await POST(
+      request({ gameId: 'bubble-ragdoll', resultKey: 'pop-12', score: 640 }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(grantPetals).not.toHaveBeenCalled();
+  });
+
   it('rejects an unauthenticated submission before persistence', async () => {
     vi.mocked(requireLocalViewer).mockRejectedValue(new AuthenticationRequiredError());
 

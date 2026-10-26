@@ -6,6 +6,7 @@ import { RUNTIME_FLAGS } from '@/constants.client';
 import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../../_shared/enhancedTextures';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
+import { THIGH_TARGET_DISTANCE } from '../../_shared/secondaryGameContracts';
 
 interface Obstacle {
   id: number;
@@ -31,12 +32,13 @@ export default function ThighChaseGame({
   onStatsUpdate,
   paused,
 }: {
-  onGameEnd?: (score: number, didWin: boolean) => void;
+  onGameEnd?: (score: number, didWin: boolean, distance: number) => void;
   onStatsUpdate?: (stats: {
     score: number;
     lives: number;
     stage: number;
     progress?: number;
+    distance: number;
   }) => void;
   paused?: boolean;
 } = {}) {
@@ -47,6 +49,7 @@ export default function ThighChaseGame({
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(600);
   const animationRef = useRef<number | undefined>(undefined);
+  const endedRef = useRef(false);
   const keysRef = useRef<Set<string>>(new Set());
 
   // Physics renderers
@@ -66,15 +69,16 @@ export default function ThighChaseGame({
   // Update stats via callback
   useEffect(() => {
     if (gameState === 'playing' && onStatsUpdate) {
-      const progress = stage / 10; // Assuming 10 stages max, adjust as needed
+      const progress = Math.min(1, distance / THIGH_TARGET_DISTANCE);
       onStatsUpdate({
         score,
         lives,
         stage,
         progress,
+        distance,
       });
     }
-  }, [gameState, score, lives, stage, onStatsUpdate]);
+  }, [distance, gameState, score, lives, stage, onStatsUpdate]);
 
   // Player state
   const [player, setPlayer] = useState({
@@ -182,6 +186,7 @@ export default function ThighChaseGame({
 
   // Start game
   const startGame = useCallback(() => {
+    endedRef.current = false;
     setGameState('playing');
     setScore(0);
     setDistance(0);
@@ -564,12 +569,20 @@ export default function ThighChaseGame({
         }
       }
 
+      if (distance >= THIGH_TARGET_DISTANCE && !endedRef.current) {
+        endedRef.current = true;
+        setGameState('gameOver');
+        onGameEnd?.(score + 1000, true, distance);
+        return;
+      }
+
       // Check game over
-      if (lives <= 0) {
+      if (lives <= 0 && !endedRef.current) {
+        endedRef.current = true;
         setGameState('gameOver');
         // Notify parent of game over
         if (onGameEnd) {
-          onGameEnd(score, false); // didWin = false (lives reached 0)
+          onGameEnd(score, false, distance); // didWin = false (lives reached 0)
         }
       }
 
@@ -586,7 +599,19 @@ export default function ThighChaseGame({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, stage, player, pursuer, lives, spawnObstacle, spawnPowerup, isPaused]);
+  }, [
+    distance,
+    gameState,
+    stage,
+    player,
+    pursuer,
+    lives,
+    score,
+    spawnObstacle,
+    spawnPowerup,
+    isPaused,
+    onGameEnd,
+  ]);
 
   // Auto-save progress
   useEffect(() => {
@@ -865,12 +890,6 @@ export default function ThighChaseGame({
       ctx.fillText(`DANGER: ${Math.floor(pursuerDistance)}px`, canvasWidth - 200, 80);
     }
   });
-
-  const formatTime = (ms: number) => {
-    const seconds = Math.floor(ms / 1000) % 60;
-    const minutes = Math.floor(ms / 60000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
 
   if (gameState === 'menu') {
     return (
