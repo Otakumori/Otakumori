@@ -389,6 +389,221 @@
       "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
     },
     {
+      "id": "puzzle_reveal_cover_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Existing approved recovered-memory artwork and launch cover",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 1024, "height": 1536 },
+      "source": {
+        "path": "docs/design/references/approved/batch-2/games/covers/game-puzzle-reveal-cover-source.png",
+        "availability": "LOCAL",
+        "sha256": "D4823B2D2120AD86755C811E808961C32D580D5F275CA3991188EBB1CAC35053",
+        "provenance": "Otaku-mori approved Puzzle Reveal production artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/covers/game-puzzle-reveal-cover.webp",
+        "sha256": "22FA43B00FA70F7CB7E9CF0331BB1B5B91513A1EF98F36E988BD278AC60F35C1",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated existing member of the eight-artwork core pack. Pack-level QA remains blocked by the missing fox v2 source."
+    },
+    {
+      "id": "puzzle_reveal_hub_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Existing approved recovered-memory artwork and Game Hub presentation",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 1024, "height": 1024 },
+      "source": {
+        "path": "docs/design/references/approved/batch-2/games/hub/game-puzzle-reveal-hub-source.png",
+        "availability": "LOCAL",
+        "sha256": "254C000A00C688F0B14516B2CDF793A58C673AA37AB22BDC5F418383CDD66520",
+        "provenance": "Otaku-mori approved Puzzle Reveal production artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/hub/game-puzzle-reveal-hub.webp",
+        "sha256": "3FE221A0040BD4CBA788799F667322E097002D6F08E8B54AD80C6BE92A33D9C3",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated existing member of the eight-artwork core pack. Pack-level QA remains blocked by the missing fox v2 source."
+    },
+    {
+      "id": "puzzle_reveal_shrine_circuit_oracle_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Intimate shrine-oracle recovered-memory artwork",
+      "state": "RUNTIME_READY",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 211268 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.png",
+        "availability": "LOCAL",
+        "sha256": "9BF9A0C8A1B46BA9955BCF6825967204E230446FD04416E5E503563453431318",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.webp",
+        "sha256": "5FE116C74FA9F4B61819BF03782CDC678869EDC94138DA6C1DB93AE6FF89B87B",
+        "integrated": false,
+        "integrationReferences": []
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_kintsugi_machine_bodhisattva_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental machine-bodhisattva recovered-memory artwork",
+      "state": "RUNTIME_READY",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 209026 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.png",
+        "availability": "LOCAL",
+        "sha256": "F4915B3CC4036E17057411CFE6EE402BF0AD99131DD19BED6BBAD04EAF7B235A",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.webp",
+        "sha256": "AA135C9946481F27C9153FF6F2E8448D3B2366FD3CB16BFD067264EF5E324977",
+        "integrated": false,
+        "integrationReferences": []
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_sakura_singularity_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental sacred-tree recovered-memory artwork",
+      "state": "RUNTIME_READY",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 216592 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.png",
+        "availability": "LOCAL",
+        "sha256": "EDEA8A56E58AAA0BAAA6163C6E1B810CF07457990C9C946E7CEEE78490A63FC1",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.webp",
+        "sha256": "5737AD0C16BD1DC0A9B0C4E42E08D0072F2395702DBC0589FD4CB1913DA339FC",
+        "integrated": false,
+        "integrationReferences": []
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_memory_well_archivist_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Intimate memory-well ritual recovered-memory artwork",
+      "state": "RUNTIME_READY",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 189900 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C7F5DB2E711D6000F4721B25B1E78E326CC4A472501841DBE154940BB7A6B10B",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.webp",
+        "sha256": "35B9AABAD37D435CDEFE7B9E83B4AA1C52F71805E686BE1A8A0E09C4C9C9817A",
+        "integrated": false,
+        "integrationReferences": []
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_celestial_komainu_gate_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental guardian-gate recovered-memory artwork",
+      "state": "RUNTIME_READY",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 198456 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "2156D5C28B555ABB939CE232AB60662928DD721E3A1DDAEB6477C721520B7D6B",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.webp",
+        "sha256": "105ABDD692463FBA4114B6F717DA181CA679CABD31F3E52B033DB795B55B2ABF",
+        "integrated": false,
+        "integrationReferences": []
+      },
+      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Superseded fox reliquary source retained as non-runtime evidence",
+      "state": "REJECTED",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "technical": { "bytes": 3493115 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/puzzle-reveal/puzzle-reveal-foxfire-data-reliquary-v1.png",
+        "availability": "LOCAL",
+        "sha256": "4D0444110330FB578ECC6C92AC8E0DA248FC1D68CCC903AD2D062B67AE119970",
+        "provenance": "OpenAI-assisted provisional Puzzle Reveal artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "SUPERSEDED by puzzle_reveal_foxfire_data_reliquary_v2. Preserve as evidence; never activate at runtime."
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v2",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Owner-selected ancient black kitsune reliquary guardian replacement",
+      "state": "MISSING",
+      "format": "png",
+      "dimensions": { "width": 800, "height": 600 },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Owner approved the replacement visual direction, but the exact source binary is not present. Source checksum, master dimensions, derivative, and asset-level approval evidence remain unavailable; no approximation is authorized."
+    },
+    {
       "id": "avatar.base.legacy-human-male-female-v1",
       "family": "avatar.base.legacy-v1",
       "surface": "Avatar Creator / Commander",
