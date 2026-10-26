@@ -1,0 +1,428 @@
+{
+  "version": 1,
+  "stateModel": [
+    "MISSING",
+    "CONCEPT",
+    "CANDIDATE",
+    "OWNER_APPROVED",
+    "RUNTIME_READY",
+    "INTEGRATED",
+    "QA_PASSED",
+    "DEFERRED",
+    "REJECTED"
+  ],
+  "legacyAuthorities": [
+    {
+      "path": "public/assets/manifest.json",
+      "role": "legacy runtime inventory"
+    },
+    {
+      "path": "content/assets.manifest.json",
+      "role": "legacy content declarations"
+    },
+    {
+      "path": "assets-roles.json",
+      "role": "game runtime role mapping"
+    },
+    {
+      "path": "app/lib/assets/registry.json",
+      "role": "legacy avatar slot registry"
+    },
+    {
+      "path": "public/assets/credits.json",
+      "role": "legacy licensing credits"
+    }
+  ],
+  "assets": [
+    {
+      "id": "home.world.early-morning.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Early-morning Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-01-early-morning-wide.png",
+        "availability": "LOCAL",
+        "sha256": "9E61FF7318C2609809E7DE22C2EB646C64DEECA72CF89F41AED54FE6C3CABB5F",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-01-early-morning-wide.png",
+        "sha256": "9E61FF7318C2609809E7DE22C2EB646C64DEECA72CF89F41AED54FE6C3CABB5F",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.morning.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Morning Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-02-morning-wide.png",
+        "availability": "LOCAL",
+        "sha256": "68A62CC58ACFB649F8F56D946B28A857576F44BEA1432A0F8C035EDE2943BD08",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-02-morning-wide.png",
+        "sha256": "68A62CC58ACFB649F8F56D946B28A857576F44BEA1432A0F8C035EDE2943BD08",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.afternoon.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Afternoon Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-03-afternoon-wide.png",
+        "availability": "LOCAL",
+        "sha256": "1AF58ACCF8ADD8366BFBCE20005630727D2CD9BACC5647B3C16C2156324B87E5",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-03-afternoon-wide.png",
+        "sha256": "1AF58ACCF8ADD8366BFBCE20005630727D2CD9BACC5647B3C16C2156324B87E5",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.late-afternoon.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Late-afternoon Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-04-late-afternoon-wide.png",
+        "availability": "LOCAL",
+        "sha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-04-late-afternoon-wide.png",
+        "sha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.night.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Night Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-05-night-wide.png",
+        "availability": "LOCAL",
+        "sha256": "486FAB4A45C070053C6C640379482CDEBD5CFC46E509C7DDAC93C403A0131015",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-05-night-wide.png",
+        "sha256": "486FAB4A45C070053C6C640379482CDEBD5CFC46E509C7DDAC93C403A0131015",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; exact-source Night QA exists but Home-level owner review remains pending."
+    },
+    {
+      "id": "home.world.special-twilight.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Special-twilight Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-06-special-twilight-wide.png",
+        "availability": "LOCAL",
+        "sha256": "853291A83B3235AA1EEAFCB7EE38DE025E1E8F7653D2A865704980E6482844C6",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-06-special-twilight-wide.png",
+        "sha256": "853291A83B3235AA1EEAFCB7EE38DE025E1E8F7653D2A865704980E6482844C6",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.early-morning.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Early-morning portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-01-early-morning-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "B54F80B77C550F958DE74460AFD5B119B5A855C6A11D36740B4C943652DCDBAF",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved early-morning wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-01-early-morning-portrait.webp",
+        "sha256": "25A9765A17D5058BCF706D1A2DDEAD7DC04ED436C52BBDC948AE49270B506A06",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.morning.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Morning portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-02-morning-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "899F19940F613876560F21165D1CE07664B8A22BCB86287756E1D2EA7C5BF71A",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved morning wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-02-morning-portrait.webp",
+        "sha256": "09D259604FCB8F75F5BB3D01A9C0B89B9090B977D95D708700FD6935508AD0CF",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.afternoon.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Afternoon portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-03-afternoon-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "408EC4C63E2C08C9ACC60F15A0BC4111A82EBC6D585D75F152E4963C223858DC",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved afternoon wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-03-afternoon-portrait.webp",
+        "sha256": "217044B74DE0831F538ED161F2262C7912B0726B253D4D46DB7A6DD8D82CBCF1",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.late-afternoon.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Canonical portrait geometry authority and late-afternoon world master",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-04-late-afternoon-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "0A1632EB872DC9B97797A923852A8961811BF5BC9B0D54D7B024DA0E8E035014",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled AI-assisted portrait recomposition from the approved late-afternoon combined wide master",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-04-late-afternoon-portrait.webp",
+        "sha256": "AC9331CDBFE654BF5D4C384A98A975FF74D2D103937F4BB6C2D4E1A3A1B675EB",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false, "geometryApproved": true },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Owner approved the composition as canonical family geometry; final integrated Home visual approval remains pending."
+    },
+    {
+      "id": "home.world.night.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Night portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-05-night-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "9427FC8ADDF322B1826EE643CEDEE03D9A77533906547544A568F61F44E97B0B",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved Night wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-05-night-portrait.webp",
+        "sha256": "C34ADB74DE568EEDD8EE6E9F984D5A085E8FCAB5E1FC44EC2F0373106422060F",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.special-twilight.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Special-twilight portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-06-special-twilight-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "2D8EA43134DC2C99826FD5A2EF5ECBF80C51D95F6DC1AC3335366DA913D2192B",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved special-twilight wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-06-special-twilight-portrait.webp",
+        "sha256": "7BD4086A45C05B7326A5AFC8B6D96B7F30EE2277B78E8020B4E6919FF8AF92BC",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "avatar.base.legacy-human-male-female-v1",
+      "family": "avatar.base.legacy-v1",
+      "surface": "Avatar Creator / Commander",
+      "purpose": "Legacy rigged male/female base candidate pending production-base acceptance",
+      "state": "CANDIDATE",
+      "format": "glb",
+      "technical": {
+        "bytes": 898536,
+        "triangles": 37324,
+        "nodes": 1419,
+        "skins": 2,
+        "jointsPerSkin": [707, 701],
+        "materials": 2,
+        "animations": 0,
+        "morphTargetNames": [],
+        "compression": ["KHR_draco_mesh_compression"]
+      },
+      "source": {
+        "path": "public/assets/external/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "availability": "LOCAL",
+        "sha256": "DB5D80674B88B5D96143EA7536C8E06F7DAC448F746BCF95F8FEACCFB90AED44",
+        "provenance": "Sketchfab Human Male/Female Basemesh Rigged by Niclas Schoepe",
+        "licenseStatus": "LICENSED",
+        "licenseReference": "CC-BY-4.0; attribution and source are embedded in the GLB asset metadata"
+      },
+      "runtime": {
+        "path": "public/assets/optimized/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "sha256": "52FB89AB876D7779FC5B355EAE1EDD548FBC3A166C6B823344346192C10C76D0",
+        "integrated": false,
+        "integrationReferences": ["public/assets/manifest.json", "packages/avatar/src/serialize.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Legacy declarations describe male/female morph targets, but the inspected source and optimized GLBs contain no morph targets or animation clips. Runtime references do not constitute production approval. The two high-joint-count skins and node count require DCC/runtime suitability review before either launch base can be derived from this candidate."
+    }
+  ]
+}
