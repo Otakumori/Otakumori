@@ -27,10 +27,8 @@ test.describe('ready-game shared-platform adoption', () => {
     await page.goto('/mini-games/otaku-beat-em-up', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { level: 1, name: 'Otaku Beat-Em-Up' })).toBeVisible();
-    await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Arcade Mode' }).click();
     await page.getByRole('button', { name: 'Play with preset character' }).click();
-    await page.getByRole('button', { name: 'Start Game' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Start game' }).click();
 

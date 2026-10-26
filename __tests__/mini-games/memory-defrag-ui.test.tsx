@@ -111,6 +111,19 @@ describe('memory defrag UI', () => {
     expect(screen.getByTestId('memory-defrag-game')).not.toHaveAttribute('data-phase', 'resolving');
   });
 
+  it('offers a bounded echo-preview challenge and unlocks input after preview', () => {
+    render(<MemoryMatchGame difficulty="initiate" seed="echo-preview" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Echo Preview' }));
+    expect(screen.getAllByRole('gridcell')[0]).toBeDisabled();
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(screen.getAllByRole('gridcell')[0]).toBeEnabled();
+  });
+
   it('returns transient Keeper reactions to idle without changing the card grid', () => {
     render(<MemoryMatchGame difficulty="initiate" seed="keeper-reaction" />);
 
@@ -150,6 +163,9 @@ describe('memory defrag UI', () => {
     }
 
     expect(onGameEnd).toHaveBeenCalledTimes(1);
+    expect(onGameEnd).toHaveBeenCalledWith(
+      expect.objectContaining({ difficulty: 'initiate', challenge: 'standard' }),
+    );
     expect(screen.getByTestId('memory-keeper-presentation')).toHaveAttribute(
       'data-reaction',
       'clear',

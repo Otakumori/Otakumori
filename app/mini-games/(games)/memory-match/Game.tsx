@@ -13,6 +13,9 @@ import MemoryMatchGame from './MemoryMatchGame';
 import { MemoryDefragResultsScreen, MemoryDefragTitleScreen } from './MemoryDefragScreens';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 import { useGameProgress } from '@/app/lib/games/progress';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
+import type { MemoryDefragChallenge } from './MemoryMatchGame';
+import type { MemoryDefragDifficulty } from './memoryDefragEngine';
 
 const MEMORY_DEFRAG_AUDIO = [
   '/assets/sounds/runic-reveal.mp3',
@@ -37,6 +40,9 @@ type MemoryMatchResult = GameSessionResult & {
   didWin: boolean;
   perfectClear?: boolean;
   lowMoveClear?: boolean;
+  difficulty: MemoryDefragDifficulty;
+  challenge: MemoryDefragChallenge;
+  personalBest?: PersonalBestResult;
 };
 
 export default function MemoryMatchGameWrapper() {
@@ -70,6 +76,8 @@ export default function MemoryMatchGameWrapper() {
       moves: number;
       timeElapsed: number;
       didWin: boolean;
+      difficulty: MemoryDefragDifficulty;
+      challenge: MemoryDefragChallenge;
       rewardIntent?: { facts?: { perfectClear?: boolean; lowMoveClear?: boolean } } | null;
       achievementIntent?: { facts?: string[] } | null;
     }) => {
@@ -85,8 +93,9 @@ export default function MemoryMatchGameWrapper() {
       session.complete(completed);
       void recordResult({
         gameId: 'memory-match',
+        resultKey: `${results.difficulty}:${results.challenge}`,
         score: results.score,
-        difficulty: 'memory-defrag',
+        difficulty: results.difficulty,
         durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
         didWin: results.didWin,
         metadata: {
@@ -96,7 +105,13 @@ export default function MemoryMatchGameWrapper() {
           perfectClear: results.rewardIntent?.facts?.perfectClear,
           lowMoveClear: results.rewardIntent?.facts?.lowMoveClear,
           achievementFacts: results.achievementIntent?.facts ?? [],
+          difficulty: results.difficulty,
+          mode: results.challenge,
         },
+      }).then((progress) => {
+        setGameResults((current) =>
+          current ? { ...current, personalBest: progress.personalBest } : current,
+        );
       });
     },
     [recordResult, session.complete],
@@ -142,6 +157,9 @@ export default function MemoryMatchGameWrapper() {
               didWin={gameResults.didWin}
               perfectClear={gameResults.perfectClear}
               lowMoveClear={gameResults.lowMoveClear}
+              difficulty={gameResults.difficulty}
+              challenge={gameResults.challenge}
+              personalBest={gameResults.personalBest}
               onRestart={() => {
                 setGameResults(null);
                 completionSubmittedRef.current = false;
