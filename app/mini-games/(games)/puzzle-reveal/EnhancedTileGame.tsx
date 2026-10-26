@@ -14,6 +14,7 @@ import {
   updatePetalParticles,
   type PetalParticle,
 } from '../../_shared/vfx';
+import { PUZZLE_REVEAL_CONTENT } from './puzzleRevealContent';
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
@@ -27,7 +28,7 @@ interface Tile {
   particles: TileParticle[];
   revealProgress: number;
   comboMultiplier: number;
-  }
+}
 
 interface TileParticle {
   x: number;
@@ -37,7 +38,7 @@ interface TileParticle {
   life: number;
   size: number;
   color: string;
-  }
+}
 
 interface GameState {
   score: number;
@@ -48,13 +49,6 @@ interface GameState {
   timeElapsed: number;
   isComplete: boolean;
   isPaused: boolean;
-  }
-
-interface ArtPiece {
-  url: string;
-  title: string;
-  artist: string;
-  category: 'sfw' | 'nsfw';
 }
 
 const GRID_SIZES: Record<GameMode, { cols: number; rows: number; timeBonus: number }> = {
@@ -64,24 +58,9 @@ const GRID_SIZES: Record<GameMode, { cols: number; rows: number; timeBonus: numb
   expert: { cols: 10, rows: 8, timeBonus: 20000 },
 };
 
-// Curated art collection - uses approved Otaku-mori game art assets.
-const ART_COLLECTION: ArtPiece[] = [
-  {
-    url: '/assets/games/covers/game-puzzle-reveal-cover.webp',
-    title: 'Puzzle Reveal — Cover',
-    artist: 'Otaku-mori Studios',
-    category: 'sfw',
-  },
-  {
-    url: '/assets/games/hub/game-puzzle-reveal-hub.webp',
-    title: 'Puzzle Reveal — Hub',
-    artist: 'Otaku-mori Studios',
-    category: 'sfw',
-  },
-];
-
 export default function EnhancedTileGame({
   mode = 'medium',
+  contentIndex = 0,
   onScoreChange,
   onComboChange,
   onGameEnd,
@@ -89,6 +68,7 @@ export default function EnhancedTileGame({
   physicsAvatarRef,
 }: {
   mode?: GameMode;
+  contentIndex?: number;
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
@@ -119,8 +99,9 @@ export default function EnhancedTileGame({
     isPaused: false,
   });
 
-  const [currentArt, setCurrentArt] = useState<ArtPiece | null>(null);
+  const [currentArt, setCurrentArt] = useState<(typeof PUZZLE_REVEAL_CONTENT)[number] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [assetError, setAssetError] = useState(false);
   const [completionVfx, setCompletionVfx] = useState<{
     active: boolean;
     scale: number;
@@ -153,23 +134,23 @@ export default function EnhancedTileGame({
 
   // Initialize game
   useEffect(() => {
-    // Select random art piece
-    const selectedArt = ART_COLLECTION[Math.floor(Math.random() * ART_COLLECTION.length)];
+    const selectedArt = PUZZLE_REVEAL_CONTENT[contentIndex % PUZZLE_REVEAL_CONTENT.length]!;
     setCurrentArt(selectedArt);
 
     // Load image
     const img = new Image();
     img.crossOrigin = 'anonymous';
 
-    // Use placeholder if asset doesn't exist
     img.src = selectedArt.url;
     img.onerror = () => {
-      // Fallback to procedural gradient
-      img.src = generateFallbackImage(800, 600);
+      imageRef.current = null;
+      setAssetError(true);
+      setIsLoading(false);
     };
 
     img.onload = () => {
       imageRef.current = img;
+      setAssetError(false);
       initializeTiles();
       setIsLoading(false);
       startGameLoop();
@@ -180,36 +161,7 @@ export default function EnhancedTileGame({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [mode]);
-
-  // Generate fallback placeholder image
-  const generateFallbackImage = (width: number, height: number): string => {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d')!;
-
-    // Beautiful sakura gradient
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#ff9fbe');
-    gradient.addColorStop(0.5, '#ec4899');
-    gradient.addColorStop(1, '#8b5cf6');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Add decorative elements
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    for (let i = 0; i < 20; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const size = 20 + Math.random() * 60;
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    return canvas.toDataURL();
-  };
+  }, [contentIndex, mode]);
 
   // Initialize tile grid
   const initializeTiles = () => {
@@ -485,7 +437,6 @@ export default function EnhancedTileGame({
     if (onGameEnd) {
       onGameEnd(finalScore, true); // didWin = true (completed puzzle)
     }
-
   };
 
   // Game loop
@@ -671,6 +622,19 @@ export default function EnhancedTileGame({
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-pink-200 font-medium">Preparing artwork...</p>
+          </div>
+        </div>
+      )}
+      {assetError && (
+        <div
+          role="status"
+          className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-zinc-950/95 p-6 text-center text-zinc-100"
+        >
+          <div>
+            <p className="font-semibold">Artwork unavailable</p>
+            <p className="mt-2 text-sm text-zinc-300">
+              This puzzle cannot begin without its approved reveal image.
+            </p>
           </div>
         </div>
       )}

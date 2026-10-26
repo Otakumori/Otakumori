@@ -6,6 +6,7 @@ import { play } from '../../_shared/audio-bus';
 import { useAvatarForGame } from '../../_shared/useAvatarForGame';
 import { useGameAvatar } from '../../_shared/GameAvatarRenderer';
 import '../../_shared/cohesion.css';
+import type { BubbleObjective } from '../../_shared/secondaryGameContracts';
 
 const ROUND_MS = 60_000;
 const MAX_BUBBLES = 24;
@@ -26,6 +27,7 @@ type Pt = { x: number; y: number; px: number; py: number }; // Verlet point
 type Stick = { a: number; b: number; len: number; stiff: number }; // constraint
 
 interface BubbleRagdollProps {
+  objective: BubbleObjective;
   paused?: boolean;
   onGameEnd?: (results: {
     score: number;
@@ -33,11 +35,23 @@ interface BubbleRagdollProps {
     combo: number;
     misses: number;
     pops: number;
+    objectiveId: BubbleObjective['id'];
+    objectiveComplete: boolean;
   }) => void;
-  onStatsUpdate?: (stats: { score: number; combo: number; timer: number; progress: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    combo: number;
+    timer: number;
+    progress: number;
+  }) => void;
 }
 
-export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate }: BubbleRagdollProps = {}) {
+export default function BubbleRagdoll({
+  objective,
+  paused = false,
+  onGameEnd,
+  onStatsUpdate,
+}: BubbleRagdollProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
@@ -97,7 +111,8 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
     let score = 0,
       combo = 0,
       bestCombo = 0,
-      misses = 0;
+      misses = 0,
+      pops = 0;
     let startAt = performance.now();
     let endAt = startAt + ROUND_MS;
 
@@ -146,6 +161,7 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
         const b = bubbles[hit];
         if (!b) return;
         b.popped = true;
+        pops++;
         score += 100 + Math.floor(combo * 7);
         combo = Math.min(99, combo + 1);
         bestCombo = Math.max(bestCombo, combo);
@@ -384,8 +400,8 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       // Update stats via callback (UI is handled by GameUI component)
       const remain = Math.max(0, endAt - now);
       const timerSeconds = Math.ceil(remain / 1000);
-      const progress = 1 - (remain / ROUND_MS);
-      
+      const progress = 1 - remain / ROUND_MS;
+
       if (onStatsUpdate) {
         onStatsUpdate({
           score,
@@ -397,7 +413,8 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
 
       // end conditions
       const botPt = pts[pTorsoBot];
-      if (botPt && (botPt.y > H + 40 || now >= endAt)) {
+      const objectiveComplete = objective.isComplete({ pops, combo: bestCombo, score });
+      if (botPt && (botPt.y > H + 40 || now >= endAt || objectiveComplete)) {
         end(now);
         return;
       }
@@ -410,13 +427,15 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       if (hasEnded) return;
       hasEnded = true;
       const duration = Math.round(Math.min(now - startAt, ROUND_MS));
-      
+
       onGameEnd?.({
         score,
         durationMs: duration,
         combo: bestCombo,
         misses,
-        pops: Math.floor(score / 100),
+        pops,
+        objectiveId: objective.id,
+        objectiveComplete: objective.isComplete({ pops, combo: bestCombo, score }),
       });
     }
 
@@ -425,11 +444,26 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [avatarEnabled, avatarSpriteUrl, bgUrl, bubbleSprite, sPop, sBoing, sThud, onGameEnd, onStatsUpdate]);
+  }, [
+    avatarEnabled,
+    avatarSpriteUrl,
+    bgUrl,
+    bubbleSprite,
+    objective,
+    sPop,
+    sBoing,
+    sThud,
+    onGameEnd,
+    onStatsUpdate,
+  ]);
 
   return (
     <div ref={hostRef} className="absolute inset-0">
-      <canvas ref={canvasRef} />
+      <canvas
+        ref={canvasRef}
+        className="touch-none"
+        aria-label={`Bubble Ragdoll: ${objective.label}`}
+      />
     </div>
   );
 }

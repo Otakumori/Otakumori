@@ -15,17 +15,27 @@ import { generateRequestId } from '@/lib/requestId';
 
 export const runtime = 'nodejs';
 
-const CORE_GAME_IDS = [
+const LAUNCH_GAME_IDS = [
   'otaku-beat-em-up',
   'petal-storm-rhythm',
   'memory-match',
   'petal-samurai',
   'blossomware',
+  'bubble-ragdoll',
+  'puzzle-reveal',
+  'thigh-coliseum',
+  'dungeon-of-desire',
+  'maid-cafe-manager',
 ] as const;
 
 const PersonalBestSchema = z.object({
-  gameId: z.enum(CORE_GAME_IDS),
-  resultKey: z.string().trim().min(1).max(120).regex(/^[a-z0-9:_-]+$/),
+  gameId: z.enum(LAUNCH_GAME_IDS),
+  resultKey: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9:_-]+$/),
   score: z.number().int().nonnegative(),
   metadata: z.record(z.unknown()).optional(),
 });

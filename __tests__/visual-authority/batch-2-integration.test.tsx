@@ -23,15 +23,15 @@ describe('approved visual assets batch 2', () => {
   });
 
   it('preserves the Bubble Ragdoll stable ID and route while updating presentation', () => {
-    const bubbleGame = gamesRegistry.games.find((game) => game.id === 'bubble-girl');
+    const bubbleGame = gamesRegistry.games.find((game) => game.id === 'bubble-ragdoll');
 
     expect(bubbleGame).toMatchObject({
-      id: 'bubble-girl',
+      id: 'bubble-ragdoll',
       slug: 'bubble-ragdoll',
       title: 'Bubble Ragdoll',
       image: approvedVisualAssets.games['bubble-ragdoll'].cover,
     });
-    expect(getApprovedGamePresentation('bubble-girl')).toMatchObject({
+    expect(getApprovedGamePresentation('bubble-ragdoll')).toMatchObject({
       displayName: 'Bubble Ragdoll',
       hub: '/assets/games/hub/game-bubble-ragdoll-hub.webp',
     });
@@ -49,7 +49,11 @@ describe('approved visual assets batch 2', () => {
   });
 
   it.each([
-    [EmptyCart, 'Your bottomless bag is... seemingly empty?', approvedVisualAssets.emptyStates.cart],
+    [
+      EmptyCart,
+      'Your bottomless bag is... seemingly empty?',
+      approvedVisualAssets.emptyStates.cart,
+    ],
     [EmptyWishlist, 'No favorites yet', approvedVisualAssets.emptyStates.wishlist],
     [EmptySearch, 'No results found', approvedVisualAssets.emptyStates.search],
     [EmptyOrders, 'No orders yet', approvedVisualAssets.destinations.orders],

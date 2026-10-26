@@ -86,7 +86,7 @@ export const GAMES: GameDefinition[] = [
     icon: 'music',
   },
   {
-    id: 'bubble-girl',
+    id: 'bubble-ragdoll',
     slug: 'bubble-ragdoll',
     title: 'Bubble Ragdoll',
     description: 'Spawn bubbles, float and score. Sandbox or challenge mode.',
@@ -102,7 +102,7 @@ export const GAMES: GameDefinition[] = [
     difficulty: 'easy',
     category: 'puzzle',
     tags: ['bubble', 'puzzle', 'relaxing'],
-    thumbnail: '/games/thumbnails/bubble-girl.jpg',
+    thumbnail: '/assets/games/hub/game-bubble-ragdoll-hub.webp',
     icon: 'bubble',
   },
   {
@@ -162,7 +162,7 @@ export const GAMES: GameDefinition[] = [
     difficulty: 'hard',
     category: 'adventure',
     tags: ['roguelike', 'dungeon', 'anime', 'adult'],
-    thumbnail: '/games/thumbnails/dungeon-of-desire.jpg',
+    thumbnail: '/assets/games/hub/game-dungeon-of-desire-hub.webp',
     icon: 'dungeon',
   },
   {
@@ -182,7 +182,7 @@ export const GAMES: GameDefinition[] = [
     difficulty: 'hard',
     category: 'action',
     tags: ['fighting', 'tournament', 'anime', 'adult'],
-    thumbnail: '/games/thumbnails/thigh-coliseum.jpg',
+    thumbnail: '/assets/games/hub/game-thigh-colosseum-hub.webp',
     icon: 'arena',
   },
   {
@@ -202,7 +202,7 @@ export const GAMES: GameDefinition[] = [
     difficulty: 'medium',
     category: 'puzzle',
     tags: ['puzzle', 'reveal', 'art'],
-    thumbnail: '/games/thumbnails/puzzle-reveal.jpg',
+    thumbnail: '/assets/games/hub/game-puzzle-reveal-hub.webp',
     icon: 'puzzle',
   },
 ];
