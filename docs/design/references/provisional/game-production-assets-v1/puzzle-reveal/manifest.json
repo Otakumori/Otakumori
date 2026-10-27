@@ -21,7 +21,7 @@
     ],
     "superseded": "puzzle_reveal_foxfire_data_reliquary_v1",
     "approvedReplacement": "puzzle_reveal_foxfire_data_reliquary_v2",
-    "replacementSourceStatus": "MISSING_SOURCE_BINARY"
+    "replacementSourceStatus": "PROMOTED_TO_APPROVED_MASTER"
   },
   "assets": [
     {
@@ -93,11 +93,15 @@
     {
       "id": "puzzle_reveal_foxfire_data_reliquary_v2",
       "filename": "puzzle-reveal-foxfire-data-reliquary-v2.png",
-      "subjectCategory": "ancient kitsune reliquary guardian",
-      "authorityState": "MISSING",
-      "ownerApproved": false,
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.png",
+      "subjectCategory": "SACRED_CREATURE",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3435195,
+      "sha256": "8D993431CF93A9CFCBEE2809DDEA7BF3C554FBC4C59F90F490B47D6FB3AE5469",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true,
       "ownerApprovedDirection": true,
-      "sourceBinaryAvailable": false,
+      "sourceBinaryAvailable": true,
       "supersedes": "puzzle_reveal_foxfire_data_reliquary_v1"
     }
   ]

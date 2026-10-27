@@ -395,7 +395,7 @@
       "purpose": "Existing approved recovered-memory artwork and launch cover",
       "state": "INTEGRATED",
       "format": "webp",
-      "dimensions": { "width": 1024, "height": 1536 },
+      "dimensions": { "width": 800, "height": 600 },
       "source": {
         "path": "docs/design/references/approved/batch-2/games/covers/game-puzzle-reveal-cover-source.png",
         "availability": "LOCAL",
@@ -405,14 +405,18 @@
         "licenseReference": "content/puzzle-reveal-art.manifest.json"
       },
       "runtime": {
-        "path": "public/assets/games/covers/game-puzzle-reveal-cover.webp",
-        "sha256": "22FA43B00FA70F7CB7E9CF0331BB1B5B91513A1EF98F36E988BD278AC60F35C1",
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-cover-v1.webp",
+        "sha256": "C5066D4FA6F2214759614F27D1B10EBEED2996DD4095374B01FB2807DE40E7C4",
         "integrated": true,
         "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] },
-      "notes": "Integrated existing member of the eight-artwork core pack. Pack-level QA remains blocked by the missing fox v2 source."
+      "notes": "Integrated existing member of the eight-artwork core pack using a dedicated 4:3 reveal derivative; the separately approved portrait cover remains unchanged."
     },
     {
       "id": "puzzle_reveal_hub_v1",
@@ -421,7 +425,7 @@
       "purpose": "Existing approved recovered-memory artwork and Game Hub presentation",
       "state": "INTEGRATED",
       "format": "webp",
-      "dimensions": { "width": 1024, "height": 1024 },
+      "dimensions": { "width": 800, "height": 600 },
       "source": {
         "path": "docs/design/references/approved/batch-2/games/hub/game-puzzle-reveal-hub-source.png",
         "availability": "LOCAL",
@@ -431,21 +435,25 @@
         "licenseReference": "content/puzzle-reveal-art.manifest.json"
       },
       "runtime": {
-        "path": "public/assets/games/hub/game-puzzle-reveal-hub.webp",
-        "sha256": "3FE221A0040BD4CBA788799F667322E097002D6F08E8B54AD80C6BE92A33D9C3",
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-hub-v1.webp",
+        "sha256": "4025801C3447EB4B1283255BF346D60AE6F967F2A6B35EFAB70BAFDA03895D22",
         "integrated": true,
         "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] },
-      "notes": "Integrated existing member of the eight-artwork core pack. Pack-level QA remains blocked by the missing fox v2 source."
+      "notes": "Integrated existing member of the eight-artwork core pack using a dedicated 4:3 reveal derivative; the separately approved square Game Hub artwork remains unchanged."
     },
     {
       "id": "puzzle_reveal_shrine_circuit_oracle_v1",
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Intimate shrine-oracle recovered-memory artwork",
-      "state": "RUNTIME_READY",
+      "state": "INTEGRATED",
       "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
       "technical": { "bytes": 211268 },
@@ -460,10 +468,14 @@
       "runtime": {
         "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.webp",
         "sha256": "5FE116C74FA9F4B61819BF03782CDC678869EDC94138DA6C1DB93AE6FF89B87B",
-        "integrated": false,
-        "integrationReferences": []
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] }
     },
     {
@@ -471,7 +483,7 @@
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Monumental machine-bodhisattva recovered-memory artwork",
-      "state": "RUNTIME_READY",
+      "state": "INTEGRATED",
       "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
       "technical": { "bytes": 209026 },
@@ -486,10 +498,14 @@
       "runtime": {
         "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.webp",
         "sha256": "AA135C9946481F27C9153FF6F2E8448D3B2366FD3CB16BFD067264EF5E324977",
-        "integrated": false,
-        "integrationReferences": []
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] }
     },
     {
@@ -497,7 +513,7 @@
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Monumental sacred-tree recovered-memory artwork",
-      "state": "RUNTIME_READY",
+      "state": "INTEGRATED",
       "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
       "technical": { "bytes": 216592 },
@@ -512,10 +528,14 @@
       "runtime": {
         "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.webp",
         "sha256": "5737AD0C16BD1DC0A9B0C4E42E08D0072F2395702DBC0589FD4CB1913DA339FC",
-        "integrated": false,
-        "integrationReferences": []
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] }
     },
     {
@@ -523,7 +543,7 @@
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Intimate memory-well ritual recovered-memory artwork",
-      "state": "RUNTIME_READY",
+      "state": "INTEGRATED",
       "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
       "technical": { "bytes": 189900 },
@@ -538,10 +558,14 @@
       "runtime": {
         "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.webp",
         "sha256": "35B9AABAD37D435CDEFE7B9E83B4AA1C52F71805E686BE1A8A0E09C4C9C9817A",
-        "integrated": false,
-        "integrationReferences": []
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] }
     },
     {
@@ -549,7 +573,7 @@
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Monumental guardian-gate recovered-memory artwork",
-      "state": "RUNTIME_READY",
+      "state": "INTEGRATED",
       "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
       "technical": { "bytes": 198456 },
@@ -564,10 +588,14 @@
       "runtime": {
         "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.webp",
         "sha256": "105ABDD692463FBA4114B6F717DA181CA679CABD31F3E52B033DB795B55B2ABF",
-        "integrated": false,
-        "integrationReferences": []
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
       },
-      "ownerApproval": { "required": true, "approved": true, "evidence": "content/puzzle-reveal-art.manifest.json" },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] }
     },
     {
@@ -596,12 +624,31 @@
       "family": "game.puzzle-reveal.reveal-art-v1",
       "surface": "Puzzle Reveal",
       "purpose": "Owner-selected ancient black kitsune reliquary guardian replacement",
-      "state": "MISSING",
-      "format": "png",
+      "state": "INTEGRATED",
+      "format": "webp",
       "dimensions": { "width": 800, "height": 600 },
-      "ownerApproval": { "required": true, "approved": false },
+      "technical": { "bytes": 227704 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.png",
+        "availability": "LOCAL",
+        "sha256": "8D993431CF93A9CFCBEE2809DDEA7BF3C554FBC4C59F90F490B47D6FB3AE5469",
+        "provenance": "Owner-approved generated artwork supplied directly by the owner",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.webp",
+        "sha256": "73C01609013B39DFCCEAD86AE7E33CF2F4832C726AE6D35F8ECD749A19842302",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "Owner-supplied session attachment; content/puzzle-reveal-art.manifest.json"
+      },
       "qa": { "passed": false, "evidence": [] },
-      "notes": "Owner approved the replacement visual direction, but the exact source binary is not present. Source checksum, master dimensions, derivative, and asset-level approval evidence remain unavailable; no approximation is authorized."
+      "notes": "Version 2 supersedes puzzle_reveal_foxfire_data_reliquary_v1. Exact source master and derivative checksums are recorded separately."
     },
     {
       "id": "avatar.base.legacy-human-male-female-v1",

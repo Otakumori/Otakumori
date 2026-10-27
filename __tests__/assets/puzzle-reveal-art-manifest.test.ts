@@ -18,7 +18,7 @@ type PuzzleRevealManifest = {
   targetArtworkCount: number;
   runtimeReadyArtworkCount: number;
   integrationState: string;
-  integrationBlockedBy: string;
+  integrationBlockedBy: string | null;
   artworks: Artwork[];
   superseded: Array<{
     id: string;
@@ -40,29 +40,31 @@ const checksum = (repositoryPath: string) =>
     .toUpperCase();
 
 describe('Puzzle Reveal production art authority', () => {
-  it('defines exactly eight distinct pack slots and blocks activation on the missing fox v2 source', () => {
+  it('defines and activates exactly eight distinct approved pack slots', () => {
     expect(manifest.targetArtworkCount).toBe(8);
     expect(manifest.artworks).toHaveLength(8);
     expect(new Set(manifest.artworks.map(({ id }) => id)).size).toBe(8);
-    expect(manifest.runtimeReadyArtworkCount).toBe(7);
-    expect(manifest.integrationState).toBe('BLOCKED_MISSING_APPROVED_SOURCE');
-    expect(manifest.integrationBlockedBy).toBe('puzzle_reveal_foxfire_data_reliquary_v2');
+    expect(manifest.runtimeReadyArtworkCount).toBe(8);
+    expect(manifest.integrationState).toBe('INTEGRATED');
+    expect(manifest.integrationBlockedBy).toBeNull();
 
     const foxV2 = manifest.artworks.find(
       ({ id }) => id === 'puzzle_reveal_foxfire_data_reliquary_v2',
     );
     expect(foxV2).toMatchObject({
-      authorityState: 'MISSING',
-      master: null,
-      runtime: null,
+      authorityState: 'INTEGRATED',
+      master:
+        'docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.png',
+      runtime:
+        'public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.webp',
       supersedes: 'puzzle_reveal_foxfire_data_reliquary_v1',
     });
   });
 
   it('keeps the superseded fox v1 out of the active pack while preserving its source evidence', () => {
-    expect(manifest.artworks.some(({ id }) => id === 'puzzle_reveal_foxfire_data_reliquary_v1')).toBe(
-      false,
-    );
+    expect(
+      manifest.artworks.some(({ id }) => id === 'puzzle_reveal_foxfire_data_reliquary_v1'),
+    ).toBe(false);
 
     const foxV1 = manifest.superseded.find(
       ({ id }) => id === 'puzzle_reveal_foxfire_data_reliquary_v1',
@@ -73,7 +75,7 @@ describe('Puzzle Reveal production art authority', () => {
   });
 
   it('matches every available master and runtime artifact to its recorded checksum', () => {
-    for (const artwork of manifest.artworks.filter(({ authorityState }) => authorityState !== 'MISSING')) {
+    for (const artwork of manifest.artworks) {
       expect(artwork.master).not.toBeNull();
       expect(artwork.runtime).not.toBeNull();
       expect(artwork.master && existsSync(join(root, artwork.master))).toBe(true);
@@ -84,9 +86,7 @@ describe('Puzzle Reveal production art authority', () => {
   });
 
   it('preserves subject diversity rather than cloning one visual template', () => {
-    const categories = manifest.artworks
-      .filter(({ authorityState }) => authorityState !== 'MISSING')
-      .map(({ subjectCategory }) => subjectCategory);
+    const categories = manifest.artworks.map(({ subjectCategory }) => subjectCategory);
     expect(new Set(categories).size).toBe(categories.length);
   });
 });
