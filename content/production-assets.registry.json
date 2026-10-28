@@ -651,6 +651,368 @@
       "notes": "Version 2 supersedes puzzle_reveal_foxfire_data_reliquary_v1. Exact source master and derivative checksums are recorded separately."
     },
     {
+      "id": "petal_samurai_moonlit_shrine_arena_v1",
+      "family": "game.petal-samurai.environment-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Primary moonlit shrine arena and gameplay-environment authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/petal-samurai/environment/petal-samurai_moonlit-shrine-arena_v1.png",
+        "availability": "LOCAL",
+        "sha256": "D8A7ADEB7DDB629194946E481752C0FEC5D6C790057D7B2A2FB09627F6EFC4B9",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; runtime derivative and integration require separate validation."
+    },
+    {
+      "id": "dungeon_of_desire_spectral_climax_arena_v1",
+      "family": "game.dungeon-of-desire.environment-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Deep-floor and boss-climax environment authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 940 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/dungeon-of-desire/environment/dungeon-of-desire_spectral-climax-arena_v1.png",
+        "availability": "LOCAL",
+        "sha256": "2B7929EF980F6F27ECCF6A11A6103AC7BE77F67E81FEE9F71D59CE9A95723CD7",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; not authority for every dungeon floor."
+    },
+    {
+      "id": "maid_cafe_manager_grand_teahouse_environment_v1",
+      "family": "game.maid-cafe-manager.environment-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Primary cafe environment, material, and hospitality authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/maid-cafe-manager/environment/maid-cafe-manager_grand-teahouse-environment_v1.png",
+        "availability": "LOCAL",
+        "sha256": "B2BA7EB1F14AF0D1C5E05118ED9A630E6323FD5A673B314A9035F9594155398E",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; runtime derivative and integration require separate validation."
+    },
+    {
+      "id": "otaku_beat_em_up_rainy_shrine_town_stage_v1",
+      "family": "game.otaku-beat-em-up.environment-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Rainy shrine-town side-scroller, parallax, and action-plane authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/otaku-beat-em-up/environment/otaku-beat-em-up_rainy-shrine-town-stage_v1.png",
+        "availability": "LOCAL",
+        "sha256": "7B77113FC990DEE06A3A525DE6E50E8343E3605810B08A708D6F626EF218AE75",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; gameplay foreground must remain visually quiet."
+    },
+    {
+      "id": "petal_samurai_slice_result_scene_candidate_v1",
+      "family": "game.petal-samurai.result-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Slice and result presentation direction",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slice-result-scene_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "23341C0B7F263891FD4CF4A2AC70DE5AD6FCE63CCB397D6BEABF9F79737CE7C9",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Transparent slash and judgment VFX sheet",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1536, "height": 1024 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_moonlit_bubble_arena_candidate_v1",
+      "family": "game.bubble-ragdoll.environment-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Primary moonlit bubble arena candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_moonlit-bubble-arena_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "37563642088A7967E2A051C909BD441459B82E3F435DD6D983EA707A6828DAA8",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_bubble_vfx_sheet_candidate_v1",
+      "family": "game.bubble-ragdoll.vfx-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Ornate transparent bubble and result VFX sheet",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_bubble-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "16C11B453404640E73F5204E5B0AFD93A5C003799FA96CC04536C53DB797C843",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_bubble_vfx_sheet_alt_candidate_v2",
+      "family": "game.bubble-ragdoll.vfx-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Restrained transparent bubble VFX alternative",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1024, "height": 1536 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_bubble-vfx-sheet_alt_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "3C28B25E67A653DF49254252361C211F0F58D1828FF3EBD65E316FC4218867A9",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_storm_rhythm_celestial_lane_stage_candidate_v1",
+      "family": "game.petal-storm-rhythm.environment-v1",
+      "surface": "Petal Storm Rhythm",
+      "purpose": "Five-lane celestial shrine stage candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-storm-rhythm/petal-storm-rhythm_celestial-lane-stage_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "6AA30A6F23B98F1CA17EE8780AC122A5662F2E51EBF0D4EDA94908DEF35FE219",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_storm_rhythm_note_glyph_sheet_candidate_v1",
+      "family": "game.petal-storm-rhythm.note-v1",
+      "surface": "Petal Storm Rhythm",
+      "purpose": "Transparent five-glyph note family candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 2172, "height": 724 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-storm-rhythm/petal-storm-rhythm_note-glyph-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "2FC0F03BB7341208BAC93B6E2F4A0EB8368757CCA50A1A8274B4A259E1CEBB1A",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_subterranean_reliquary_candidate_v1",
+      "family": "game.dungeon-of-desire.environment-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Mid and deep floor environment candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_subterranean-reliquary_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "213BD906733E9790119512335780B76735E433E9CB656A2F461ABF3BB8F5E19E",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_wraith_regal_candidate_v1",
+      "family": "game.dungeon-of-desire.character-concept-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Regal wraith character concept A",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1086, "height": 1448 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_wraith-regal_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "A5DFE73751AF95FE6075737BAD7EC97ABA12F2D580E8EB69A29B1A4BD09228AE",
+        "provenance": "Owner-supplied concept art; not a gameplay sprite",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_wraith_oni_candidate_v2",
+      "family": "game.dungeon-of-desire.character-concept-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Oni wraith character concept B",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_wraith-oni_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "8FB7EBE25FB7BED1B76D7458B97F16B994E07A79FEDAE315A04F9423CC005064",
+        "provenance": "Owner-supplied concept art; not a gameplay sprite",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "maid_cafe_manager_staff_family_alt_candidate_v1",
+      "family": "game.maid-cafe-manager.character-concept-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Staff-family concept alternative",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/maid-cafe-manager/maid-cafe-manager_staff-family_alt_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "47AC552FECC496341382E22BFE114C3C9E8B605484A1C16B28FA9112FC4D6302",
+        "provenance": "Owner-supplied concept art; not runtime portraits",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "maid_cafe_manager_staff_family_candidate_v2",
+      "family": "game.maid-cafe-manager.character-concept-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Preferred staff and customer family concept",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/maid-cafe-manager/maid-cafe-manager_staff-family_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "3F13EC9B35E58775A54E2C30E2F00C59551F2B2CC592D345350981B8E2F86EA6",
+        "provenance": "Owner-supplied concept art; not runtime portraits",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "otaku_beat_em_up_fighter_enemy_lineup_candidate_v1",
+      "family": "game.otaku-beat-em-up.character-concept-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Fighter and enemy silhouette concept",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/otaku-beat-em-up/otaku-beat-em-up_fighter-enemy-lineup_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "E890E07A9E78CADDA9BB25B12B54775EF5E278678D7AEF239E4485907BD9933C",
+        "provenance": "Owner-supplied concept art; not gameplay sprites",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "otaku_beat_em_up_victory_result_candidate_v1",
+      "family": "game.otaku-beat-em-up.result-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Victory and result composition candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/otaku-beat-em-up/otaku-beat-em-up_victory-result_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "EAF82FF84953B26A6691A05C91FBFDE5B0F82A64AC4366AAE94D58FEAB6C67DE",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
       "id": "avatar.base.legacy-human-male-female-v1",
       "family": "avatar.base.legacy-v1",
       "surface": "Avatar Creator / Commander",

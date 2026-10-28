@@ -15,8 +15,9 @@ describe('production asset registry', () => {
     const result = validateProductionAssetRegistry(registry);
 
     expect(result.errors).toEqual([]);
-    expect(result.counts.INTEGRATED).toBe(6);
-    expect(result.counts.CANDIDATE).toBe(7);
+    expect(result.counts.INTEGRATED).toBe(14);
+    expect(result.counts.CANDIDATE).toBe(21);
+    expect(result.counts.OWNER_APPROVED).toBe(4);
     expect(result.counts.MISSING).toBe(0);
   });
 
