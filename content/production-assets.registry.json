@@ -1,0 +1,1227 @@
+{
+  "version": 1,
+  "stateModel": [
+    "MISSING",
+    "CONCEPT",
+    "CANDIDATE",
+    "OWNER_APPROVED",
+    "RUNTIME_READY",
+    "INTEGRATED",
+    "QA_PASSED",
+    "DEFERRED",
+    "REJECTED"
+  ],
+  "legacyAuthorities": [
+    {
+      "path": "public/assets/manifest.json",
+      "role": "legacy runtime inventory"
+    },
+    {
+      "path": "content/assets.manifest.json",
+      "role": "legacy content declarations"
+    },
+    {
+      "path": "assets-roles.json",
+      "role": "game runtime role mapping"
+    },
+    {
+      "path": "app/lib/assets/registry.json",
+      "role": "legacy avatar slot registry"
+    },
+    {
+      "path": "public/assets/credits.json",
+      "role": "legacy licensing credits"
+    }
+  ],
+  "assets": [
+    {
+      "id": "home.world.early-morning.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Early-morning Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-01-early-morning-wide.png",
+        "availability": "LOCAL",
+        "sha256": "9E61FF7318C2609809E7DE22C2EB646C64DEECA72CF89F41AED54FE6C3CABB5F",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-01-early-morning-wide.png",
+        "sha256": "9E61FF7318C2609809E7DE22C2EB646C64DEECA72CF89F41AED54FE6C3CABB5F",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.morning.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Morning Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-02-morning-wide.png",
+        "availability": "LOCAL",
+        "sha256": "68A62CC58ACFB649F8F56D946B28A857576F44BEA1432A0F8C035EDE2943BD08",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-02-morning-wide.png",
+        "sha256": "68A62CC58ACFB649F8F56D946B28A857576F44BEA1432A0F8C035EDE2943BD08",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.afternoon.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Afternoon Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-03-afternoon-wide.png",
+        "availability": "LOCAL",
+        "sha256": "1AF58ACCF8ADD8366BFBCE20005630727D2CD9BACC5647B3C16C2156324B87E5",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-03-afternoon-wide.png",
+        "sha256": "1AF58ACCF8ADD8366BFBCE20005630727D2CD9BACC5647B3C16C2156324B87E5",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.late-afternoon.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Late-afternoon Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-04-late-afternoon-wide.png",
+        "availability": "LOCAL",
+        "sha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-04-late-afternoon-wide.png",
+        "sha256": "1BD630C31B5CBD7E4D01259E726F2DCF8F59BB7A891FC16D1C620140DAF93861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.night.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Night Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-05-night-wide.png",
+        "availability": "LOCAL",
+        "sha256": "486FAB4A45C070053C6C640379482CDEBD5CFC46E509C7DDAC93C403A0131015",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-05-night-wide.png",
+        "sha256": "486FAB4A45C070053C6C640379482CDEBD5CFC46E509C7DDAC93C403A0131015",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; exact-source Night QA exists but Home-level owner review remains pending."
+    },
+    {
+      "id": "home.world.special-twilight.wide-v1",
+      "family": "home.world.wide-v1",
+      "surface": "Home",
+      "purpose": "Special-twilight Surface to roots to Underground world master",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1325, "height": 1187 },
+      "source": {
+        "path": "docs/design/references/home-world-wide-approved/om-home-world-06-special-twilight-wide.png",
+        "availability": "LOCAL",
+        "sha256": "853291A83B3235AA1EEAFCB7EE38DE025E1E8F7653D2A865704980E6482844C6",
+        "provenance": "Owner-provided approved combined Home wide authority",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-06-special-twilight-wide.png",
+        "sha256": "853291A83B3235AA1EEAFCB7EE38DE025E1E8F7653D2A865704980E6482844C6",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "docs/design/references/home-world-wide-approved"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated asset; Home-level owner visual closure remains pending."
+    },
+    {
+      "id": "home.world.early-morning.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Early-morning portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-01-early-morning-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "B54F80B77C550F958DE74460AFD5B119B5A855C6A11D36740B4C943652DCDBAF",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved early-morning wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-01-early-morning-portrait.webp",
+        "sha256": "25A9765A17D5058BCF706D1A2DDEAD7DC04ED436C52BBDC948AE49270B506A06",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.morning.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Morning portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-02-morning-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "899F19940F613876560F21165D1CE07664B8A22BCB86287756E1D2EA7C5BF71A",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved morning wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-02-morning-portrait.webp",
+        "sha256": "09D259604FCB8F75F5BB3D01A9C0B89B9090B977D95D708700FD6935508AD0CF",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.afternoon.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Afternoon portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-03-afternoon-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "408EC4C63E2C08C9ACC60F15A0BC4111A82EBC6D585D75F152E4963C223858DC",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved afternoon wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-03-afternoon-portrait.webp",
+        "sha256": "217044B74DE0831F538ED161F2262C7912B0726B253D4D46DB7A6DD8D82CBCF1",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.late-afternoon.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Canonical portrait geometry authority and late-afternoon world master",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-04-late-afternoon-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "0A1632EB872DC9B97797A923852A8961811BF5BC9B0D54D7B024DA0E8E035014",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled AI-assisted portrait recomposition from the approved late-afternoon combined wide master",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-04-late-afternoon-portrait.webp",
+        "sha256": "AC9331CDBFE654BF5D4C384A98A975FF74D2D103937F4BB6C2D4E1A3A1B675EB",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false, "geometryApproved": true },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Owner approved the composition as canonical family geometry; final integrated Home visual approval remains pending."
+    },
+    {
+      "id": "home.world.night.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Night portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-05-night-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "9427FC8ADDF322B1826EE643CEDEE03D9A77533906547544A568F61F44E97B0B",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved Night wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-05-night-portrait.webp",
+        "sha256": "C34ADB74DE568EEDD8EE6E9F984D5A085E8FCAB5E1FC44EC2F0373106422060F",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "home.world.special-twilight.portrait-v1",
+      "family": "home.world.portrait-v1",
+      "surface": "Home",
+      "purpose": "Special-twilight portrait world master using approved portrait geometry",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 853, "height": 1844 },
+      "source": {
+        "path": "docs/design/references/home-world-portrait-candidates/om-home-world-06-special-twilight-portrait.png",
+        "availability": "PENDING_MERGE",
+        "sha256": "2D8EA43134DC2C99826FD5A2EF5ECBF80C51D95F6DC1AC3335366DA913D2192B",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "provenance": "Controlled lighting transfer from the approved special-twilight wide master onto owner-approved portrait geometry",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "docs/design/production-authority/otaku-mori-home-portrait-asset-authority-v1.md"
+      },
+      "runtime": {
+        "path": "public/assets/home/world/combined/om-home-world-06-special-twilight-portrait.webp",
+        "sha256": "7BD4086A45C05B7326A5AFC8B6D96B7F30EE2277B78E8020B4E6919FF8AF92BC",
+        "availability": "PENDING_MERGE",
+        "sourceRef": "codex/home-flagship-closure@acc131fddd5db5ea5d8e8dccf3e8b51563639861",
+        "integrated": true,
+        "integrationReferences": ["app/components/hero/homeScene.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated only for final Home owner review; candidate state is intentionally preserved."
+    },
+    {
+      "id": "puzzle_reveal_cover_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Existing approved recovered-memory artwork and launch cover",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "source": {
+        "path": "docs/design/references/approved/batch-2/games/covers/game-puzzle-reveal-cover-source.png",
+        "availability": "LOCAL",
+        "sha256": "D4823B2D2120AD86755C811E808961C32D580D5F275CA3991188EBB1CAC35053",
+        "provenance": "Otaku-mori approved Puzzle Reveal production artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-cover-v1.webp",
+        "sha256": "C5066D4FA6F2214759614F27D1B10EBEED2996DD4095374B01FB2807DE40E7C4",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated existing member of the eight-artwork core pack using a dedicated 4:3 reveal derivative; the separately approved portrait cover remains unchanged."
+    },
+    {
+      "id": "puzzle_reveal_hub_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Existing approved recovered-memory artwork and Game Hub presentation",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "source": {
+        "path": "docs/design/references/approved/batch-2/games/hub/game-puzzle-reveal-hub-source.png",
+        "availability": "LOCAL",
+        "sha256": "254C000A00C688F0B14516B2CDF793A58C673AA37AB22BDC5F418383CDD66520",
+        "provenance": "Otaku-mori approved Puzzle Reveal production artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-hub-v1.webp",
+        "sha256": "4025801C3447EB4B1283255BF346D60AE6F967F2A6B35EFAB70BAFDA03895D22",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Integrated existing member of the eight-artwork core pack using a dedicated 4:3 reveal derivative; the separately approved square Game Hub artwork remains unchanged."
+    },
+    {
+      "id": "puzzle_reveal_shrine_circuit_oracle_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Intimate shrine-oracle recovered-memory artwork",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 211268 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.png",
+        "availability": "LOCAL",
+        "sha256": "9BF9A0C8A1B46BA9955BCF6825967204E230446FD04416E5E503563453431318",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.webp",
+        "sha256": "5FE116C74FA9F4B61819BF03782CDC678869EDC94138DA6C1DB93AE6FF89B87B",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_kintsugi_machine_bodhisattva_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental machine-bodhisattva recovered-memory artwork",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 209026 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.png",
+        "availability": "LOCAL",
+        "sha256": "F4915B3CC4036E17057411CFE6EE402BF0AD99131DD19BED6BBAD04EAF7B235A",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.webp",
+        "sha256": "AA135C9946481F27C9153FF6F2E8448D3B2366FD3CB16BFD067264EF5E324977",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_sakura_singularity_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental sacred-tree recovered-memory artwork",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 216592 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.png",
+        "availability": "LOCAL",
+        "sha256": "EDEA8A56E58AAA0BAAA6163C6E1B810CF07457990C9C946E7CEEE78490A63FC1",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.webp",
+        "sha256": "5737AD0C16BD1DC0A9B0C4E42E08D0072F2395702DBC0589FD4CB1913DA339FC",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_memory_well_archivist_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Intimate memory-well ritual recovered-memory artwork",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 189900 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C7F5DB2E711D6000F4721B25B1E78E326CC4A472501841DBE154940BB7A6B10B",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.webp",
+        "sha256": "35B9AABAD37D435CDEFE7B9E83B4AA1C52F71805E686BE1A8A0E09C4C9C9817A",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_celestial_komainu_gate_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Monumental guardian-gate recovered-memory artwork",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 198456 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "2156D5C28B555ABB939CE232AB60662928DD721E3A1DDAEB6477C721520B7D6B",
+        "provenance": "OpenAI-assisted Otaku-mori production artwork; owner approved without replacement",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.webp",
+        "sha256": "105ABDD692463FBA4114B6F717DA181CA679CABD31F3E52B033DB795B55B2ABF",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v1",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Superseded fox reliquary source retained as non-runtime evidence",
+      "state": "REJECTED",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "technical": { "bytes": 3493115 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/puzzle-reveal/puzzle-reveal-foxfire-data-reliquary-v1.png",
+        "availability": "LOCAL",
+        "sha256": "4D0444110330FB578ECC6C92AC8E0DA248FC1D68CCC903AD2D062B67AE119970",
+        "provenance": "OpenAI-assisted provisional Puzzle Reveal artwork",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "SUPERSEDED by puzzle_reveal_foxfire_data_reliquary_v2. Preserve as evidence; never activate at runtime."
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v2",
+      "family": "game.puzzle-reveal.reveal-art-v1",
+      "surface": "Puzzle Reveal",
+      "purpose": "Owner-selected ancient black kitsune reliquary guardian replacement",
+      "state": "INTEGRATED",
+      "format": "webp",
+      "dimensions": { "width": 800, "height": 600 },
+      "technical": { "bytes": 227704 },
+      "source": {
+        "path": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.png",
+        "availability": "LOCAL",
+        "sha256": "8D993431CF93A9CFCBEE2809DDEA7BF3C554FBC4C59F90F490B47D6FB3AE5469",
+        "provenance": "Owner-approved generated artwork supplied directly by the owner",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/puzzle-reveal-art.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.webp",
+        "sha256": "73C01609013B39DFCCEAD86AE7E33CF2F4832C726AE6D35F8ECD749A19842302",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/puzzle-reveal/puzzleRevealContent.ts"]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "Owner-supplied session attachment; content/puzzle-reveal-art.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Version 2 supersedes puzzle_reveal_foxfire_data_reliquary_v1. Exact source master and derivative checksums are recorded separately."
+    },
+    {
+      "id": "petal_samurai_moonlit_shrine_arena_v1",
+      "family": "game.petal-samurai.environment-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Primary moonlit shrine arena and gameplay-environment authority",
+      "state": "INTEGRATED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/petal-samurai/environment/petal-samurai_moonlit-shrine-arena_v1.png",
+        "availability": "LOCAL",
+        "sha256": "D8A7ADEB7DDB629194946E481752C0FEC5D6C790057D7B2A2FB09627F6EFC4B9",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/environment/petal-samurai-moonlit-shrine-arena-v1-desktop.webp",
+        "sha256": "428EB435FDEAAFD06A513F9F781612C5AB529D0C284984014CEBD64C4630B131",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts",
+          "content/petal-samurai-assets.manifest.json"
+        ]
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "The desktop runtime is canonical in this registry; the separately checksummed mobile portrait treatment is recorded in content/petal-samurai-assets.manifest.json. Owner review of the runtime crop remains open."
+    },
+    {
+      "id": "dungeon_of_desire_spectral_climax_arena_v1",
+      "family": "game.dungeon-of-desire.environment-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Deep-floor and boss-climax environment authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 940 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/dungeon-of-desire/environment/dungeon-of-desire_spectral-climax-arena_v1.png",
+        "availability": "LOCAL",
+        "sha256": "2B7929EF980F6F27ECCF6A11A6103AC7BE77F67E81FEE9F71D59CE9A95723CD7",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; not authority for every dungeon floor."
+    },
+    {
+      "id": "maid_cafe_manager_grand_teahouse_environment_v1",
+      "family": "game.maid-cafe-manager.environment-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Primary cafe environment, material, and hospitality authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/maid-cafe-manager/environment/maid-cafe-manager_grand-teahouse-environment_v1.png",
+        "availability": "LOCAL",
+        "sha256": "B2BA7EB1F14AF0D1C5E05118ED9A630E6323FD5A673B314A9035F9594155398E",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; runtime derivative and integration require separate validation."
+    },
+    {
+      "id": "otaku_beat_em_up_rainy_shrine_town_stage_v1",
+      "family": "game.otaku-beat-em-up.environment-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Rainy shrine-town side-scroller, parallax, and action-plane authority",
+      "state": "OWNER_APPROVED",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/approved/batch-4/games/otaku-beat-em-up/environment/otaku-beat-em-up_rainy-shrine-town-stage_v1.png",
+        "availability": "LOCAL",
+        "sha256": "7B77113FC990DEE06A3A525DE6E50E8343E3605810B08A708D6F626EF218AE75",
+        "provenance": "Owner-supplied game production source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": {
+        "required": true,
+        "approved": true,
+        "evidence": "content/game-production-assets-v1.manifest.json"
+      },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Source authority only; gameplay foreground must remain visually quiet."
+    },
+    {
+      "id": "petal_samurai_slice_result_scene_candidate_v1",
+      "family": "game.petal-samurai.result-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Slice and result presentation direction",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slice-result-scene_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "23341C0B7F263891FD4CF4A2AC70DE5AD6FCE63CCB397D6BEABF9F79737CE7C9",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/result/petal-samurai-slice-result-scene-candidate-v1.webp",
+        "sha256": "74B8D62D63CE127F150A347976C2719705F1C077FCACE2A3432385E720C85FAC",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts",
+          "app/mini-games/(games)/petal-samurai/GameWrapper.tsx"
+        ]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Candidate runtime integration is for owner visual review only; it is not approved production result art."
+    },
+    {
+      "id": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Transparent slash and judgment VFX sheet",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1536, "height": 1024 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_light_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Clean-cut judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 72202 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-left cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-light-v1.webp",
+        "sha256": "26963894163CEFC1B1A90291FD969A0FCF4B6B6E3A90EA932E012220641A3A5D",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_heavy_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Gold-petal judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 121780 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-center cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-heavy-v1.webp",
+        "sha256": "F94972336A450EE836B5A66CC28901666425B605F0F9D77502E79B83DC1702AA",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_cross_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Five-cut cadence feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 123468 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-right cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-cross-v1.webp",
+        "sha256": "8754297BA4A212D4F754A3ED35105FA02CB69A445F5E619E18E2CBED5EB799B3",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_vertical_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Vertical-gesture feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 130576 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-left cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-vertical-v1.webp",
+        "sha256": "EB1BBE696D7AD442ACF8A6AC6C89E8C3369C61C37E8D8566F3D84381C496EC6F",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_combo_ring_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Combo-milestone feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 148248 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-center cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-combo-ring-v1.webp",
+        "sha256": "584659206346858BCDA9EA9AC6B1F08EB74BB0E323DF7E26540CFB4D8FDFF0DE",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_perfect_bloom_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Perfect rare-petal judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 149380 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-right cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-perfect-bloom-v1.webp",
+        "sha256": "641A600CE35555C847AB4C91C2ED3225CF8D5D5C79DBCD00EA8F3F42DB6B7B19",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_moonlit_bubble_arena_candidate_v1",
+      "family": "game.bubble-ragdoll.environment-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Primary moonlit bubble arena candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_moonlit-bubble-arena_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "37563642088A7967E2A051C909BD441459B82E3F435DD6D983EA707A6828DAA8",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_bubble_vfx_sheet_candidate_v1",
+      "family": "game.bubble-ragdoll.vfx-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Ornate transparent bubble and result VFX sheet",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_bubble-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "16C11B453404640E73F5204E5B0AFD93A5C003799FA96CC04536C53DB797C843",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_bubble_vfx_sheet_alt_candidate_v2",
+      "family": "game.bubble-ragdoll.vfx-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Restrained transparent bubble VFX alternative",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1024, "height": 1536 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_bubble-vfx-sheet_alt_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "3C28B25E67A653DF49254252361C211F0F58D1828FF3EBD65E316FC4218867A9",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_storm_rhythm_celestial_lane_stage_candidate_v1",
+      "family": "game.petal-storm-rhythm.environment-v1",
+      "surface": "Petal Storm Rhythm",
+      "purpose": "Five-lane celestial shrine stage candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-storm-rhythm/petal-storm-rhythm_celestial-lane-stage_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "6AA30A6F23B98F1CA17EE8780AC122A5662F2E51EBF0D4EDA94908DEF35FE219",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_storm_rhythm_note_glyph_sheet_candidate_v1",
+      "family": "game.petal-storm-rhythm.note-v1",
+      "surface": "Petal Storm Rhythm",
+      "purpose": "Transparent five-glyph note family candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 2172, "height": 724 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-storm-rhythm/petal-storm-rhythm_note-glyph-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "2FC0F03BB7341208BAC93B6E2F4A0EB8368757CCA50A1A8274B4A259E1CEBB1A",
+        "provenance": "Owner-supplied candidate source package with verified alpha",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_subterranean_reliquary_candidate_v1",
+      "family": "game.dungeon-of-desire.environment-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Mid and deep floor environment candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_subterranean-reliquary_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "213BD906733E9790119512335780B76735E433E9CB656A2F461ABF3BB8F5E19E",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_wraith_regal_candidate_v1",
+      "family": "game.dungeon-of-desire.character-concept-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Regal wraith character concept A",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1086, "height": 1448 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_wraith-regal_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "A5DFE73751AF95FE6075737BAD7EC97ABA12F2D580E8EB69A29B1A4BD09228AE",
+        "provenance": "Owner-supplied concept art; not a gameplay sprite",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "dungeon_of_desire_wraith_oni_candidate_v2",
+      "family": "game.dungeon-of-desire.character-concept-v1",
+      "surface": "Dungeon of Desire",
+      "purpose": "Oni wraith character concept B",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/dungeon-of-desire/dungeon-of-desire_wraith-oni_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "8FB7EBE25FB7BED1B76D7458B97F16B994E07A79FEDAE315A04F9423CC005064",
+        "provenance": "Owner-supplied concept art; not a gameplay sprite",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "maid_cafe_manager_staff_family_alt_candidate_v1",
+      "family": "game.maid-cafe-manager.character-concept-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Staff-family concept alternative",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/maid-cafe-manager/maid-cafe-manager_staff-family_alt_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "47AC552FECC496341382E22BFE114C3C9E8B605484A1C16B28FA9112FC4D6302",
+        "provenance": "Owner-supplied concept art; not runtime portraits",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "maid_cafe_manager_staff_family_candidate_v2",
+      "family": "game.maid-cafe-manager.character-concept-v1",
+      "surface": "Maid Cafe Manager",
+      "purpose": "Preferred staff and customer family concept",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/maid-cafe-manager/maid-cafe-manager_staff-family_candidate-v2.png",
+        "availability": "LOCAL",
+        "sha256": "3F13EC9B35E58775A54E2C30E2F00C59551F2B2CC592D345350981B8E2F86EA6",
+        "provenance": "Owner-supplied concept art; not runtime portraits",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "otaku_beat_em_up_fighter_enemy_lineup_candidate_v1",
+      "family": "game.otaku-beat-em-up.character-concept-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Fighter and enemy silhouette concept",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/otaku-beat-em-up/otaku-beat-em-up_fighter-enemy-lineup_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "E890E07A9E78CADDA9BB25B12B54775EF5E278678D7AEF239E4485907BD9933C",
+        "provenance": "Owner-supplied concept art; not gameplay sprites",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "otaku_beat_em_up_victory_result_candidate_v1",
+      "family": "game.otaku-beat-em-up.result-v1",
+      "surface": "Otaku Beat-em-up",
+      "purpose": "Victory and result composition candidate",
+      "state": "CANDIDATE",
+      "format": "png",
+      "dimensions": { "width": 1672, "height": 941 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/otaku-beat-em-up/otaku-beat-em-up_victory-result_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "EAF82FF84953B26A6691A05C91FBFDE5B0F82A64AC4366AAE94D58FEAB6C67DE",
+        "provenance": "Owner-supplied candidate source package",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "avatar.base.legacy-human-male-female-v1",
+      "family": "avatar.base.legacy-v1",
+      "surface": "Avatar Creator / Commander",
+      "purpose": "Legacy rigged male/female base candidate pending production-base acceptance",
+      "state": "CANDIDATE",
+      "format": "glb",
+      "technical": {
+        "bytes": 898536,
+        "triangles": 37324,
+        "nodes": 1419,
+        "skins": 2,
+        "jointsPerSkin": [707, 701],
+        "materials": 2,
+        "animations": 0,
+        "morphTargetNames": [],
+        "compression": ["KHR_draco_mesh_compression"]
+      },
+      "source": {
+        "path": "public/assets/external/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "availability": "LOCAL",
+        "sha256": "DB5D80674B88B5D96143EA7536C8E06F7DAC448F746BCF95F8FEACCFB90AED44",
+        "provenance": "Sketchfab Human Male/Female Basemesh Rigged by Niclas Schoepe",
+        "licenseStatus": "LICENSED",
+        "licenseReference": "CC-BY-4.0; attribution and source are embedded in the GLB asset metadata"
+      },
+      "runtime": {
+        "path": "public/assets/optimized/base_mesh_rigged/human_malefemale_basemesh_rigged.glb",
+        "sha256": "52FB89AB876D7779FC5B355EAE1EDD548FBC3A166C6B823344346192C10C76D0",
+        "integrated": false,
+        "integrationReferences": ["public/assets/manifest.json", "packages/avatar/src/serialize.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Legacy declarations describe male/female morph targets, but the inspected source and optimized GLBs contain no morph targets or animation clips. Runtime references do not constitute production approval. The two high-joint-count skins and node count require DCC/runtime suitability review before either launch base can be derived from this candidate."
+    }
+  ]
+}

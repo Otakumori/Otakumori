@@ -5,9 +5,15 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
+import {
+  completePuzzleRevealRun,
+  createPuzzleRevealRun,
+  recordPuzzleRevealTile,
+} from './puzzleRevealRun';
 import {
   easingFunctions,
   createPetalBurst,
@@ -25,6 +31,7 @@ interface Tile {
   width: number;
   height: number;
   isRevealed: boolean;
+  isRevealing: boolean;
   particles: TileParticle[];
   revealProgress: number;
   comboMultiplier: number;
@@ -64,6 +71,10 @@ export default function EnhancedTileGame({
   onScoreChange,
   onComboChange,
   onGameEnd,
+  onReplay,
+  onBack,
+  personalBest,
+  petalReward,
   paused,
   physicsAvatarRef,
 }: {
@@ -72,6 +83,10 @@ export default function EnhancedTileGame({
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
+  onReplay?: () => void;
+  onBack?: () => void;
+  personalBest?: PersonalBestResult | null;
+  petalReward?: number | null;
   paused?: boolean;
   physicsAvatarRef?: React.RefObject<{
     applyImpact: (force: { x: number; y: number }, part: string) => void;
@@ -87,6 +102,9 @@ export default function EnhancedTileGame({
   const previousPausedRef = useRef(paused);
   const pauseStartedAtRef = useRef<number | null>(null);
   const resumeLoopRef = useRef<() => void>(() => {});
+  const isCompleteRef = useRef(false);
+  const runProgressRef = useRef(createPuzzleRevealRun(0));
+  const comboRef = useRef(0);
 
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
@@ -136,6 +154,9 @@ export default function EnhancedTileGame({
   useEffect(() => {
     const selectedArt = PUZZLE_REVEAL_CONTENT[contentIndex % PUZZLE_REVEAL_CONTENT.length]!;
     setCurrentArt(selectedArt);
+    isCompleteRef.current = false;
+    runProgressRef.current = createPuzzleRevealRun(0);
+    comboRef.current = 0;
 
     // Load image
     const img = new Image();
@@ -184,6 +205,7 @@ export default function EnhancedTileGame({
           width: tileWidth,
           height: tileHeight,
           isRevealed: false,
+          isRevealing: false,
           particles: [],
           revealProgress: 0,
           comboMultiplier: 1,
@@ -192,6 +214,7 @@ export default function EnhancedTileGame({
     }
 
     tilesRef.current = tiles;
+    runProgressRef.current = createPuzzleRevealRun(tiles.length);
     setGameState((prev) => ({
       ...prev,
       totalTiles: tiles.length,
@@ -199,39 +222,46 @@ export default function EnhancedTileGame({
   };
 
   // Handle tile click
-  const handleCanvasClick = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (gameState.isComplete || gameState.isPaused || !canvasRef.current) return;
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (
+      gameState.isComplete ||
+      gameState.isPaused ||
+      runProgressRef.current.completionScheduled ||
+      !canvasRef.current
+    )
+      return;
 
-      const canvas = canvasRef.current;
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-      const clickX = (event.clientX - rect.left) * scaleX;
-      const clickY = (event.clientY - rect.top) * scaleY;
+    const clickX = (event.clientX - rect.left) * scaleX;
+    const clickY = (event.clientY - rect.top) * scaleY;
 
-      // Find clicked tile
-      const clickedTile = tilesRef.current.find(
-        (tile) =>
-          !tile.isRevealed &&
-          clickX >= tile.x &&
-          clickX <= tile.x + tile.width &&
-          clickY >= tile.y &&
-          clickY <= tile.y + tile.height,
-      );
+    // Find clicked tile
+    const clickedTile = tilesRef.current.find(
+      (tile) =>
+        !tile.isRevealed &&
+        !tile.isRevealing &&
+        clickX >= tile.x &&
+        clickX <= tile.x + tile.width &&
+        clickY >= tile.y &&
+        clickY <= tile.y + tile.height,
+    );
 
-      if (clickedTile) {
-        revealTile(clickedTile);
-      }
-    },
-    [gameState.isComplete, gameState.isPaused],
-  );
+    if (clickedTile) {
+      revealTile(clickedTile);
+    }
+  };
 
   // Reveal tile with satisfying effects
   const revealTile = (tile: Tile) => {
+    if (tile.isRevealed || tile.isRevealing || runProgressRef.current.completionScheduled) return;
+
     // Start reveal animation (progress from 0 to 1)
     tile.revealProgress = 0;
+    tile.isRevealing = true;
 
     // Animate reveal progress
     const revealDuration = 300; // ms
@@ -245,6 +275,7 @@ export default function EnhancedTileGame({
         requestAnimationFrame(animateReveal);
       } else {
         tile.isRevealed = true;
+        tile.isRevealing = false;
         tile.revealProgress = 1;
       }
     };
@@ -263,7 +294,7 @@ export default function EnhancedTileGame({
         vy: Math.sin(angle) * speed - 1, // Slight upward bias
         life: 1.0,
         size: 4 + Math.random() * 6,
-        color: ['#ff9fbe', '#ec4899', '#ffc7d9', '#ff6bc1'][Math.floor(Math.random() * 4)],
+        color: ['#d8b06b', '#8b6a42', '#c98798', '#62564f'][Math.floor(Math.random() * 4)],
       });
     }
 
@@ -279,25 +310,32 @@ export default function EnhancedTileGame({
     const timeSinceLastClick = now - lastClickTimeRef.current;
     lastClickTimeRef.current = now;
 
-    let newCombo = gameState.combo;
+    let newCombo = comboRef.current;
     if (timeSinceLastClick < 500) {
       // Fast click - increase combo
-      newCombo = Math.min(gameState.combo + 1, 10);
+      newCombo = Math.min(comboRef.current + 1, 10);
     } else if (timeSinceLastClick > 2000) {
       // Too slow - reset combo
       newCombo = 0;
     }
+    comboRef.current = newCombo;
 
     // Calculate score
     const baseScore = 100;
     const comboBonus = newCombo * 50;
     const tileScore = baseScore + comboBonus;
 
-    const newScore = gameState.score + tileScore;
+    const revealResult = recordPuzzleRevealTile(runProgressRef.current, tileScore);
+    if (!revealResult.accepted) {
+      tile.isRevealing = false;
+      return;
+    }
+    runProgressRef.current = revealResult.progress;
+    const newScore = revealResult.progress.score;
     setGameState((prev) => ({
       ...prev,
       score: newScore,
-      tilesRevealed: prev.tilesRevealed + 1,
+      tilesRevealed: revealResult.progress.tilesRevealed,
       combo: newCombo,
       maxCombo: Math.max(prev.maxCombo, newCombo),
     }));
@@ -320,7 +358,7 @@ export default function EnhancedTileGame({
     }
 
     // Check for completion
-    if (gameState.tilesRevealed + 1 >= gameState.totalTiles) {
+    if (revealResult.shouldComplete) {
       // Trigger completion VFX
       setCompletionVfx({ active: true, scale: 1, opacity: 1 });
 
@@ -375,7 +413,7 @@ export default function EnhancedTileGame({
           requestAnimationFrame(animateCompletion);
         } else {
           setCompletionVfx({ active: false, scale: 1, opacity: 0 });
-          completeGame();
+          completeGame(newScore);
         }
       };
       animateCompletion();
@@ -420,12 +458,17 @@ export default function EnhancedTileGame({
   }, [petalParticles.length]);
 
   // Complete game
-  const completeGame = () => {
+  const completeGame = (revealedScore: number) => {
+    const completion = completePuzzleRevealRun(runProgressRef.current);
+    runProgressRef.current = completion.progress;
+    if (!completion.didComplete) return;
+
     const timeElapsed = Date.now() - startTimeRef.current;
     const { timeBonus } = GRID_SIZES[mode];
     const timeBonusScore = Math.max(0, timeBonus - Math.floor(timeElapsed / 1000) * 10);
-    const finalScore = gameState.score + timeBonusScore;
+    const finalScore = revealedScore + timeBonusScore;
 
+    isCompleteRef.current = true;
     setGameState((prev) => ({
       ...prev,
       isComplete: true,
@@ -449,6 +492,14 @@ export default function EnhancedTileGame({
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (isCompleteRef.current) {
+        ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(199, 151, 78, 0.72)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(1.5, 1.5, canvas.width - 3, canvas.height - 3);
+        return;
+      }
 
       // Draw tiles
       tilesRef.current.forEach((tile) => {
@@ -487,16 +538,16 @@ export default function EnhancedTileGame({
           );
           ctx.restore();
 
-          // Draw subtle glow border with intensity based on reveal progress
+          // Draw restrained recovered-memory fracture light.
           const glowIntensity = isRevealing ? tile.revealProgress : 1;
-          ctx.strokeStyle = `rgba(255, 155, 190, ${0.5 * glowIntensity})`;
+          ctx.strokeStyle = `rgba(202, 155, 84, ${0.42 * glowIntensity})`;
           ctx.lineWidth = 2;
           ctx.strokeRect(tile.x, tile.y, tile.width, tile.height);
 
           // Add pulse effect for newly revealed tiles
           if (isRevealing && tile.revealProgress > 0.8) {
             const pulse = Math.sin((tile.revealProgress - 0.8) * 5 * Math.PI) * 0.3;
-            ctx.strokeStyle = `rgba(236, 72, 153, ${0.8 + pulse})`;
+            ctx.strokeStyle = `rgba(224, 186, 116, ${0.68 + pulse})`;
             ctx.lineWidth = 3;
             ctx.strokeRect(tile.x - 2, tile.y - 2, tile.width + 4, tile.height + 4);
           }
@@ -518,17 +569,29 @@ export default function EnhancedTileGame({
           );
           ctx.restore();
 
-          // Draw dark overlay
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          // Petrified black-lacquer corruption layer.
+          ctx.fillStyle = 'rgba(10, 9, 8, 0.78)';
           ctx.fillRect(tile.x, tile.y, tile.width, tile.height);
 
+          const mineralVein = ctx.createLinearGradient(
+            tile.x,
+            tile.y,
+            tile.x + tile.width,
+            tile.y + tile.height,
+          );
+          mineralVein.addColorStop(0, 'rgba(42, 37, 32, 0.56)');
+          mineralVein.addColorStop(0.55, 'rgba(18, 16, 14, 0.2)');
+          mineralVein.addColorStop(1, 'rgba(114, 74, 51, 0.3)');
+          ctx.fillStyle = mineralVein;
+          ctx.fillRect(tile.x + 2, tile.y + 2, tile.width - 4, tile.height - 4);
+
           // Draw grid border
-          ctx.strokeStyle = 'rgba(236, 72, 153, 0.3)';
+          ctx.strokeStyle = 'rgba(172, 126, 70, 0.38)';
           ctx.lineWidth = 1;
           ctx.strokeRect(tile.x, tile.y, tile.width, tile.height);
 
-          // Draw hover effect (simplified - would need mouse tracking)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          // A restrained sakura fracture catches light through the crust.
+          ctx.fillStyle = 'rgba(190, 111, 128, 0.08)';
           ctx.fillRect(tile.x + 2, tile.y + 2, tile.width - 4, tile.height - 4);
         }
 
@@ -558,7 +621,7 @@ export default function EnhancedTileGame({
       if (completionVfx.active) {
         ctx.save();
         ctx.globalAlpha = completionVfx.opacity * 0.3;
-        ctx.fillStyle = 'rgba(236, 72, 153, 0.5)';
+        ctx.fillStyle = 'rgba(161, 115, 58, 0.36)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw radial pulse
@@ -570,9 +633,9 @@ export default function EnhancedTileGame({
           canvas.height / 2,
           Math.max(canvas.width, canvas.height) * completionVfx.scale,
         );
-        gradient.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
-        gradient.addColorStop(0.5, 'rgba(236, 72, 153, 0.4)');
-        gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+        gradient.addColorStop(0, 'rgba(229, 194, 125, 0.74)');
+        gradient.addColorStop(0.5, 'rgba(169, 116, 58, 0.3)');
+        gradient.addColorStop(1, 'rgba(84, 54, 32, 0)');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
@@ -583,7 +646,7 @@ export default function EnhancedTileGame({
         petalParticles.forEach((particle) => {
           ctx.save();
           ctx.globalAlpha = particle.alpha;
-          ctx.fillStyle = '#ec4899';
+          ctx.fillStyle = '#c98798';
           ctx.beginPath();
           ctx.arc(particle.x, particle.y, 4 * particle.scale, 0, Math.PI * 2);
           ctx.fill();
@@ -620,8 +683,8 @@ export default function EnhancedTileGame({
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-lg rounded-2xl">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-pink-200 font-medium">Preparing artwork...</p>
+            <div className="mx-auto mb-4 h-16 w-16 rounded-full border-4 border-amber-700/70 border-t-transparent motion-reduce:animate-none animate-spin" />
+            <p className="font-medium text-amber-100">Preparing recovered memory...</p>
           </div>
         </div>
       )}
@@ -644,110 +707,133 @@ export default function EnhancedTileGame({
         ref={canvasRef}
         width={800}
         height={600}
-        className="w-full h-auto cursor-pointer rounded-2xl border border-pink-500/20 shadow-2xl transition-all hover:border-pink-500/40"
+        className={`h-auto w-full rounded-2xl border border-amber-700/30 shadow-2xl transition-colors ${
+          gameState.isComplete ? 'cursor-default' : 'cursor-pointer hover:border-amber-500/50'
+        }`}
         onClick={handleCanvasClick}
-        aria-label="Puzzle Reveal game area - click tiles to reveal the hidden artwork"
+        aria-label={
+          gameState.isComplete
+            ? `${currentArt?.title ?? 'Recovered artwork'} fully restored`
+            : 'Puzzle Reveal game area - click tiles to reveal the hidden artwork'
+        }
       />
 
       {/* HUD Overlay */}
-      <div className="absolute top-4 left-4 flex flex-col gap-2">
-        <div className="bg-black/80 backdrop-blur-lg px-4 py-2 rounded-xl border border-pink-500/30 text-pink-200 font-medium">
-          Score: <span className="text-pink-400 font-bold">{gameState.score.toLocaleString()}</span>
-        </div>
-        <div className="bg-black/80 backdrop-blur-lg px-4 py-2 rounded-xl border border-pink-500/30 text-pink-200 font-medium">
-          Progress: <span className="text-pink-400 font-bold">{revealPercent}%</span>
-        </div>
-        {gameState.combo > 0 && (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-gradient-to-r from-pink-500/40 to-purple-500/40 backdrop-blur-lg px-4 py-2 rounded-xl border border-pink-400/50 text-white font-bold"
-          >
-            <span className="text-yellow-300 font-semibold" aria-hidden="true">
-              Combo
-            </span>{' '}
-            {gameState.combo}x COMBO!
-          </motion.div>
-        )}
-      </div>
-
-      {/* Art Info */}
-      {currentArt && (
-        <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-lg px-4 py-2 rounded-xl border border-pink-500/30 text-right">
-          <p className="text-pink-400 font-bold text-sm">{currentArt.title}</p>
-          <p className="text-pink-200/70 text-xs">by {currentArt.artist}</p>
+      {!gameState.isComplete && (
+        <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-2">
+          <div className="rounded-xl border border-amber-700/40 bg-stone-950/85 px-4 py-2 font-medium text-amber-100 backdrop-blur-lg">
+            Score:{' '}
+            <span className="font-bold text-amber-300">{gameState.score.toLocaleString()}</span>
+          </div>
+          <div className="rounded-xl border border-amber-700/40 bg-stone-950/85 px-4 py-2 font-medium text-amber-100 backdrop-blur-lg">
+            Progress: <span className="font-bold text-amber-300">{revealPercent}%</span>
+          </div>
+          {gameState.combo > 0 && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="rounded-xl border border-rose-300/30 bg-gradient-to-r from-stone-950/90 to-rose-950/55 px-4 py-2 font-bold text-white backdrop-blur-lg"
+            >
+              <span className="text-yellow-300 font-semibold" aria-hidden="true">
+                Combo
+              </span>{' '}
+              {gameState.combo}x COMBO!
+            </motion.div>
+          )}
         </div>
       )}
 
-      {/* Game Complete Screen */}
-      <AnimatePresence>
-        {gameState.isComplete && (
-          <motion.div
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center rounded-2xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="bg-gradient-to-br from-black/90 to-pink-900/20 backdrop-blur-xl border-2 border-pink-500/50 rounded-3xl p-8 text-center max-w-md mx-4 shadow-2xl"
-              initial={{ scale: 0.8, y: 50 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ type: 'spring', damping: 15 }}
-            >
-              <motion.h2
-                className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-6"
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                Masterpiece Revealed!
-              </motion.h2>
+      {/* Art Info */}
+      {currentArt && (
+        <div className="pointer-events-none absolute right-4 top-4 rounded-xl border border-amber-700/40 bg-stone-950/85 px-4 py-2 text-right backdrop-blur-lg">
+          <p className="text-sm font-bold text-amber-200">{currentArt.title}</p>
+          <p className="text-xs text-stone-300">by {currentArt.artist}</p>
+        </div>
+      )}
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-200">Final Score:</span>
-                  <span className="text-pink-400 font-bold text-xl">
-                    {gameState.score.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-200">Max Combo:</span>
-                  <span className="text-yellow-400 font-bold">{gameState.maxCombo}x</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-200">Difficulty:</span>
-                  <span className="text-purple-400 font-bold capitalize">{mode}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-200">Time:</span>
-                  <span className="text-blue-400 font-bold">{gameState.timeElapsed}s</span>
-                </div>
+      {gameState.isComplete && currentArt && (
+        <motion.section
+          aria-live="polite"
+          className="mt-4 rounded-2xl border border-amber-700/45 bg-gradient-to-br from-stone-950 via-stone-950 to-rose-950/35 p-4 text-stone-100 shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:p-5"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28 }}
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-400/80">
+                Recovered memory
+              </p>
+              <h2 className="mt-1 font-serif text-2xl font-semibold text-amber-100">
+                {currentArt.title}
+              </h2>
+              <p className="mt-1 text-sm text-stone-300">
+                The corrupted memory has been fully restored.
+              </p>
+            </div>
+
+            <dl className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm sm:grid-cols-4">
+              <div>
+                <dt className="text-stone-400">Score</dt>
+                <dd className="font-semibold text-amber-200">{gameState.score.toLocaleString()}</dd>
               </div>
-
-              <div className="bg-pink-500/10 border border-pink-500/30 rounded-lg p-4 mb-6">
-                <p className="text-pink-100 text-lg">
-                  <span className="text-2xl font-semibold" aria-hidden="true">
-                    Petal
-                  </span>{' '}
-                  Petals Earned:{' '}
-                  <span className="font-bold text-pink-400">
-                    {Math.floor(gameState.score / 100)}
-                  </span>
-                </p>
+              <div>
+                <dt className="text-stone-400">Time</dt>
+                <dd className="font-semibold text-amber-200">{gameState.timeElapsed}s</dd>
               </div>
+              <div>
+                <dt className="text-stone-400">Best combo</dt>
+                <dd className="font-semibold text-amber-200">{gameState.maxCombo}x</dd>
+              </div>
+              <div>
+                <dt className="text-stone-400">Difficulty</dt>
+                <dd className="font-semibold capitalize text-amber-200">{mode}</dd>
+              </div>
+            </dl>
+          </div>
 
-              <motion.button
-                className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-pink-500/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                onClick={() => window.location.reload()}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Play Again
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <div className="mt-4 flex flex-col gap-3 border-t border-amber-800/35 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-stone-300" role="status">
+              {personalBest?.status === 'unavailable' ? (
+                <span>Score not saved. The restored memory remains visible.</span>
+              ) : personalBest?.currentBest !== null && personalBest?.currentBest !== undefined ? (
+                <span>
+                  {personalBest.isNewBest ? 'New personal best' : 'Personal best'}:{' '}
+                  <strong className="text-amber-200">
+                    {personalBest.currentBest.toLocaleString()}
+                  </strong>
+                </span>
+              ) : (
+                <span>Personal best sync pending.</span>
+              )}
+              {petalReward !== null && petalReward !== undefined && petalReward > 0 ? (
+                <span className="ml-3 text-rose-200">+{petalReward} Petals</span>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {onReplay ? (
+                <button
+                  type="button"
+                  onClick={onReplay}
+                  className="min-h-11 rounded-xl border border-amber-500/50 bg-amber-700/25 px-4 py-2 text-sm font-semibold text-amber-100 transition-colors hover:bg-amber-700/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                >
+                  Restore next artifact
+                </button>
+              ) : null}
+              {onBack ? (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="min-h-11 rounded-xl border border-stone-600 bg-stone-900/80 px-4 py-2 text-sm font-semibold text-stone-100 transition-colors hover:border-stone-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-300"
+                >
+                  Return to hub
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </motion.section>
+      )}
     </div>
   );
 }

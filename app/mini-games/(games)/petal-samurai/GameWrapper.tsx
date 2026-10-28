@@ -4,7 +4,6 @@ import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine';
-import { GameResultsScreen } from '../../_shared/GameResultsScreen';
 import {
   GamePlatformHud,
   GamePlatformPause,
@@ -18,6 +17,8 @@ import { MoriButton, MoriStatus } from '@/app/components/mori/MoriFoundation';
 import { MoriGameThreshold } from '@/app/components/mori/MoriGameSystem';
 import { MoriArtifact } from '@/app/components/mori/MoriProduction';
 import { useGameProgress, type PersonalBestResult } from '@/app/lib/games/progress';
+import { PETAL_SAMURAI_ASSETS } from './petalSamuraiAssets';
+import styles from './petal-samurai.module.css';
 
 interface PetalSamuraiGameWrapperProps {
   mode?: PetalSamuraiMode;
@@ -168,26 +169,10 @@ export default function PetalSamuraiGameWrapper({
 
         if (state === 'results' && gameResults) {
           return (
-            <GameResultsScreen
-              title="Petal Samurai"
-              score={gameResults.score}
-              isWin={gameResults.didWin}
-              personalBest={gameResults.personalBest}
-              stats={[
-                { label: 'Final Score', value: gameResults.score },
-                { label: 'Max Combo', value: gameResults.combo },
-                { label: 'Misses', value: gameResults.misses },
-                {
-                  label: 'Ritual',
-                  value: selectedMode === 'timed' ? 'Timed' : 'Endless',
-                },
-                {
-                  label: 'Discipline',
-                  value:
-                    DIFFICULTIES.find((item) => item.value === selectedDifficulty)?.label ??
-                    selectedDifficulty,
-                },
-              ]}
+            <PetalSamuraiResultScreen
+              difficulty={selectedDifficulty}
+              mode={selectedMode}
+              result={gameResults}
               onRestart={() => {
                 setGameResults(null);
                 submittedRef.current = false;
@@ -262,11 +247,16 @@ function PetalSamuraiTitleScreen({
   return (
     <MoriGameThreshold className="game-threshold-screen" label="Petal Samurai launch threshold">
       <MoriArtifact className="game-threshold-panel game-threshold-panel--launch" family="game">
-        <figure className="game-threshold-focal" data-has-artwork="false">
-          <span aria-hidden="true" className="game-threshold-focal__orbit" />
-          <span aria-hidden="true" className="game-threshold-focal__monogram">
-            PS
-          </span>
+        <figure className="game-threshold-focal" data-has-artwork="true">
+          <picture>
+            <img
+              alt="Moonlit shrine arena framed by black stone, bronze lanterns, waterfalls, and sakura"
+              className={styles.thresholdArtwork}
+              decoding="async"
+              loading="eager"
+              src={PETAL_SAMURAI_ASSETS.arena.desktop}
+            />
+          </picture>
         </figure>
 
         <div className="game-threshold-launch-copy">
@@ -342,5 +332,91 @@ function PetalSamuraiTitleScreen({
         </div>
       </MoriArtifact>
     </MoriGameThreshold>
+  );
+}
+
+function PetalSamuraiResultScreen({
+  difficulty,
+  mode,
+  onBack,
+  onRestart,
+  result,
+}: {
+  difficulty: PetalSamuraiDifficulty;
+  mode: PetalSamuraiMode;
+  onBack: () => void;
+  onRestart: () => void;
+  result: PetalSamuraiResult;
+}) {
+  const discipline = DIFFICULTIES.find((item) => item.value === difficulty)?.label ?? difficulty;
+  const personalBest = result.personalBest;
+
+  return (
+    <main className={styles.resultStage} aria-label="Petal Samurai results">
+      <img
+        alt="A ceremonial shrine target split by a luminous sakura slash"
+        className={styles.resultArtwork}
+        decoding="async"
+        loading="eager"
+        src={PETAL_SAMURAI_ASSETS.result.path}
+      />
+      <section className={styles.resultRecord} aria-labelledby="petal-samurai-result-title">
+        <header className={styles.resultHeader}>
+          <div>
+            <h1 id="petal-samurai-result-title">
+              {result.didWin ? 'Ritual complete' : 'Ritual ended'}
+            </h1>
+            <p>The final cut is recorded beneath the moonlit shrine.</p>
+          </div>
+          <MoriStatus tone={result.didWin ? 'success' : 'neutral'}>
+            {personalBest?.isNewBest ? 'New personal best' : 'Run recorded'}
+          </MoriStatus>
+        </header>
+
+        <dl className={styles.resultStats}>
+          <div>
+            <dt>Final score</dt>
+            <dd>{result.score.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt>Max combo</dt>
+            <dd>{result.combo}x</dd>
+          </div>
+          <div>
+            <dt>Misses</dt>
+            <dd>{result.misses}</dd>
+          </div>
+          <div>
+            <dt>Ritual</dt>
+            <dd>{mode === 'timed' ? 'Timed' : 'Endless'}</dd>
+          </div>
+          <div>
+            <dt>Discipline</dt>
+            <dd>{discipline}</dd>
+          </div>
+          {personalBest &&
+            personalBest.status !== 'unavailable' &&
+            personalBest.currentBest !== null && (
+              <div>
+                <dt>{personalBest?.isNewBest ? 'New best' : 'Personal best'}</dt>
+                <dd>{personalBest.currentBest.toLocaleString()}</dd>
+              </div>
+            )}
+          {personalBest?.status === 'unavailable' && (
+            <div>
+              <dt>Score save</dt>
+              <dd>Unavailable — run retained locally</dd>
+            </div>
+          )}
+        </dl>
+
+        <div className={styles.resultActions}>
+          <MoriButton onClick={onRestart}>Replay ritual</MoriButton>
+          <MoriButton onClick={onBack} variant="secondary">
+            Return to games
+          </MoriButton>
+        </div>
+      </section>
+    </main>
   );
 }

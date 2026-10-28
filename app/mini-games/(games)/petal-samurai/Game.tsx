@@ -19,7 +19,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import { useGameHud } from '../../_shared/useGameHud';
-import { getGameVisualProfile, applyVisualProfile } from '../../_shared/gameVisuals';
+import { getGameVisualProfile } from '../../_shared/gameVisuals';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
 import {
@@ -32,6 +32,8 @@ import {
 } from '../../_shared/vfx';
 import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../../_shared/enhancedTextures';
+import { PETAL_SAMURAI_ASSETS, type PetalSamuraiVfx } from './petalSamuraiAssets';
+import styles from './petal-samurai.module.css';
 
 type Props = {
   mode: 'endless' | 'timed';
@@ -82,6 +84,8 @@ const GAME_CONFIG = {
   SPRITE_COUNT: 12, // 4x3 grid
 } as const;
 
+const PETAL_SAMURAI_VISUAL_PROFILE = getGameVisualProfile('petal-samurai');
+
 interface GameState {
   score: number;
   combo: number;
@@ -117,6 +121,14 @@ interface PowerUp {
   active: boolean;
 }
 
+type SliceFeedback = {
+  id: number;
+  x: number;
+  y: number;
+  label: string;
+  effect: PetalSamuraiVfx | 'miss';
+};
+
 export default function Game({
   mode,
   difficulty = 'normal',
@@ -128,7 +140,11 @@ export default function Game({
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<GameEngine | null>(null);
   const pausedRef = useRef(paused);
+  const onGameEndRef = useRef(onGameEnd);
+  const onStatsUpdateRef = useRef(onStatsUpdate);
   pausedRef.current = paused;
+  onGameEndRef.current = onGameEnd;
+  onStatsUpdateRef.current = onStatsUpdate;
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     combo: 0,
@@ -145,10 +161,11 @@ export default function Game({
   // VFX hooks
   const { shake, shakeOffset, style: shakeStyle } = useScreenShake();
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
+  const [sliceFeedback, setSliceFeedback] = useState<SliceFeedback | null>(null);
+  const feedbackId = useRef(0);
 
   // Visual profile and HUD
-  const visualProfile = getGameVisualProfile('petal-samurai');
-  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const visualProfile = PETAL_SAMURAI_VISUAL_PROFILE;
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-samurai');
   const { balance: petalBalance } = usePetalBalance();
   // Get container size for responsive canvas
@@ -196,7 +213,8 @@ export default function Game({
         const currentCombo = gameRef.current.getCombo();
         const currentMisses = gameRef.current.getMisses();
         const currentTime = gameRef.current.getTime();
-        const currentTimeLeft = mode === 'endless' ? 999 : Math.max(0, 60 - currentTime);
+        const currentTimeLeft =
+          mode === 'endless' ? 999 : Math.max(0, Math.ceil(GAME_CONFIG.TIME_LIMIT - currentTime));
 
         setGameState((prev) => ({
           ...prev,
@@ -209,8 +227,8 @@ export default function Game({
         }));
 
         // Update stats via callback
-        if (onStatsUpdate) {
-          onStatsUpdate({
+        if (onStatsUpdateRef.current) {
+          onStatsUpdateRef.current({
             score: currentScore,
             combo: currentCombo,
             timer: currentTimeLeft,
@@ -230,8 +248,8 @@ export default function Game({
           gameRef.current.endGame();
 
           // Notify parent component
-          if (onGameEnd) {
-            onGameEnd({
+          if (onGameEndRef.current) {
+            onGameEndRef.current({
               score: gameRef.current.getScore(),
               combo: gameRef.current.getCombo(),
               misses: gameRef.current.getMisses(),
@@ -257,7 +275,7 @@ export default function Game({
       gameRef.current?.destroy();
       gameRef.current = null;
     };
-  }, [mode, difficulty, onGameEnd, onStatsUpdate]);
+  }, [mode, difficulty]);
 
   useEffect(() => {
     gameRef.current?.setPaused(paused);
@@ -309,6 +327,38 @@ export default function Game({
       hitPetals.forEach((petal) => {
         const wasBad = petal.type === 'bad';
         gameRef.current!.slashPetal(petal);
+
+        const combo = gameRef.current!.getCombo();
+        const previousPoint = slashPoints.current.at(-2);
+        const latestPoint = slashPoints.current.at(-1);
+        const verticalGesture =
+          previousPoint && latestPoint
+            ? Math.abs(latestPoint.y - previousPoint.y) >
+              Math.abs(latestPoint.x - previousPoint.x) * 1.25
+            : false;
+        const effect: SliceFeedback['effect'] = wasBad
+          ? 'miss'
+          : petal.type === 'rare'
+            ? 'perfectBloom'
+            : combo >= 15
+              ? 'comboRing'
+              : petal.type === 'gold'
+                ? 'heavy'
+                : verticalGesture
+                  ? 'vertical'
+                  : combo > 0 && combo % 5 === 0
+                    ? 'cross'
+                    : 'light';
+        const label = wasBad
+          ? 'Miss'
+          : effect === 'perfectBloom'
+            ? 'Perfect bloom'
+            : effect === 'comboRing'
+              ? 'Combo milestone'
+              : 'Clean cut';
+
+        feedbackId.current += 1;
+        setSliceFeedback({ id: feedbackId.current, x: petal.x, y: petal.y, effect, label });
 
         // Create petal burst particles on slice
         if (!wasBad && trailRendererRef.current) {
@@ -404,21 +454,33 @@ export default function Game({
   // handleRestart removed - handled by GameStateMachine wrapper
 
   return (
-    <div className="relative w-full h-screen" style={{ ...backgroundStyle, ...shakeStyle }}>
+    <div className={styles.stage} style={shakeStyle}>
       {/* Keyboard Controls Display */}
-      <GameControls
-        game="Petal Samurai"
-        controls={[...CONTROL_PRESETS['petal-samurai']]}
-        position="bottom-left"
-        autoHideDelay={8000}
-      />
+      <div className={styles.controls}>
+        <GameControls
+          game="Petal Samurai"
+          controls={[...CONTROL_PRESETS['petal-samurai']]}
+          position="bottom-left"
+          autoHideDelay={8000}
+        />
+      </div>
 
       {/* Game Canvas Container */}
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div ref={containerRef} className="max-w-4xl w-full aspect-[4/3]">
+      <div className="flex min-h-screen items-center justify-center p-0 sm:p-4">
+        <div ref={containerRef} className={styles.arena}>
+          <picture className={styles.arenaPicture}>
+            <source media="(max-width: 640px)" srcSet={PETAL_SAMURAI_ASSETS.arena.mobile} />
+            <img
+              alt=""
+              decoding="async"
+              loading="eager"
+              src={PETAL_SAMURAI_ASSETS.arena.desktop}
+            />
+          </picture>
+          <span aria-hidden="true" className={styles.arenaShade} />
           <canvas
             ref={canvasRef}
-            className="w-full h-full cursor-crosshair rounded-2xl border-2 border-pink-500/30 shadow-2xl bg-black/20"
+            className={styles.canvas}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -429,6 +491,24 @@ export default function Game({
               touchAction: 'none',
             }}
           />
+          {sliceFeedback && (
+            <span
+              aria-hidden="true"
+              className={`${styles.feedback} ${sliceFeedback.effect === 'miss' ? styles.miss : ''}`}
+              key={sliceFeedback.id}
+              onAnimationEnd={() => setSliceFeedback(null)}
+              style={{ left: sliceFeedback.x, top: sliceFeedback.y }}
+            >
+              {sliceFeedback.effect === 'miss' ? (
+                '×'
+              ) : (
+                <img alt="" src={PETAL_SAMURAI_ASSETS.vfx[sliceFeedback.effect]} />
+              )}
+            </span>
+          )}
+          <span className="sr-only" aria-live="polite">
+            {sliceFeedback?.label ?? ''}
+          </span>
         </div>
       </div>
 
@@ -957,13 +1037,12 @@ class GameEngine {
     // Create gradient based on visual profile
     const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.logicalHeight);
 
-    // Use dojo-style background for petal-samurai
+    // Keep the authored arena legible while adding a quiet gameplay substrate.
     if (bg.kind === 'dojo') {
-      bgGradient.addColorStop(0, '#0a0a0a'); // Deep black
-      bgGradient.addColorStop(0.3, '#1a0d2e'); // Deep purple-black
-      bgGradient.addColorStop(0.5, '#2e0b1a'); // Dark sakura pink
-      bgGradient.addColorStop(0.7, '#1a0d2e'); // Deep purple-black
-      bgGradient.addColorStop(1, '#0a0a0a'); // Near black
+      bgGradient.addColorStop(0, 'rgba(4, 5, 10, 0.38)');
+      bgGradient.addColorStop(0.42, 'rgba(7, 6, 12, 0.18)');
+      bgGradient.addColorStop(0.72, 'rgba(18, 8, 12, 0.24)');
+      bgGradient.addColorStop(1, 'rgba(3, 3, 6, 0.52)');
     } else {
       // Fallback to visual profile backgroundColor if it's a gradient string
       // Parse gradient or use solid color
@@ -1242,12 +1321,13 @@ class GameEngine {
       this.ctx.restore();
     }
 
-    // Draw combo streak effect - pink glow
+    // Combo escalation uses a restrained bronze frame so targets remain primary.
     if (this.combo > 5) {
       this.ctx.save();
-      this.ctx.globalAlpha = Math.min(0.2, (this.combo - 5) * 0.015);
-      this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
-      this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
+      this.ctx.globalAlpha = Math.min(0.28, (this.combo - 5) * 0.018);
+      this.ctx.strokeStyle = 'rgba(220, 170, 92, 0.62)';
+      this.ctx.lineWidth = Math.min(9, 3 + this.combo * 0.18);
+      this.ctx.strokeRect(8, 8, this.logicalWidth - 16, this.logicalHeight - 16);
       this.ctx.restore();
     }
   }

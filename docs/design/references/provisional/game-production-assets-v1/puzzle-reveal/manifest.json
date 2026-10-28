@@ -1,0 +1,108 @@
+{
+  "family": "game.puzzle-reveal.reveal-art-v1",
+  "surface": "Puzzle Reveal",
+  "productionMethod": "OpenAI image generation using approved Puzzle Reveal cover and hub art as visual-language references",
+  "referenceSources": [
+    "docs/design/references/approved/batch-2/games/covers/game-puzzle-reveal-cover-source.png",
+    "docs/design/references/approved/batch-2/games/hub/game-puzzle-reveal-hub-source.png"
+  ],
+  "sharedConstraints": {
+    "composition": "4:3 landscape with an intentional focal safe zone and meaningful detail in every reveal quadrant",
+    "visualDirection": "Same dark anime-fantasy civilization, different recovered artifact; charcoal, aged bronze, restrained sakura",
+    "excluded": ["text", "logos", "UI", "puzzle pieces", "watermarks", "borders", "baked labels"]
+  },
+  "ownerDecision": {
+    "approvedWithoutReplacement": [
+      "puzzle_reveal_shrine_circuit_oracle_v1",
+      "puzzle_reveal_kintsugi_machine_bodhisattva_v1",
+      "puzzle_reveal_sakura_singularity_v1",
+      "puzzle_reveal_memory_well_archivist_v1",
+      "puzzle_reveal_celestial_komainu_gate_v1"
+    ],
+    "superseded": "puzzle_reveal_foxfire_data_reliquary_v1",
+    "approvedReplacement": "puzzle_reveal_foxfire_data_reliquary_v2",
+    "replacementSourceStatus": "PROMOTED_TO_APPROVED_MASTER"
+  },
+  "assets": [
+    {
+      "id": "puzzle_reveal_shrine_circuit_oracle_v1",
+      "filename": "puzzle-reveal-shrine-circuit-oracle-v1.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-shrine-circuit-oracle-v1.png",
+      "subjectCategory": "intimate character ritual",
+      "dimensions": { "width": 1447, "height": 1087 },
+      "bytes": 3379134,
+      "sha256": "9BF9A0C8A1B46BA9955BCF6825967204E230446FD04416E5E503563453431318",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true
+    },
+    {
+      "id": "puzzle_reveal_kintsugi_machine_bodhisattva_v1",
+      "filename": "puzzle-reveal-kintsugi-machine-bodhisattva-v1.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-kintsugi-machine-bodhisattva-v1.png",
+      "subjectCategory": "monumental character contemplation",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3459106,
+      "sha256": "F4915B3CC4036E17057411CFE6EE402BF0AD99131DD19BED6BBAD04EAF7B235A",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v1",
+      "filename": "puzzle-reveal-foxfire-data-reliquary-v1.png",
+      "subjectCategory": "sacred creature",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3493115,
+      "sha256": "4D0444110330FB578ECC6C92AC8E0DA248FC1D68CCC903AD2D062B67AE119970",
+      "authorityState": "SUPERSEDED",
+      "ownerApproved": false,
+      "supersededBy": "puzzle_reveal_foxfire_data_reliquary_v2"
+    },
+    {
+      "id": "puzzle_reveal_sakura_singularity_v1",
+      "filename": "puzzle-reveal-sakura-singularity-v1.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-sakura-singularity-v1.png",
+      "subjectCategory": "environmental monument",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3526191,
+      "sha256": "EDEA8A56E58AAA0BAAA6163C6E1B810CF07457990C9C946E7CEEE78490A63FC1",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true
+    },
+    {
+      "id": "puzzle_reveal_memory_well_archivist_v1",
+      "filename": "puzzle-reveal-memory-well-archivist-v1.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-memory-well-archivist-v1.png",
+      "subjectCategory": "memory ritual",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3067320,
+      "sha256": "C7F5DB2E711D6000F4721B25B1E78E326CC4A472501841DBE154940BB7A6B10B",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true
+    },
+    {
+      "id": "puzzle_reveal_celestial_komainu_gate_v1",
+      "filename": "puzzle-reveal-celestial-komainu-gate-v1.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-celestial-komainu-gate-v1.png",
+      "subjectCategory": "guardian architecture",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3343903,
+      "sha256": "2156D5C28B555ABB939CE232AB60662928DD721E3A1DDAEB6477C721520B7D6B",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true
+    },
+    {
+      "id": "puzzle_reveal_foxfire_data_reliquary_v2",
+      "filename": "puzzle-reveal-foxfire-data-reliquary-v2.png",
+      "masterPath": "docs/design/references/approved/batch-3/games/puzzle-reveal/reveal-art/puzzle-reveal-foxfire-data-reliquary-v2.png",
+      "subjectCategory": "SACRED_CREATURE",
+      "dimensions": { "width": 1448, "height": 1086 },
+      "bytes": 3435195,
+      "sha256": "8D993431CF93A9CFCBEE2809DDEA7BF3C554FBC4C59F90F490B47D6FB3AE5469",
+      "authorityState": "RUNTIME_READY",
+      "ownerApproved": true,
+      "ownerApprovedDirection": true,
+      "sourceBinaryAvailable": true,
+      "supersedes": "puzzle_reveal_foxfire_data_reliquary_v1"
+    }
+  ]
+}
