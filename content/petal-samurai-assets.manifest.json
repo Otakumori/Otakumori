@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "packId": "petal_samurai_visual_family_v1",
+  "surface": "Petal Samurai",
+  "integrationState": "OWNER_VISUAL_REVIEW_REQUIRED",
+  "audioState": "EXTERNAL_ARTIST_REQUIRED",
+  "assets": [
+    {
+      "id": "petal_samurai_moonlit_shrine_arena_v1",
+      "role": "primary arena",
+      "source": "docs/design/references/approved/batch-4/games/petal-samurai/environment/petal-samurai_moonlit-shrine-arena_v1.png",
+      "sourceSha256": "D8A7ADEB7DDB629194946E481752C0FEC5D6C790057D7B2A2FB09627F6EFC4B9",
+      "sourceDimensions": { "width": 1672, "height": 941 },
+      "ownerApprovalState": "OWNER_APPROVED_SOURCE",
+      "runtime": [
+        {
+          "path": "public/assets/games/petal-samurai/environment/petal-samurai-moonlit-shrine-arena-v1-desktop.webp",
+          "sha256": "428EB435FDEAAFD06A513F9F781612C5AB529D0C284984014CEBD64C4630B131",
+          "dimensions": { "width": 1600, "height": 900 },
+          "viewport": "desktop/tablet",
+          "cropNotes": "Symmetric 16:9 crop preserves the shrine gate, moon, waterfalls, and full ceremonial action circle."
+        },
+        {
+          "path": "public/assets/games/petal-samurai/environment/petal-samurai-moonlit-shrine-arena-v1-mobile.webp",
+          "sha256": "F6868116B3FE77A126DB34B93D7E602E80C685EF5E1D0307414EF8469D8891E7",
+          "dimensions": { "width": 900, "height": 1600 },
+          "viewport": "mobile portrait",
+          "cropNotes": "Intentional central portrait crop keeps the torii, shrine entrance, moon edge, stairs, and action-circle centerline."
+        }
+      ],
+      "gameplaySafeZone": "Central 58% width and middle 70% height; HUD occupies the outer top and side rails."
+    },
+    {
+      "id": "petal_samurai_slice_result_scene_candidate_v1",
+      "role": "result scene",
+      "source": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slice-result-scene_candidate-v1.png",
+      "sourceSha256": "23341C0B7F263891FD4CF4A2AC70DE5AD6FCE63CCB397D6BEABF9F79737CE7C9",
+      "sourceDimensions": { "width": 1672, "height": 941 },
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": [
+        {
+          "path": "public/assets/games/petal-samurai/result/petal-samurai-slice-result-scene-candidate-v1.webp",
+          "sha256": "74B8D62D63CE127F150A347976C2719705F1C077FCACE2A3432385E720C85FAC",
+          "dimensions": { "width": 1600, "height": 900 },
+          "viewport": "responsive result background",
+          "cropNotes": "16:9 crop preserves the split ceremonial target, slash path, moon, waterfalls, and foreground action circle."
+        }
+      ],
+      "gameplaySafeZone": "Lower result record avoids the central split-target payoff."
+    },
+    {
+      "id": "petal_samurai_slash_light_v1",
+      "role": "clean-cut feedback",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-light-v1.webp",
+      "runtimeSha256": "26963894163CEFC1B1A90291FD969A0FCF4B6B6E3A90EA932E012220641A3A5D",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    },
+    {
+      "id": "petal_samurai_slash_heavy_v1",
+      "role": "gold-petal judgment",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-heavy-v1.webp",
+      "runtimeSha256": "F94972336A450EE836B5A66CC28901666425B605F0F9D77502E79B83DC1702AA",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    },
+    {
+      "id": "petal_samurai_slash_cross_v1",
+      "role": "five-cut cadence feedback",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-cross-v1.webp",
+      "runtimeSha256": "8754297BA4A212D4F754A3ED35105FA02CB69A445F5E619E18E2CBED5EB799B3",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    },
+    {
+      "id": "petal_samurai_slash_vertical_v1",
+      "role": "vertical-gesture feedback",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-vertical-v1.webp",
+      "runtimeSha256": "EB1BBE696D7AD442ACF8A6AC6C89E8C3369C61C37E8D8566F3D84381C496EC6F",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    },
+    {
+      "id": "petal_samurai_slash_combo_ring_v1",
+      "role": "combo-milestone feedback",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-combo-ring-v1.webp",
+      "runtimeSha256": "584659206346858BCDA9EA9AC6B1F08EB74BB0E323DF7E26540CFB4D8FDFF0DE",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    },
+    {
+      "id": "petal_samurai_slash_perfect_bloom_v1",
+      "role": "perfect rare-petal judgment",
+      "sourceId": "petal_samurai_slash_vfx_sheet_candidate_v1",
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-perfect-bloom-v1.webp",
+      "runtimeSha256": "641A600CE35555C847AB4C91C2ED3225CF8D5D5C79DBCD00EA8F3F42DB6B7B19",
+      "dimensions": { "width": 512, "height": 512 },
+      "alpha": true
+    }
+  ]
+}

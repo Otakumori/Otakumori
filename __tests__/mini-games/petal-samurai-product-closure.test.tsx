@@ -142,7 +142,8 @@ describe('Petal Samurai product closure', () => {
     );
     expect(screen.getByText('Ritual').nextElementSibling).toHaveTextContent('Endless');
     expect(screen.getByText('Discipline').nextElementSibling).toHaveTextContent('Ronin');
-    expect(screen.getByText('NEW BEST 1200')).toBeInTheDocument();
+    expect(screen.getByText('New personal best')).toBeInTheDocument();
+    expect(screen.getAllByText('1,200')).toHaveLength(2);
   });
 
   it('keeps one frame-loop owner, one pointer input path, and no invalid leaderboard write', () => {
@@ -158,5 +159,10 @@ describe('Petal Samurai product closure', () => {
     expect(source).toContain('onPointerCancel={handlePointerUp}');
     expect(source).toContain("touchAction: 'none'");
     expect(source).toContain('setPointerCapture(event.pointerId)');
+    expect(source).toContain('PETAL_SAMURAI_ASSETS.arena.mobile');
+    expect(source).toContain("effect === 'miss'");
+    expect(source).toContain('onGameEndRef.current');
+    expect(source).toContain('}, [mode, difficulty]);');
+    expect(source).not.toContain('[mode, difficulty, onGameEnd, onStatsUpdate]');
   });
 });

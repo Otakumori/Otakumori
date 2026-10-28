@@ -655,7 +655,7 @@
       "family": "game.petal-samurai.environment-v1",
       "surface": "Petal Samurai",
       "purpose": "Primary moonlit shrine arena and gameplay-environment authority",
-      "state": "OWNER_APPROVED",
+      "state": "INTEGRATED",
       "format": "png",
       "dimensions": { "width": 1672, "height": 941 },
       "source": {
@@ -666,13 +666,22 @@
         "licenseStatus": "OWNER_PROVIDED",
         "licenseReference": "content/game-production-assets-v1.manifest.json"
       },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/environment/petal-samurai-moonlit-shrine-arena-v1-desktop.webp",
+        "sha256": "428EB435FDEAAFD06A513F9F781612C5AB529D0C284984014CEBD64C4630B131",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts",
+          "content/petal-samurai-assets.manifest.json"
+        ]
+      },
       "ownerApproval": {
         "required": true,
         "approved": true,
         "evidence": "content/game-production-assets-v1.manifest.json"
       },
       "qa": { "passed": false, "evidence": [] },
-      "notes": "Source authority only; runtime derivative and integration require separate validation."
+      "notes": "The desktop runtime is canonical in this registry; the separately checksummed mobile portrait treatment is recorded in content/petal-samurai-assets.manifest.json. Owner review of the runtime crop remains open."
     },
     {
       "id": "dungeon_of_desire_spectral_climax_arena_v1",
@@ -762,8 +771,18 @@
         "licenseStatus": "OWNER_PROVIDED",
         "licenseReference": "content/game-production-assets-v1.manifest.json"
       },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/result/petal-samurai-slice-result-scene-candidate-v1.webp",
+        "sha256": "74B8D62D63CE127F150A347976C2719705F1C077FCACE2A3432385E720C85FAC",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts",
+          "app/mini-games/(games)/petal-samurai/GameWrapper.tsx"
+        ]
+      },
       "ownerApproval": { "required": true, "approved": false },
-      "qa": { "passed": false, "evidence": [] }
+      "qa": { "passed": false, "evidence": [] },
+      "notes": "Candidate runtime integration is for owner visual review only; it is not approved production result art."
     },
     {
       "id": "petal_samurai_slash_vfx_sheet_candidate_v1",
@@ -780,6 +799,162 @@
         "provenance": "Owner-supplied candidate source package with verified alpha",
         "licenseStatus": "OWNER_PROVIDED",
         "licenseReference": "content/game-production-assets-v1.manifest.json"
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_light_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Clean-cut judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 72202 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-left cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-light-v1.webp",
+        "sha256": "26963894163CEFC1B1A90291FD969A0FCF4B6B6E3A90EA932E012220641A3A5D",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_heavy_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Gold-petal judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 121780 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-center cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-heavy-v1.webp",
+        "sha256": "F94972336A450EE836B5A66CC28901666425B605F0F9D77502E79B83DC1702AA",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_cross_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Five-cut cadence feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 123468 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive top-right cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-cross-v1.webp",
+        "sha256": "8754297BA4A212D4F754A3ED35105FA02CB69A445F5E619E18E2CBED5EB799B3",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_vertical_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Vertical-gesture feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 130576 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-left cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-vertical-v1.webp",
+        "sha256": "EB1BBE696D7AD442ACF8A6AC6C89E8C3369C61C37E8D8566F3D84381C496EC6F",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_combo_ring_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Combo-milestone feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 148248 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-center cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-combo-ring-v1.webp",
+        "sha256": "584659206346858BCDA9EA9AC6B1F08EB74BB0E323DF7E26540CFB4D8FDFF0DE",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "petal_samurai_slash_perfect_bloom_v1",
+      "family": "game.petal-samurai.vfx-v1",
+      "surface": "Petal Samurai",
+      "purpose": "Perfect rare-petal judgment feedback",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 512, "height": 512 },
+      "technical": { "bytes": 149380 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/petal-samurai/petal-samurai_slash-vfx-sheet_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "C58A08838717D3A8877DCD4CA4D7EC590A1446C1158224F08894333DA8D31671",
+        "provenance": "Non-destructive bottom-right cell derivative of the owner-supplied candidate VFX sheet",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/petal-samurai-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/petal-samurai/vfx/petal-samurai-slash-perfect-bloom-v1.webp",
+        "sha256": "641A600CE35555C847AB4C91C2ED3225CF8D5D5C79DBCD00EA8F3F42DB6B7B19",
+        "integrated": true,
+        "integrationReferences": ["app/mini-games/(games)/petal-samurai/petalSamuraiAssets.ts"]
       },
       "ownerApproval": { "required": true, "approved": false },
       "qa": { "passed": false, "evidence": [] }
