@@ -18,6 +18,7 @@ import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
 import { GameUI } from '../../_shared/GameUI';
 import BubbleRagdollScene from './Scene';
+import { BUBBLE_RAGDOLL_ASSETS } from './bubbleRagdollAssets';
 import { bubbleObjectiveForRun, type BubbleObjective } from '../../_shared/secondaryGameContracts';
 import type { PersonalBestResult } from '@/app/lib/games/progress';
 
@@ -47,7 +48,8 @@ export default function BubbleRagdollGame() {
 
   const gameAssets: AssetManifest = {
     images: [
-      getAsset('bubble-ragdoll', 'bg') || '',
+      BUBBLE_RAGDOLL_ASSETS.arena.desktop,
+      BUBBLE_RAGDOLL_ASSETS.arena.mobile,
       getAsset('bubble-ragdoll', 'bubbleSprite') || '',
     ].filter(Boolean),
     audio: [
@@ -120,7 +122,8 @@ export default function BubbleRagdollGame() {
           return (
             <GameTitleScreen
               title="Bubble Ragdoll"
-              description="Toss the ragdoll into bubbles. Survive the chaos."
+              description="Drift through the moonlit arena and complete a rotating bubble trial."
+              artworkSrc={BUBBLE_RAGDOLL_ASSETS.arena.desktop}
               instructions={[
                 'Click to spawn bubbles',
                 'Drag the ragdoll to throw it',
@@ -166,7 +169,7 @@ export default function BubbleRagdollGame() {
                 combo={gameStats.combo}
                 timer={gameStats.timer}
                 progress={gameStats.progress}
-                milestone="Pop those bubbles!"
+                milestone={objective.label}
               />
               <GamePlatformControls session={session} />
               <BubbleRagdollScene

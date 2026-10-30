@@ -975,6 +975,43 @@
         "licenseStatus": "OWNER_PROVIDED",
         "licenseReference": "content/game-production-assets-v1.manifest.json"
       },
+      "runtime": {
+        "path": "public/assets/games/bubble-ragdoll/environment/bubble-ragdoll-moonlit-bubble-arena-candidate-v1-desktop.webp",
+        "sha256": "B9FDD52FE7CC85E7041474C0464AF9EF92FBF66D42E4F8D744E246985A1B6A5B",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/bubble-ragdoll/bubbleRagdollAssets.ts",
+          "app/mini-games/(games)/bubble-ragdoll/Scene.tsx"
+        ]
+      },
+      "ownerApproval": { "required": true, "approved": false },
+      "qa": { "passed": false, "evidence": [] }
+    },
+    {
+      "id": "bubble_ragdoll_moonlit_bubble_arena_candidate_v1_mobile",
+      "family": "game.bubble-ragdoll.environment-v1",
+      "surface": "Bubble Ragdoll",
+      "purpose": "Mobile portrait derivative of the moonlit bubble arena candidate",
+      "state": "CANDIDATE",
+      "format": "webp",
+      "dimensions": { "width": 900, "height": 1600 },
+      "source": {
+        "path": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_moonlit-bubble-arena_candidate-v1.png",
+        "availability": "LOCAL",
+        "sha256": "37563642088A7967E2A051C909BD441459B82E3F435DD6D983EA707A6828DAA8",
+        "provenance": "Intentional central portrait derivative of the owner-supplied candidate arena",
+        "licenseStatus": "OWNER_PROVIDED",
+        "licenseReference": "content/bubble-ragdoll-assets.manifest.json"
+      },
+      "runtime": {
+        "path": "public/assets/games/bubble-ragdoll/environment/bubble-ragdoll-moonlit-bubble-arena-candidate-v1-mobile.webp",
+        "sha256": "83B11CBE9CE5F3A9C8B75B45B5A3C3B06B5F4C8CBA79103A6A1628274C61E653",
+        "integrated": true,
+        "integrationReferences": [
+          "app/mini-games/(games)/bubble-ragdoll/bubbleRagdollAssets.ts",
+          "app/mini-games/(games)/bubble-ragdoll/Scene.tsx"
+        ]
+      },
       "ownerApproval": { "required": true, "approved": false },
       "qa": { "passed": false, "evidence": [] }
     },

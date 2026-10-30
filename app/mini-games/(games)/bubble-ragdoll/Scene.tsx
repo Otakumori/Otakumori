@@ -7,6 +7,7 @@ import { useAvatarForGame } from '../../_shared/useAvatarForGame';
 import { useGameAvatar } from '../../_shared/GameAvatarRenderer';
 import '../../_shared/cohesion.css';
 import type { BubbleObjective } from '../../_shared/secondaryGameContracts';
+import { BUBBLE_RAGDOLL_ASSETS } from './bubbleRagdollAssets';
 
 const ROUND_MS = 60_000;
 const MAX_BUBBLES = 24;
@@ -55,10 +56,17 @@ export default function BubbleRagdoll({
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
+  const objectiveRef = useRef(objective);
+  const onGameEndRef = useRef(onGameEnd);
+  const onStatsUpdateRef = useRef(onStatsUpdate);
   pausedRef.current = paused;
+  objectiveRef.current = objective;
+  onGameEndRef.current = onGameEnd;
+  onStatsUpdateRef.current = onStatsUpdate;
 
   // assets
-  const bgUrl = getAsset('bubble-ragdoll', 'bg') ?? '';
+  const desktopBgUrl = BUBBLE_RAGDOLL_ASSETS.arena.desktop;
+  const mobileBgUrl = BUBBLE_RAGDOLL_ASSETS.arena.mobile;
   const bubbleSprite = getAsset('bubble-ragdoll', 'bubbleSprite') ?? '';
   const sPop = getAsset('bubble-ragdoll', 'popSfx') ?? '';
   const sBoing = getAsset('bubble-ragdoll', 'bounceSfx') ?? '';
@@ -70,17 +78,29 @@ export default function BubbleRagdoll({
     if (bubbleSprite) im.src = bubbleSprite;
     return im;
   }, [bubbleSprite]);
-  const bgImg = useMemo(() => {
+  const desktopBgImg = useMemo(() => {
     if (typeof window === 'undefined') return null;
     const im = new Image();
-    if (bgUrl) im.src = bgUrl;
+    im.src = desktopBgUrl;
     return im;
-  }, [bgUrl]);
+  }, [desktopBgUrl]);
+  const mobileBgImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const im = new Image();
+    im.src = mobileBgUrl;
+    return im;
+  }, [mobileBgUrl]);
 
   // avatar integration
   const { data: avatarData } = useGameAvatar('bubble-ragdoll', 'default');
   const { enabled: avatarEnabled, avatar } = useAvatarForGame(true);
   const avatarSpriteUrl = avatar?.spriteUrl ?? avatarData?.fallbackSpriteUrl ?? null;
+  const avatarImg = useMemo(() => {
+    if (typeof window === 'undefined' || !avatarSpriteUrl) return null;
+    const image = new Image();
+    image.src = avatarSpriteUrl;
+    return image;
+  }, [avatarSpriteUrl]);
 
   useEffect(() => {
     const host = hostRef.current!,
@@ -270,6 +290,7 @@ export default function BubbleRagdoll({
 
     // draw helpers
     function drawBG() {
+      const bgImg = W / H < 0.9 ? mobileBgImg : desktopBgImg;
       if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
         const iw = bgImg.naturalWidth * s,
@@ -330,7 +351,7 @@ export default function BubbleRagdoll({
       ctx.stroke();
 
       // sprite billboard on torso if available
-      if (avatarEnabled && avatarSpriteUrl) {
+      if (avatarEnabled && avatarImg?.complete && avatarImg.naturalWidth > 0) {
         const dx = ptBot.x - ptTop.x;
         const dy = ptBot.y - ptTop.y;
         const ang = Math.atan2(dy, dx) + Math.PI / 2;
@@ -340,10 +361,8 @@ export default function BubbleRagdoll({
         ctx.save();
         ctx.translate(ptTop.x, ptTop.y);
         ctx.rotate(ang);
-        const img = new Image();
-        img.src = avatarSpriteUrl;
         ctx.globalAlpha = 0.95;
-        ctx.drawImage(img, -w / 2, -h * 0.1, w, h);
+        ctx.drawImage(avatarImg, -w / 2, -h * 0.1, w, h);
         ctx.restore();
       } else {
         // neutral head/torso
@@ -400,20 +419,27 @@ export default function BubbleRagdoll({
       // Update stats via callback (UI is handled by GameUI component)
       const remain = Math.max(0, endAt - now);
       const timerSeconds = Math.ceil(remain / 1000);
-      const progress = 1 - remain / ROUND_MS;
 
-      if (onStatsUpdate) {
-        onStatsUpdate({
+      const currentObjective = objectiveRef.current;
+      const objectiveProgress =
+        currentObjective.id === 'pop-12'
+          ? pops / 12
+          : currentObjective.id === 'combo-6'
+            ? bestCombo / 6
+            : score / 1800;
+
+      if (onStatsUpdateRef.current) {
+        onStatsUpdateRef.current({
           score,
           combo,
           timer: timerSeconds,
-          progress,
+          progress: Math.min(1, Math.max(0, objectiveProgress)),
         });
       }
 
       // end conditions
       const botPt = pts[pTorsoBot];
-      const objectiveComplete = objective.isComplete({ pops, combo: bestCombo, score });
+      const objectiveComplete = currentObjective.isComplete({ pops, combo: bestCombo, score });
       if (botPt && (botPt.y > H + 40 || now >= endAt || objectiveComplete)) {
         end(now);
         return;
@@ -428,14 +454,15 @@ export default function BubbleRagdoll({
       hasEnded = true;
       const duration = Math.round(Math.min(now - startAt, ROUND_MS));
 
-      onGameEnd?.({
+      const currentObjective = objectiveRef.current;
+      onGameEndRef.current?.({
         score,
         durationMs: duration,
         combo: bestCombo,
         misses,
         pops,
-        objectiveId: objective.id,
-        objectiveComplete: objective.isComplete({ pops, combo: bestCombo, score }),
+        objectiveId: currentObjective.id,
+        objectiveComplete: currentObjective.isComplete({ pops, combo: bestCombo, score }),
       });
     }
 
@@ -444,18 +471,7 @@ export default function BubbleRagdoll({
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [
-    avatarEnabled,
-    avatarSpriteUrl,
-    bgUrl,
-    bubbleSprite,
-    objective,
-    sPop,
-    sBoing,
-    sThud,
-    onGameEnd,
-    onStatsUpdate,
-  ]);
+  }, [avatarEnabled, avatarImg, bubbleSprite, desktopBgImg, mobileBgImg, sPop, sBoing, sThud]);
 
   return (
     <div ref={hostRef} className="absolute inset-0">
