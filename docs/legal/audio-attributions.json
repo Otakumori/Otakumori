@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "super-dialogue-audio-pack-v1",
+      "assetFamily": "SUPER_DIALOGUE_AUDIO_PACK_V1",
+      "creator": "Dillon Becker",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "credit": "Super Dialogue Audio Pack V1 by Dillon Becker",
+      "changesDisclosureRequired": true
+    }
+  ],
+  "pendingEvidenceFamilies": ["TOMMUSIC_FREE_FANTASY_SFX", "OWNER_INDIVIDUAL_AUDIO"]
+}

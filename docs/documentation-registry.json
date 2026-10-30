@@ -21,6 +21,35 @@
       "verification": "corepack pnpm exec vitest run __tests__/components/MoriProduction.test.tsx"
     },
     {
+      "path": "docs/design/production-authority/audio-library-manifest.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts",
+      "warning": "Regenerate from the owner-managed SFX root when that local source library changes."
+    },
+    {
+      "path": "docs/design/production-authority/avatar-source-manifest.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts",
+      "warning": "Source inventory only; no record grants runtime or owner approval."
+    },
+    {
+      "path": "docs/legal/audio-attributions.json",
+      "domain": "legal-attribution",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts"
+    },
+    {
       "path": "docs/design/checkpoint.md",
       "domain": "visual-system",
       "status": "current-reference",
