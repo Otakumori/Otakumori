@@ -50,6 +50,26 @@
       "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts"
     },
     {
+      "path": "docs/design/production-authority/blossomware-external-candidates.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/blossomware-external-candidates.test.ts",
+      "warning": "Research only: assets are not acquired, licensed for runtime, owner-approved, or eligible for public credits."
+    },
+    {
+      "path": "docs/design/blossomware-system-panic-v1-plan.md",
+      "domain": "game-design",
+      "status": "current-reference",
+      "owner": "games",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/mini-games/blossomware-orchestration.test.tsx __tests__/mini-games/blossomware-playlist.test.ts",
+      "warning": "Separate-branch plan only; no candidate asset or reward-authority approval is implied."
+    },
+    {
       "path": "docs/design/checkpoint.md",
       "domain": "visual-system",
       "status": "current-reference",
