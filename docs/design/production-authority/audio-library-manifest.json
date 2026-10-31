@@ -33,7 +33,7 @@
       "ATTRIBUTION_REQUIRED": 557,
       "LICENSE_EVIDENCE_REQUIRED": 2,
       "LICENSE_VERIFIED": 413,
-      "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING": 2,
+      "OWNER_AUTHORED_RIGHTS_CONFIRMED": 2,
       "OWNER_STATES_LICENSED_EVIDENCE_PENDING": 1
     }
   },
@@ -2016,7 +2016,7 @@
             "id": "audio_4863d325b4356752",
             "relativePath": "interesting ui.mp3",
             "decision": "GOOD_ALTERNATE",
-            "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+            "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
             "score": 4.2
           }
         ]
@@ -2205,7 +2205,7 @@
             "id": "audio_917e1c41a1857736",
             "relativePath": "satisfying-soft-cute-butt-uqdnx4eo.wav",
             "decision": "GOOD_ALTERNATE",
-            "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+            "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
             "score": 4.0
           }
         ]
@@ -2471,7 +2471,7 @@
             "id": "audio_4863d325b4356752",
             "relativePath": "interesting ui.mp3",
             "decision": "GOOD_ALTERNATE",
-            "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+            "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
             "score": 4.2
           }
         ]
@@ -33561,8 +33561,8 @@
         "canonicalId": null,
         "contentGroup": null
       },
-      "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
-      "licenseNote": "Owner authorship stated; embedded component/sample rights unanswered",
+      "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+      "licenseNote": "Owner attests independent creation with no third-party samples, loops, or AI-generated components",
       "provenance": {
         "publisherEvidenceId": null,
         "creator": "Otakumori owner",
@@ -33578,12 +33578,12 @@
             "owner-supplied SHA-256 attestation"
           ]
         },
-        "commercialRights": "ATTESTATION_PENDING_COMPONENT_RIGHTS",
+        "commercialRights": "CLEARED_OWNER_ATTESTATION",
         "technicalRuntimeState": "SOURCE_ONLY",
         "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
         "publicationState": "NOT_AUTHORIZED"
       },
-      "runtimeRecommendation": "HOLD_LICENSE_EVIDENCE",
+      "runtimeRecommendation": "OWNER_PLACEMENT_REQUIRED",
       "contentAnalysis": {
         "state": "ANALYZED",
         "method": "FFMPEG_VOLUME_SEGMENTS",
@@ -34119,8 +34119,8 @@
         "canonicalId": null,
         "contentGroup": null
       },
-      "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
-      "licenseNote": "Owner authorship stated; embedded component/sample rights unanswered",
+      "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+      "licenseNote": "Owner attests independent creation with no third-party samples, loops, or AI-generated components",
       "provenance": {
         "publisherEvidenceId": null,
         "creator": "Otakumori owner",
@@ -34136,12 +34136,12 @@
             "owner-supplied SHA-256 attestation"
           ]
         },
-        "commercialRights": "ATTESTATION_PENDING_COMPONENT_RIGHTS",
+        "commercialRights": "CLEARED_OWNER_ATTESTATION",
         "technicalRuntimeState": "SOURCE_ONLY",
         "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
         "publicationState": "NOT_AUTHORIZED"
       },
-      "runtimeRecommendation": "HOLD_LICENSE_EVIDENCE",
+      "runtimeRecommendation": "OWNER_PLACEMENT_REQUIRED",
       "contentAnalysis": {
         "state": "ANALYZED",
         "method": "FFMPEG_VOLUME_SEGMENTS",

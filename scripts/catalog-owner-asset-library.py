@@ -553,7 +553,7 @@ def provenance_for_audio(
             "licenseId": "OWNER_AUTHORED",
             "attribution": "NOT_REQUIRED",
             "sourceMatch": {"state": "VERIFIED_OWNER_HASH", "basis": ["owner-supplied SHA-256 attestation"]},
-            "commercialRights": "ATTESTATION_PENDING_COMPONENT_RIGHTS",
+            "commercialRights": "CLEARED_OWNER_ATTESTATION",
         }
 
     return base
@@ -564,6 +564,11 @@ def license_for_provenance(provenance: dict[str, Any]) -> tuple[str, str]:
     if rights == "CLEARED":
         state = "ATTRIBUTION_REQUIRED" if provenance["attribution"] == "REQUIRED" else "LICENSE_VERIFIED"
         return state, f"{provenance['licenseId']}; exact source evidence recorded"
+    if rights == "CLEARED_OWNER_ATTESTATION":
+        return (
+            "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+            "Owner attests independent creation with no third-party samples, loops, or AI-generated components",
+        )
     if rights == "ATTESTATION_PENDING_COMPONENT_RIGHTS":
         return "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING", "Owner authorship stated; embedded component/sample rights unanswered"
     if provenance["publisherEvidenceId"] == "incompetech-cc-by-4":
@@ -603,6 +608,8 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         }
         if license_state in blocked_states:
             recommendation = "HOLD_LICENSE_EVIDENCE"
+        elif license_state == "OWNER_AUTHORED_RIGHTS_CONFIRMED":
+            recommendation = "OWNER_PLACEMENT_REQUIRED"
         elif classified["category"].startswith("DIALOGUE"):
             recommendation = "OWNER_CASTING_REQUIRED"
         elif classified["family"] == "TOMMUSIC_FREE_FANTASY_SFX" and path.suffix.lower() == ".wav":
@@ -797,7 +804,12 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         }
         for record in records
         if record["family"] == "OWNER_INDIVIDUAL_AUDIO"
-        and record["licenseState"] not in {"LICENSE_VERIFIED", "ATTRIBUTION_REQUIRED"}
+        and record["licenseState"]
+        not in {
+            "LICENSE_VERIFIED",
+            "ATTRIBUTION_REQUIRED",
+            "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+        }
     ]
     attributions = {
         "version": 2,

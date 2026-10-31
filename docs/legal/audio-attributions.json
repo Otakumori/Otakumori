@@ -362,12 +362,6 @@
       "reason": "Publisher license identified; exact local recording match needs additional evidence"
     },
     {
-      "relativePath": "interesting ui.mp3",
-      "sha256": "4863D325B435675298AE0C4AA6E84D6537C836AAB8AF6EE5DED6D6D4B569DC0C",
-      "state": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
-      "reason": "Owner authorship stated; embedded component/sample rights unanswered"
-    },
-    {
       "relativePath": "Leaving Home.mp3",
       "sha256": "974DFDF897D6EB781091A784F946825CCF4181C5354C2EE84B235DFAB7E9F0AF",
       "state": "LICENSE_EVIDENCE_REQUIRED",
@@ -378,12 +372,6 @@
       "sha256": "979ACDC883A99F0FE12AAC43BDD1C524D9B081B665F392D5D134B5766C921AFF",
       "state": "OWNER_STATES_LICENSED_EVIDENCE_PENDING",
       "reason": "Owner-supplied individual download; per-file evidence not present"
-    },
-    {
-      "relativePath": "satisfying-soft-cute-butt-uqdnx4eo.wav",
-      "sha256": "917E1C41A18577367AC8175F0EDD89AA3503B1F8BC7C65D56B2F8CDD2F6370ED",
-      "state": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
-      "reason": "Owner authorship stated; embedded component/sample rights unanswered"
     }
   ]
 }

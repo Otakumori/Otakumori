@@ -12,6 +12,25 @@
       "verification": "corepack pnpm docs:security:check"
     },
     {
+      "path": "docs/authority/owner-decisions.json",
+      "domain": "owner-authority",
+      "status": "canonical",
+      "owner": "product-owner",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/owner-authority.test.ts",
+      "warning": "Owner-approved policy does not authorize remote, provider, database, deployment, economy, or final-art actions unless the specific record explicitly grants that scope."
+    },
+    {
+      "path": "docs/authority/owner-authority.md",
+      "domain": "owner-authority",
+      "status": "canonical",
+      "owner": "product-owner",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/owner-authority.test.ts"
+    },
+    {
       "path": "docs/design/mori-production-system.md",
       "domain": "visual-system",
       "status": "canonical",
@@ -68,6 +87,26 @@
       "maintenance": "manual",
       "verification": "corepack pnpm exec vitest run __tests__/mini-games/blossomware-orchestration.test.tsx __tests__/mini-games/blossomware-playlist.test.ts",
       "warning": "Separate-branch plan only; no candidate asset or reward-authority approval is implied."
+    },
+    {
+      "path": "docs/design/reviews/game-production-assets-v1-owner-review.md",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "manual owner review",
+      "warning": "Engineering review evidence only; owner decisions remain unresolved and source assets are not promoted by this document."
+    },
+    {
+      "path": "docs/design/reviews/audio-placement-recommendations-v1.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/audio-placement-recommendations.test.ts",
+      "warning": "Audition shortlist only; no placement, runtime publication, or autoplay is authorized."
     },
     {
       "path": "docs/design/checkpoint.md",

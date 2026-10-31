@@ -22,6 +22,10 @@ documentation status. Documents marked `historical`, `stale`, `unsafe`, `duplica
 `unverified` must not guide current implementation or provider operations without source
 verification.
 
+Explicit owner decisions are recorded in `docs/authority/owner-decisions.json` and interpreted by
+`docs/authority/owner-authority.md`. Product policy does not override the mutation and approval
+boundaries below.
+
 ## Inspect Before Editing
 
 Before editing, inspect and report:

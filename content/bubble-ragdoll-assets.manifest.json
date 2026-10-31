@@ -17,9 +17,9 @@
       "sourceAssetId": "audio_917e1c41a1857736",
       "semanticRole": "BUBBLE_SOFT_IMPACT",
       "sourceAuthority": "OWNER_AUTHORED",
-      "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+      "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
       "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
-      "runtimeState": "BLOCKED_RIGHTS_ATTESTATION"
+      "runtimeState": "NOT_PREPARED_OWNER_REVIEW_REQUIRED"
     }
   ],
   "assets": [

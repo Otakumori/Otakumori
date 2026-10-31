@@ -51,8 +51,8 @@ describe('Bubble Ragdoll visual family', () => {
       expect.objectContaining({
         sourceAssetId: 'audio_917e1c41a1857736',
         semanticRole: 'BUBBLE_SOFT_IMPACT',
-        licenseState: 'OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING',
-        runtimeState: 'BLOCKED_RIGHTS_ATTESTATION',
+        licenseState: 'OWNER_AUTHORED_RIGHTS_CONFIRMED',
+        runtimeState: 'NOT_PREPARED_OWNER_REVIEW_REQUIRED',
       }),
     ]);
     expect(manifest.assets).toHaveLength(1);

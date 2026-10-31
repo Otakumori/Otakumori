@@ -112,7 +112,7 @@ describe('owner-managed asset library manifests', () => {
       ATTRIBUTION_REQUIRED: 557,
       LICENSE_EVIDENCE_REQUIRED: 2,
       LICENSE_VERIFIED: 413,
-      OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING: 2,
+      OWNER_AUTHORED_RIGHTS_CONFIRMED: 2,
       OWNER_STATES_LICENSED_EVIDENCE_PENDING: 1,
     });
 
@@ -143,12 +143,15 @@ describe('owner-managed asset library manifests', () => {
     });
 
     const ownerAuthored = audio.files.filter(
-      ({ licenseState }) => licenseState === 'OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING',
+      ({ licenseState }) => licenseState === 'OWNER_AUTHORED_RIGHTS_CONFIRMED',
     );
     expect(ownerAuthored).toHaveLength(2);
     expect(
       ownerAuthored.every(
-        ({ runtimeRecommendation }) => runtimeRecommendation === 'HOLD_LICENSE_EVIDENCE',
+        ({ runtimeRecommendation, provenance }) =>
+          runtimeRecommendation === 'OWNER_PLACEMENT_REQUIRED' &&
+          provenance.commercialRights === 'CLEARED_OWNER_ATTESTATION' &&
+          provenance.publicationState === 'NOT_AUTHORIZED',
       ),
     ).toBe(true);
   });
