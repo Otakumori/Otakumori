@@ -3,6 +3,12 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
 import {
+  hasBetaAccess,
+  isBetaCheckoutBlocked,
+  isBetaCheckoutPage,
+  isBetaPublicPath,
+} from '@/app/lib/auth/betaAccess';
+import {
   VISUAL_QA_AUTH_STATE_COOKIE,
   VISUAL_QA_AUTH_STATE_HEADER,
   isVisualQaAuthEnabled,
@@ -120,6 +126,13 @@ function buildAgeCheckUrl(reqUrl: string, returnTo: string) {
   return url;
 }
 
+function buildBetaAccessUrl(reqUrl: string, returnTo: string, state?: string) {
+  const url = new URL('/beta-access', reqUrl);
+  url.searchParams.set('returnTo', returnTo);
+  if (state) url.searchParams.set('state', state);
+  return url;
+}
+
 function createRequestId(req: NextRequest) {
   return (
     req.headers.get('x-request-id') ||
@@ -217,6 +230,8 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
     const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
 
     const reqId = createRequestId(req);
+    let userId: string | null = null;
+    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
 
     if (req.method === 'OPTIONS' && (isApi || isIngest)) {
       return handleCorsPreflight(req);
@@ -235,17 +250,57 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(url, 308);
     }
 
+    const betaPublicPath = isBetaPublicPath(url.pathname);
+    if (!betaPublicPath && !userId) {
+      const authResult = await auth();
+      userId = authResult.userId;
+      sessionClaims = authResult.sessionClaims;
+    }
+
+    if (!betaPublicPath && !userId) {
+      if (isApi || isIngest) return apiAuthError(401, 'BETA_INVITE_REQUIRED', reqId);
+      return NextResponse.redirect(
+        buildBetaAccessUrl(req.url, `${url.pathname}${url.search}`, 'sign-in-required'),
+      );
+    }
+
+    if (!betaPublicPath && !hasBetaAccess(sessionClaims)) {
+      if (isApi || isIngest) return apiAuthError(403, 'BETA_INVITE_REQUIRED', reqId);
+      return NextResponse.redirect(
+        buildBetaAccessUrl(req.url, `${url.pathname}${url.search}`, 'not-invited'),
+      );
+    }
+
+    if (isBetaCheckoutBlocked(url.pathname, req.method)) {
+      return addPublicSecurityHeaders(
+        NextResponse.json(
+          {
+            ok: false,
+            error: 'BETA_PURCHASES_DISABLED',
+            message: 'Purchases are unavailable during the closed beta.',
+          },
+          { status: 503 },
+        ),
+        reqId,
+      );
+    }
+
+    if (isBetaCheckoutPage(url.pathname)) {
+      const shopUrl = new URL('/shop', req.url);
+      shopUrl.searchParams.set('beta', 'purchases-disabled');
+      return NextResponse.redirect(shopUrl);
+    }
+
     if (isAgeGatedRoute(url.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
       return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
     }
 
-    let userId: string | null = null;
-    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
-
     if (requiresAdminAuth) {
-      const authResult = await auth();
-      userId = authResult.userId;
-      sessionClaims = authResult.sessionClaims;
+      if (!userId) {
+        const authResult = await auth();
+        userId = authResult.userId;
+        sessionClaims = authResult.sessionClaims;
+      }
 
       if (!userId) {
         if (isApi) return apiAuthError(401, 'Unauthorized', reqId);
