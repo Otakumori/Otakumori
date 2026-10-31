@@ -92,4 +92,28 @@ describe('closed beta middleware boundary', () => {
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ error: 'BETA_PURCHASES_DISABLED' });
   });
+
+  it('fails closed when authentication is unavailable', async () => {
+    mocks.auth.mockRejectedValue(new Error('auth unavailable'));
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/mini-games/petal-samurai'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(503);
+  });
+
+  it('does not honor a spoofed Lighthouse bypass header on a remote host', async () => {
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/', {
+        headers: { 'x-otakumori-lighthouse-ci': '1' },
+      }),
+      {} as never,
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/beta-access');
+  });
 });

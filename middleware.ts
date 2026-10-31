@@ -188,7 +188,9 @@ function apiAuthError(status: 401 | 403, message: string, reqId: string) {
 }
 
 function isLighthousePublicRoute(req: NextRequest) {
+  const hostname = (req.headers.get('host') || '').split(':')[0]?.toLowerCase();
   return (
+    (hostname === 'localhost' || hostname === '127.0.0.1') &&
     req.headers.get('x-otakumori-lighthouse-ci') === '1' &&
     !req.nextUrl.pathname.startsWith('/api/') &&
     !req.nextUrl.pathname.startsWith('/ingest') &&
@@ -334,7 +336,10 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
   } catch {
     const reqId = createRequestId(req);
     const isSensitiveRoute =
-      req.nextUrl.pathname.startsWith('/api/') || isAdmin(req) || isProtected(req);
+      !isBetaPublicPath(req.nextUrl.pathname) ||
+      req.nextUrl.pathname.startsWith('/api/') ||
+      isAdmin(req) ||
+      isProtected(req);
 
     if (isSensitiveRoute) {
       return addPublicSecurityHeaders(
