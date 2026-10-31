@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Build durable manifests for the owner-managed SFX and Avatar source libraries.
 
-The script inventories source files without copying them into runtime directories. It expects
-the optional `mutagen` package for compressed-audio metadata:
+The script inventories source files without copying them into runtime directories. Install its
+pinned metadata dependencies before use:
 
-    python -m pip install mutagen
+    python -m pip install -r scripts/requirements-asset-catalog.txt
 
 Usage:
     python scripts/catalog-owner-asset-library.py \
@@ -21,7 +21,6 @@ import re
 import struct
 import subprocess
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +40,118 @@ AVATAR_EXTENSIONS = {
     ".ma", ".mb", ".fbx", ".glb", ".gltf", ".pmx", ".vrm", ".obj",
     ".png", ".jpg", ".jpeg", ".bmp", ".tga", ".webp", ".ktx2", ".fx",
     ".fxsub", ".swatch", ".txt", ".md", ".pdf",
+}
+
+EVIDENCE_CAPTURED_AT = "2026-10-30"
+GENERATED_AT = f"{EVIDENCE_CAPTURED_AT}T00:00:00+00:00"
+CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
+PIXABAY_LICENSE_URL = "https://pixabay.com/service/license-summary/"
+
+PUBLISHER_EVIDENCE: dict[str, dict[str, Any]] = {
+    "tommusic-free-fantasy-200": {
+        "publisher": "TomMusic",
+        "title": "Free Fantasy 200 SFX Pack",
+        "sourceUrl": "https://tommusic.itch.io/free-fantasy-200-sfx-pack",
+        "licenseId": "CUSTOM_ROYALTY_FREE",
+        "licenseUrl": "https://tommusic.itch.io/free-fantasy-200-sfx-pack",
+        "rightsSummary": "Commercial and noncommercial project use permitted; credit optional; standalone resale or redistribution prohibited.",
+        "attribution": "OPTIONAL",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+    "dillon-becker-sdap-v1": {
+        "publisher": "Dillon Becker",
+        "title": "Super Dialogue Audio Pack v1",
+        "sourceUrl": "https://dillonbecker.itch.io/sdap",
+        "licenseId": "CC_BY_4_0",
+        "licenseUrl": CC_BY_4_URL,
+        "rightsSummary": "Commercial use and adaptation permitted with creator attribution and modification disclosure.",
+        "attribution": "REQUIRED",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+    "kenney-asset-pages": {
+        "publisher": "Kenney",
+        "title": "Kenney asset-page licensing",
+        "sourceUrl": "https://kenney.nl/support",
+        "licenseId": "CC0",
+        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "rightsSummary": "Exact assets published on Kenney asset pages are CC0; no local files matched during this intake.",
+        "attribution": "OPTIONAL",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+    "pixabay-content-license": {
+        "publisher": "Pixabay",
+        "title": "Pixabay Content License",
+        "sourceUrl": PIXABAY_LICENSE_URL,
+        "licenseId": "PIXABAY_CONTENT_LICENSE",
+        "licenseUrl": PIXABAY_LICENSE_URL,
+        "rightsSummary": "Free use and adaptation permitted under the Content License; standalone redistribution is prohibited.",
+        "attribution": "OPTIONAL",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+    "freesound-bubble-pops-497198": {
+        "publisher": "Freesound",
+        "title": "Bubble Pops",
+        "sourceUrl": "https://freesound.org/people/Abacagi/sounds/497198/",
+        "licenseId": "CC_BY_4_0",
+        "licenseUrl": CC_BY_4_URL,
+        "rightsSummary": "Commercial use and adaptation permitted with attribution to Abacagi and modification disclosure.",
+        "attribution": "REQUIRED",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+    "incompetech-cc-by-4": {
+        "publisher": "Incompetech",
+        "title": "Kevin MacLeod royalty-free catalog",
+        "sourceUrl": "https://incompetech.com/music/royalty-free/full_list.html",
+        "licenseId": "CC_BY_4_0",
+        "licenseUrl": CC_BY_4_URL,
+        "rightsSummary": "Verified catalog recordings permit commercial use and adaptation with Kevin MacLeod attribution and modification disclosure.",
+        "attribution": "REQUIRED",
+        "evidenceCapturedAt": EVIDENCE_CAPTURED_AT,
+    },
+}
+
+PIXABAY_FILES = {
+    "freesound_community-katana-sword-70247.mp3": {
+        "title": "Katana Sword", "creator": "crawfordjohnb@bellsouth.net (Freesound)",
+        "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-katana-sword-70247/",
+    },
+    "freesound_community-loud-silence-75803.mp3": {
+        "title": "Loud Silence", "creator": "qubodup (Freesound)",
+        "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-loud-silence-75803/",
+    },
+    "freesound_community-sfx_spirit_gain-95855.mp3": {
+        "title": "SFX_SPIRIT_GAIN", "creator": "Brimistic (Freesound)",
+        "sourceUrl": "https://pixabay.com/sound-effects/musical-sfx-spirit-gain-95855/",
+    },
+    "soundreality-wrong-place-129242.mp3": {
+        "title": "Wrong Place", "creator": "SoundReality",
+        "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-wrong-place-129242/",
+    },
+    "54427377-sword-slash-476148.mp3": {
+        "title": "Sword Slash", "creator": "54427377",
+        "sourceUrl": "https://pixabay.com/sound-effects/sword-slash-476148/",
+    },
+}
+
+INCOMPETECH_FILES = {
+    "Baba Yaga.mp3": ("Baba Yaga", "USUAN1500079", "petal-storm"),
+    "Atlantean%20Twilight.mp3": ("Atlantean Twilight", "USUAN1100322", "memory-keeper"),
+    "villian_Master Disorder.mp3": ("Master Disorder", "USUAN1600034", "special-results"),
+    "Bleeping Demo.mp3": ("Bleeping Demo", "USUAN2000021", "memory-defrag"),
+    "Cretaceous Dawn.mp3": ("Cretaceous Dawn", "USUAN2500001", "otaku-beat-em-up"),
+    "Ethernight Club.mp3": ("Ethernight Club", "USUAN2100002", "competitive-minigame"),
+    "Galactic Rap.mp3": ("Galactic Rap", "USUAN2300009", "results-progression"),
+    "Gregorian Chant_interestingdialoguebg.mp3": ("Gregorian Chant", "USUAN1600052", "narrative-chambers"),
+    "Journey To Ascend.mp3": ("Journey to Ascend", "USUAN2200001", "petal-samurai"),
+    "Leaving Home.mp3": ("Leaving Home", "USUAN1900002", "reflective-progression"),
+    "Lewis and Dekalb__fighter.mp3": ("Lewis and Dekalb", "USUAN1600027", "otaku-beat-em-up"),
+    "Screen Saver.mp3": ("Screen Saver", "USUAN1900046", "game-hub"),
+    "Valse Gymnopedie.mp3": ("Valse Gymnopedie", "USUAN2100012", "profile-sanctuary"),
+}
+
+OWNER_AUTHORED_FILES = {
+    "satisfying-soft-cute-butt-uqdnx4eo.wav": "917E1C41A18577367AC8175F0EDD89AA3503B1F8BC7C65D56B2F8CDD2F6370ED",
+    "interesting ui.mp3": "4863D325B435675298AE0C4AA6E84D6537C836AAB8AF6EE5DED6D6D4B569DC0C",
 }
 
 
@@ -307,11 +418,156 @@ def classify_audio(relative: str, metadata: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def license_for_audio(family: str) -> tuple[str, str]:
-    if family == "SUPER_DIALOGUE_AUDIO_PACK_V1":
-        return "ATTRIBUTION_REQUIRED", "CC BY 4.0; attribution to Dillon Becker"
+def normalized_tag(metadata: dict[str, Any], key: str) -> str | None:
+    value = metadata.get("tags", {}).get(key)
+    if isinstance(value, list):
+        value = value[0] if value else None
+    return normalized_text(str(value)) if value else None
+
+
+def provenance_for_audio(
+    relative: str,
+    family: str,
+    metadata: dict[str, Any],
+    checksum: str,
+) -> dict[str, Any]:
+    base = {
+        "publisherEvidenceId": None,
+        "creator": None,
+        "title": Path(relative).stem,
+        "sourceUrl": None,
+        "licenseId": None,
+        "licenseUrl": None,
+        "attribution": "UNKNOWN",
+        "modificationDisclosureRequired": False,
+        "sourceMatch": {"state": "UNVERIFIED", "basis": []},
+        "commercialRights": "PENDING",
+        "technicalRuntimeState": "SOURCE_ONLY",
+        "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
+        "publicationState": "NOT_AUTHORIZED",
+    }
+
     if family == "TOMMUSIC_FREE_FANTASY_SFX":
-        return "LICENSE_EVIDENCE_REQUIRED", "Included ReadMe identifies TomMusic but contains no usage grant"
+        evidence = PUBLISHER_EVIDENCE["tommusic-free-fantasy-200"]
+        return {
+            **base,
+            "publisherEvidenceId": "tommusic-free-fantasy-200",
+            "creator": "TomMusic",
+            "sourceUrl": evidence["sourceUrl"],
+            "licenseId": evidence["licenseId"],
+            "licenseUrl": evidence["licenseUrl"],
+            "attribution": "OPTIONAL",
+            "sourceMatch": {
+                "state": "VERIFIED_PACK_MEMBERSHIP",
+                "basis": ["original package directory", "publisher WAV/OGG hierarchy", "bundled ReadMe"],
+            },
+            "commercialRights": "CLEARED",
+        }
+
+    if family == "SUPER_DIALOGUE_AUDIO_PACK_V1":
+        evidence = PUBLISHER_EVIDENCE["dillon-becker-sdap-v1"]
+        return {
+            **base,
+            "publisherEvidenceId": "dillon-becker-sdap-v1",
+            "creator": "Dillon Becker",
+            "sourceUrl": evidence["sourceUrl"],
+            "licenseId": evidence["licenseId"],
+            "licenseUrl": evidence["licenseUrl"],
+            "attribution": "REQUIRED",
+            "modificationDisclosureRequired": True,
+            "sourceMatch": {
+                "state": "VERIFIED_PACK_MEMBERSHIP",
+                "basis": ["original package directory", "bundled License.pdf", "speaker/category hierarchy"],
+            },
+            "commercialRights": "CLEARED",
+        }
+
+    filename = Path(relative).name
+    if filename in PIXABAY_FILES:
+        source = PIXABAY_FILES[filename]
+        return {
+            **base,
+            "publisherEvidenceId": "pixabay-content-license",
+            "creator": source["creator"],
+            "title": source["title"],
+            "sourceUrl": source["sourceUrl"],
+            "licenseId": "PIXABAY_CONTENT_LICENSE",
+            "licenseUrl": PIXABAY_LICENSE_URL,
+            "attribution": "OPTIONAL",
+            "sourceMatch": {
+                "state": "VERIFIED_SOURCE_ID_MATCH",
+                "basis": ["publisher source ID in filename", "publisher title/creator record"],
+            },
+            "commercialRights": "CLEARED",
+        }
+
+    if filename == "497198__abacagi__bubble-pops.wav":
+        evidence = PUBLISHER_EVIDENCE["freesound-bubble-pops-497198"]
+        duration_matches = abs(float(metadata.get("durationSeconds") or 0) - 6.099) <= 0.02
+        return {
+            **base,
+            "publisherEvidenceId": "freesound-bubble-pops-497198",
+            "creator": "Abacagi",
+            "title": "Bubble Pops",
+            "sourceUrl": evidence["sourceUrl"],
+            "licenseId": evidence["licenseId"],
+            "licenseUrl": evidence["licenseUrl"],
+            "attribution": "REQUIRED",
+            "modificationDisclosureRequired": True,
+            "sourceMatch": {
+                "state": "VERIFIED_SOURCE_ID_MATCH" if duration_matches else "FILE_MATCH_REVIEW_REQUIRED",
+                "basis": ["Freesound source ID and creator in filename", "publisher duration match"],
+            },
+            "commercialRights": "CLEARED" if duration_matches else "PENDING",
+        }
+
+    if filename in INCOMPETECH_FILES:
+        title, isrc, destination = INCOMPETECH_FILES[filename]
+        tagged_title = normalized_tag(metadata, "title")
+        tagged_artist = normalized_tag(metadata, "artist")
+        tag_match = tagged_title == normalized_text(title) and tagged_artist == "kevin macleod"
+        return {
+            **base,
+            "publisherEvidenceId": "incompetech-cc-by-4",
+            "creator": "Kevin MacLeod",
+            "title": title,
+            "sourceUrl": f"https://incompetech.com/music/royalty-free/index.html?isrc={isrc}",
+            "licenseId": "CC_BY_4_0",
+            "licenseUrl": CC_BY_4_URL,
+            "attribution": "REQUIRED",
+            "modificationDisclosureRequired": True,
+            "sourceMatch": {
+                "state": "VERIFIED_TAG_AND_CATALOG_MATCH" if tag_match else "FILE_MATCH_REVIEW_REQUIRED",
+                "basis": ["exact filename", "embedded title/artist tags" if tag_match else "embedded identifying tags absent"],
+                "isrc": isrc,
+            },
+            "commercialRights": "CLEARED" if tag_match else "PENDING",
+            "creativeDestination": destination,
+        }
+
+    if filename in OWNER_AUTHORED_FILES and checksum == OWNER_AUTHORED_FILES[filename]:
+        return {
+            **base,
+            "creator": "Otakumori owner",
+            "title": Path(filename).stem,
+            "licenseId": "OWNER_AUTHORED",
+            "attribution": "NOT_REQUIRED",
+            "sourceMatch": {"state": "VERIFIED_OWNER_HASH", "basis": ["owner-supplied SHA-256 attestation"]},
+            "commercialRights": "ATTESTATION_PENDING_COMPONENT_RIGHTS",
+        }
+
+    return base
+
+
+def license_for_provenance(provenance: dict[str, Any]) -> tuple[str, str]:
+    rights = provenance["commercialRights"]
+    if rights == "CLEARED":
+        state = "ATTRIBUTION_REQUIRED" if provenance["attribution"] == "REQUIRED" else "LICENSE_VERIFIED"
+        return state, f"{provenance['licenseId']}; exact source evidence recorded"
+    if rights == "ATTESTATION_PENDING_COMPONENT_RIGHTS":
+        return "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING", "Owner authorship stated; embedded component/sample rights unanswered"
+    if provenance["publisherEvidenceId"] == "incompetech-cc-by-4":
+        return "LICENSE_EVIDENCE_REQUIRED", "Publisher license identified; exact local recording match needs additional evidence"
     return "OWNER_STATES_LICENSED_EVIDENCE_PENDING", "Owner-supplied individual download; per-file evidence not present"
 
 
@@ -338,8 +594,21 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         checksum = sha256(path)
         metadata = audio_metadata(path)
         classified = classify_audio(relative, metadata)
-        license_state, license_note = license_for_audio(classified["family"])
-        recommendation = "HOLD_LICENSE_EVIDENCE" if license_state in {"LICENSE_EVIDENCE_REQUIRED", "OWNER_STATES_LICENSED_EVIDENCE_PENDING"} else "OWNER_CASTING_REQUIRED" if classified["category"].startswith("DIALOGUE") else "RUNTIME_CANDIDATE"
+        provenance = provenance_for_audio(relative, classified["family"], metadata, checksum)
+        license_state, license_note = license_for_provenance(provenance)
+        blocked_states = {
+            "LICENSE_EVIDENCE_REQUIRED",
+            "OWNER_STATES_LICENSED_EVIDENCE_PENDING",
+            "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+        }
+        if license_state in blocked_states:
+            recommendation = "HOLD_LICENSE_EVIDENCE"
+        elif classified["category"].startswith("DIALOGUE"):
+            recommendation = "OWNER_CASTING_REQUIRED"
+        elif classified["family"] == "TOMMUSIC_FREE_FANTASY_SFX" and path.suffix.lower() == ".wav":
+            recommendation = "SOURCE_MASTER_ONLY"
+        else:
+            recommendation = "RUNTIME_CANDIDATE"
         record = {
             "id": f"audio_{checksum[:16].lower()}",
             "sourceRoot": "OWNER_SFX_LIBRARY",
@@ -353,6 +622,7 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             "duplicate": {"status": "UNIQUE", "canonicalId": None, "contentGroup": None},
             "licenseState": license_state,
             "licenseNote": license_note,
+            "provenance": provenance,
             "runtimeRecommendation": recommendation,
             "contentAnalysis": waveform_analysis(path, float(metadata.get("durationSeconds") or 0))
             if classified["family"] == "OWNER_INDIVIDUAL_AUDIO"
@@ -391,8 +661,8 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             records[ogg]["duplicate"] = {
                 "status": "CONTENT_DUPLICATE", "canonicalId": records[wav]["id"], "contentGroup": group_id,
             }
-        if records[ogg]["licenseState"] == "LICENSE_EVIDENCE_REQUIRED":
-            records[ogg]["runtimeRecommendation"] = "HOLD_LICENSE_EVIDENCE"
+        if records[ogg]["licenseState"] == "LICENSE_VERIFIED":
+            records[ogg]["runtimeRecommendation"] = "RUNTIME_CANDIDATE"
         paired_content.append({
             "id": group_id,
             "sourceCanonicalId": records[wav]["id"],
@@ -450,7 +720,7 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     }
     manifest = {
         "version": 1,
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": GENERATED_AT,
         "sourceRoot": {"id": "OWNER_SFX_LIBRARY", "pathPolicy": "OWNER_LOCAL_RELATIVE_PATHS_ONLY"},
         "summary": {
             "rootFiles": len(all_source_files),
@@ -464,38 +734,80 @@ def build_audio_manifest(root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
             "rollup": rollup,
             "licenseStates": dict(sorted(license_counts.items())),
         },
-        "licenseEvidence": [
-            {
-                "family": "SUPER_DIALOGUE_AUDIO_PACK_V1", "state": "ATTRIBUTION_REQUIRED",
-                "license": "CC BY 4.0", "creator": "Dillon Becker",
-                "evidence": "Super Dialogue Audio Pack v1/Step 1 - License and Contact Info/License.pdf",
-            },
-            {
-                "family": "TOMMUSIC_FREE_FANTASY_SFX", "state": "LICENSE_EVIDENCE_REQUIRED",
-                "creator": "TomMusic", "evidence": "Free Fantasy SFX Pack By TomMusic/ReadMe.txt",
-                "note": "The included ReadMe identifies the creator and contact links but contains no usage grant.",
-            },
-            {
-                "family": "OWNER_INDIVIDUAL_AUDIO", "state": "OWNER_STATES_LICENSED_EVIDENCE_PENDING",
-                "note": "Per-track license or source-page evidence was not present in the intake root.",
-            },
+        "publisherEvidence": [
+            {"id": evidence_id, **evidence}
+            for evidence_id, evidence in PUBLISHER_EVIDENCE.items()
         ],
         "contentDuplicateGroups": paired_content,
         "shortlists": shortlists,
         "files": records,
     }
+    credit_records: list[dict[str, Any]] = [
+        {
+            "id": "tommusic-free-fantasy-200", "scope": "SOURCE_LIBRARY",
+            "title": "Free Fantasy 200 SFX Pack", "creator": "TomMusic",
+            "sourceUrl": PUBLISHER_EVIDENCE["tommusic-free-fantasy-200"]["sourceUrl"],
+            "licenseId": "CUSTOM_ROYALTY_FREE",
+            "licenseUrl": PUBLISHER_EVIDENCE["tommusic-free-fantasy-200"]["licenseUrl"],
+            "attributionRequired": False, "credit": "Free Fantasy 200 SFX Pack by TomMusic",
+            "modifications": "No runtime transformation approved; publisher OGG variants preferred.",
+            "publicationState": "NOT_AUTHORIZED", "publicCredit": True,
+        },
+        {
+            "id": "super-dialogue-audio-pack-v1", "scope": "SOURCE_LIBRARY",
+            "title": "Super Dialogue Audio Pack v1", "creator": "Dillon Becker",
+            "sourceUrl": PUBLISHER_EVIDENCE["dillon-becker-sdap-v1"]["sourceUrl"],
+            "licenseId": "CC_BY_4_0", "licenseUrl": CC_BY_4_URL,
+            "attributionRequired": True, "credit": "Super Dialogue Audio Pack v1 by Dillon Becker",
+            "modifications": "No runtime derivatives selected.",
+            "publicationState": "NOT_AUTHORIZED", "publicCredit": True,
+        },
+    ]
+    credited_ids = {record["id"] for record in credit_records}
+    for record in records:
+        provenance = record["provenance"]
+        if record["licenseState"] not in {"LICENSE_VERIFIED", "ATTRIBUTION_REQUIRED"}:
+            continue
+        if record["family"] in {"TOMMUSIC_FREE_FANTASY_SFX", "SUPER_DIALOGUE_AUDIO_PACK_V1"}:
+            continue
+        credit_id = f"audio-credit-{record['sha256'][:16].lower()}"
+        if credit_id in credited_ids:
+            continue
+        credited_ids.add(credit_id)
+        if provenance["creator"] == "Kevin MacLeod":
+            credit = (
+                f"\"{provenance['title']}\" Kevin MacLeod (incompetech.com); "
+                "Licensed under Creative Commons: By Attribution 4.0"
+            )
+        else:
+            credit = f"{provenance['title']} by {provenance['creator']}"
+        credit_records.append({
+            "id": credit_id, "scope": "INDIVIDUAL_SOURCE", "assetId": record["id"],
+            "title": provenance["title"], "creator": provenance["creator"],
+            "sourceUrl": provenance["sourceUrl"], "licenseId": provenance["licenseId"],
+            "licenseUrl": provenance["licenseUrl"],
+            "attributionRequired": provenance["attribution"] == "REQUIRED",
+            "credit": credit, "modifications": "None; source library intake only.",
+            "publicationState": "NOT_AUTHORIZED", "publicCredit": True,
+        })
+    pending = [
+        {
+            "relativePath": record["relativePath"], "sha256": record["sha256"],
+            "state": record["licenseState"], "reason": record["licenseNote"],
+        }
+        for record in records
+        if record["family"] == "OWNER_INDIVIDUAL_AUDIO"
+        and record["licenseState"] not in {"LICENSE_VERIFIED", "ATTRIBUTION_REQUIRED"}
+    ]
     attributions = {
-        "version": 1,
-        "entries": [
-            {
-                "id": "super-dialogue-audio-pack-v1", "assetFamily": "SUPER_DIALOGUE_AUDIO_PACK_V1",
-                "creator": "Dillon Becker", "license": "CC BY 4.0",
-                "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-                "credit": "Super Dialogue Audio Pack V1 by Dillon Becker",
-                "changesDisclosureRequired": True,
-            }
+        "version": 2,
+        "generatedAt": GENERATED_AT,
+        "publisherEvidence": [
+            {"id": evidence_id, **evidence}
+            for evidence_id, evidence in PUBLISHER_EVIDENCE.items()
         ],
-        "pendingEvidenceFamilies": ["TOMMUSIC_FREE_FANTASY_SFX", "OWNER_INDIVIDUAL_AUDIO"],
+        "entries": credit_records,
+        "pendingEvidence": pending,
     }
     return manifest, attributions
 
@@ -583,7 +895,7 @@ def build_avatar_manifest(root: Path) -> dict[str, Any]:
     source = next((record for record in records if record["relativePath"] == "anime_base_male_female.ma"), None)
     return {
         "version": 1,
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": GENERATED_AT,
         "sourceRoot": {"id": "OWNER_AVATAR_LIBRARY", "pathPolicy": "OWNER_LOCAL_RELATIVE_PATHS_ONLY"},
         "summary": {
             "relevantFiles": len(records),

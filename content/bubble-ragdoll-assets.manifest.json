@@ -3,7 +3,25 @@
   "packId": "bubble_ragdoll_visual_family_v1",
   "surface": "Bubble Ragdoll",
   "integrationState": "OWNER_VISUAL_REVIEW_REQUIRED",
-  "audioState": "LICENSE_EVIDENCE_REQUIRED",
+  "audioState": "MIXED_CLEARANCE_OWNER_REVIEW_REQUIRED",
+  "audioCandidates": [
+    {
+      "sourceAssetId": "audio_05fa084b71ba21d3",
+      "semanticRole": "BUBBLE_POP",
+      "sourceAuthority": "freesound-bubble-pops-497198",
+      "licenseState": "ATTRIBUTION_REQUIRED",
+      "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
+      "runtimeState": "NOT_PREPARED"
+    },
+    {
+      "sourceAssetId": "audio_917e1c41a1857736",
+      "semanticRole": "BUBBLE_SOFT_IMPACT",
+      "sourceAuthority": "OWNER_AUTHORED",
+      "licenseState": "OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING",
+      "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
+      "runtimeState": "BLOCKED_RIGHTS_ATTESTATION"
+    }
+  ],
   "assets": [
     {
       "id": "bubble_ragdoll_moonlit_bubble_arena_candidate_v1",

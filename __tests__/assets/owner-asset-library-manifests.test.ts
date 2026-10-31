@@ -9,15 +9,25 @@ type AudioRecord = {
   duplicate: { status: string; canonicalId: string | null; contentGroup: string | null };
   licenseState: string;
   runtimeRecommendation: string;
+  provenance: {
+    publisherEvidenceId: string | null;
+    sourceUrl: string | null;
+    licenseId: string | null;
+    sourceMatch: { state: string };
+    commercialRights: string;
+    publicationState: string;
+  };
 };
 
 type AudioManifest = {
+  generatedAt: string;
   summary: {
     rootFiles: number;
     audioFiles: number;
     uniqueContentAssets: number;
     binaryDuplicateAliases: number;
     contentDuplicateGroups: number;
+    licenseStates: Record<string, number>;
   };
   contentDuplicateGroups: Array<{
     sourceCanonicalId: string;
@@ -28,6 +38,7 @@ type AudioManifest = {
 };
 
 type AvatarManifest = {
+  generatedAt: string;
   summary: {
     relevantFiles: number;
     strongestFemaleBase: string;
@@ -47,9 +58,15 @@ const load = <T>(path: string): T =>
 
 const audio = load<AudioManifest>('docs/design/production-authority/audio-library-manifest.json');
 const avatar = load<AvatarManifest>('docs/design/production-authority/avatar-source-manifest.json');
+const attributions = load<{ generatedAt: string; entries: unknown[] }>(
+  'docs/legal/audio-attributions.json',
+);
 
 describe('owner-managed asset library manifests', () => {
   it('records the complete filtered audio inventory without absolute local paths', () => {
+    expect(audio.generatedAt).toBe('2026-10-30T00:00:00+00:00');
+    expect(avatar.generatedAt).toBe(audio.generatedAt);
+    expect(attributions.generatedAt).toBe(audio.generatedAt);
     expect(audio.summary.rootFiles).toBe(1630);
     expect(audio.summary.audioFiles).toBe(975);
     expect(audio.files).toHaveLength(audio.summary.audioFiles);
@@ -76,14 +93,62 @@ describe('owner-managed asset library manifests', () => {
 
   it('does not recommend license-blocked audio for runtime shipment', () => {
     const blocked = audio.files.filter(({ licenseState }) =>
-      ['LICENSE_EVIDENCE_REQUIRED', 'OWNER_STATES_LICENSED_EVIDENCE_PENDING'].includes(
-        licenseState,
-      ),
+      [
+        'LICENSE_EVIDENCE_REQUIRED',
+        'OWNER_STATES_LICENSED_EVIDENCE_PENDING',
+        'OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING',
+      ].includes(licenseState),
     );
     expect(blocked.length).toBeGreaterThan(0);
     expect(
       blocked.every(({ runtimeRecommendation }) =>
         ['HOLD_LICENSE_EVIDENCE', 'ALIAS_ONLY'].includes(runtimeRecommendation),
+      ),
+    ).toBe(true);
+  });
+
+  it('separates verified pack rights, exact-file matching, placement, and publication authority', () => {
+    expect(audio.summary.licenseStates).toEqual({
+      ATTRIBUTION_REQUIRED: 557,
+      LICENSE_EVIDENCE_REQUIRED: 2,
+      LICENSE_VERIFIED: 413,
+      OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING: 2,
+      OWNER_STATES_LICENSED_EVIDENCE_PENDING: 1,
+    });
+
+    const tomMusic = audio.files.filter(
+      ({ provenance }) => provenance.publisherEvidenceId === 'tommusic-free-fantasy-200',
+    );
+    expect(tomMusic).toHaveLength(408);
+    expect(
+      tomMusic.every(
+        ({ licenseState, provenance }) =>
+          licenseState === 'LICENSE_VERIFIED' &&
+          provenance.sourceMatch.state === 'VERIFIED_PACK_MEMBERSHIP' &&
+          provenance.commercialRights === 'CLEARED' &&
+          provenance.publicationState === 'NOT_AUTHORIZED',
+      ),
+    ).toBe(true);
+
+    const bubblePops = audio.files.find(({ relativePath }) =>
+      relativePath.includes('497198__abacagi__bubble-pops'),
+    );
+    expect(bubblePops).toMatchObject({
+      licenseState: 'ATTRIBUTION_REQUIRED',
+      provenance: {
+        publisherEvidenceId: 'freesound-bubble-pops-497198',
+        sourceMatch: { state: 'VERIFIED_SOURCE_ID_MATCH' },
+        commercialRights: 'CLEARED',
+      },
+    });
+
+    const ownerAuthored = audio.files.filter(
+      ({ licenseState }) => licenseState === 'OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING',
+    );
+    expect(ownerAuthored).toHaveLength(2);
+    expect(
+      ownerAuthored.every(
+        ({ runtimeRecommendation }) => runtimeRecommendation === 'HOLD_LICENSE_EVIDENCE',
       ),
     ).toBe(true);
   });

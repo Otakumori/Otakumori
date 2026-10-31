@@ -13,6 +13,13 @@ type RuntimeAsset = {
 type PetalSamuraiManifest = {
   integrationState: string;
   audioState: string;
+  audioCandidates: Array<{
+    sourceAssetId: string;
+    semanticRole: string;
+    licenseState: string;
+    ownerPlacementState: string;
+    runtimeState: string;
+  }>;
   assets: Array<{
     id: string;
     ownerApprovalState: string;
@@ -37,7 +44,16 @@ const checksum = (repositoryPath: string) =>
 describe('Petal Samurai visual family', () => {
   it('integrates one approved arena while keeping result and VFX derivatives in owner review', () => {
     expect(manifest.integrationState).toBe('OWNER_VISUAL_REVIEW_REQUIRED');
-    expect(manifest.audioState).toBe('EXTERNAL_ARTIST_REQUIRED');
+    expect(manifest.audioState).toBe('LICENSE_CLEARED_CANDIDATES_OWNER_REVIEW_REQUIRED');
+    expect(manifest.audioCandidates).toHaveLength(6);
+    expect(
+      manifest.audioCandidates.every(
+        ({ licenseState, ownerPlacementState, runtimeState }) =>
+          licenseState === 'LICENSE_VERIFIED' &&
+          ownerPlacementState === 'OWNER_REVIEW_REQUIRED' &&
+          runtimeState === 'NOT_PREPARED',
+      ),
+    ).toBe(true);
     expect(manifest.assets).toHaveLength(8);
 
     const arena = manifest.assets.find(({ id }) => id === 'petal_samurai_moonlit_shrine_arena_v1');

@@ -7,6 +7,13 @@ import { describe, expect, it } from 'vitest';
 type BubbleManifest = {
   integrationState: string;
   audioState: string;
+  audioCandidates: Array<{
+    sourceAssetId: string;
+    semanticRole: string;
+    licenseState: string;
+    ownerPlacementState: string;
+    runtimeState: string;
+  }>;
   assets: Array<{
     id: string;
     ownerApprovalState: string;
@@ -30,9 +37,24 @@ const checksum = (repositoryPath: string) =>
     .toUpperCase();
 
 describe('Bubble Ragdoll visual family', () => {
-  it('keeps the integrated arena in owner review and audio license-blocked', () => {
+  it('keeps the integrated arena and mixed-clearance audio candidates in owner review', () => {
     expect(manifest.integrationState).toBe('OWNER_VISUAL_REVIEW_REQUIRED');
-    expect(manifest.audioState).toBe('LICENSE_EVIDENCE_REQUIRED');
+    expect(manifest.audioState).toBe('MIXED_CLEARANCE_OWNER_REVIEW_REQUIRED');
+    expect(manifest.audioCandidates).toEqual([
+      expect.objectContaining({
+        sourceAssetId: 'audio_05fa084b71ba21d3',
+        semanticRole: 'BUBBLE_POP',
+        licenseState: 'ATTRIBUTION_REQUIRED',
+        ownerPlacementState: 'OWNER_REVIEW_REQUIRED',
+        runtimeState: 'NOT_PREPARED',
+      }),
+      expect.objectContaining({
+        sourceAssetId: 'audio_917e1c41a1857736',
+        semanticRole: 'BUBBLE_SOFT_IMPACT',
+        licenseState: 'OWNER_AUTHORED_RIGHTS_ATTESTATION_PENDING',
+        runtimeState: 'BLOCKED_RIGHTS_ATTESTATION',
+      }),
+    ]);
     expect(manifest.assets).toHaveLength(1);
     expect(manifest.assets[0]).toMatchObject({
       id: 'bubble_ragdoll_moonlit_bubble_arena_candidate_v1',
