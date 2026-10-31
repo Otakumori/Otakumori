@@ -6,6 +6,7 @@
  */
 
 import { db } from '@/app/lib/db';
+import { PetalSpendError, spendPetalsInTransaction } from '@/app/lib/petals/spend';
 
 export async function ensureUserByClerkId(clerkId: string) {
   // Minimal upsert to guarantee a row exists; mimic existing patterns
@@ -54,27 +55,18 @@ export async function debitPetals(clerkId: string, amount: number, reason: strin
     if (amount <= 0) return { success: false, balance: 0, error: 'Amount must be positive' };
 
     const user = await ensureUserByClerkId(clerkId);
-    const updated = await db.$transaction(async (tx) => {
-      const current = await tx.user.findUnique({
-        where: { id: user.id },
-        select: { petalBalance: true },
-      });
-      const balance = current?.petalBalance ?? 0;
-      if (balance < amount) {
-        throw Object.assign(new Error('INSUFFICIENT_FUNDS'), { code: 'INSUFFICIENT_FUNDS' });
-      }
-      await tx.petalLedger.create({ data: { userId: user.id, type: 'spend', amount, reason } });
-      const updatedUser = await tx.user.update({
-        where: { id: user.id },
-        data: { petalBalance: { decrement: amount } },
-        select: { petalBalance: true },
-      });
-      return updatedUser;
-    });
+    const updated = await db.$transaction((tx) =>
+      spendPetalsInTransaction(tx, user.id, amount, reason, 'legacy_petal_debit'),
+    );
 
-    return { success: true, balance: updated.petalBalance };
+    return { success: true, balance: updated.newBalance };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Debit failed';
+    const message =
+      error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS'
+        ? 'INSUFFICIENT_FUNDS'
+        : error instanceof Error
+          ? error.message
+          : 'Debit failed';
     return { success: false, balance: 0, error: message };
   }
 }

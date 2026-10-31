@@ -10,7 +10,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { PetalService } from '@/app/lib/petals';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { generateRequestId } from '@/lib/requestId';
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { env } from '@/env';
@@ -110,7 +110,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has enough petals
-    const petalService = new PetalService();
     const wallet = await db.petalWallet.findUnique({
       where: { userId: user.id },
     });
@@ -144,25 +143,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Spend petals first (PetalService handles its own transaction)
-    const spendResult = await petalService.spendPetals(
-      user.id,
-      voucherConfig.costPetals,
-      `Purchased discount voucher: ${voucherConfig.name}`,
-      requestId,
-    );
-
-    if (!spendResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: spendResult.error || 'Failed to spend petals',
-          requestId,
-        },
-        { status: 500 },
-      );
-    }
-
     // Generate unique voucher code
     const voucherCode = `PETAL_${tier.toUpperCase()}_${Date.now()}_${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
@@ -170,36 +150,47 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30); // 30 days expiry
 
-    const couponGrant = await db.couponGrant.create({
-      data: {
-        userId: user.id,
-        code: voucherCode,
-        discountType: 'PERCENT',
-        percentOff: voucherConfig.percent,
-        expiresAt,
-      },
-    });
-
-    const result = {
-      voucherCode,
-      couponGrant,
-      newBalance: spendResult.newBalance,
-      lifetimePetalsEarned: spendResult.lifetimePetalsEarned,
-    };
+    const result = await spendPetalsAndFulfill(
+      user.id,
+      voucherConfig.costPetals,
+      `Purchased discount voucher: ${voucherConfig.name}`,
+      'petal_voucher_purchase',
+      (tx) =>
+        tx.couponGrant.create({
+          data: {
+            userId: user.id,
+            code: voucherCode,
+            discountType: 'PERCENT',
+            percentOff: voucherConfig.percent,
+            expiresAt,
+          },
+        }),
+    );
 
     return NextResponse.json({
       ok: true,
       data: {
-        voucherCode: result.voucherCode,
+        voucherCode: result.fulfillment.code,
         percentOff: voucherConfig.percent,
-        expiresAt: result.couponGrant.expiresAt,
+        expiresAt: result.fulfillment.expiresAt,
         balance: result.newBalance,
         lifetimePetalsEarned: result.lifetimePetalsEarned,
       },
       requestId,
     });
   } catch (error: any) {
-    logger.error('[Voucher Purchase] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(
+        { ok: false, error: 'Insufficient petals', requestId },
+        { status: 400 },
+      );
+    }
+    logger.error(
+      '[Voucher Purchase] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     return NextResponse.json(
       { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },

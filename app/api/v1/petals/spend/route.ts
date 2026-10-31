@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import {
@@ -7,6 +6,7 @@ import {
   schemaUnavailableResponse,
 } from '@/app/lib/auth/viewer';
 import { randomUUID } from 'crypto';
+import { PetalSpendError, spendPetalsInTransaction } from '@/app/lib/petals/spend';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
@@ -15,7 +15,9 @@ export async function POST(req: Request) {
     ({ localUserId } = await requireLocalViewer());
   } catch (error) {
     if (error instanceof LocalUserUnavailableError) {
-      return NextResponse.json(schemaUnavailableResponse('petals_user_unavailable'), { status: 503 });
+      return NextResponse.json(schemaUnavailableResponse('petals_user_unavailable'), {
+        status: 503,
+      });
     }
 
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -38,26 +40,19 @@ export async function POST(req: Request) {
         },
       });
 
-      const user = await tx.user.findUnique({
-        where: { id: localUserId },
-        select: { petalBalance: true },
-      });
-      const balance = user?.petalBalance ?? 0;
-      if (balance < amount) throw new Error('Insufficient petals');
+      const spend = await spendPetalsInTransaction(
+        tx,
+        localUserId,
+        amount,
+        reason || 'spend',
+        'petals_spend_api',
+      );
 
-      await tx.user.update({ where: { id: localUserId }, data: { petalBalance: { decrement: amount } } });
-      await tx.petalLedger.create({
-        data: { userId: localUserId, type: 'spend', amount: -amount, reason: reason || 'spend' },
+      const entries = await tx.petalLedger.findMany({
+        where: { userId: localUserId },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
       });
-
-      const [updated, entries] = await Promise.all([
-        tx.user.findUnique({ where: { id: localUserId }, select: { petalBalance: true } }),
-        tx.petalLedger.findMany({
-          where: { userId: localUserId },
-          orderBy: { createdAt: 'desc' },
-          take: 200,
-        }),
-      ]);
 
       const totalEarned = entries.filter((e) => e.amount > 0).reduce((a, b) => a + b.amount, 0);
       const totalSpent = entries
@@ -65,7 +60,7 @@ export async function POST(req: Request) {
         .reduce((a, b) => a + Math.abs(b.amount), 0);
 
       return {
-        balance: updated?.petalBalance ?? 0,
+        balance: spend.newBalance,
         totalEarned,
         totalSpent,
         entries: entries.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() })),
@@ -78,6 +73,9 @@ export async function POST(req: Request) {
     }
     return NextResponse.json({ ok: true, data: result });
   } catch (e: any) {
+    if (e instanceof PetalSpendError && e.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json({ ok: false, error: 'Insufficient petals' }, { status: 400 });
+    }
     const msg = e?.message || 'Unknown error';
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }

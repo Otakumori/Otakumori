@@ -7,7 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
-import { PetalService } from '@/app/lib/petals';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { generateRequestId } from '@/lib/requestId';
 import { logger } from '@/app/lib/logger';
 
@@ -148,65 +148,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Spend petals
-    const petalService = new PetalService();
-    const spendResult = await petalService.spendPetals(
-      userId,
-      discountReward.petalCost,
-      `Discount reward purchase: ${discountReward.name}`,
-      requestId,
-    );
-
-    if (!spendResult.success) {
-      logger.error('Discount reward purchase failed - insufficient petals', undefined, {
-        requestId,
-        userId,
-        extra: {
-          discountRewardId: discountReward.id,
-          discountRewardName: discountReward.name,
-          petalCost: discountReward.petalCost,
-          error: spendResult.error,
-        },
-      }, undefined);
-      return NextResponse.json(
-        { ok: false, error: spendResult.error || 'Insufficient petals', requestId },
-        { status: 400 },
-      );
-    }
-
     // Create CouponGrant
     const code = `OM-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + discountReward.validityDays);
 
-    const result = await db.$transaction(async (tx) => {
-      // Store idempotency key
-      await tx.idempotencyKey.create({
-        data: {
-          key: idempotencyKey,
-          purpose: 'discount_reward_purchase',
-        },
-      });
+    const purchase = await spendPetalsAndFulfill(
+      user.id,
+      discountReward.petalCost,
+      `Discount reward purchase: ${discountReward.name}`,
+      'discount_reward_purchase',
+      async (tx) => {
+        await tx.idempotencyKey.create({
+          data: {
+            key: idempotencyKey,
+            purpose: 'discount_reward_purchase',
+          },
+        });
 
-      // Create CouponGrant
-      const couponGrant = await tx.couponGrant.create({
-        data: {
-          userId: user.id,
-          code,
-          discountType: discountReward.discountType,
-          amountOff: discountReward.amountOff,
-          percentOff: discountReward.percentOff,
-          expiresAt,
-          petalCost: discountReward.petalCost,
-          nsfwOnly: discountReward.nsfwOnly,
-          requiresAchievementId: discountReward.requiresAchievementId,
-          minSpendCents: discountReward.minSpendCents,
-          discountRewardId: discountReward.id,
-        },
-      });
-
-      return couponGrant;
-    });
+        return tx.couponGrant.create({
+          data: {
+            userId: user.id,
+            code,
+            discountType: discountReward.discountType,
+            amountOff: discountReward.amountOff,
+            percentOff: discountReward.percentOff,
+            expiresAt,
+            petalCost: discountReward.petalCost,
+            nsfwOnly: discountReward.nsfwOnly,
+            requiresAchievementId: discountReward.requiresAchievementId,
+            minSpendCents: discountReward.minSpendCents,
+            discountRewardId: discountReward.id,
+          },
+        });
+      },
+    );
+    const result = purchase.fulfillment;
 
     // Log successful purchase
     logger.info('Discount reward purchased successfully', {
@@ -220,7 +197,7 @@ export async function POST(req: NextRequest) {
         amountOff: result.amountOff,
         percentOff: result.percentOff,
         petalCost: discountReward.petalCost,
-        newBalance: spendResult.newBalance,
+        newBalance: purchase.newBalance,
         expiresAt: result.expiresAt?.toISOString(),
       },
     });
@@ -234,11 +211,23 @@ export async function POST(req: NextRequest) {
         percentOff: result.percentOff,
         expiresAt: result.expiresAt?.toISOString(),
         minSpendCents: result.minSpendCents,
-        newBalance: spendResult.newBalance,
+        newBalance: purchase.newBalance,
       },
       requestId,
     });
   } catch (error: any) {
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(
+        { ok: false, error: 'Insufficient petals', requestId },
+        { status: 400 },
+      );
+    }
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { ok: false, error: 'Duplicate request', requestId },
+        { status: 409 },
+      );
+    }
     logger.error(
       'Error purchasing discount reward',
       {
