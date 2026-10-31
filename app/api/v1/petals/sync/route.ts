@@ -13,23 +13,30 @@ import { z } from 'zod';
 
 export const runtime = 'nodejs';
 
-const SyncPetalsSchema = z.object({
-  localBalance: z.number().min(0),
-  localTransactions: z
-    .array(
-      z.object({
-        id: z.string(),
-        amount: z.number(),
-        source: z.string(),
-        timestamp: z.number(),
-      }),
-    )
-    .optional(),
-});
+const SyncPetalsSchema = z
+  .object({
+    localBalance: z.number().int().safe().nonnegative(),
+    localTransactions: z
+      .array(
+        z
+          .object({
+            id: z.string().trim().min(1).max(128),
+            amount: z.number().int().safe(),
+            source: z.string().trim().min(1).max(128),
+            timestamp: z.number().int().safe().nonnegative(),
+          })
+          .strict(),
+      )
+      .max(100)
+      .optional(),
+  })
+  .strict();
 
 /**
  * Sync petal balance across devices
- * Merges local and cloud petal totals with conflict resolution
+ * Reports local/cloud differences without treating browser state as currency authority.
+ * Guest progress remains available to the client for a future, separately approved
+ * conversion flow, but this endpoint never turns it into spendable petals.
  */
 export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
@@ -37,88 +44,47 @@ export async function POST(req: NextRequest) {
   try {
     const { localUserId } = await requireLocalViewer();
 
-    const body = await req.json();
-    const { localBalance, localTransactions } = SyncPetalsSchema.parse(body);
+    const parsed = SyncPetalsSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'VALIDATION_ERROR',
+          message: 'Petal sync data is invalid.',
+          requestId,
+        },
+        { status: 400 },
+      );
+    }
 
-    // Get cloud wallet
-    const cloudWallet = await db.petalWallet.findUnique({
+    const { localBalance, localTransactions } = parsed.data;
+
+    // Upsert is the only mutation: concurrent first-time requests converge on a
+    // zero-value authoritative wallet and can never promote browser claims.
+    const cloudWallet = await db.petalWallet.upsert({
       where: { userId: localUserId },
+      create: {
+        userId: localUserId,
+        balance: 0,
+        lifetimeEarned: 0,
+        currentStreak: 0,
+      },
+      update: {},
     });
 
-    if (!cloudWallet) {
-      // Create wallet if it doesn't exist
-      const newWallet = await db.petalWallet.create({
-        data: {
-          userId: localUserId,
-          balance: localBalance,
-          lifetimeEarned: localBalance,
-          lastCollectedAt: new Date(),
-        },
-      });
-
-      return NextResponse.json({
-        ok: true,
-        data: {
-          syncedBalance: newWallet.balance,
-          cloudBalance: newWallet.balance,
-          localBalance,
-          conflict: false,
-        },
-        requestId,
-      });
-    }
-
-    // Conflict resolution: Use the higher balance (last-write-wins with merge)
     const cloudBalance = cloudWallet.balance;
-    const syncedBalance = Math.max(cloudBalance, localBalance);
-
-    // If cloud balance is higher, update local
-    // If local balance is higher, update cloud
-    if (syncedBalance !== cloudBalance) {
-      await db.petalWallet.update({
-        where: { userId: localUserId },
-        data: {
-          balance: syncedBalance,
-          // Only update lifetimeEarned if synced balance is higher
-          lifetimeEarned: Math.max(cloudWallet.lifetimeEarned, syncedBalance),
-        },
-      });
-    }
-
-    // Merge transactions if provided
-    if (localTransactions && localTransactions.length > 0) {
-      // Check for duplicate transactions and merge
-      for (const localTx of localTransactions) {
-        const existingTx = await db.petalTransaction.findFirst({
-          where: {
-            userId: localUserId,
-            amount: localTx.amount,
-            source: localTx.source,
-            createdAt: new Date(localTx.timestamp),
-          },
-        });
-
-        if (!existingTx) {
-          // Create missing transaction
-          await db.petalTransaction.create({
-            data: {
-              userId: localUserId,
-              amount: localTx.amount,
-              source: localTx.source,
-              description: `Synced transaction from device`,
-            },
-          });
-        }
-      }
-    }
+    const conflict = cloudBalance !== localBalance;
 
     return NextResponse.json({
       ok: true,
       data: {
-        syncedBalance,
+        syncedBalance: cloudBalance,
         cloudBalance,
         localBalance,
-        conflict: syncedBalance !== localBalance && syncedBalance !== cloudBalance,
+        conflict,
+        resolution: 'SERVER_AUTHORITATIVE',
+        requiresGuestProgressReview: conflict || Boolean(localTransactions?.length),
+        importedTransactions: 0,
         lastSyncedAt: new Date().toISOString(),
       },
       requestId,
@@ -133,7 +99,23 @@ export async function POST(req: NextRequest) {
     if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
       return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
     }
-    logger.error('[Petal Sync] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'VALIDATION_ERROR',
+          message: 'Petal sync data is invalid.',
+          requestId,
+        },
+        { status: 400 },
+      );
+    }
+    logger.error(
+      '[Petal Sync] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,
