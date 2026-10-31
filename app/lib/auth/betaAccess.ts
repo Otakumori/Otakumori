@@ -22,7 +22,15 @@ export function hasBetaAccess(claims: unknown): boolean {
   );
 }
 
-const PUBLIC_EXACT_PATHS = new Set(['/age-check', '/beta-access', '/health', '/privacy', '/terms']);
+const PUBLIC_EXACT_PATHS = new Set([
+  '/age-check',
+  '/beta-access',
+  '/cookies',
+  '/data-deletion',
+  '/health',
+  '/privacy',
+  '/terms',
+]);
 
 const PUBLIC_PATH_PREFIXES = [
   '/sign-in',
@@ -31,6 +39,7 @@ const PUBLIC_PATH_PREFIXES = [
   '/api/_health',
   '/api/health',
   '/api/clerk/webhook',
+  '/api/contact',
   '/api/stripe/webhook',
   '/api/webhooks/',
   '/api/v1/auth/',

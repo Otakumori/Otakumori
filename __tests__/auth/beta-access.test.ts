@@ -20,6 +20,8 @@ describe('closed beta access policy', () => {
     expect(isBetaPublicPath('/beta-access')).toBe(true);
     expect(isBetaPublicPath('/sign-in/callback')).toBe(true);
     expect(isBetaPublicPath('/privacy')).toBe(true);
+    expect(isBetaPublicPath('/cookies')).toBe(true);
+    expect(isBetaPublicPath('/data-deletion')).toBe(true);
     expect(isBetaPublicPath('/api/health/comprehensive')).toBe(true);
     expect(isBetaPublicPath('/api/webhooks/stripe')).toBe(true);
     expect(isBetaPublicPath('/api/v1/games/personal-best')).toBe(false);
