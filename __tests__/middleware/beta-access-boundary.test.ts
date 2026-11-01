@@ -67,6 +67,89 @@ describe('closed beta middleware boundary', () => {
     expect(response.headers.get('x-middleware-next')).toBe('1');
   });
 
+  it.each([
+    {},
+    { metadata: null },
+    { metadata: { betaAccess: 'true' } },
+    { public_metadata: { betaAccess: false } },
+  ])('denies absent or malformed beta metadata: %j', async (sessionClaims) => {
+    mocks.auth.mockResolvedValue({ userId: 'user_1', sessionClaims });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/api/v1/petals/wallet'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(403);
+  });
+
+  it('honors revocation after Clerk supplies refreshed claims', async () => {
+    const { default: middleware } = await import('@/middleware');
+    mocks.auth.mockResolvedValueOnce({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: true } },
+    });
+    const allowed = await middleware(
+      new NextRequest('https://preview.example.com/mini-games/petal-samurai'),
+      {} as never,
+    );
+    mocks.auth.mockResolvedValueOnce({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: false } },
+    });
+    const revoked = await middleware(
+      new NextRequest('https://preview.example.com/mini-games/petal-samurai'),
+      {} as never,
+    );
+
+    expect(allowed.status).toBe(200);
+    expect(revoked.status).toBe(307);
+    expect(revoked.headers.get('location')).toContain('state=not-invited');
+  });
+
+  it('preserves administrative recovery for a signed admin claim', async () => {
+    mocks.auth.mockResolvedValue({
+      userId: 'admin_1',
+      sessionClaims: { metadata: { role: 'admin' } },
+    });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/admin'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-middleware-next')).toBe('1');
+  });
+
+  it('does not trust browser headers as a beta invitation signal', async () => {
+    mocks.auth.mockResolvedValue({ userId: 'user_1', sessionClaims: {} });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/api/v1/games/personal-best', {
+        headers: { 'x-beta-access': 'true' },
+      }),
+      {} as never,
+    );
+
+    expect(response.status).toBe(403);
+  });
+
+  it('retains the mature-game age gate after beta authorization', async () => {
+    mocks.auth.mockResolvedValue({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: true } },
+    });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/mini-games/dungeon-of-desire'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/age-check');
+  });
+
   it('keeps verified webhooks reachable without a beta session', async () => {
     const { default: middleware } = await import('@/middleware');
     const response = await middleware(

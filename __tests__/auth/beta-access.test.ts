@@ -12,6 +12,8 @@ describe('closed beta access policy', () => {
     expect(hasBetaAccess({ metadata: { betaAccess: true } })).toBe(true);
     expect(hasBetaAccess({ metadata: { role: 'admin' } })).toBe(true);
     expect(hasBetaAccess({ public_metadata: { betaAccess: false } })).toBe(false);
+    expect(hasBetaAccess({ metadata: { betaAccess: 'true' } })).toBe(false);
+    expect(hasBetaAccess({ metadata: null })).toBe(false);
     expect(hasBetaAccess({ unsafeMetadata: { betaAccess: true } })).toBe(false);
     expect(hasBetaAccess(null)).toBe(false);
   });
@@ -23,6 +25,7 @@ describe('closed beta access policy', () => {
     expect(isBetaPublicPath('/cookies')).toBe(true);
     expect(isBetaPublicPath('/data-deletion')).toBe(true);
     expect(isBetaPublicPath('/api/health/comprehensive')).toBe(true);
+    expect(isBetaPublicPath('/api/contact')).toBe(true);
     expect(isBetaPublicPath('/api/webhooks/stripe')).toBe(true);
     expect(isBetaPublicPath('/api/v1/games/personal-best')).toBe(false);
     expect(isBetaPublicPath('/mini-games/petal-samurai')).toBe(false);

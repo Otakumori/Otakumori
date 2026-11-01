@@ -78,9 +78,14 @@ export function inspectRepository(repoRoot) {
   };
 }
 
+export function resolveRepositoryRoot(args, currentFile) {
+  const explicitRoot = args.find((argument) => !argument.startsWith('--'));
+  return resolve(explicitRoot ?? join(dirname(currentFile), '..'));
+}
+
 const currentFile = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === resolve(currentFile)) {
-  const repoRoot = resolve(process.argv[2] ?? join(dirname(currentFile), '..'));
+  const repoRoot = resolveRepositoryRoot(process.argv.slice(2), currentFile);
   const report = inspectRepository(repoRoot);
   console.log(JSON.stringify(report, null, 2));
   const requireCertified = process.argv.includes('--require-certified');

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { evaluateCatalog } from './check-game-acceptance-coverage.mjs';
+import { evaluateCatalog, resolveRepositoryRoot } from './check-game-acceptance-coverage.mjs';
 
 const manifest = {
   games: [
@@ -47,4 +49,11 @@ test('fails for missing routes, duplicate identities, and stale QA identifiers',
   assert.deepEqual(report.routesMissing, ['maid-cafe-manager']);
   assert.deepEqual(report.staleQaIdentifiers, ['bubble-girl']);
   assert.equal(report.qaUsesCanonicalManifest, false);
+});
+
+test('does not treat certification flags as a repository path', () => {
+  const currentFile = fileURLToPath(new URL('./check-game-acceptance-coverage.mjs', import.meta.url));
+  const resolved = resolveRepositoryRoot(['--require-certified'], currentFile);
+
+  assert.equal(resolved, resolve(dirname(currentFile), '..'));
 });
