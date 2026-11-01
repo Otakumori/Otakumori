@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
-import { PetalService } from '@/app/lib/petals';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { generateRequestId } from '@/lib/requestId';
 
 export const runtime = 'nodejs';
@@ -61,14 +61,6 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       );
     }
-
-    // Create idempotency key record
-    await db.idempotencyKey.create({
-      data: {
-        key: idempotencyKey,
-        purpose: 'voucher_purchase',
-      },
-    });
 
     // Get user
     const user = await db.user.findUnique({
@@ -162,7 +154,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Check user has enough petals
-    const petalService = new PetalService();
     const wallet = await db.petalWallet.findUnique({
       where: { userId: user.id },
       select: { balance: true },
@@ -184,25 +175,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Spend petals
-    const spendResult = await petalService.spendPetals(
-      user.id,
-      discountReward.petalCost,
-      `Purchased discount voucher: ${discountReward.name}`,
-      requestId,
-    );
-
-    if (!spendResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: spendResult.error || 'FAILED_TO_SPEND_PETALS',
-          requestId,
-        },
-        { status: 500 },
-      );
-    }
-
     // Generate unique voucher code
     const voucherCode = `OM-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
@@ -211,21 +183,33 @@ export async function POST(req: NextRequest) {
     expiresAt.setDate(expiresAt.getDate() + discountReward.validityDays);
 
     // Create CouponGrant record
-    const couponGrant = await db.couponGrant.create({
-      data: {
-        userId: user.id,
-        code: voucherCode,
-        discountType: discountReward.discountType,
-        percentOff: discountReward.percentOff,
-        amountOff: discountReward.amountOff,
-        expiresAt,
-        petalCost: discountReward.petalCost,
-        nsfwOnly: discountReward.nsfwOnly,
-        requiresAchievementId: discountReward.requiresAchievementId,
-        minSpendCents: discountReward.minSpendCents,
-        discountRewardId: discountReward.id,
+    const purchase = await spendPetalsAndFulfill(
+      user.id,
+      discountReward.petalCost,
+      `Purchased discount voucher: ${discountReward.name}`,
+      'voucher_purchase',
+      async (tx) => {
+        await tx.idempotencyKey.create({
+          data: { key: idempotencyKey, purpose: 'voucher_purchase' },
+        });
+        return tx.couponGrant.create({
+          data: {
+            userId: user.id,
+            code: voucherCode,
+            discountType: discountReward.discountType,
+            percentOff: discountReward.percentOff,
+            amountOff: discountReward.amountOff,
+            expiresAt,
+            petalCost: discountReward.petalCost,
+            nsfwOnly: discountReward.nsfwOnly,
+            requiresAchievementId: discountReward.requiresAchievementId,
+            minSpendCents: discountReward.minSpendCents,
+            discountRewardId: discountReward.id,
+          },
+        });
       },
-    });
+    );
+    const couponGrant = purchase.fulfillment;
 
     const response = {
       ok: true,
@@ -236,15 +220,32 @@ export async function POST(req: NextRequest) {
         amountOff: couponGrant.amountOff,
         expiresAt: couponGrant.expiresAt,
         minSpendCents: couponGrant.minSpendCents,
-        balance: spendResult.newBalance,
-        lifetimePetalsEarned: spendResult.lifetimePetalsEarned,
+        balance: purchase.newBalance,
+        lifetimePetalsEarned: purchase.lifetimePetalsEarned,
       },
       requestId,
     };
 
     return NextResponse.json(response);
   } catch (error) {
-    logger.error('[Voucher Purchase] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(
+        { ok: false, error: 'INSUFFICIENT_PETALS', requestId },
+        { status: 400 },
+      );
+    }
+    if ((error as { code?: string }).code === 'P2002') {
+      return NextResponse.json(
+        { ok: false, error: 'DUPLICATE_REQUEST', requestId },
+        { status: 409 },
+      );
+    }
+    logger.error(
+      '[Voucher Purchase] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

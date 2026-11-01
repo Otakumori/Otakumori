@@ -27,7 +27,7 @@ interface FeatureFlagDisplay {
   effectiveValue: boolean;
   source: 'default' | 'override';
   dbValue?: boolean | null;
-  }
+}
 
 interface SystemStatus {
   name: string;
@@ -98,7 +98,12 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       const logger = await getLogger();
-      logger.error('Failed to load admin data', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Failed to load admin data',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setLoading(false);
     }
@@ -120,7 +125,6 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
         body: JSON.stringify({
           key,
           boolValue: !currentValue,
-          updatedBy: userId,
         }),
       });
 
@@ -134,7 +138,12 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update setting');
       const logger = await getLogger();
-      logger.error('Failed to execute command', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Failed to execute command',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setUpdating(null);
     }

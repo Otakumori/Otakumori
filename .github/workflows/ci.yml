@@ -125,6 +125,7 @@ jobs:
           NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
           NEXT_PUBLIC_LIVE_DATA: '0'
           NEXT_PUBLIC_PROBE_MODE: '1'
+          OTM_VISUAL_QA_AUTH: '1'
 
       - name: Analyze bundle size
         run: |

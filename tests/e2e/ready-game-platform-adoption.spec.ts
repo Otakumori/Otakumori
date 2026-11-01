@@ -5,7 +5,9 @@ test.describe('ready-game shared-platform adoption', () => {
     page,
   }) => {
     test.setTimeout(90_000);
-    await page.goto('/mini-games/petal-storm-rhythm', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mini-games/petal-storm-rhythm?visualAuth=signed-in', {
+      waitUntil: 'domcontentloaded',
+    });
 
     await expect(page.getByRole('heading', { level: 1, name: 'Petal Hero' })).toBeVisible();
     await page.waitForTimeout(500);
@@ -24,7 +26,9 @@ test.describe('ready-game shared-platform adoption', () => {
     page,
   }) => {
     test.setTimeout(90_000);
-    await page.goto('/mini-games/otaku-beat-em-up', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mini-games/otaku-beat-em-up?visualAuth=signed-in', {
+      waitUntil: 'domcontentloaded',
+    });
 
     await expect(page.getByRole('heading', { level: 1, name: 'Otaku Beat-Em-Up' })).toBeVisible();
     await page.getByRole('button', { name: 'Arcade Mode' }).click();

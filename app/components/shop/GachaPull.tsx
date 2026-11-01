@@ -7,7 +7,10 @@ export function GachaPull() {
 
   const pull = async () => {
     setBusy(true);
-    const res = await fetch('/api/petal-gacha', { method: 'POST' });
+    const res = await fetch('/api/petal-gacha', {
+      method: 'POST',
+      headers: { 'x-idempotency-key': crypto.randomUUID() },
+    });
     setBusy(false);
     if (res.ok) {
       const j = await res.json();

@@ -146,6 +146,16 @@
       "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
     },
     {
+      "path": "docs/qa/game-beta-acceptance.json",
+      "domain": "game-release-acceptance",
+      "status": "canonical",
+      "owner": "game-release-qa",
+      "lastVerifiedDate": "2026-10-31",
+      "maintenance": "manual-evidence",
+      "verification": "corepack pnpm mini-games:coverage && corepack pnpm mini-games:certify",
+      "entryPoint": "docs/repository-validation.md"
+    },
+    {
       "path": "README.md",
       "domain": "product-brand",
       "status": "current-reference",
