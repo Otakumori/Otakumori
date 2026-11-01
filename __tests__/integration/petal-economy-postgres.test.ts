@@ -38,8 +38,13 @@ import {
 
 const databaseUrl = process.env.DATABASE_URL;
 const integrationEnabled = process.env.OTM_LOCAL_POSTGRES_INTEGRATION === '1';
+const expectedDatabase = process.env.OTM_LOCAL_POSTGRES_DATABASE;
+const expectedPort = Number(process.env.OTM_LOCAL_POSTGRES_PORT);
 const prisma = databaseUrl ? new PrismaClient({ datasources: { db: { url: databaseUrl } } }) : null;
-const suite = integrationEnabled && prisma ? describe : describe.skip;
+const suite =
+  integrationEnabled && prisma && expectedDatabase && Number.isInteger(expectedPort)
+    ? describe
+    : describe.skip;
 const runId = randomUUID().replaceAll('-', '');
 let userSequence = 0;
 
@@ -86,7 +91,7 @@ suite.sequential('petal economy PostgreSQL invariants', () => {
       Array<{ database: string; host: string | null; port: number | null }>
     >`SELECT current_database() AS database, host(inet_server_addr()) AS host, inet_server_port() AS port`;
     expect(identity).toEqual([
-      { database: 'otm_security_test_20261101', host: '127.0.0.1', port: 55439 },
+      { database: expectedDatabase, host: '127.0.0.1', port: expectedPort },
     ]);
   });
 
