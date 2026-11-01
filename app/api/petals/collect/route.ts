@@ -62,6 +62,7 @@ export async function POST(request: Request) {
           email: `${userId}@temp.com`, // Required field
           username: `user_${userId.slice(0, 8)}`, // Required field
           petalBalance: count,
+          visibility: 'private',
         },
       });
     }

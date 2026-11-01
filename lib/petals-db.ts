@@ -20,6 +20,7 @@ export async function ensureUserByClerkId(clerkId: string) {
       clerkId,
       email,
       username,
+      visibility: 'private',
     },
     select: { id: true, petalBalance: true },
   });

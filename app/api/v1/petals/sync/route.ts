@@ -32,6 +32,30 @@ const SyncPetalsSchema = z
   })
   .strict();
 
+async function getOrCreateAuthoritativeWallet(userId: string) {
+  try {
+    return await db.petalWallet.upsert({
+      where: { userId },
+      create: {
+        userId,
+        balance: 0,
+        lifetimeEarned: 0,
+        currentStreak: 0,
+      },
+      update: {},
+    });
+  } catch (error) {
+    // Concurrent first-time syncs may both observe no wallet before one wins
+    // the unique userId insert. The loser must read the winner's authoritative
+    // row rather than report a false persistence failure.
+    if ((error as { code?: string }).code !== 'P2002') throw error;
+
+    const wallet = await db.petalWallet.findUnique({ where: { userId } });
+    if (!wallet) throw error;
+    return wallet;
+  }
+}
+
 /**
  * Sync petal balance across devices
  * Reports local/cloud differences without treating browser state as currency authority.
@@ -59,18 +83,8 @@ export async function POST(req: NextRequest) {
 
     const { localBalance, localTransactions } = parsed.data;
 
-    // Upsert is the only mutation: concurrent first-time requests converge on a
-    // zero-value authoritative wallet and can never promote browser claims.
-    const cloudWallet = await db.petalWallet.upsert({
-      where: { userId: localUserId },
-      create: {
-        userId: localUserId,
-        balance: 0,
-        lifetimeEarned: 0,
-        currentStreak: 0,
-      },
-      update: {},
-    });
+    // Wallet initialization is the only mutation and never promotes browser claims.
+    const cloudWallet = await getOrCreateAuthoritativeWallet(localUserId);
 
     const cloudBalance = cloudWallet.balance;
     const conflict = cloudBalance !== localBalance;

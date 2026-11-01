@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   requireLocalViewer: vi.fn(),
   upsert: vi.fn(),
+  findUnique: vi.fn(),
   transactionCreate: vi.fn(),
 }));
 
@@ -26,7 +27,7 @@ vi.mock('@/app/lib/auth/viewer', () => {
 
 vi.mock('@/lib/db', () => ({
   db: {
-    petalWallet: { upsert: mocks.upsert },
+    petalWallet: { upsert: mocks.upsert, findUnique: mocks.findUnique },
     petalTransaction: { create: mocks.transactionCreate },
   },
 }));
@@ -61,6 +62,12 @@ describe('petal sync security boundary', () => {
       balance: 25,
       lifetimeEarned: 40,
       currentStreak: 2,
+    });
+    mocks.findUnique.mockResolvedValue({
+      userId: viewer.localUserId,
+      balance: 0,
+      lifetimeEarned: 0,
+      currentStreak: 0,
     });
   });
 
@@ -153,6 +160,19 @@ describe('petal sync security boundary', () => {
     expect(mocks.upsert).toHaveBeenCalledTimes(2);
     expect(bodies.map((body) => body.data.syncedBalance)).toEqual([0, 0]);
     expect(mocks.transactionCreate).not.toHaveBeenCalled();
+  });
+
+  it('reads the winner wallet when a concurrent first insert loses the unique race', async () => {
+    mocks.upsert.mockRejectedValue(Object.assign(new Error('unique race'), { code: 'P2002' }));
+    const { POST } = await import('@/app/api/v1/petals/sync/route');
+    const response = await POST(request({ localBalance: 500 }));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      ok: true,
+      data: { syncedBalance: 0, cloudBalance: 0, importedTransactions: 0 },
+    });
+    expect(mocks.findUnique).toHaveBeenCalledWith({ where: { userId: viewer.localUserId } });
   });
 
   it('returns 401 without touching wallet data when signed out', async () => {
