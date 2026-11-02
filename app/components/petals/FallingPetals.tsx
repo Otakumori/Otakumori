@@ -308,9 +308,9 @@ export default function FallingPetals({ onPetalCollect }: FallingPetalsProps) {
           data-testid="petal-discovery-hint"
           data-reduced-motion={reducedMotion ? 'true' : 'false'}
         >
-          <span>A petal stirred. Try catching one.</span>
+          <span>A loose sakura petal drifts nearby.</span>
           <button type="button" onClick={markHintSeen} aria-label="Dismiss petal hint">
-            Dismiss
+            Let it pass
           </button>
         </aside>
       ) : null}

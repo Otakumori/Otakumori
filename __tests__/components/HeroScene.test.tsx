@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/image', () => ({
@@ -65,6 +65,7 @@ describe('homepage hero scene client island', () => {
 
     const scene = await screen.findByTestId('mori-hero-scene');
     await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'specialTwilight'));
+    expect(scene).toHaveAttribute('data-scene-ready', 'true');
     expect(screen.getByTestId('mori-world-extension')).toBeInTheDocument();
     expect(screen.getByTestId('mori-scene-plate')).toBeInTheDocument();
 
@@ -75,22 +76,41 @@ describe('homepage hero scene client island', () => {
       '/assets/home/world/combined/om-home-world-06-special-twilight-wide.png',
     );
     expect(images[0].className).toContain('image');
+    expect(scene).toHaveAttribute('data-world-status', 'loading');
+    fireEvent.load(images[0]);
+    await waitFor(() => expect(scene).toHaveAttribute('data-world-status', 'ready'));
     await waitFor(() => {
-      const preloadHrefs = Array.from(
+      const preloadedSources = Array.from(
         document.head.querySelectorAll<HTMLLinkElement>('link[rel="preload"]'),
-      ).map((link) => link.href);
+      ).map((link) => link.dataset.homeSceneSrc);
 
       expect(
-        preloadHrefs.some((href) =>
-          href.endsWith('/assets/home/world/combined/om-home-world-06-special-twilight-wide.png'),
+        preloadedSources.includes(
+          '/assets/home/world/combined/om-home-world-06-special-twilight-wide.png',
         ),
       ).toBe(true);
       expect(
-        preloadHrefs.some((href) =>
-          href.endsWith('/assets/home/world/combined/om-home-world-05-night-wide.png'),
-        ),
+        preloadedSources.includes('/assets/home/world/combined/om-home-world-05-night-wide.png'),
       ).toBe(true);
     });
+  });
+
+  it('uses the matching portrait master on portrait-class viewports', async () => {
+    vi.spyOn(Date.prototype, 'getHours').mockReturnValue(21);
+    vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
+    stubMatchMedia(false);
+    vi.stubGlobal('innerWidth', 390);
+    vi.stubGlobal('innerHeight', 844);
+
+    await renderHeroScene();
+
+    const scene = await screen.findByTestId('mori-hero-scene');
+    await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'night'));
+    expect(scene).toHaveAttribute('data-scene-asset-variant', 'portrait');
+    expect(screen.getByRole('img', { name: /Otakumori sakura shoreline/i })).toHaveAttribute(
+      'src',
+      '/assets/home/world/combined/om-home-world-05-night-portrait.webp',
+    );
   });
 
   it('keeps reduced-motion petal density bounded', async () => {
@@ -103,6 +123,10 @@ describe('homepage hero scene client island', () => {
     const scene = await screen.findByTestId('mori-hero-scene');
     await waitFor(() => expect(scene).toHaveAttribute('data-scene-bucket', 'afternoon'));
 
+    fireEvent.load(screen.getByRole('img', { name: /Otakumori sakura shoreline/i }));
+
+    await waitFor(() => expect(scene).toHaveAttribute('data-world-status', 'ready'));
+
     expect(screen.getAllByTestId('mori-petal')).toHaveLength(4);
   });
 
@@ -112,6 +136,8 @@ describe('homepage hero scene client island', () => {
     stubMatchMedia(false);
 
     await renderHeroScene();
+
+    fireEvent.load(await screen.findByRole('img', { name: /Otakumori sakura shoreline/i }));
 
     const petalEmitter = await screen.findByTestId('mori-petal-emitter');
     expect(petalEmitter).toHaveAttribute('aria-hidden', 'true');
@@ -125,5 +151,27 @@ describe('homepage hero scene client island', () => {
       );
       expect(petal).toHaveAttribute('data-petal-variant');
     });
+  });
+
+  it('uses an authored fallback when both the active and fallback assets fail', async () => {
+    vi.spyOn(Date.prototype, 'getHours').mockReturnValue(12);
+    vi.spyOn(Date.prototype, 'getDate').mockReturnValue(2);
+    stubMatchMedia(false);
+
+    await renderHeroScene();
+
+    const scene = await screen.findByTestId('mori-hero-scene');
+    const primary = screen.getByRole('img', { name: /Otakumori sakura shoreline/i });
+    fireEvent.error(primary);
+
+    const fallback = await screen.findByRole('img', { name: /Otakumori sakura shoreline/i });
+    expect(fallback).toHaveAttribute(
+      'src',
+      '/assets/home/world/combined/om-home-world-04-late-afternoon-wide.png',
+    );
+    fireEvent.error(fallback);
+
+    await waitFor(() => expect(scene).toHaveAttribute('data-world-status', 'fallback'));
+    expect(screen.queryByTestId('mori-petal-emitter')).not.toBeInTheDocument();
   });
 });

@@ -7,6 +7,7 @@ export type HomeSceneBucket =
   | 'specialTwilight';
 
 export type HomeSceneSurfaceFamily = 'combined';
+export type HomeSceneAssetVariant = 'wide' | 'portrait';
 
 export type ScenePoint = {
   x: number;
@@ -18,6 +19,8 @@ export type HomeSceneAsset = {
   label: string;
   src: string;
   fallback: string;
+  portraitSrc: string;
+  portraitFallback: string;
   alt: string;
 };
 
@@ -57,6 +60,7 @@ export type HomeSceneState = {
 
 export type HomeSceneProjection = {
   family: HomeSceneSurfaceFamily;
+  assetVariant: HomeSceneAssetVariant;
   viewport: {
     width: number;
     height: number;
@@ -75,10 +79,17 @@ const COMBINED_WORLD_ASSET_ROOT = '/assets/home/world/combined';
 const FALLBACK_TIMEZONE = 'local';
 const COMBINED_WORLD_WIDTH = 1325;
 const COMBINED_WORLD_HEIGHT = 1187;
+const PORTRAIT_WORLD_WIDTH = 853;
+const PORTRAIT_WORLD_HEIGHT = 1844;
+const PORTRAIT_MAX_WIDTH = 820;
 const MIN_WORLD_HEIGHT_MULTIPLIER = 1.42;
 
 function combinedWorldAsset(name: string) {
   return `${COMBINED_WORLD_ASSET_ROOT}/${name}.png`;
+}
+
+function portraitWorldAsset(name: string) {
+  return `${COMBINED_WORLD_ASSET_ROOT}/${name}.webp`;
 }
 
 const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
@@ -87,6 +98,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Early morning',
     src: combinedWorldAsset('om-home-world-01-early-morning-wide'),
     fallback: combinedWorldAsset('om-home-world-02-morning-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-01-early-morning-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-01-early-morning-wide'),
     alt: 'Otakumori sakura shoreline and root cavern in early morning light',
   },
   morning: {
@@ -94,6 +107,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Morning',
     src: combinedWorldAsset('om-home-world-02-morning-wide'),
     fallback: combinedWorldAsset('om-home-world-03-afternoon-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-02-morning-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-02-morning-wide'),
     alt: 'Otakumori sakura shoreline and root cavern in soft morning light',
   },
   afternoon: {
@@ -101,6 +116,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Afternoon',
     src: combinedWorldAsset('om-home-world-03-afternoon-wide'),
     fallback: combinedWorldAsset('om-home-world-04-late-afternoon-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-03-afternoon-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-03-afternoon-wide'),
     alt: 'Otakumori sakura shoreline and root cavern in afternoon light',
   },
   lateAfternoon: {
@@ -108,6 +125,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Late afternoon',
     src: combinedWorldAsset('om-home-world-04-late-afternoon-wide'),
     fallback: combinedWorldAsset('om-home-world-05-night-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-04-late-afternoon-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-04-late-afternoon-wide'),
     alt: 'Otakumori sakura shoreline and root cavern in late afternoon light',
   },
   night: {
@@ -115,6 +134,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Night',
     src: combinedWorldAsset('om-home-world-05-night-wide'),
     fallback: combinedWorldAsset('om-home-world-04-late-afternoon-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-05-night-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-05-night-wide'),
     alt: 'Otakumori sakura shoreline and root cavern at night',
   },
   specialTwilight: {
@@ -122,6 +143,8 @@ const WORLD_STATES: Record<HomeSceneBucket, HomeSceneAsset> = {
     label: 'Special twilight',
     src: combinedWorldAsset('om-home-world-06-special-twilight-wide'),
     fallback: combinedWorldAsset('om-home-world-05-night-wide'),
+    portraitSrc: portraitWorldAsset('om-home-world-06-special-twilight-portrait'),
+    portraitFallback: combinedWorldAsset('om-home-world-06-special-twilight-wide'),
     alt: 'Otakumori sakura shoreline and root cavern in special twilight glow',
   },
 };
@@ -147,13 +170,36 @@ const COMBINED_ARTBOARD: HomeSceneArtboard = {
   viewportTreeBase: { x: 0.3, y: 0.57 },
 };
 
+const PORTRAIT_ARTBOARD: HomeSceneArtboard = {
+  width: PORTRAIT_WORLD_WIDTH,
+  height: PORTRAIT_WORLD_HEIGHT,
+  anchors: {
+    treeBase: { x: 246, y: 812 },
+    groundLine: { x: 426, y: 832 },
+    rootCrossSection: { x: 426, y: 904 },
+    undergroundStart: { x: 426, y: 1010 },
+    footerContent: { x: 426, y: 1320 },
+    canopy: [
+      { x: 72, y: 186 },
+      { x: 162, y: 142 },
+      { x: 264, y: 182 },
+      { x: 376, y: 232 },
+      { x: 512, y: 210 },
+      { x: 636, y: 270 },
+    ],
+  },
+  viewportTreeBase: { x: 0.29, y: 0.5 },
+};
+
 export const HOME_SCENE_MANIFEST = {
   world: {
     sourceDirectory: 'docs/design/references/home-world-wide-approved',
+    portraitSourceDirectory: 'docs/design/references/home-world-portrait-candidates',
     runtimeDirectory: COMBINED_WORLD_ASSET_ROOT,
     states: WORLD_STATES,
     artboard: COMBINED_ARTBOARD,
-    portraitMasterAvailable: false,
+    portraitArtboard: PORTRAIT_ARTBOARD,
+    portraitMasterAvailable: true,
     precomposedSurfaceAndUnderground: true,
   },
   petals: {
@@ -311,12 +357,28 @@ export function resolveHomeScene(date = new Date(), reducedMotion = false): Home
   };
 }
 
-export function resolveHomeSceneImageSrc(asset: HomeSceneAsset) {
+export function resolveHomeSceneImageSrc(
+  asset: HomeSceneAsset,
+  variant: HomeSceneAssetVariant = 'wide',
+) {
+  if (variant === 'portrait') {
+    return { src: asset.portraitSrc, fallback: asset.portraitFallback };
+  }
+
   return { src: asset.src, fallback: asset.fallback };
 }
 
 export function resolveHomeSceneSurfaceFamily(): HomeSceneSurfaceFamily {
   return 'combined';
+}
+
+export function resolveHomeSceneAssetVariant(viewport: {
+  width: number;
+  height: number;
+}): HomeSceneAssetVariant {
+  return viewport.width <= PORTRAIT_MAX_WIDTH && viewport.height > viewport.width
+    ? 'portrait'
+    : 'wide';
 }
 
 export function projectHomeScenePoint(
@@ -335,7 +397,11 @@ export function resolveHomeSceneProjection(viewport: {
 }): HomeSceneProjection {
   const width = Number.isFinite(viewport.width) && viewport.width > 0 ? viewport.width : 1280;
   const height = Number.isFinite(viewport.height) && viewport.height > 0 ? viewport.height : 720;
-  const artboard = HOME_SCENE_MANIFEST.world.artboard;
+  const assetVariant = resolveHomeSceneAssetVariant({ width, height });
+  const artboard =
+    assetVariant === 'portrait'
+      ? HOME_SCENE_MANIFEST.world.portraitArtboard
+      : HOME_SCENE_MANIFEST.world.artboard;
   const widthScale = width / artboard.width;
   const minimumHeight = height * MIN_WORLD_HEIGHT_MULTIPLIER;
   const worldHeight = Math.max(minimumHeight, artboard.height * widthScale);
@@ -350,6 +416,7 @@ export function resolveHomeSceneProjection(viewport: {
 
   return {
     family: 'combined',
+    assetVariant,
     viewport: { width, height },
     artboard,
     scale,

@@ -70,7 +70,9 @@ export default function HomeSoapstoneDialog() {
         onClick={() => setOpen(true)}
         className={`${styles.soapstoneTrigger} focus-ring mt-5 inline-flex min-h-11 items-center text-left`}
         data-home-soapstone-control="approved-plaque"
+        data-soapstone-state="resting"
         aria-haspopup="dialog"
+        aria-label="Read a soapstone"
       >
         <img
           src={SOAPSTONE_PLAQUE_SOURCE}
@@ -82,14 +84,9 @@ export default function HomeSoapstoneDialog() {
           className={styles.triggerPlaque}
         />
         <span className={styles.triggerContent}>
-          <span className={styles.runeMark} aria-hidden="true">
-            ᚱ
-          </span>
-          <span>
-            <span className={styles.triggerEyebrow} aria-hidden="true">
-              {DORMANT_RUNES}
-            </span>
-            <span className={styles.triggerLabel}>Read a soapstone</span>
+          <span className={styles.runeSeal} aria-hidden="true">
+            <span className={styles.runeMark}>ᚱ</span>
+            <span className={styles.triggerRunes}>{DORMANT_RUNES}</span>
           </span>
         </span>
       </button>

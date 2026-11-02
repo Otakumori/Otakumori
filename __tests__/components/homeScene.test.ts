@@ -6,6 +6,7 @@ import {
   HOME_SCENE_VIEWPORT_MATRIX,
   resolveBrowserTimeZone,
   resolveHomeScene,
+  resolveHomeSceneAssetVariant,
   resolveHomeSceneBucket,
   resolveHomeSceneImageSrc,
   resolveHomeSceneProjection,
@@ -71,9 +72,23 @@ describe('homepage combined world scene mapping', () => {
     expect(HOME_SCENE_MANIFEST.world.runtimeDirectory).toBe('/assets/home/world/combined');
     expect(HOME_SCENE_MANIFEST.world.artboard.width).toBe(1325);
     expect(HOME_SCENE_MANIFEST.world.artboard.height).toBe(1187);
+    expect(HOME_SCENE_MANIFEST.world.portraitArtboard.width).toBe(853);
+    expect(HOME_SCENE_MANIFEST.world.portraitArtboard.height).toBe(1844);
     expect(HOME_SCENE_MANIFEST.world.precomposedSurfaceAndUnderground).toBe(true);
-    expect(HOME_SCENE_MANIFEST.world.portraitMasterAvailable).toBe(false);
+    expect(HOME_SCENE_MANIFEST.world.portraitMasterAvailable).toBe(true);
     expect('root' in HOME_SCENE_MANIFEST).toBe(false);
+  });
+
+  it('selects portrait masters only for portrait-class viewports', () => {
+    expect(resolveHomeSceneAssetVariant({ width: 390, height: 844 })).toBe('portrait');
+    expect(resolveHomeSceneAssetVariant({ width: 768, height: 1024 })).toBe('portrait');
+    expect(resolveHomeSceneAssetVariant({ width: 1280, height: 900 })).toBe('wide');
+    expect(resolveHomeSceneAssetVariant({ width: 820, height: 600 })).toBe('wide');
+
+    expect(resolveHomeSceneImageSrc(HOME_SCENE_ASSETS.night, 'portrait')).toEqual({
+      src: '/assets/home/world/combined/om-home-world-05-night-portrait.webp',
+      fallback: '/assets/home/world/combined/om-home-world-05-night-wide.png',
+    });
   });
 
   it('selects a combined scene image without changing the time bucket', () => {
@@ -95,6 +110,9 @@ describe('homepage combined world scene mapping', () => {
       expect(projection.height).toBeGreaterThan(viewport.height);
       expect(projection.scale).toBeCloseTo(projection.height / projection.artboard.height, 5);
       expect(projection.footerContentTop).toBeGreaterThan(viewport.height * 0.6);
+      expect(projection.assetVariant).toBe(
+        viewport.width <= 820 && viewport.height > viewport.width ? 'portrait' : 'wide',
+      );
     }
   });
 
