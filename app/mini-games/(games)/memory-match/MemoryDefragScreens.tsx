@@ -1,5 +1,8 @@
 'use client';
 
+import type { PersonalBestResult } from '@/app/lib/games/progress';
+import type { MemoryDefragChallenge } from './MemoryMatchGame';
+import type { MemoryDefragDifficulty } from './memoryDefragEngine';
 import styles from './MemoryMatchGame.module.css';
 import { MemorySealIcon } from './MemoryRelicIcon';
 
@@ -15,6 +18,9 @@ interface MemoryDefragResultsScreenProps {
   didWin: boolean;
   perfectClear?: boolean;
   lowMoveClear?: boolean;
+  difficulty: MemoryDefragDifficulty;
+  challenge: MemoryDefragChallenge;
+  personalBest?: PersonalBestResult;
   onRestart: () => void;
   onBack: () => void;
 }
@@ -69,6 +75,9 @@ export function MemoryDefragResultsScreen({
   didWin,
   perfectClear,
   lowMoveClear,
+  difficulty,
+  challenge,
+  personalBest,
   onRestart,
   onBack,
 }: MemoryDefragResultsScreenProps) {
@@ -79,6 +88,18 @@ export function MemoryDefragResultsScreen({
     { label: 'Time', value: formatResultTime(timeElapsed) },
     { label: 'Perfect', value: perfectClear ? 'Yes' : 'No' },
     { label: 'Low move', value: lowMoveClear ? 'Yes' : 'No' },
+    { label: 'Archive', value: difficulty },
+    { label: 'Challenge', value: challenge === 'echo-preview' ? 'Echo Preview' : 'Standard' },
+    ...(personalBest?.status === 'unavailable'
+      ? [{ label: 'Score save', value: 'Unavailable' }]
+      : personalBest?.currentBest !== null && personalBest?.currentBest !== undefined
+        ? [
+            {
+              label: personalBest.isNewBest ? 'New personal best' : 'Personal best',
+              value: personalBest.currentBest.toLocaleString(),
+            },
+          ]
+        : []),
   ];
 
   return (

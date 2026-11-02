@@ -11,6 +11,12 @@ interface GameResultsScreenProps {
   score: number;
   isWin: boolean;
   stats?: Array<{ label: string; value: string | number }>;
+  personalBest?: {
+    previousBest: number | null;
+    currentBest: number | null;
+    isNewBest: boolean;
+    status: 'new_best' | 'unchanged' | 'unavailable';
+  } | null;
   onRestart: () => void;
   onBack: () => void;
   children?: ReactNode;
@@ -25,6 +31,7 @@ export function GameResultsScreen({
   score,
   isWin,
   stats = [],
+  personalBest,
   onRestart,
   onBack,
   children,
@@ -50,6 +57,20 @@ export function GameResultsScreen({
               <dd>{stat.value}</dd>
             </div>
           ))}
+          {personalBest &&
+            personalBest.status !== 'unavailable' &&
+            personalBest.currentBest !== null && (
+              <div className="game-threshold-results__personal-best">
+                <dt>{personalBest.isNewBest ? 'New personal best' : 'Personal best'}</dt>
+                <dd>{personalBest.currentBest.toLocaleString()}</dd>
+              </div>
+            )}
+          {personalBest?.status === 'unavailable' && (
+            <div className="game-threshold-results__save-state">
+              <dt>Score save</dt>
+              <dd>Unavailable — this run is still shown locally</dd>
+            </div>
+          )}
         </dl>
         {children}
         <div className="game-threshold-actions">
@@ -62,4 +83,3 @@ export function GameResultsScreen({
     </MoriGameThreshold>
   );
 }
-
