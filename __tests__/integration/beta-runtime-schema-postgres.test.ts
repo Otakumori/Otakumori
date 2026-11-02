@@ -143,6 +143,26 @@ suite.sequential('controlled-beta runtime schema compatibility', () => {
         'GameSession_time_window_valid',
       ]),
     );
+
+    const inventoryColumns = await prisma!.$queryRaw<Array<{ column_name: string }>>`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'InventoryItem'
+        AND column_name IN ('createdAt', 'updatedAt')
+    `;
+    expect(inventoryColumns.map(({ column_name }) => column_name)).toEqual(
+      expect.arrayContaining(['createdAt', 'updatedAt']),
+    );
+
+    const idempotencyColumns = await prisma!.$queryRaw<Array<{ column_name: string }>>`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'IdempotencyKey'
+        AND column_name = 'updatedAt'
+    `;
+    expect(idempotencyColumns).toEqual([{ column_name: 'updatedAt' }]);
   });
 
   test('serves a populated catalog through the production route', async () => {

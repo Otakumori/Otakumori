@@ -84,6 +84,18 @@ ALTER TABLE "GameSession"
     ADD CONSTRAINT "GameSession_userId_fkey"
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- The populated beta database predates these Prisma-managed timestamp columns.
+-- Without them, even a narrow InventoryItem lookup fails before Petal Shop can
+-- check ownership or create an entitlement.
+ALTER TABLE "InventoryItem"
+    ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- Purchase replay protection writes through the current Prisma model, whose
+-- updatedAt column is also absent from the populated historical schema.
+ALTER TABLE "IdempotencyKey"
+    ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
 -- New accounts are private by default. Existing explicit visibility values are
 -- preserved; changing existing profiles requires a separately approved policy migration.
 ALTER TABLE "User" ALTER COLUMN "visibility" SET DEFAULT 'private';
@@ -91,4 +103,5 @@ ALTER TABLE "User" ALTER COLUMN "visibility" SET DEFAULT 'private';
 -- Rollback notes (manual and approval-gated; do not execute automatically):
 -- 1. Preserve/export all three tables and verify no save, analytics, catalog, or entitlement dependency.
 -- 2. Drop GameSession, GameSave, and PetalShopItem only if their runtime paths are withdrawn.
--- 3. Restore the User.visibility default only if the private-by-default policy is reversed.
+-- 3. Do not drop InventoryItem or IdempotencyKey timestamps while Prisma selects them; preserve values first.
+-- 4. Restore the User.visibility default only if the private-by-default policy is reversed.

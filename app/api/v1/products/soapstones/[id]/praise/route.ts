@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
+import { Prisma } from '@prisma/client';
 
 export const runtime = 'nodejs';
 
@@ -10,14 +11,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // Extract optional message from body
     const body = await req.json().catch(() => ({}));
     const message = body.message as string | undefined;
-    
+
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const soapstoneId = params.id;
-    
+
     // Use message if provided (for future praise message feature)
     if (message) {
       const { logger } = await import('@/app/lib/logger');
@@ -135,8 +136,22 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
   } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      (error.code === 'P2021' || error.code === 'P2022')
+    ) {
+      return NextResponse.json(
+        { ok: false, error: 'Soapstone praise is not available yet. Please check back soon.' },
+        { status: 503 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
-    logger.error('Failed to praise soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Failed to praise soapstone:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Failed to process praise' }, { status: 500 });
   }
 }
