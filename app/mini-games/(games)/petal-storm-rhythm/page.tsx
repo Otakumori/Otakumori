@@ -98,6 +98,7 @@ const SAMPLE_TRACKS: Track[] = [
 
 export default function PetalStormRhythm() {
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
   const session = useGameSession<PetalStormResult>({
     initialPhase: 'idle',
     onExit: () => router.push('/mini-games'),
@@ -141,6 +142,10 @@ export default function PetalStormRhythm() {
     Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>
   >([]);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Hit VFX state
   const [laneFlashes, setLaneFlashes] = useState<
@@ -744,6 +749,7 @@ export default function PetalStormRhythm() {
 
               <div className="mt-8 text-center">
                 <button
+                  disabled={!isHydrated}
                   onClick={() => {
                     startGame();
                     setGameState('playing');

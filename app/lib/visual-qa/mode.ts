@@ -13,20 +13,27 @@ function getBrowserHost() {
 
 function hasBrowserVisualQaShellMarker() {
   return (
-    typeof document !== 'undefined' &&
-    document.body?.getAttribute('data-visual-qa-auth') === 'true'
+    typeof document !== 'undefined' && document.body?.getAttribute('data-visual-qa-auth') === 'true'
   );
 }
 
 export function isVisualQaHostAllowed(host: string | null | undefined) {
   if (!host) return true;
-  const normalized = host.split(':')[0]?.trim().toLowerCase();
-  return (
+  const normalized = host.trim().toLowerCase();
+  if (
     normalized === 'localhost' ||
     normalized === '127.0.0.1' ||
     normalized === '[::1]' ||
     normalized === '::1'
-  );
+  ) {
+    return true;
+  }
+
+  const localWithPort = normalized.match(/^(?:localhost|127\.0\.0\.1|\[::1\]):(\d{1,5})$/);
+  if (!localWithPort) return false;
+
+  const port = Number(localWithPort[1]);
+  return port >= 1 && port <= 65_535;
 }
 
 export function isVisualQaAuthEnabled(
@@ -51,12 +58,13 @@ export function isVisualQaAuthEnabled(
   const hasVisualQaShellMarker = hasBrowserVisualQaShellMarker();
   const nodeEnvName = env.NODE_ENV ?? nodeEnv.NODE_ENV;
   const vercel = env.VERCEL ?? nodeEnv.VERCEL;
-
-  return (
-    (enabled || hasBrowserVisualAuthState || hasVisualQaShellMarker) &&
+  const isExplicitLocalProductionHarness =
+    nodeEnvName === 'production' && Boolean(host) && env.OTM_VISUAL_QA_AUTH === '1';
+  const isNonProductionHarness =
     nodeEnvName !== 'production' &&
-    vercel !== '1'
-  );
+    (enabled || hasBrowserVisualAuthState || hasVisualQaShellMarker);
+
+  return vercel !== '1' && (isExplicitLocalProductionHarness || isNonProductionHarness);
 }
 
 export function normalizeVisualQaAuthState(

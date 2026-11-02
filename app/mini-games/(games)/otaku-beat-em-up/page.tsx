@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import GameShell from '../../_shared/GameShell';
@@ -40,6 +40,11 @@ type GameMode = 'story' | 'arcade' | 'survival';
 
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -169,6 +174,7 @@ export default function RhythmBeatEmUpPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Story Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
@@ -204,6 +210,7 @@ export default function RhythmBeatEmUpPage() {
 
                 {/* Arcade Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
@@ -239,6 +246,7 @@ export default function RhythmBeatEmUpPage() {
 
                 {/* Survival Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
