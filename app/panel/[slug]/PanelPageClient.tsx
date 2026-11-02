@@ -17,8 +17,8 @@ interface PanelConfig {
 
 const PANEL_CONFIGS: Record<string, PanelConfig> = {
   trade: {
-    title: 'Trade Center',
-    description: 'Shop and trading hub for the community',
+    title: 'Rune Archive',
+    description: 'Your persisted rune collection and fusion status',
     icon: <ShoppingBag className="h-12 w-12 text-pink-400" />,
     routes: [
       {
@@ -26,7 +26,11 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
         href: '/shop',
         description: 'Browse anime-inspired apparel and accessories',
       },
-      { name: 'Trade Items', href: '/trade', description: 'Exchange items with other players' },
+      {
+        name: 'Rune Archive',
+        href: '/mini-games/trade',
+        description: 'Review owned runes and fusion availability',
+      },
       {
         name: 'Petals Store',
         href: '/account/petals',
@@ -157,4 +161,3 @@ export default function PanelPageClient() {
     </div>
   );
 }
-

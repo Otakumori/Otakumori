@@ -91,7 +91,7 @@ export function CommunitySettings() {
           {!user?.publicMetadata?.adultVerified && (
             <div className="mt-4">
               <a
-                href="/adults/verify"
+                href="/safety"
                 className="inline-flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
               >
                 Verify Age for Adult Content
@@ -140,7 +140,7 @@ interface SettingToggleProps {
   checked: boolean;
   onChange: (value: boolean) => void;
   disabled?: boolean;
-  }
+}
 
 function SettingToggle({
   label,

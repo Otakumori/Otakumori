@@ -82,7 +82,7 @@ function label(k: 'games' | 'trade' | 'avatar' | 'music') {
   return (
     {
       games: 'Mini-Games',
-      trade: 'Trade Center',
+      trade: 'Rune Archive',
       avatar: 'Avatar & Community',
       music: 'Music Player',
     } as const
