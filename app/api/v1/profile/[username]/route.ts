@@ -7,6 +7,18 @@ import { ProfileViewSchema } from '../../../../lib/contracts';
 
 export const runtime = 'nodejs';
 
+type ProfileVisibility = 'public' | 'friends' | 'private';
+
+export function normalizeProfileVisibility(visibility: string): ProfileVisibility {
+  const normalized = visibility.trim().toLowerCase();
+
+  if (normalized === 'public' || normalized === 'friends' || normalized === 'private') {
+    return normalized;
+  }
+
+  return 'private';
+}
+
 export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
   try {
     // Extract query params
@@ -91,13 +103,16 @@ export async function GET(request: NextRequest, { params }: { params: { username
       }
     }
 
-    // Check visibility permissions
+    // Check visibility permissions. Clerk provisioning and settings persist lowercase values;
+    // normalize defensively so legacy uppercase rows retain the same authorization semantics.
     let canView = true;
     let isFollowing = false;
+    const visibility = normalizeProfileVisibility(profileUser.visibility);
+    const isOwner = userId === profileUser.clerkId;
 
-    if (profileUser.visibility === 'PRIVATE') {
-      canView = false;
-    } else if (profileUser.visibility === 'FRIENDS') {
+    if (visibility === 'private') {
+      canView = isOwner;
+    } else if (visibility === 'friends' && !isOwner) {
       if (!userId) {
         canView = false;
       } else {
@@ -169,7 +184,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
       website: profileUser.website,
       avatarUrl: profileUser.avatarUrl,
       bannerUrl: profileUser.bannerUrl,
-      visibility: profileUser.visibility,
+      visibility,
       isFollowing,
       isBlocked: false, // We already checked blocks above
       followerCount: profileUser._count.Follow_Follow_followeeIdToUser,
