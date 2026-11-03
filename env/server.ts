@@ -17,6 +17,8 @@ const PREVIEW_DISABLED_PROVIDER_KEYS = new Set<RequiredServerKey>([
   'STRIPE_WEBHOOK_SECRET',
   'PRINTIFY_API_KEY',
   'PRINTIFY_SHOP_ID',
+  'UPSTASH_REDIS_REST_URL',
+  'UPSTASH_REDIS_REST_TOKEN',
 ]);
 
 function ensureRequired(env: RawServerEnv): asserts env is ServerEnv {

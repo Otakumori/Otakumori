@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   PREVIEW_DATABASE_ISOLATION_ERROR,
+  PREVIEW_REDIS_ISOLATION_ERROR,
   assertPreviewDatabaseIsolation,
+  assertPreviewRedisIsolation,
   isPreviewExternalMutationRequest,
   isVercelPreview,
 } from '@/app/lib/security/previewIsolation';
@@ -63,6 +65,18 @@ describe('Preview credential and database isolation', () => {
         ...previewEnvironment,
         DATABASE_URL: 'postgresql://user:pass@ep-preview-pooler.example/neondb',
         DATABASE_URL_UNPOOLED: 'postgresql://user:pass@ep-preview.example/neondb',
+      }),
+    ).not.toThrow();
+  });
+
+  it('refuses Redis access until Preview isolation is explicitly asserted', () => {
+    expect(() => assertPreviewRedisIsolation(previewEnvironment)).toThrow(
+      PREVIEW_REDIS_ISOLATION_ERROR,
+    );
+    expect(() =>
+      assertPreviewRedisIsolation({
+        ...previewEnvironment,
+        OTM_PREVIEW_REDIS_ISOLATED: '1',
       }),
     ).not.toThrow();
   });

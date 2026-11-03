@@ -1,10 +1,23 @@
 import { Redis } from '@upstash/redis';
 import { env } from '@/env';
+import { assertPreviewRedisIsolation } from '@/app/lib/security/previewIsolation';
 
-// Create Redis client for caching and rate limiting
-export const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
+let redisClient: Redis | null = null;
+
+function getRedisClient() {
+  assertPreviewRedisIsolation();
+  redisClient ??= new Redis({
+    url: env.UPSTASH_REDIS_REST_URL,
+    token: env.UPSTASH_REDIS_REST_TOKEN,
+  });
+  return redisClient;
+}
+
+export const redis = new Proxy({} as Redis, {
+  get(_target, property) {
+    const value = Reflect.get(getRedisClient(), property);
+    return typeof value === 'function' ? value.bind(getRedisClient()) : value;
+  },
 });
 
 // Cache helper functions

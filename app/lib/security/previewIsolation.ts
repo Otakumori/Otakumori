@@ -6,6 +6,7 @@ function readRuntimeEnvironment(): RuntimeEnvironment {
 
 export const PREVIEW_EXTERNAL_MUTATION_ERROR = 'PREVIEW_EXTERNAL_MUTATION_DISABLED';
 export const PREVIEW_DATABASE_ISOLATION_ERROR = 'PREVIEW_DATABASE_ISOLATION_REQUIRED';
+export const PREVIEW_REDIS_ISOLATION_ERROR = 'PREVIEW_REDIS_ISOLATION_REQUIRED';
 
 const MUTATION_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const EXTERNAL_MUTATION_PREFIXES = [
@@ -52,6 +53,15 @@ export function assertExternalMutationAllowed(
 ): void {
   if (!isVercelPreview(environment)) return;
   throw new Error(`${PREVIEW_EXTERNAL_MUTATION_ERROR}:${capability}`);
+}
+
+export function assertPreviewRedisIsolation(
+  environment: RuntimeEnvironment = readRuntimeEnvironment(),
+): void {
+  if (!isVercelPreview(environment)) return;
+  if (environment.OTM_PREVIEW_REDIS_ISOLATED !== '1') {
+    throw new Error(PREVIEW_REDIS_ISOLATION_ERROR);
+  }
 }
 
 function databaseIdentity(value: string) {
