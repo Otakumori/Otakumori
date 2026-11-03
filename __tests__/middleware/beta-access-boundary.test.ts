@@ -25,6 +25,7 @@ vi.mock('@/app/lib/visual-qa/mode', () => ({
 
 describe('closed beta middleware boundary', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     mocks.auth.mockResolvedValue({ userId: null, sessionClaims: null });
   });
@@ -158,6 +159,20 @@ describe('closed beta middleware boundary', () => {
     );
 
     expect(response.status).toBe(200);
+    expect(mocks.auth).not.toHaveBeenCalled();
+  });
+
+  it('refuses provider mutation webhooks on a deployed Preview', async () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://preview.example.com/api/webhooks/stripe', { method: 'POST' }),
+      {} as never,
+    );
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ error: 'PREVIEW_EXTERNAL_MUTATION_DISABLED' });
     expect(mocks.auth).not.toHaveBeenCalled();
   });
 

@@ -15,6 +15,10 @@ import {
   normalizeVisualQaAuthState,
   resolveVisualQaAuthStateFromCookieHeader,
 } from '@/app/lib/visual-qa/mode';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isPreviewExternalMutationRequest,
+} from '@/app/lib/security/previewIsolation';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 const AGE_GATE_COOKIE = 'om_age_ok';
@@ -291,6 +295,20 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
       const shopUrl = new URL('/shop', req.url);
       shopUrl.searchParams.set('beta', 'purchases-disabled');
       return NextResponse.redirect(shopUrl);
+    }
+
+    if (isPreviewExternalMutationRequest(url.pathname, req.method)) {
+      return addPublicSecurityHeaders(
+        NextResponse.json(
+          {
+            ok: false,
+            error: PREVIEW_EXTERNAL_MUTATION_ERROR,
+            message: 'External provider mutations are disabled in Preview.',
+          },
+          { status: 503 },
+        ),
+        reqId,
+      );
     }
 
     if (isAgeGatedRoute(url.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
