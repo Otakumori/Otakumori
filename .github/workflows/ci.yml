@@ -82,6 +82,17 @@ jobs:
       UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
       UPSTASH_REDIS_REST_TOKEN: ci_placeholder
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+      NEXT_PUBLIC_FEATURE_HERO: '1'
+      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+      NEXT_PUBLIC_FEATURE_SHOP: '1'
+      NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
+      NEXT_PUBLIC_FEATURE_BLOG: '1'
+      NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+      NEXT_PUBLIC_LIVE_DATA: '0'
+      NEXT_PUBLIC_PROBE_MODE: '1'
+      # Both optimized build passes must produce the same localhost-only QA artifact.
+      # next.config.mjs refuses this adapter whenever VERCEL=1.
+      OTM_VISUAL_QA_AUTH: '1'
 
     steps:
       - name: Checkout code
@@ -116,16 +127,6 @@ jobs:
 
       - name: Build application
         run: pnpm run build
-        env:
-          NEXT_PUBLIC_FEATURE_HERO: '1'
-          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
-          NEXT_PUBLIC_FEATURE_SHOP: '1'
-          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
-          NEXT_PUBLIC_FEATURE_BLOG: '1'
-          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
-          NEXT_PUBLIC_LIVE_DATA: '0'
-          NEXT_PUBLIC_PROBE_MODE: '1'
-          OTM_VISUAL_QA_AUTH: '1'
 
       - name: Analyze bundle size
         run: |
