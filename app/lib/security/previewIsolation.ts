@@ -1,8 +1,7 @@
-type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
-
-function readRuntimeEnvironment(): RuntimeEnvironment {
-  return typeof globalThis.process === 'undefined' ? {} : globalThis.process.env;
-}
+import {
+  readRuntimeEnvironment,
+  type RuntimeEnvironment,
+} from '@/app/lib/runtime-env';
 
 export const PREVIEW_EXTERNAL_MUTATION_ERROR = 'PREVIEW_EXTERNAL_MUTATION_DISABLED';
 export const PREVIEW_DATABASE_ISOLATION_ERROR = 'PREVIEW_DATABASE_ISOLATION_REQUIRED';
