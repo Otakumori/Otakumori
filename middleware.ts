@@ -158,6 +158,13 @@ function handleLocalVisualQaRequest(req: NextRequest) {
   const host = req.headers.get('host');
   if (!isVisualQaAuthEnabled(undefined, host)) return null;
 
+  // The local Clerk substitute never substitutes for mature-content consent.
+  if (isAgeGatedRoute(req.nextUrl.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
+    return NextResponse.redirect(
+      buildAgeCheckUrl(req.url, `${req.nextUrl.pathname}${req.nextUrl.search}`),
+    );
+  }
+
   const queryState = normalizeVisualQaAuthState(req.nextUrl.searchParams.get('visualAuth'));
   const cookieState = resolveVisualQaAuthStateFromCookieHeader(req.headers.get('cookie'));
   const state = queryState ?? cookieState ?? 'signed-out';

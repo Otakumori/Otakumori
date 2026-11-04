@@ -283,6 +283,8 @@ jobs:
         run: pnpm exec playwright test
         env:
           BASE_URL: http://localhost:3000
+          # Keep test expectations aligned with the localhost-only server adapter.
+          OTM_VISUAL_QA_AUTH: '1'
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

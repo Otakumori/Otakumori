@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { isVisualQaAuthEnabled } from '@/app/lib/visual-qa/mode';
 
 const mocks = vi.hoisted(() => ({ auth: vi.fn() }));
 
@@ -27,6 +28,7 @@ describe('closed beta middleware boundary', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
     vi.clearAllMocks();
+    vi.mocked(isVisualQaAuthEnabled).mockReturnValue(false);
     mocks.auth.mockResolvedValue({ userId: null, sessionClaims: null });
   });
 
@@ -149,6 +151,19 @@ describe('closed beta middleware boundary', () => {
 
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toContain('/age-check');
+  });
+
+  it('retains the mature-game age gate in the local visual QA harness', async () => {
+    vi.mocked(isVisualQaAuthEnabled).mockReturnValue(true);
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('http://localhost:3000/mini-games/dungeon-of-desire'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/age-check');
+    expect(mocks.auth).not.toHaveBeenCalled();
   });
 
   it('keeps verified webhooks reachable without a beta session', async () => {
