@@ -7,14 +7,20 @@ import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
 import { capturePaidOrderLedger, reconcileRefundLedger } from '@/lib/finance/ledger';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isVercelPreview,
+} from '@/app/lib/security/previewIsolation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-10-29.clover',
-  typescript: true,
-});
+function getStripeClient() {
+  return new Stripe(env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-10-29.clover',
+    typescript: true,
+  });
+}
 
 type EventProcessingStatus = 'processing' | 'completed' | 'failed';
 
@@ -71,12 +77,22 @@ async function readRawBody(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (isVercelPreview()) {
+    return NextResponse.json(
+      { ok: false, error: PREVIEW_EXTERNAL_MUTATION_ERROR },
+      { status: 503 },
+    );
+  }
+
   const headersList = await headers();
   const sig = headersList.get('stripe-signature');
   if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
 
   const secret = env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return new NextResponse('Missing STRIPE_WEBHOOK_SECRET', { status: 500 });
+  if (!env.STRIPE_SECRET_KEY) return new NextResponse('Stripe is not configured', { status: 503 });
+
+  const stripe = getStripeClient();
 
   const raw = await readRawBody(req);
 

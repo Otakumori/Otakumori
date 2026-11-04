@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import GameShell from '../../_shared/GameShell';
@@ -25,15 +25,12 @@ const OtakuBeatEmUpGameWrapper = dynamic(() => import('./Game'), {
 import { motion } from 'framer-motion';
 import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameOverlay } from '../../_shared/GameOverlay';
-import { useGameHud } from '../../_shared/useGameHud';
 import {
   getGameVisualProfile,
   applyVisualProfile,
   getGameDisplayName,
 } from '../../_shared/gameVisuals';
 import { MiniGameFrame } from '../../_shared/MiniGameFrame';
-import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -43,12 +40,11 @@ type GameMode = 'story' | 'arcade' | 'survival';
 
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
-  const [score] = useState(0);
-  const [health] = useState(100);
-  const [combo] = useState(0);
-  const [gameState, setGameState] = useState<
-    'instructions' | 'playing' | 'win' | 'lose' | 'paused'
-  >('instructions');
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -66,19 +62,9 @@ export default function RhythmBeatEmUpPage() {
     avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
-  // Visual profile and HUD
+  // Visual profile
   const visualProfile = getGameVisualProfile('otaku-beat-em-up');
   const { backgroundStyle } = applyVisualProfile(visualProfile);
-  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('otaku-beat-em-up');
-  const { balance: petalBalance } = usePetalBalance();
-
-  // Game configuration
-  const GAME_CONFIG = {
-    MAX_HEALTH: 100,
-    BASE_SCORE_PER_HIT: 10,
-    COMBO_MULTIPLIER_BASE: 1.0,
-    RHYTHM_ACCURACY_BONUS: 1.5,
-  } as const;
 
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
@@ -87,11 +73,7 @@ export default function RhythmBeatEmUpPage() {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
-    // Transition to instructions after avatar choice
-    if (selectedMode) {
-      setGameState('instructions');
-    }
-  }, [selectedMode]);
+  }, []);
 
   const displayName = getGameDisplayName('otaku-beat-em-up');
 
@@ -142,24 +124,7 @@ export default function RhythmBeatEmUpPage() {
             </div>
           )}
 
-          {/* HUD - uses loader for cosmetics */}
-          {isQuakeHud ? (
-            <HudComponent {...hudProps} petals={petalBalance} gameId="otaku-beat-em-up" />
-          ) : (
-            <HudComponent
-              {...hudProps}
-              score={score}
-              health={health}
-              maxHealth={GAME_CONFIG.MAX_HEALTH}
-              combo={combo}
-            />
-          )}
-
-          <GameShell
-            title={displayName}
-            gameKey="rhythm-beat-em-up"
-            pauseAuthority="external"
-          >
+          <GameShell title={displayName} gameKey="rhythm-beat-em-up" pauseAuthority="external">
             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-4">
               <div className="mb-4">
                 <button
@@ -169,43 +134,9 @@ export default function RhythmBeatEmUpPage() {
                   ← Back to Mode Select
                 </button>
               </div>
-              {gameState === 'playing' && selectedMode && (
-                <OtakuBeatEmUpGameWrapper mode={selectedMode} />
-              )}
+              <OtakuBeatEmUpGameWrapper mode={selectedMode} />
             </div>
           </GameShell>
-
-          {/* Game Overlay */}
-          <GameOverlay
-            state={gameState}
-            instructions={[
-              'WASD/Arrows to move',
-              'Spacebar to attack (time with beat!)',
-              'Shift to block',
-              'Perfect timing = 2x damage multiplier',
-              'Chain combos for higher scores',
-            ]}
-            winMessage="Rhythm Master! You've conquered the beat!"
-            loseMessage="Health reached zero. Try again and stay on beat!"
-            score={score}
-            petalReward={null}
-            onRestart={() => {
-              setSelectedMode(null);
-              setGameState('instructions');
-            }}
-            onResume={() => {
-              if (gameState === 'instructions') {
-                setGameState('playing');
-              } else if (gameState === 'paused') {
-                setGameState('playing');
-              }
-            }}
-            onPause={() => {
-              if (gameState === 'playing') {
-                setGameState('paused');
-              }
-            }}
-          />
         </div>
       </MiniGameFrame>
     );
@@ -243,6 +174,7 @@ export default function RhythmBeatEmUpPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Story Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
@@ -253,7 +185,6 @@ export default function RhythmBeatEmUpPage() {
                       setSelectedMode('story');
                     } else {
                       setSelectedMode('story');
-                      setGameState('instructions');
                     }
                   }}
                   className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-pink-500/50 rounded-2xl p-6 text-white transition-all"
@@ -279,6 +210,7 @@ export default function RhythmBeatEmUpPage() {
 
                 {/* Arcade Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
@@ -289,7 +221,6 @@ export default function RhythmBeatEmUpPage() {
                       setSelectedMode('arcade');
                     } else {
                       setSelectedMode('arcade');
-                      setGameState('instructions');
                     }
                   }}
                   className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-purple-500/50 rounded-2xl p-6 text-white transition-all"
@@ -315,6 +246,7 @@ export default function RhythmBeatEmUpPage() {
 
                 {/* Survival Mode */}
                 <motion.button
+                  disabled={!isHydrated}
                   onClick={() => {
                     if (
                       avatarUsage === 'avatar-or-preset' &&
@@ -325,7 +257,6 @@ export default function RhythmBeatEmUpPage() {
                       setSelectedMode('survival');
                     } else {
                       setSelectedMode('survival');
-                      setGameState('instructions');
                     }
                   }}
                   className="scroll-mt-32 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-red-500/50 rounded-2xl p-6 text-white transition-all"

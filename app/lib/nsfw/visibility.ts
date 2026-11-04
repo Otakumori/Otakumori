@@ -9,6 +9,7 @@ import type { ContentRating } from './types';
 import { getUserNSFWStatus } from './user';
 import { db } from '@/app/lib/db';
 import { shouldFilterNSFW } from './config';
+import { isMissingSiteSettingsSchemaError } from '@/app/lib/config/siteSettings.server';
 
 export interface VisibilityContext {
   viewerUserId: string | null;
@@ -40,10 +41,16 @@ export async function shouldShowNSFWContent(context: VisibilityContext): Promise
   }
 
   // Check global NSFW setting
-  const globalSetting = await db.siteSetting.findUnique({
-    where: { key: 'nsfw_global_enabled' },
-    select: { boolValue: true },
-  });
+  let globalSetting: { boolValue: boolean | null } | null;
+  try {
+    globalSetting = await db.siteSetting.findUnique({
+      where: { key: 'nsfw_global_enabled' },
+      select: { boolValue: true },
+    });
+  } catch (error) {
+    if (isMissingSiteSettingsSchemaError(error)) return false;
+    throw error;
+  }
 
   const globalEnabled = globalSetting?.boolValue ?? true;
   if (!globalEnabled) {

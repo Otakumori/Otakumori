@@ -21,6 +21,7 @@ const INITIAL_SCENE_DATE = new Date(2026, 0, 1, 12);
 
 type HomeSceneContextValue = {
   scene: HomeSceneState;
+  sceneReady: boolean;
   projection: HomeSceneProjection | null;
   reducedMotion: boolean;
   surfaceRef: (node: HTMLDivElement | null) => void;
@@ -31,6 +32,7 @@ const HomeSceneContext = createContext<HomeSceneContextValue | null>(null);
 export function HomeSceneProvider({ children }: { children: ReactNode }) {
   const [surfaceNode, setSurfaceNode] = useState<HTMLDivElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
   const [scene, setScene] = useState<HomeSceneState>(() => ({
     ...resolveHomeScene(INITIAL_SCENE_DATE, false),
     timezone: 'local',
@@ -48,7 +50,10 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const update = () => setScene(resolveHomeScene(new Date(), reducedMotion));
+    const update = () => {
+      setScene(resolveHomeScene(new Date(), reducedMotion));
+      setSceneReady(true);
+    };
 
     update();
     const interval = window.setInterval(update, 60_000);
@@ -83,8 +88,8 @@ export function HomeSceneProvider({ children }: { children: ReactNode }) {
   }, [surfaceNode]);
 
   const value = useMemo(
-    () => ({ scene, projection, reducedMotion, surfaceRef }),
-    [projection, reducedMotion, scene, surfaceRef],
+    () => ({ scene, sceneReady, projection, reducedMotion, surfaceRef }),
+    [projection, reducedMotion, scene, sceneReady, surfaceRef],
   );
 
   return <HomeSceneContext.Provider value={value}>{children}</HomeSceneContext.Provider>;

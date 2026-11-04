@@ -5,11 +5,11 @@ test('Story flagship path enters combat and preserves shared pause and exit', as
   await page.goto('/mini-games/otaku-beat-em-up', { waitUntil: 'domcontentloaded' });
   const storyMode = page.getByRole('button', { name: 'Story Mode' });
   const presetChoice = page.getByRole('button', { name: 'Play with preset character' });
-  const startGame = page.getByRole('button', { name: 'Start Game' });
+  const continueToGame = page.getByRole('button', { name: 'Continue' });
   await expect
     .poll(
       async () => {
-        if ((await presetChoice.isVisible()) || (await startGame.isVisible())) return true;
+        if ((await presetChoice.isVisible()) || (await continueToGame.isVisible())) return true;
         await storyMode.click().catch(() => undefined);
         return false;
       },
@@ -19,9 +19,8 @@ test('Story flagship path enters combat and preserves shared pause and exit', as
   if (await presetChoice.isVisible({ timeout: 3000 }).catch(() => false)) {
     await presetChoice.click();
   }
-  await startGame.click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Start game' }).click();
+  await continueToGame.click();
+  await page.getByRole('button', { name: 'Start game', exact: true }).click();
 
   const controls = page.getByRole('navigation', { name: 'Game session controls' });
   await expect(controls).toHaveAttribute('data-game-session-phase', 'running');

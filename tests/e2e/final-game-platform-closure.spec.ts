@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test';
 test.describe('final game platform closure', () => {
   test('Bubble compatibility route resolves to the adopted runtime', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto('/mini-games/bubble-girl', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mini-games/bubble-girl?visualAuth=signed-in', {
+      waitUntil: 'domcontentloaded',
+    });
 
     await expect(page).toHaveURL(/\/mini-games\/bubble-ragdoll/);
     await expect(page.getByRole('heading', { level: 1, name: 'Bubble Ragdoll' })).toBeVisible();
@@ -11,7 +13,9 @@ test.describe('final game platform closure', () => {
 
   test('Petal Storm live runtime follows shared pause and exit authority', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto('/mini-games/petal-storm-rhythm', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mini-games/petal-storm-rhythm?visualAuth=signed-in', {
+      waitUntil: 'domcontentloaded',
+    });
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Start Playing' }).click();
 
@@ -27,7 +31,9 @@ test.describe('final game platform closure', () => {
 
   test('Maid Café shared pause resumes and exits through the canonical path', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto('/mini-games/maid-cafe-manager', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mini-games/maid-cafe-manager?visualAuth=signed-in', {
+      waitUntil: 'domcontentloaded',
+    });
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Start game' }).click();
 

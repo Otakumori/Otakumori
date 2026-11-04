@@ -57,6 +57,7 @@ const getGameThumbnail = (gameSlug: string): string => {
     'memory-match': '/assets/games/memory-match.svg',
     'puzzle-reveal': '/assets/games/puzzle-reveal.svg',
     'bubble-girl': '/assets/games/bubble-girl.svg',
+    'bubble-ragdoll': '/assets/games/hub/game-bubble-ragdoll-hub.webp',
     'petal-storm-rhythm': '/assets/games/petal-storm-rhythm.svg',
     blossomware: '/assets/games/blossomware.svg',
     'dungeon-of-desire': '/assets/games/dungeon-of-desire.svg',
@@ -64,7 +65,7 @@ const getGameThumbnail = (gameSlug: string): string => {
     'otaku-beat-em-up': '/assets/games/otaku-beat-em-up.svg',
   };
 
-  return thumbnailMap[gameSlug] || '/assets/games/memory-match.svg'; // Fallback
+  return thumbnailMap[gameSlug] || '/assets/placeholder-game.jpg';
 };
 
 type FacePosition = 'front' | 'up' | 'left' | 'right' | 'down';

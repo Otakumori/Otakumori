@@ -45,7 +45,6 @@ vi.mock('@/app/lib/prisma', () => ({
   },
 }));
 
-
 vi.mock('@/app/lib/rateLimit', () => ({
   rateLimitConfigs: { api: {}, auth: {} },
   withRateLimit: vi.fn((_req, _config, handler) => handler()),
@@ -140,6 +139,7 @@ function merchizeProduct() {
 
 describe('checkout session safety gates', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     vi.mocked(auth).mockResolvedValue({ userId: 'clerk_user_1' } as never);
     vi.mocked(requireLocalViewer).mockResolvedValue({
@@ -150,6 +150,22 @@ describe('checkout session safety gates', () => {
       displayName: null,
       avatarUrl: null,
     });
+  });
+
+  it('/api/v1/checkout/session refuses Preview checkout before Stripe', async () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    const mod = await import('../../app/api/v1/checkout/session/route');
+
+    const response = await mod.POST(request('http://localhost/api/v1/checkout/session'));
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      error: 'BETA_PURCHASES_DISABLED',
+      code: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+    });
+    expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(prisma.product.findUnique).not.toHaveBeenCalled();
   });
 
   it('/api/v1/checkout/session rejects hidden products before Stripe', async () => {
@@ -204,5 +220,4 @@ describe('checkout session safety gates', () => {
     expect(legacySession.maxDuration).toBe(10);
     expect(legacyCheckout).not.toHaveProperty('maxDuration');
   });
-
 });

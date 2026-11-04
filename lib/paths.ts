@@ -37,6 +37,7 @@ export const paths = {
   privacy: () => '/privacy',
   help: () => '/help',
   cookies: () => '/cookies',
+  credits: () => '/credits',
 
   // Admin
   adminPrintify: () => '/admin/printify',

@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { prisma } from '@/app/lib/prisma';
-import { debitPetals, ensureUserByClerkId } from '@/lib/petals-db';
+import { ensureUserByClerkId } from '@/lib/petals-db';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { rateLimit } from '@/app/api/rate-limit';
 import { InventoryKind } from '@prisma/client';
 import { logger } from '@/app/lib/logger';
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
   logger.request(req, 'POST /api/petal-shop/purchase');
   const { userId } = await auth();
   if (!userId) return NextResponse.json(problem(401, 'Unauthorized'), { status: 401 });
+  const idempotencyKey = req.headers.get('x-idempotency-key')?.trim();
+  if (!idempotencyKey || idempotencyKey.length > 128) {
+    return NextResponse.json(problem(400, 'Idempotency key required'), { status: 400 });
+  }
 
   // Basic RL to prevent hammering
   const rl = await rateLimit(
@@ -41,10 +46,6 @@ export async function POST(req: NextRequest) {
     const user = await ensureUserByClerkId(userId);
     // Handle coupons vs inventory
     if (shopItem.kind?.toUpperCase() === 'COUPON' || (shopItem.metadata as any)?.coupon) {
-      const res = await debitPetals(userId, price, 'petal-shop-purchase');
-      if (!res.success) {
-        return NextResponse.json(problem(400, res.error || 'Debit failed'), { status: 400 });
-      }
       const meta = (shopItem.metadata as any) || {};
       const coupon = meta.coupon || {};
       const type = coupon.type === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT';
@@ -52,60 +53,80 @@ export async function POST(req: NextRequest) {
       const ttlDays = Number(coupon.ttlDays) || 30;
       const code = `OM-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const expiresAt = new Date(Date.now() + ttlDays * 86400000);
-      await prisma.couponGrant.create({
-        data: {
-          userId: user.id,
-          code,
-          discountType: type as any,
-          amountOff: type === 'OFF_AMOUNT' ? amount : null,
-          percentOff: type === 'PERCENT' ? amount : null,
-          expiresAt,
+      const purchase = await spendPetalsAndFulfill(
+        user.id,
+        price,
+        `Purchased coupon: ${shopItem.name}`,
+        'petal_shop_purchase',
+        async (tx) => {
+          await tx.idempotencyKey.create({
+            data: {
+              key: `legacy-petal-shop:${user.id}:${idempotencyKey}`,
+              purpose: 'petal_shop_coupon',
+            },
+          });
+          return tx.couponGrant.create({
+            data: {
+              userId: user.id,
+              code,
+              discountType: type as any,
+              amountOff: type === 'OFF_AMOUNT' ? amount : null,
+              percentOff: type === 'PERCENT' ? amount : null,
+              expiresAt,
+            },
+          });
         },
+      );
+      return NextResponse.json({
+        ok: true,
+        data: { balance: purchase.newBalance, code: purchase.fulfillment.code },
+        requestId: rid,
       });
-      // Balance was debited above via 'res'
-      const userRec = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { petalBalance: true },
-      });
-      if (!userRec) {
-        return NextResponse.json(problem(404, 'User not found'), { status: 404 });
-      }
-      const newBalance = userRec.petalBalance ?? 0;
-      return NextResponse.json({ ok: true, data: { balance: newBalance, code }, requestId: rid });
     } else {
       const existing = await prisma.inventoryItem.findFirst({ where: { userId: user.id, sku } });
       if (existing) {
         return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
-      }
-      const res = await debitPetals(userId, price, 'petal-shop-purchase');
-      if (!res.success) {
-        return NextResponse.json(problem(400, res.error || 'Debit failed'), { status: 400 });
       }
       const kind = (() => {
         const k = (shopItem.kind || '').toUpperCase();
         if (k in InventoryKind) return k as keyof typeof InventoryKind as any;
         return InventoryKind.COSMETIC as any;
       })();
-      await prisma.inventoryItem.create({
-        data: {
-          userId: user.id,
-          sku,
-          kind,
-          metadata: { shopKind: shopItem.kind },
+      const purchase = await spendPetalsAndFulfill(
+        user.id,
+        price,
+        `Purchased inventory item: ${shopItem.name}`,
+        'petal_shop_purchase',
+        async (tx) => {
+          await tx.idempotencyKey.create({
+            data: {
+              key: `legacy-petal-shop:${user.id}:${idempotencyKey}`,
+              purpose: 'petal_shop_inventory',
+            },
+          });
+          return tx.inventoryItem.create({
+            data: {
+              userId: user.id,
+              sku,
+              kind,
+              metadata: { shopKind: shopItem.kind },
+            },
+          });
         },
+      );
+      return NextResponse.json({
+        ok: true,
+        data: { balance: purchase.newBalance },
+        requestId: rid,
       });
-      // Get updated balance after debit
-      const userRec = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { petalBalance: true },
-      });
-      if (!userRec) {
-        return NextResponse.json(problem(404, 'User not found'), { status: 404 });
-      }
-      const newBalance = userRec.petalBalance ?? 0;
-      return NextResponse.json({ ok: true, data: { balance: newBalance }, requestId: rid });
     }
   } catch (e: any) {
+    if (e instanceof PetalSpendError && e.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(problem(400, 'Insufficient funds'), { status: 400 });
+    }
+    if (e?.code === 'P2002') {
+      return NextResponse.json(problem(409, 'Duplicate request'), { status: 409 });
+    }
     const msg =
       e?.code === 'INSUFFICIENT_FUNDS' ? 'Insufficient funds' : e?.message || 'purchase_failed';
     const status = e?.code === 'INSUFFICIENT_FUNDS' ? 400 : 500;

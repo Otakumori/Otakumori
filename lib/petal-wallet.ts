@@ -1,4 +1,5 @@
 import { db } from '@/app/lib/db';
+import { spendPetalsInTransaction } from '@/app/lib/petals/spend';
 
 export interface PetalWalletData {
   balance: number;
@@ -79,33 +80,17 @@ export async function spendPetals(
   source: string,
   description?: string,
 ): Promise<{ balance: number; transactionId: string }> {
-  const wallet = await getPetalWallet(userId);
+  const result = await db.$transaction((tx) =>
+    spendPetalsInTransaction(
+      tx,
+      userId,
+      amount,
+      description || `Spent ${amount} petals on ${source}`,
+      source,
+    ),
+  );
 
-  if (wallet.balance < amount) {
-    throw new Error('INSUFFICIENT_PETALS');
-  }
-
-  const result = await db.$transaction(async (tx) => {
-    const updatedWallet = await tx.petalWallet.update({
-      where: { userId },
-      data: {
-        balance: { decrement: amount },
-      },
-    });
-
-    const transaction = await tx.petalTransaction.create({
-      data: {
-        userId,
-        amount: -amount,
-        source,
-        description: description || `Spent ${amount} petals on ${source}`,
-      },
-    });
-
-    return { balance: updatedWallet.balance, transactionId: transaction.id };
-  });
-
-  return result;
+  return { balance: result.newBalance, transactionId: result.transactionId };
 }
 
 /**
@@ -154,7 +139,7 @@ export async function updateStreak(
     },
   });
 
-  let currentStreak = 1;
+  let currentStreak = Math.max(1, wallet.currentStreak);
   let streakBonus = 0;
 
   if (yesterdayCollection) {
@@ -167,11 +152,8 @@ export async function updateStreak(
       data: { currentStreak },
     });
   } else {
-    // Reset streak
-    await db.petalWallet.update({
-      where: { userId },
-      data: { currentStreak: 1 },
-    });
+    // Returning after time away never erases previously earned participation.
+    // No continuity bonus is granted, but the recorded streak is preserved.
   }
 
   return { currentStreak, streakBonus };

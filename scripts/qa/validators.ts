@@ -47,7 +47,7 @@ export function validateAvatarIntegration(gameSlug: string, filePath: string): V
       'petal-storm-rhythm': 'bust',
       'memory-match': 'portrait',
       'puzzle-reveal': 'portrait',
-      'bubble-girl': 'chibi',
+      'bubble-ragdoll': 'chibi',
       blossomware: 'chibi',
       'dungeon-of-desire': 'bust',
     };
@@ -202,10 +202,10 @@ export function validateGameMechanics(gameSlug: string, filePath: string): Valid
     }
   }
 
-  if (gameSlug === 'bubble-girl') {
+  if (gameSlug === 'bubble-ragdoll') {
     // Check for physics/sandbox mechanics
     if (!/physics|sandbox|tool/i.test(content)) {
-      warnings.push(`Bubble Girl: Physics/sandbox mechanics may be missing`);
+      warnings.push(`Bubble Ragdoll: Physics/sandbox mechanics may be missing`);
     }
   }
 

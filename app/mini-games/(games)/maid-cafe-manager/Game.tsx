@@ -13,11 +13,14 @@ import {
 } from '../../_shared/GamePlatform';
 import { useGameSession, type GameSessionResult } from '../../_shared/GameSession';
 import MaidCafeGameScene from './MaidCafeGame';
+import { getAsset } from '../../_shared/assets-resolver';
+import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
+import { useGameProgress, type PersonalBestResult } from '@/app/lib/games/progress';
 
 type MaidCafeResult = GameSessionResult & {
-    score: number;
-    money: number;
-    level: number;
+  score: number;
+  money: number;
+  level: number;
 };
 
 export default function MaidCafeManagerGame() {
@@ -30,6 +33,10 @@ export default function MaidCafeManagerGame() {
     },
   });
   const [gameResults, setGameResults] = useState<MaidCafeResult | null>(null);
+  const completionSubmittedRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const { beginResultSession, recordResult } = useGameProgress();
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
     combo: 0,
@@ -37,35 +44,72 @@ export default function MaidCafeManagerGame() {
     progress: 0,
   });
 
-  const handleGameEnd = useCallback((results: { score: number; money: number; level: number }) => {
-    const result: MaidCafeResult = { ...results, outcome: 'completed' };
-    setGameResults(result);
-    session.complete(result);
-  }, [session.complete]);
+  const gameAssets: AssetManifest = {
+    images: [
+      getAsset('maid-cafe-manager', 'bg') || '',
+      getAsset('maid-cafe-manager', 'customerSprite') || '',
+    ].filter(Boolean),
+    audio: [
+      getAsset('maid-cafe-manager', 'bgm') || '',
+      getAsset('maid-cafe-manager', 'serveSfx') || '',
+    ].filter(Boolean),
+  };
 
-  const handleGameStatsUpdate = useCallback((stats: { score: number; combo: number; timer?: number; progress: number }) => {
-    setGameStats({
-      score: stats.score,
-      combo: stats.combo,
-      timer: stats.timer ?? undefined,
-      progress: stats.progress,
-    });
-  }, []);
+  const handleGameEnd = useCallback(
+    (results: { score: number; money: number; level: number }) => {
+      if (completionSubmittedRef.current) return;
+      completionSubmittedRef.current = true;
+      const result: MaidCafeResult = { ...results, outcome: 'completed' };
+      setGameResults(result);
+      session.complete(result);
+      void recordResult({
+        gameId: 'maid-cafe-manager',
+        resultKey: 'standard-shift',
+        score: result.score,
+        difficulty: 'medium',
+        durationMs: Math.max(0, Date.now() - startedAtRef.current),
+        didWin: result.score > 0,
+        metadata: { money: result.money, level: result.level },
+      }).then((saved) => setPersonalBest(saved.personalBest ?? null));
+    },
+    [recordResult, session.complete],
+  );
+
+  const handleGameStatsUpdate = useCallback(
+    (stats: { score: number; combo: number; timer?: number; progress: number }) => {
+      setGameStats({
+        score: stats.score,
+        combo: stats.combo,
+        timer: stats.timer ?? undefined,
+        progress: stats.progress,
+      });
+    },
+    [],
+  );
 
   const syncSession = useCallback(
     (state: GameState) => {
       if (state === 'loading' || state === 'boot') session.prepare();
       if (state === 'title') session.ready();
-      if (state === 'playing') session.start();
+      if (state === 'playing') {
+        completionSubmittedRef.current = false;
+        startedAtRef.current = Date.now();
+        beginResultSession('maid-cafe-manager');
+        session.start();
+      }
     },
-    [session.prepare, session.ready, session.start],
+    [beginResultSession, session.prepare, session.ready, session.start],
   );
 
   return (
     <GameStateMachine
       gameId="maid-cafe-manager"
       gameTitle="Maid Café Manager"
-      assets={undefined}
+      assets={
+        (gameAssets.images?.length ?? 0) > 0 || (gameAssets.audio?.length ?? 0) > 0
+          ? gameAssets
+          : undefined
+      }
       onStateChange={syncSession}
     >
       {(state, transitionTo) => {
@@ -91,6 +135,7 @@ export default function MaidCafeManagerGame() {
               title="Maid Café Manager"
               score={gameResults.score}
               isWin={gameResults.score > 0}
+              personalBest={personalBest}
               stats={[
                 { label: 'Final Score', value: gameResults.score },
                 { label: 'Money Earned', value: `$${gameResults.money}` },
@@ -99,6 +144,7 @@ export default function MaidCafeManagerGame() {
               onRestart={() => {
                 setGameResults(null);
                 setGameStats({ score: 0, combo: 0, timer: undefined, progress: 0 });
+                setPersonalBest(null);
                 session.restart();
                 transitionTo('title');
               }}
@@ -141,4 +187,3 @@ export default function MaidCafeManagerGame() {
     </GameStateMachine>
   );
 }
-

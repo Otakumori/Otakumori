@@ -66,6 +66,7 @@ const footerGroups = [
       { label: 'Privacy', href: paths.privacy(), region: 'root-cavity-privacy' },
       { label: 'Terms', href: paths.terms(), region: 'root-cavity-terms' },
       { label: 'Cookies', href: paths.cookies(), region: 'root-cavity-cookies' },
+      { label: 'Credits', href: paths.credits(), region: 'root-cavity-credits' },
     ],
   },
 ];

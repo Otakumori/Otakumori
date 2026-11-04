@@ -160,6 +160,11 @@ export default function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link href={paths.credits()} className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Credits &amp; Acknowledgments
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

@@ -1,6 +1,7 @@
 import { env } from '@/env';
 import { db as prisma } from '@/lib/db';
 import { resolveCatalogProvider } from '@/lib/catalog/provider';
+import { assertExternalMutationAllowed } from '@/app/lib/security/previewIsolation';
 
 export interface PrintifyAddress {
   first_name: string;
@@ -126,6 +127,8 @@ export async function createPrintifyOrder(
   session: any,
   options: PrintifyFulfillmentOptions = {},
 ): Promise<PrintifyOrderResult> {
+  assertExternalMutationAllowed('printify-fulfillment');
+
   const existingSync = await prisma.printifyOrderSync.findUnique({
     where: { localOrderId },
   });

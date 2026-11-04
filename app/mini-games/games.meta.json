@@ -36,12 +36,6 @@
     "desc": "Restore paired relic fragments with clean recall and careful moves."
   },
   {
-    "slug": "bubble-girl",
-    "name": "Bubble Ragdoll",
-    "icon": "bubble_chart",
-    "desc": "Spawn bubbles, float and score. Sandbox or challenge mode."
-  },
-  {
     "slug": "petal-storm-rhythm",
     "name": "Petal Storm Rhythm",
     "icon": "thunderstorm",
