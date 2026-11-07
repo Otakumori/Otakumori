@@ -71,13 +71,20 @@ export async function GET(request: NextRequest, { params }: { params: { username
       return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
+    const viewer = userId
+      ? await db.user.findUnique({
+          where: { clerkId: userId },
+          select: { id: true },
+        })
+      : null;
+
     // Check if viewer is blocked
-    if (userId) {
+    if (viewer) {
       const isBlocked = await db.block.findUnique({
         where: {
           blockerId_blockedId: {
             blockerId: profileUser.id,
-            blockedId: userId,
+            blockedId: viewer.id,
           },
         },
       });
@@ -88,11 +95,11 @@ export async function GET(request: NextRequest, { params }: { params: { username
     }
 
     // Check if viewer is blocked by profile user
-    if (userId) {
+    if (viewer) {
       const isBlockedBy = await db.block.findUnique({
         where: {
           blockerId_blockedId: {
-            blockerId: userId,
+            blockerId: viewer.id,
             blockedId: profileUser.id,
           },
         },
@@ -113,60 +120,43 @@ export async function GET(request: NextRequest, { params }: { params: { username
     if (visibility === 'private') {
       canView = isOwner;
     } else if (visibility === 'friends' && !isOwner) {
-      if (!userId) {
+      if (!viewer) {
         canView = false;
       } else {
-        // Get current user's ID from Clerk ID
-        const currentUser = await db.user.findUnique({
-          where: { clerkId: userId },
-          select: { id: true },
+        // Check if they're mutual followers (friends)
+        const mutualFollow = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: viewer.id,
+              followeeId: profileUser.id,
+            },
+          },
         });
 
-        if (!currentUser) {
-          canView = false;
-        } else {
-          // Check if they're mutual followers (friends)
-          const mutualFollow = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: currentUser.id,
-                followeeId: profileUser.id,
-              },
+        const mutualFollowBack = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: profileUser.id,
+              followeeId: viewer.id,
             },
-          });
+          },
+        });
 
-          const mutualFollowBack = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: profileUser.id,
-                followeeId: currentUser.id,
-              },
-            },
-          });
-
-          canView = !!(mutualFollow && mutualFollowBack);
-          isFollowing = !!mutualFollow;
-        }
+        canView = !!(mutualFollow && mutualFollowBack);
+        isFollowing = !!mutualFollow;
       }
     } else {
       // Public profile
-      if (userId) {
-        const currentUser = await db.user.findUnique({
-          where: { clerkId: userId },
-          select: { id: true },
-        });
-
-        if (currentUser) {
-          const follow = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: currentUser.id,
-                followeeId: profileUser.id,
-              },
+      if (viewer) {
+        const follow = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: viewer.id,
+              followeeId: profileUser.id,
             },
-          });
-          isFollowing = !!follow;
-        }
+          },
+        });
+        isFollowing = !!follow;
       }
     }
 
@@ -178,7 +168,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
     const profileData = {
       id: profileUser.id,
       username: profileUser.username,
-      displayName: profileUser.displayName,
+      display_name: profileUser.displayName,
       bio: profileUser.bio,
       location: profileUser.location,
       website: profileUser.website,

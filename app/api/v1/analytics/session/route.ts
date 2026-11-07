@@ -29,6 +29,15 @@ const SessionSchema = z.object({
   synced: z.boolean(),
 });
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'P2002'
+  );
+}
+
 /**
  * POST /api/v1/analytics/session
  * Store game session analytics
@@ -79,6 +88,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { ok: false, error: 'Session analytics are temporarily unavailable' },
         { status: 503 },
+      );
+    }
+    if (isUniqueConstraintError(error)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'DUPLICATE_SESSION',
+          message: 'This game session has already been recorded.',
+        },
+        { status: 409 },
       );
     }
     const { logger } = await import('@/app/lib/logger');

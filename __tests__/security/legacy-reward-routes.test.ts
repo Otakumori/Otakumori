@@ -9,6 +9,7 @@ import { POST as unlockAchievement } from '@/app/api/v1/achievements/unlock/rout
 import { POST as submitMiniGame } from '@/app/api/mini-games/submit/route';
 import { POST as finishGame } from '@/app/api/games/finish/route';
 import { POST as claimLegacyQuest } from '@/app/api/quests/route';
+import { POST as submitLeaderboard } from '@/app/api/v1/leaderboards/[gameId]/route';
 
 const legacyRoutes = [
   ['/api/v1/petals/grant', grantPetals],
@@ -19,6 +20,7 @@ const legacyRoutes = [
   ['/api/mini-games/submit', submitMiniGame],
   ['/api/games/finish', finishGame],
   ['/api/quests', claimLegacyQuest],
+  ['/api/v1/leaderboards/[gameId]', submitLeaderboard],
 ] as const;
 
 describe('legacy reward mutation containment', () => {
