@@ -15,6 +15,13 @@ const PurchaseSchema = z.object({
   itemId: z.string().min(1),
 });
 
+class PetalShopAlreadyOwnedError extends Error {
+  constructor() {
+    super('PETAL_SHOP_ITEM_ALREADY_OWNED');
+    this.name = 'PetalShopAlreadyOwnedError';
+  }
+}
+
 // Rate limit config for purchases
 const PURCHASE_RATE_LIMIT = {
   windowMs: 60000, // 1 minute
@@ -262,6 +269,15 @@ export async function POST(req: NextRequest) {
       `Purchased cosmetic: ${item.name}`,
       'petal_shop_cosmetic',
       async (tx) => {
+        // Recheck ownership after the wallet row has been conditionally updated.
+        // That update serializes competing spends for this user, so a second
+        // request cannot charge again after the first entitlement commits.
+        const existingItem = await tx.inventoryItem.findFirst({
+          where: { userId: user.id, sku: itemId },
+        });
+        if (existingItem) {
+          throw new PetalShopAlreadyOwnedError();
+        }
         await tx.idempotencyKey.create({
           data: {
             key: `petal-shop:${user.id}:${idempotencyKey}`,
@@ -321,6 +337,13 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
+    if (error instanceof PetalShopAlreadyOwnedError) {
+      return NextResponse.json({
+        ok: true,
+        data: { alreadyOwned: true, balance: null },
+        requestId,
+      });
+    }
     if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
       return NextResponse.json(
         {
@@ -345,7 +368,12 @@ export async function POST(req: NextRequest) {
       error instanceof Error ? error : new Error(String(error)),
     );
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Purchase failed. Please try again.',
+        requestId,
+      },
       { status: 500 },
     );
   }

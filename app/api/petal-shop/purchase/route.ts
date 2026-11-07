@@ -14,6 +14,13 @@ export const runtime = 'nodejs';
 
 const Body = z.object({ sku: z.string().min(1) });
 
+class PetalShopAlreadyOwnedError extends Error {
+  constructor() {
+    super('PETAL_SHOP_ITEM_ALREADY_OWNED');
+    this.name = 'PetalShopAlreadyOwnedError';
+  }
+}
+
 export async function POST(req: NextRequest) {
   const rid = reqId(req.headers);
   logger.request(req, 'POST /api/petal-shop/purchase');
@@ -98,6 +105,15 @@ export async function POST(req: NextRequest) {
         `Purchased inventory item: ${shopItem.name}`,
         'petal_shop_purchase',
         async (tx) => {
+          // The wallet update serializes competing spends. Rechecking here
+          // prevents a second request with a different idempotency key from
+          // charging for an entitlement that just committed.
+          const existingItem = await tx.inventoryItem.findFirst({
+            where: { userId: user.id, sku },
+          });
+          if (existingItem) {
+            throw new PetalShopAlreadyOwnedError();
+          }
           await tx.idempotencyKey.create({
             data: {
               key: `legacy-petal-shop:${user.id}:${idempotencyKey}`,
@@ -121,15 +137,18 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (e: any) {
+    if (e instanceof PetalShopAlreadyOwnedError) {
+      return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
+    }
     if (e instanceof PetalSpendError && e.code === 'INSUFFICIENT_PETALS') {
       return NextResponse.json(problem(400, 'Insufficient funds'), { status: 400 });
     }
     if (e?.code === 'P2002') {
       return NextResponse.json(problem(409, 'Duplicate request'), { status: 409 });
     }
-    const msg =
-      e?.code === 'INSUFFICIENT_FUNDS' ? 'Insufficient funds' : e?.message || 'purchase_failed';
-    const status = e?.code === 'INSUFFICIENT_FUNDS' ? 400 : 500;
+    const insufficientFunds = e?.code === 'INSUFFICIENT_FUNDS';
+    const msg = insufficientFunds ? 'Insufficient funds' : 'purchase_failed';
+    const status = insufficientFunds ? 400 : 500;
     logger.error(
       'petal_shop_purchase_error',
       { requestId: rid },

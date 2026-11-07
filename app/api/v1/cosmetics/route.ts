@@ -74,9 +74,19 @@ export async function GET(_req: NextRequest) {
       requestId,
     });
   } catch (error: any) {
-    logger.error('[Cosmetics GET] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[Cosmetics GET] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Cosmetics are temporarily unavailable.',
+        requestId,
+      },
       { status: 500 },
     );
   }
