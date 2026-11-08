@@ -31,6 +31,7 @@ export interface GameResultMetadata {
 export interface GameResult {
   gameId: string;
   sessionId?: string;
+  resultKey?: string;
   score: number;
   difficulty: string;
   durationMs: number;
@@ -61,8 +62,44 @@ export interface AchievementCheckResult {
 export interface RecordGameResultResponse {
   success: boolean;
   petalReward?: PetalRewardResult;
+  personalBest?: PersonalBestResult;
   achievements?: AchievementCheckResult;
   error?: string;
+}
+
+export interface PersonalBestResult {
+  status: 'new_best' | 'unchanged' | 'unavailable';
+  previousBest: number | null;
+  currentBest: number | null;
+  isNewBest: boolean;
+}
+
+export async function recordPersonalBest(input: {
+  gameId: string;
+  resultKey: string;
+  score: number;
+  metadata?: GameResultMetadata;
+}): Promise<PersonalBestResult> {
+  try {
+    const response = await fetch('/api/v1/games/personal-best', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok || payload.data?.persisted !== true) {
+      return { status: 'unavailable', previousBest: null, currentBest: null, isNewBest: false };
+    }
+
+    return {
+      status: payload.data.isNewBest ? 'new_best' : 'unchanged',
+      previousBest: payload.data.previousBest,
+      currentBest: payload.data.currentBest,
+      isNewBest: payload.data.isNewBest,
+    };
+  } catch {
+    return { status: 'unavailable', previousBest: null, currentBest: null, isNewBest: false };
+  }
 }
 
 export function createGameResultSessionId(gameId: string): string {
@@ -206,28 +243,33 @@ export async function recordGameResult(
   }>,
 ): Promise<RecordGameResultResponse> {
   try {
-    // Earn petals via the API
-    const petalResult = await earnPetalsFn({
-      gameId: result.gameId,
-      sessionId: result.sessionId,
-      score: result.score,
-      didWin: result.didWin,
-      metadata: result.metadata,
-    });
+    const resultKey = result.resultKey ?? result.difficulty;
+    const [petalResult, personalBest] = await Promise.all([
+      earnPetalsFn({
+        gameId: result.gameId,
+        sessionId: result.sessionId,
+        score: result.score,
+        didWin: result.didWin,
+        metadata: result.metadata,
+      }),
+      recordPersonalBest({
+        gameId: result.gameId,
+        resultKey,
+        score: result.score,
+        metadata: result.metadata,
+      }),
+    ]);
 
     if (!petalResult.success) {
       return {
         success: false,
+        personalBest,
         error: petalResult.error || 'Failed to record game result',
       };
     }
 
     // Check and unlock achievements
-    const achievementResult = await checkAchievements(
-      result.gameId,
-      result.score,
-      result.metadata,
-    );
+    const achievementResult = await checkAchievements(result.gameId, result.score, result.metadata);
 
     return {
       success: true,
@@ -240,6 +282,7 @@ export async function recordGameResult(
         duplicate: petalResult.duplicate,
         status: petalResult.status,
       },
+      personalBest,
       achievements: achievementResult,
     };
   } catch (error) {
@@ -284,6 +327,7 @@ export function useGameProgress() {
   return {
     beginResultSession,
     recordResult,
+    recordPersonalBest,
     calculatePetalReward: (
       gameId: string,
       score: number,
@@ -295,4 +339,3 @@ export function useGameProgress() {
       checkAchievements(gameId, score, metadata),
   };
 }
-

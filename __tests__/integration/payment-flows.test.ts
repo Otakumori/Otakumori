@@ -27,11 +27,11 @@ vi.mock('@/app/lib/petals', () => ({
   },
 }));
 vi.mock('@/app/lib/stripe', () => ({
-  stripe: {
+  getStripeClient: () => ({
     checkout: {
       sessions: { create: mocks.createCheckoutSession },
     },
-  },
+  }),
 }));
 
 import { POST } from '@/app/api/adults/purchase/route.safe';

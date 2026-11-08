@@ -19,6 +19,10 @@ import { getDiscountConfig } from '@/app/config/petalTuning';
 import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isVercelPreview,
+} from '@/app/lib/security/previewIsolation';
 
 function getStripeClient() {
   return new Stripe(env.STRIPE_SECRET_KEY, {
@@ -32,6 +36,17 @@ function isHttpUrl(value: unknown): value is string {
 }
 
 export async function POST(req: NextRequest) {
+  if (isVercelPreview()) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'BETA_PURCHASES_DISABLED',
+        code: PREVIEW_EXTERNAL_MUTATION_ERROR,
+      },
+      { status: 503 },
+    );
+  }
+
   return withRateLimit(req, rateLimitConfigs.api, async () => {
     const requestId = generateRequestId();
     let stage = 'init';

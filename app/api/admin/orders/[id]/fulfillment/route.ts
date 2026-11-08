@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdmin } from '@/app/lib/auth/admin';
 import { db } from '@/lib/db';
-import { stripe } from '@/app/lib/stripe';
+import { getStripeClient } from '@/app/lib/stripe';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
 
 export const runtime = 'nodejs';
@@ -14,10 +14,7 @@ const RetrySchema = z.object({
 
 const RETRYABLE_STATUSES = new Set(['failed', 'mapping_failed', 'no_items']);
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
@@ -54,7 +51,7 @@ export async function POST(
       );
     }
 
-    const session = await stripe.checkout.sessions.retrieve(order.stripeId);
+    const session = await getStripeClient().checkout.sessions.retrieve(order.stripeId);
     const result = await createPrintifyOrder(order.id, session, { allowRetry: true });
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   } catch (error) {

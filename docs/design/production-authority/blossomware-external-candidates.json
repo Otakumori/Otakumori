@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "lastReviewedDate": "2026-10-30",
+  "scope": "Internal acquisition research for future Blossomware and game-family production. These records are not public credits or runtime assets.",
+  "requiredAcquisitionState": "CANDIDATE_NOT_ACQUIRED",
+  "candidates": [
+    {
+      "id": "helton_yan_retro_anime_sfx",
+      "title": "FREE Retro Anime SFX",
+      "publisher": "Helton Yan",
+      "sourceUrl": "https://heltonyan.itch.io/retroanimesfx",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "CC BY 4.0",
+      "licenseEvidenceState": "PUBLISHER_TERMS_REQUIRE_PACKAGE_REVIEW",
+      "restrictions": [
+        "Retain creator attribution",
+        "Verify downloaded package membership before use"
+      ],
+      "intendedUses": ["parry", "combat impact", "charge", "microgame reaction"]
+    },
+    {
+      "id": "kenney_pixel_platformer_food_expansion",
+      "title": "Pixel Platformer Food Expansion",
+      "publisher": "Kenney",
+      "sourceUrl": "https://kenney.nl/assets/pixel-platformer-food-expansion",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "CC0",
+      "licenseEvidenceState": "PUBLISHER_TERMS_REQUIRE_PACKAGE_REVIEW",
+      "restrictions": ["Verify exact asset-page package membership"],
+      "intendedUses": ["food matching", "Maid Cafe microgames"]
+    },
+    {
+      "id": "b0tfly_japanese_treats",
+      "title": "10 Free Japanese Treats",
+      "publisher": "B0tfly",
+      "sourceUrl": "https://b0tfly.itch.io/10-free-japanese-treats-pixel-asset-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Publisher states commercial game use is permitted",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": ["Capture full publisher terms", "Verify redistribution restrictions"],
+      "intendedUses": ["food matching", "dessert serving"]
+    },
+    {
+      "id": "aamatniekss_fantasy_knight",
+      "title": "Fantasy Knight",
+      "publisher": "aamatniekss",
+      "sourceUrl": "https://aamatniekss.itch.io/fantasy-knight-free-pixelart-animated-character",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Commercial use and modification under custom terms",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": [
+        "No standalone redistribution",
+        "Honor prohibited AI-use workflows",
+        "Retain exact custom terms"
+      ],
+      "intendedUses": ["one-action parry", "pixel fantasy combat"]
+    },
+    {
+      "id": "pocogamesco_kawaii_gui",
+      "title": "Kawaii GUI",
+      "publisher": "PocoGamesCo",
+      "sourceUrl": "https://pocogamesco.itch.io/ui-user-interface-kawaii-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Commercial use under creator terms",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": [
+        "Use only within authored microgame scenes",
+        "Do not replace the Mori global UI"
+      ],
+      "intendedUses": ["Maid Cafe microgame UI", "kawaii scenario feedback"]
+    },
+    {
+      "id": "potat0master_ryoko_madoka",
+      "title": "Ryoko and Madoka",
+      "publisher": "Potat0Master",
+      "sourceUrl": "https://potat0master.itch.io/free-character-sprite-for-visual-novels-ryoko-madoka",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Commercial use under creator terms",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": [
+        "Do not redistribute source assets",
+        "Owner casting and character-fit approval required"
+      ],
+      "intendedUses": ["original character reactions", "microgame commands"]
+    },
+    {
+      "id": "daniconshow_basic_announcer_voice_pack",
+      "title": "Basic Announcer Voice Pack",
+      "publisher": "Dan Bosley / @daniconshow",
+      "sourceUrl": "https://daniconshow.itch.io/basic-announcer-voice-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Commercial use with creator credit",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": ["Credit Dan Bosley / @daniconshow", "Owner voice-casting approval required"],
+      "intendedUses": ["microgame commands", "success", "failure"]
+    },
+    {
+      "id": "hypnobius_dark_ages_ui",
+      "title": "Dark Ages UI",
+      "publisher": "Hypnobius",
+      "sourceUrl": "https://hypnobius.itch.io/dark-ages-ui",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Commercial use under publisher restrictions",
+      "licenseEvidenceState": "FULL_TERMS_VERIFICATION_REQUIRED",
+      "restrictions": ["Retain publisher restrictions", "Use only in dedicated fantasy HUDs"],
+      "intendedUses": ["Soulslike Interruption HUD"]
+    },
+    {
+      "id": "opengameart_super_prop_pack",
+      "title": "WIP Super Prop Pack",
+      "publisher": "OpenGameArt contributor",
+      "sourceUrl": "https://opengameart.org/content/wip-super-prop-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify author, license version, and per-file scope"],
+      "intendedUses": ["Otaku Room props"]
+    },
+    {
+      "id": "opengameart_small_arms",
+      "title": "Various Small Arms",
+      "publisher": "OpenGameArt contributor",
+      "sourceUrl": "https://opengameart.org/content/various-small-arms-assault-rifles-sniper-pistol",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify author, license version, and per-file scope"],
+      "intendedUses": ["future combat prop research"]
+    },
+    {
+      "id": "soundicons_eightbit",
+      "title": "Eightbit",
+      "publisher": "Soundicons",
+      "sourceUrl": "https://www.soundicons.net/en/eightbit/",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify commercial and redistribution terms"],
+      "intendedUses": ["System Panic", "retro microgame feedback"]
+    },
+    {
+      "id": "carelesswizard_cute_frog",
+      "title": "Cute Frog Sprite",
+      "publisher": "CarelessWizard",
+      "sourceUrl": "https://carelesswizard.itch.io/cute-frog-sprite",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify commercial, modification, and redistribution terms"],
+      "intendedUses": ["absurd reaction microgame research"]
+    },
+    {
+      "id": "wonderweave_kawaii_kitchen",
+      "title": "Kawaii Kitchen Sprites",
+      "publisher": "Wonderweave",
+      "sourceUrl": "https://wonderweave.itch.io/kawaii-kitchen-sprites-30-arcade-characters-4848",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify commercial, modification, and redistribution terms"],
+      "intendedUses": ["Maid Cafe Chaos"]
+    },
+    {
+      "id": "williamqm_dark_enemies",
+      "title": "Dark Enemies Pack",
+      "publisher": "WilliamQM",
+      "sourceUrl": "https://williamqm.itch.io/dark-enemies-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify commercial, modification, and redistribution terms"],
+      "intendedUses": ["Soulslike Interruption"]
+    },
+    {
+      "id": "snoblin_pixel_rpg_npc",
+      "title": "Pixel RPG Free NPC",
+      "publisher": "Snoblin",
+      "sourceUrl": "https://snoblin.itch.io/pixel-rpg-free-npc",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Unverified",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify commercial, modification, and redistribution terms"],
+      "intendedUses": ["microgame character research"]
+    },
+    {
+      "id": "free_game_assets_schoolgirls",
+      "title": "Free Schoolgirls Anime Character Pixel Sprite Pack",
+      "publisher": "Free Game Assets",
+      "sourceUrl": "https://free-game-assets.itch.io/free-schoolgirls-anime-character-pixel-sprite-pack",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Pending",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Blocked from production until full licensing is established"],
+      "intendedUses": ["anime character reaction research"]
+    },
+    {
+      "id": "nnanachii_simple_room_tileset",
+      "title": "RPG Maker MV Simple Room Tileset",
+      "publisher": "nnanachii",
+      "sourceUrl": "https://nnanachii.itch.io/rpg-maker-mv-simple-room-tileset",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Pending",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": ["Verify engine restrictions and commercial redistribution terms"],
+      "intendedUses": ["Otaku Room research"]
+    },
+    {
+      "id": "cucurbitapeposama_visual_novel_girls",
+      "title": "Girl Sprites for Visual Novels",
+      "publisher": "CucurbitaPepoSama",
+      "sourceUrl": "https://www.deviantart.com/cucurbitapeposama/art/Girl-Sprites-for-Visual-Novels-for-FREE-877685280",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Pending",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": [
+        "Blocked from production until commercial and redistribution rights are explicit"
+      ],
+      "intendedUses": ["anime character reaction research"]
+    },
+    {
+      "id": "comp3interactive_retro_windows_gui",
+      "title": "Retro Windows GUI",
+      "publisher": "Comp-3 Interactive",
+      "sourceUrl": "https://comp3interactive.itch.io/retro-windows-gui",
+      "acquisitionState": "CANDIDATE_NOT_ACQUIRED",
+      "licenseClaim": "Pending",
+      "licenseEvidenceState": "LICENSE_VERIFICATION_REQUIRED",
+      "restrictions": [
+        "Artistic reference only until commercial and redistribution terms are established"
+      ],
+      "intendedUses": ["System Panic visual reference"]
+    }
+  ]
+}

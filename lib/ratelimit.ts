@@ -1,13 +1,15 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { env } from '@/env.mjs';
+import { isVercelPreview } from '@/app/lib/security/previewIsolation';
 
 // Simple Upstash rate-limit helper for API routes
 const url = env.UPSTASH_REDIS_REST_URL;
 const token = env.UPSTASH_REDIS_REST_TOKEN;
+const previewRedisIsolated = !isVercelPreview() || env.OTM_PREVIEW_REDIS_ISOLATED === '1';
 
 export const rl =
-  url && token
+  url && token && previewRedisIsolated
     ? new Ratelimit({
         // @ts-ignore type mismatch between libs in some TS setups
         redis: new (Redis as any)({ url, token }),

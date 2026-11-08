@@ -6,6 +6,8 @@ import { play } from '../../_shared/audio-bus';
 import { useAvatarForGame } from '../../_shared/useAvatarForGame';
 import { useGameAvatar } from '../../_shared/GameAvatarRenderer';
 import '../../_shared/cohesion.css';
+import type { BubbleObjective } from '../../_shared/secondaryGameContracts';
+import { BUBBLE_RAGDOLL_ASSETS } from './bubbleRagdollAssets';
 
 const ROUND_MS = 60_000;
 const MAX_BUBBLES = 24;
@@ -26,6 +28,7 @@ type Pt = { x: number; y: number; px: number; py: number }; // Verlet point
 type Stick = { a: number; b: number; len: number; stiff: number }; // constraint
 
 interface BubbleRagdollProps {
+  objective: BubbleObjective;
   paused?: boolean;
   onGameEnd?: (results: {
     score: number;
@@ -33,18 +36,37 @@ interface BubbleRagdollProps {
     combo: number;
     misses: number;
     pops: number;
+    objectiveId: BubbleObjective['id'];
+    objectiveComplete: boolean;
   }) => void;
-  onStatsUpdate?: (stats: { score: number; combo: number; timer: number; progress: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    combo: number;
+    timer: number;
+    progress: number;
+  }) => void;
 }
 
-export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate }: BubbleRagdollProps = {}) {
+export default function BubbleRagdoll({
+  objective,
+  paused = false,
+  onGameEnd,
+  onStatsUpdate,
+}: BubbleRagdollProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
+  const objectiveRef = useRef(objective);
+  const onGameEndRef = useRef(onGameEnd);
+  const onStatsUpdateRef = useRef(onStatsUpdate);
   pausedRef.current = paused;
+  objectiveRef.current = objective;
+  onGameEndRef.current = onGameEnd;
+  onStatsUpdateRef.current = onStatsUpdate;
 
   // assets
-  const bgUrl = getAsset('bubble-ragdoll', 'bg') ?? '';
+  const desktopBgUrl = BUBBLE_RAGDOLL_ASSETS.arena.desktop;
+  const mobileBgUrl = BUBBLE_RAGDOLL_ASSETS.arena.mobile;
   const bubbleSprite = getAsset('bubble-ragdoll', 'bubbleSprite') ?? '';
   const sPop = getAsset('bubble-ragdoll', 'popSfx') ?? '';
   const sBoing = getAsset('bubble-ragdoll', 'bounceSfx') ?? '';
@@ -56,17 +78,29 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
     if (bubbleSprite) im.src = bubbleSprite;
     return im;
   }, [bubbleSprite]);
-  const bgImg = useMemo(() => {
+  const desktopBgImg = useMemo(() => {
     if (typeof window === 'undefined') return null;
     const im = new Image();
-    if (bgUrl) im.src = bgUrl;
+    im.src = desktopBgUrl;
     return im;
-  }, [bgUrl]);
+  }, [desktopBgUrl]);
+  const mobileBgImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const im = new Image();
+    im.src = mobileBgUrl;
+    return im;
+  }, [mobileBgUrl]);
 
   // avatar integration
   const { data: avatarData } = useGameAvatar('bubble-ragdoll', 'default');
   const { enabled: avatarEnabled, avatar } = useAvatarForGame(true);
   const avatarSpriteUrl = avatar?.spriteUrl ?? avatarData?.fallbackSpriteUrl ?? null;
+  const avatarImg = useMemo(() => {
+    if (typeof window === 'undefined' || !avatarSpriteUrl) return null;
+    const image = new Image();
+    image.src = avatarSpriteUrl;
+    return image;
+  }, [avatarSpriteUrl]);
 
   useEffect(() => {
     const host = hostRef.current!,
@@ -97,7 +131,8 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
     let score = 0,
       combo = 0,
       bestCombo = 0,
-      misses = 0;
+      misses = 0,
+      pops = 0;
     let startAt = performance.now();
     let endAt = startAt + ROUND_MS;
 
@@ -146,6 +181,7 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
         const b = bubbles[hit];
         if (!b) return;
         b.popped = true;
+        pops++;
         score += 100 + Math.floor(combo * 7);
         combo = Math.min(99, combo + 1);
         bestCombo = Math.max(bestCombo, combo);
@@ -254,6 +290,7 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
 
     // draw helpers
     function drawBG() {
+      const bgImg = W / H < 0.9 ? mobileBgImg : desktopBgImg;
       if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
         const iw = bgImg.naturalWidth * s,
@@ -314,7 +351,7 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       ctx.stroke();
 
       // sprite billboard on torso if available
-      if (avatarEnabled && avatarSpriteUrl) {
+      if (avatarEnabled && avatarImg?.complete && avatarImg.naturalWidth > 0) {
         const dx = ptBot.x - ptTop.x;
         const dy = ptBot.y - ptTop.y;
         const ang = Math.atan2(dy, dx) + Math.PI / 2;
@@ -324,10 +361,8 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
         ctx.save();
         ctx.translate(ptTop.x, ptTop.y);
         ctx.rotate(ang);
-        const img = new Image();
-        img.src = avatarSpriteUrl;
         ctx.globalAlpha = 0.95;
-        ctx.drawImage(img, -w / 2, -h * 0.1, w, h);
+        ctx.drawImage(avatarImg, -w / 2, -h * 0.1, w, h);
         ctx.restore();
       } else {
         // neutral head/torso
@@ -384,20 +419,28 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       // Update stats via callback (UI is handled by GameUI component)
       const remain = Math.max(0, endAt - now);
       const timerSeconds = Math.ceil(remain / 1000);
-      const progress = 1 - (remain / ROUND_MS);
-      
-      if (onStatsUpdate) {
-        onStatsUpdate({
+
+      const currentObjective = objectiveRef.current;
+      const objectiveProgress =
+        currentObjective.id === 'pop-12'
+          ? pops / 12
+          : currentObjective.id === 'combo-6'
+            ? bestCombo / 6
+            : score / 1800;
+
+      if (onStatsUpdateRef.current) {
+        onStatsUpdateRef.current({
           score,
           combo,
           timer: timerSeconds,
-          progress,
+          progress: Math.min(1, Math.max(0, objectiveProgress)),
         });
       }
 
       // end conditions
       const botPt = pts[pTorsoBot];
-      if (botPt && (botPt.y > H + 40 || now >= endAt)) {
+      const objectiveComplete = currentObjective.isComplete({ pops, combo: bestCombo, score });
+      if (botPt && (botPt.y > H + 40 || now >= endAt || objectiveComplete)) {
         end(now);
         return;
       }
@@ -410,13 +453,16 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       if (hasEnded) return;
       hasEnded = true;
       const duration = Math.round(Math.min(now - startAt, ROUND_MS));
-      
-      onGameEnd?.({
+
+      const currentObjective = objectiveRef.current;
+      onGameEndRef.current?.({
         score,
         durationMs: duration,
         combo: bestCombo,
         misses,
-        pops: Math.floor(score / 100),
+        pops,
+        objectiveId: currentObjective.id,
+        objectiveComplete: currentObjective.isComplete({ pops, combo: bestCombo, score }),
       });
     }
 
@@ -425,11 +471,15 @@ export default function BubbleRagdoll({ paused = false, onGameEnd, onStatsUpdate
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [avatarEnabled, avatarSpriteUrl, bgUrl, bubbleSprite, sPop, sBoing, sThud, onGameEnd, onStatsUpdate]);
+  }, [avatarEnabled, avatarImg, bubbleSprite, desktopBgImg, mobileBgImg, sPop, sBoing, sThud]);
 
   return (
     <div ref={hostRef} className="absolute inset-0">
-      <canvas ref={canvasRef} />
+      <canvas
+        ref={canvasRef}
+        className="touch-none"
+        aria-label={`Bubble Ragdoll: ${objective.label}`}
+      />
     </div>
   );
 }

@@ -6,8 +6,9 @@ import { env } from './env.mjs';
 const require = createRequire(import.meta.url);
 const isVercelPreview = process.env.VERCEL_ENV === 'preview';
 const isVercelBuild = process.env.VERCEL === '1';
-const useVisualQaClerk =
-  process.env.OTM_VISUAL_QA_AUTH === '1' && process.env.NODE_ENV !== 'production' && !isVercelBuild;
+// CI exercises the optimized production bundle through `next start`. The adapter is
+// build-time only, explicitly opted in, and must never be bundled by Vercel.
+const useVisualQaClerk = process.env.OTM_VISUAL_QA_AUTH === '1' && !isVercelBuild;
 
 if (isVercelPreview) {
   for (const key of [
@@ -48,10 +49,7 @@ const visualQaClerkClientAdapter = path.resolve(
   process.cwd(),
   'app/lib/visual-qa/clerk-nextjs.tsx',
 );
-const visualQaClerkServerAdapter = path.resolve(
-  process.cwd(),
-  'app/lib/visual-qa/clerk-server.ts',
-);
+const visualQaClerkServerAdapter = path.resolve(process.cwd(), 'app/lib/visual-qa/clerk-server.ts');
 const clerkNextjsDistRoot = path.resolve(path.dirname(require.resolve('@clerk/nextjs')), '..');
 const clerkNextjsEsmRoot = path.join(clerkNextjsDistRoot, 'esm');
 const clerkNextjsEsmRootPosix = clerkNextjsEsmRoot.replaceAll(path.sep, '/');
@@ -61,8 +59,7 @@ const visualQaClerkAliases = useVisualQaClerk
       '@clerk/nextjs$': visualQaClerkClientAdapter,
       '@clerk/nextjs/server': visualQaClerkServerAdapter,
       '@clerk/nextjs': visualQaClerkClientAdapter,
-      '@clerk/nextjs/dist/esm/client-boundary/PromisifiedAuthProvider':
-        visualQaClerkClientAdapter,
+      '@clerk/nextjs/dist/esm/client-boundary/PromisifiedAuthProvider': visualQaClerkClientAdapter,
       '@clerk/nextjs/dist/esm/client-boundary/ClerkProvider': visualQaClerkClientAdapter,
       '@clerk/nextjs/dist/esm/client-boundary/hooks': visualQaClerkClientAdapter,
       '@clerk/nextjs/dist/esm/client-boundary/PromisifiedAuthProvider.js':
@@ -76,8 +73,7 @@ const visualQaClerkAliases = useVisualQaClerk
       [path.join(clerkNextjsEsmRoot, 'client-boundary/hooks.js')]: visualQaClerkClientAdapter,
       [`${clerkNextjsEsmRootPosix}/client-boundary/PromisifiedAuthProvider.js`]:
         visualQaClerkClientAdapter,
-      [`${clerkNextjsEsmRootPosix}/client-boundary/ClerkProvider.js`]:
-        visualQaClerkClientAdapter,
+      [`${clerkNextjsEsmRootPosix}/client-boundary/ClerkProvider.js`]: visualQaClerkClientAdapter,
       [`${clerkNextjsEsmRootPosix}/client-boundary/hooks.js`]: visualQaClerkClientAdapter,
     }
   : undefined;
@@ -89,6 +85,7 @@ const withBundleAnalyzer = (config) => config;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: Object.keys(publicEnv).length ? publicEnv : undefined,
+  transpilePackages: useVisualQaClerk ? ['@clerk/nextjs'] : undefined,
   // safety net during build; real fix is dynamic rendering
   staticPageGenerationTimeout: 300,
   // Enable source maps for Edge Tools debugging
@@ -309,6 +306,19 @@ const nextConfig = {
         return data;
       }),
     );
+
+    if (useVisualQaClerk) {
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /^@clerk\/nextjs\/server(?:\/.*)?$/,
+          visualQaClerkServerAdapter,
+        ),
+        new webpack.NormalModuleReplacementPlugin(
+          /^@clerk\/nextjs(?!\/server)(?:\/.*)?$/,
+          visualQaClerkClientAdapter,
+        ),
+      );
+    }
 
     // Reduce polyfills and giant blobs entering the cache
     config.resolve.fallback = { ...config.resolve.fallback, buffer: false };

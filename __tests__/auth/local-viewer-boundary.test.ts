@@ -95,7 +95,7 @@ describe('local viewer identity boundary', () => {
     expect(tx.user.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { clerkId: 'clerk_user_123' },
-        create: expect.objectContaining({ clerkId: 'clerk_user_123' }),
+        create: expect.objectContaining({ clerkId: 'clerk_user_123', visibility: 'private' }),
       }),
     );
     for (const model of ['userProfile', 'privacySettings', 'userSettings', 'cart', 'wallet'] as const) {
@@ -156,7 +156,7 @@ describe('local viewer identity boundary', () => {
     expect(tx.user.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { clerkId: 'clerk_user_123' },
-        create: expect.objectContaining({ clerkId: 'clerk_user_123' }),
+        create: expect.objectContaining({ clerkId: 'clerk_user_123', visibility: 'private' }),
       }),
     );
     expect(tx.userProfile.upsert).toHaveBeenCalledWith(

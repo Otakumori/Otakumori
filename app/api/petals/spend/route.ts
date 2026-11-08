@@ -1,7 +1,6 @@
-
 import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
-import { requireUserId } from '@/app/lib/auth';
+import { requireLocalViewer } from '@/app/lib/auth/viewer';
 import { petalService } from '@/app/lib/petals';
 
 export const runtime = 'nodejs';
@@ -9,14 +8,19 @@ export const maxDuration = 10;
 
 export async function POST(req: Request) {
   try {
-    const userId = await requireUserId();
+    const { localUserId } = await requireLocalViewer();
     const { amount, reason, metadata } = await req.json();
 
     // Log spend with metadata for analytics/debugging
-    logger.warn('Petal spend request:', undefined, { userId, amount, reason, metadata: metadata || {} });
+    logger.warn('Petal spend request:', undefined, {
+      userId: localUserId,
+      amount,
+      reason,
+      metadata: metadata || {},
+    });
 
     const result = await petalService.spendPetals(
-      userId,
+      localUserId,
       Number(amount),
       reason ?? 'SHOP_PURCHASE',
     );

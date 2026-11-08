@@ -8,6 +8,10 @@ import {
   LocalUserUnavailableError,
   requireLocalViewer,
 } from '@/app/lib/auth/viewer';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isVercelPreview,
+} from '@/app/lib/security/previewIsolation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,12 +28,22 @@ function getStripeClient() {
  * The client never receives authority to clear a cart from a query parameter.
  */
 export async function GET(request: NextRequest) {
+  if (isVercelPreview()) {
+    return NextResponse.json(
+      { ok: false, error: 'BETA_PURCHASES_DISABLED', code: PREVIEW_EXTERNAL_MUTATION_ERROR },
+      { status: 503 },
+    );
+  }
+
   try {
     const viewer = await requireLocalViewer();
     const sessionId = new URL(request.url).searchParams.get('session_id');
 
     if (!sessionId || sessionId.length > 255) {
-      return NextResponse.json({ ok: false, error: 'Checkout session is required.' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Checkout session is required.' },
+        { status: 400 },
+      );
     }
 
     const order = await prisma.order.findUnique({

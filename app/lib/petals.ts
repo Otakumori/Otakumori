@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { logger } from '@/app/lib/logger';
 import { type PetalTransaction, PetalTransactionSchema } from '@/app/lib/contracts';
+import { PetalSpendError, spendPetalsInTransaction } from '@/app/lib/petals/spend';
 
 /**
  * Petal System Architecture Summary
@@ -41,7 +42,7 @@ export interface PetalReward {
   reason: string;
   metadata?: Record<string, unknown>;
   source?: 'game' | 'achievement' | 'daily_bonus' | 'purchase_bonus' | 'other';
-  }
+}
 
 export interface PetalBalance {
   balance: number;
@@ -319,52 +320,7 @@ export class PetalService {
 
       // Use a transaction to ensure data consistency
       const result = await db.$transaction(async (tx) => {
-        // Check PetalWallet balance (primary source)
-        const wallet = await tx.petalWallet.findUnique({
-          where: { userId },
-        });
-
-        if (!wallet) {
-          throw new Error('User wallet not found');
-        }
-
-        if (wallet.balance < amount) {
-          throw new Error('Insufficient petal balance');
-        }
-
-        // Create the petal ledger entry (negative amount for spending)
-        const ledgerEntry = await tx.petalLedger.create({
-          data: {
-            id: `petal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            userId,
-            type: 'spend',
-            amount: -amount, // Negative amount for spending
-            reason,
-          },
-        });
-
-        // Update PetalWallet (balance decreases, lifetimeEarned stays the same)
-        const updatedWallet = await tx.petalWallet.update({
-          where: { userId },
-          data: {
-            balance: { decrement: amount },
-            // lifetimeEarned does NOT change on spend
-          },
-        });
-
-        // Update User.petalBalance for backward compatibility
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            petalBalance: { decrement: amount },
-          },
-        });
-
-        return {
-          ledgerEntry,
-          wallet: updatedWallet,
-          newBalance: updatedWallet.balance,
-        };
+        return spendPetalsInTransaction(tx, userId, amount, reason, 'petal_service');
       });
 
       logger.info('Petals spent successfully', {
@@ -380,7 +336,7 @@ export class PetalService {
       return {
         success: true,
         newBalance: result.newBalance,
-        lifetimePetalsEarned: result.wallet.lifetimeEarned,
+        lifetimePetalsEarned: result.lifetimePetalsEarned,
       };
     } catch (error) {
       logger.error(
@@ -412,7 +368,12 @@ export class PetalService {
         success: false,
         newBalance: 0,
         lifetimePetalsEarned,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS'
+            ? 'Insufficient petal balance'
+            : error instanceof Error
+              ? error.message
+              : 'Unknown error',
       };
     }
   }

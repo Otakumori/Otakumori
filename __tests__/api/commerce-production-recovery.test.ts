@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/app/lib/auth/admin', () => ({ requireAdmin: mocks.requireAdmin }));
 vi.mock('@/lib/db', () => ({ db: { order: { findUnique: mocks.findOrder } } }));
 vi.mock('@/app/lib/stripe', () => ({
-  stripe: { checkout: { sessions: { retrieve: mocks.retrieveSession } } },
+  getStripeClient: () => ({ checkout: { sessions: { retrieve: mocks.retrieveSession } } }),
 }));
 vi.mock('@/lib/fulfillment/printify', () => ({
   createPrintifyOrder: mocks.createPrintifyOrder,

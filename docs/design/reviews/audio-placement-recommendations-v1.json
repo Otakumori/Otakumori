@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "lastReviewedDate": "2026-10-30",
+  "authority": "OWNER_AUDITION_REQUIRED",
+  "publicationState": "NOT_AUTHORIZED",
+  "recommendations": [
+    {
+      "surface": "Home",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_6863e5d54bae219a",
+          "sourceTitle": "Forest Day.ogg",
+          "intendedInteraction": "Restrained inhabited-world ambience after explicit audio enablement",
+          "technicalSuitability": "Publisher OGG; 60-second environmental loop; stream rather than predecode",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Audition at low level, verify loop seam, and avoid masking navigation feedback"
+        }
+      ]
+    },
+    {
+      "surface": "Navigation",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_4863d325b4356752",
+          "sourceTitle": "interesting ui",
+          "intendedInteraction": "Meaningful confirm or destination-open action, not every hover",
+          "technicalSuitability": "1.541-second owner-authored cue; likely needs a shorter transient derivative",
+          "rightsStatus": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+          "runtimePreparation": "Trim candidate transient, normalize for UI headroom, and test repetition fatigue"
+        }
+      ]
+    },
+    {
+      "surface": "Commander",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_a3ad327aa9661d95",
+          "sourceTitle": "Atlantean Twilight",
+          "intendedInteraction": "Reflective archive or Underground listening context after user activation",
+          "technicalSuitability": "171-second music track; stream through media playback, never predecode globally",
+          "rightsStatus": "ATTRIBUTION_REQUIRED",
+          "runtimePreparation": "Owner audition, exact credit retention, streaming QA, and route-exit cleanup"
+        }
+      ]
+    },
+    {
+      "surface": "Petal Samurai",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_30f752c8bbaac9ee",
+          "sourceTitle": "Sword Attack 1.ogg",
+          "intendedInteraction": "Light slice judgment",
+          "technicalSuitability": "0.5-second publisher OGG with immediate transient",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Bounded predecoded pool with pitch variation and concurrency cap"
+        },
+        {
+          "sourceAssetId": "audio_89f6b2d93b20d0c3",
+          "sourceTitle": "Sword Parry 1.ogg",
+          "intendedInteraction": "Perfect/parry judgment",
+          "technicalSuitability": "0.25-second publisher OGG; distinct fast confirmation",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Predecode after game start; preserve attack and cap overlap"
+        },
+        {
+          "sourceAssetId": "audio_be927f49f6747d0d",
+          "sourceTitle": "Waterfall Loop.ogg",
+          "intendedInteraction": "Arena ambience",
+          "technicalSuitability": "60-second publisher OGG loop matching the approved environment",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Stream at restrained level; verify seamless loop and route cleanup"
+        }
+      ]
+    },
+    {
+      "surface": "Bubble Ragdoll",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_05fa084b71ba21d3",
+          "sourceTitle": "Bubble Pops",
+          "intendedInteraction": "Bubble pop variation source",
+          "technicalSuitability": "6.1-second WAV source containing multiple pop events",
+          "rightsStatus": "ATTRIBUTION_REQUIRED",
+          "runtimePreparation": "Cut individual events, disclose modifications, encode runtime derivatives, and use a bounded variation pool"
+        },
+        {
+          "sourceAssetId": "audio_917e1c41a1857736",
+          "sourceTitle": "satisfying-soft-cute-butt-uqdnx4eo",
+          "intendedInteraction": "Soft ragdoll impact or wobble accent",
+          "technicalSuitability": "4-second owner-authored WAV; candidate source rather than a ready one-shot",
+          "rightsStatus": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+          "runtimePreparation": "Owner audition, isolate a short impact, and test repetition at mobile speaker levels"
+        }
+      ]
+    },
+    {
+      "surface": "Puzzle Reveal",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_29057634c8d71df5",
+          "sourceTitle": "Spell Impact 2.wav",
+          "intendedInteraction": "Tile restoration impact",
+          "technicalSuitability": "0.308-second source master with readable transient",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Use publisher OGG pair where available and tune below artwork payoff"
+        },
+        {
+          "sourceAssetId": "audio_d3a5ae8360d8ec9d",
+          "sourceTitle": "SFX_SPIRIT_GAIN",
+          "intendedInteraction": "Full artifact restoration or result accent",
+          "technicalSuitability": "7.296-second musical effect suitable only for rare completion",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Audition and trim only if source terms permit; do not use per tile"
+        }
+      ]
+    },
+    {
+      "surface": "Otaku Beat-em-up",
+      "candidates": [
+        {
+          "sourceAssetId": "audio_1c25f2a4f3fd0273",
+          "sourceTitle": "Sword Impact Hit 1.wav",
+          "intendedInteraction": "Weapon impact source",
+          "technicalSuitability": "Short TomMusic impact with strong gameplay readability",
+          "rightsStatus": "LICENSE_VERIFIED",
+          "runtimePreparation": "Prefer publisher OGG pair; predecode bounded variants and cap concurrency"
+        },
+        {
+          "sourceAssetId": "audio_f8f1b74b327103a2",
+          "sourceTitle": "Lewis and Dekalb",
+          "intendedInteraction": "Comic antagonist or active encounter music",
+          "technicalSuitability": "197-second music track; streaming candidate",
+          "rightsStatus": "ATTRIBUTION_REQUIRED",
+          "runtimePreparation": "Owner audition, retain exact credit, stream, and stop on route exit"
+        },
+        {
+          "sourceAssetId": "audio_9ffac8d37c04b998",
+          "sourceTitle": "damage_10_alex",
+          "intendedInteraction": "Generic male damage vocal candidate",
+          "technicalSuitability": "Short dialogue-pack recording suitable for event playback",
+          "rightsStatus": "ATTRIBUTION_REQUIRED",
+          "runtimePreparation": "Owner casting decision, CC BY credit, and bounded variation pool"
+        }
+      ]
+    }
+  ],
+  "requiredForEveryPlacement": [
+    "Owner artistic approval",
+    "Runtime derivative checksum and provenance",
+    "Accessible mute and persistent preference behavior",
+    "No playback before appropriate user interaction",
+    "Route-exit cleanup and bounded decoding"
+  ]
+}

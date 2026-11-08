@@ -1,4 +1,3 @@
-
 'use client';
 
 import { logger } from '@/app/lib/logger';
@@ -33,7 +32,7 @@ interface DiscountReward {
   minSpendCents?: number | null;
   validityDays: number;
   available: boolean;
-  }
+}
 
 interface PetalStoreResponse {
   ok: boolean;
@@ -93,7 +92,12 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       setError('Failed to fetch shop items');
-      logger.error('Error fetching shop items', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Error fetching shop items',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +118,12 @@ export default function PetalStorePage() {
         }
       }
     } catch (err) {
-      logger.error('Error fetching discount rewards', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Error fetching discount rewards',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     }
   };
 
@@ -126,7 +135,12 @@ export default function PetalStorePage() {
         if (typeof data.balance === 'number') setPetalBalance(data.balance);
       }
     } catch (err) {
-      logger.error('Error fetching petal balance', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Error fetching petal balance',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     }
   };
 
@@ -141,7 +155,10 @@ export default function PetalStorePage() {
 
       const response = await fetch('/api/petal-shop/purchase', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-idempotency-key': crypto.randomUUID(),
+        },
         body: JSON.stringify({ sku: item.sku }),
       });
 
@@ -157,7 +174,12 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       alert('Purchase failed. Please try again.');
-      logger.error('Error purchasing item', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Error purchasing item',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setPurchasing(null);
     }
@@ -201,7 +223,12 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       alert('Purchase failed. Please try again.');
-      logger.error('Error purchasing discount reward', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
+      logger.error(
+        'Error purchasing discount reward',
+        undefined,
+        undefined,
+        err instanceof Error ? err : new Error(String(err)),
+      );
     } finally {
       setPurchasing(null);
     }

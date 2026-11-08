@@ -9,7 +9,7 @@ test.describe('Game Threshold', () => {
       { width: 1280, height: 900 },
     ]) {
       await page.setViewportSize(viewport);
-      await page.goto('/mini-games');
+      await page.goto('/mini-games?visualAuth=signed-in');
 
       const thresholdNodes = page.locator(
         'section[data-mori-archetype="game-threshold"][aria-label="Mini-game collection"]'
@@ -39,7 +39,7 @@ test.describe('Game Threshold', () => {
   test('keeps launch and return actions clear through ready and results states', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/test/game-threshold');
+    await page.goto('/test/game-threshold?visualAuth=signed-in');
     await expect(page.locator('[data-game-threshold-fixture-hydrated="true"]')).toBeAttached({
       timeout: 15_000,
     });

@@ -12,6 +12,25 @@
       "verification": "corepack pnpm docs:security:check"
     },
     {
+      "path": "docs/authority/owner-decisions.json",
+      "domain": "owner-authority",
+      "status": "canonical",
+      "owner": "product-owner",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/owner-authority.test.ts",
+      "warning": "Owner-approved policy does not authorize remote, provider, database, deployment, economy, or final-art actions unless the specific record explicitly grants that scope."
+    },
+    {
+      "path": "docs/authority/owner-authority.md",
+      "domain": "owner-authority",
+      "status": "canonical",
+      "owner": "product-owner",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/docs/owner-authority.test.ts"
+    },
+    {
       "path": "docs/design/mori-production-system.md",
       "domain": "visual-system",
       "status": "canonical",
@@ -19,6 +38,75 @@
       "lastVerifiedDate": "2026-10-07",
       "maintenance": "manual",
       "verification": "corepack pnpm exec vitest run __tests__/components/MoriProduction.test.tsx"
+    },
+    {
+      "path": "docs/design/production-authority/audio-library-manifest.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts",
+      "warning": "Regenerate from the owner-managed SFX root when that local source library changes."
+    },
+    {
+      "path": "docs/design/production-authority/avatar-source-manifest.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts",
+      "warning": "Source inventory only; no record grants runtime or owner approval."
+    },
+    {
+      "path": "docs/legal/audio-attributions.json",
+      "domain": "legal-attribution",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "generated",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/owner-asset-library-manifests.test.ts"
+    },
+    {
+      "path": "docs/design/production-authority/blossomware-external-candidates.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/blossomware-external-candidates.test.ts",
+      "warning": "Research only: assets are not acquired, licensed for runtime, owner-approved, or eligible for public credits."
+    },
+    {
+      "path": "docs/design/blossomware-system-panic-v1-plan.md",
+      "domain": "game-design",
+      "status": "current-reference",
+      "owner": "games",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/mini-games/blossomware-orchestration.test.tsx __tests__/mini-games/blossomware-playlist.test.ts",
+      "warning": "Separate-branch plan only; no candidate asset or reward-authority approval is implied."
+    },
+    {
+      "path": "docs/design/reviews/game-production-assets-v1-owner-review.md",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "manual owner review",
+      "warning": "Engineering review evidence only; owner decisions remain unresolved and source assets are not promoted by this document."
+    },
+    {
+      "path": "docs/design/reviews/audio-placement-recommendations-v1.json",
+      "domain": "production-assets",
+      "status": "current-reference",
+      "owner": "production-assets",
+      "lastVerifiedDate": "2026-10-30",
+      "maintenance": "manual",
+      "verification": "corepack pnpm exec vitest run __tests__/assets/audio-placement-recommendations.test.ts",
+      "warning": "Audition shortlist only; no placement, runtime publication, or autoplay is authorized."
     },
     {
       "path": "docs/design/checkpoint.md",
@@ -56,6 +144,16 @@
       "lastVerifiedDate": "2026-07-22",
       "maintenance": "manual",
       "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
+    },
+    {
+      "path": "docs/qa/game-beta-acceptance.json",
+      "domain": "game-release-acceptance",
+      "status": "canonical",
+      "owner": "game-release-qa",
+      "lastVerifiedDate": "2026-10-31",
+      "maintenance": "manual-evidence",
+      "verification": "corepack pnpm mini-games:coverage && corepack pnpm mini-games:certify",
+      "entryPoint": "docs/repository-validation.md"
     },
     {
       "path": "README.md",

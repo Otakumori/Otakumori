@@ -68,6 +68,7 @@ function checkoutEvent() {
 
 describe('Stripe webhook closure', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     mocks.event = checkoutEvent();
     mocks.eventCreate.mockResolvedValue({});
@@ -102,6 +103,19 @@ describe('Stripe webhook closure', () => {
       paidAt: null,
       User: { clerkId: 'clerk_user_1' },
     });
+  });
+
+  it('refuses Stripe webhook processing on a deployed Preview', async () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('VERCEL_ENV', 'preview');
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ error: 'PREVIEW_EXTERNAL_MUTATION_DISABLED' });
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
   });
 
   it('reconciles a paid pre-created order and invokes fulfillment once', async () => {

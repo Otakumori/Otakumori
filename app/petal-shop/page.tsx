@@ -76,7 +76,12 @@ export default function PetalShopPage() {
         }
       } catch (error) {
         const logger = await getLogger();
-        logger.error('Failed to fetch data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        logger.error(
+          'Failed to fetch data:',
+          undefined,
+          undefined,
+          error instanceof Error ? error : new Error(String(error)),
+        );
         setPetalBalance(0);
       } finally {
         setLoading(false);
@@ -106,7 +111,10 @@ export default function PetalShopPage() {
 
       const response = await fetch('/api/v1/petals/shop/purchase', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-idempotency-key': crypto.randomUUID(),
+        },
         body: JSON.stringify({ itemId: item.id }),
       });
 
@@ -142,7 +150,12 @@ export default function PetalShopPage() {
       }
     } catch (error: any) {
       const logger = await getLogger();
-      logger.error('Purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Purchase error:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasing(null);
@@ -209,7 +222,12 @@ export default function PetalShopPage() {
       }
     } catch (error: any) {
       const logger = await getLogger();
-      logger.error('Voucher purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Voucher purchase error:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasingVoucher(null);

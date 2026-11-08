@@ -2,7 +2,7 @@ import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PetalService } from '@/app/lib/petals';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { generateRequestId } from '@/lib/requestId';
 import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
 import { db } from '@/lib/db';
@@ -14,6 +14,13 @@ export const runtime = 'nodejs';
 const PurchaseSchema = z.object({
   itemId: z.string().min(1),
 });
+
+class PetalShopAlreadyOwnedError extends Error {
+  constructor() {
+    super('PETAL_SHOP_ITEM_ALREADY_OWNED');
+    this.name = 'PetalShopAlreadyOwnedError';
+  }
+}
 
 // Rate limit config for purchases
 const PURCHASE_RATE_LIMIT = {
@@ -78,6 +85,13 @@ export async function POST(req: NextRequest) {
     }
 
     const { itemId } = validation.data;
+    const idempotencyKey = req.headers.get('x-idempotency-key')?.trim();
+    if (!idempotencyKey || idempotencyKey.length > 128) {
+      return NextResponse.json(
+        { ok: false, error: 'IDEMPOTENCY_KEY_REQUIRED', requestId },
+        { status: 400 },
+      );
+    }
 
     // Get cosmetic item
     const item = getCosmeticItem(itemId);
@@ -175,43 +189,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check user balance
-    if (user.petalBalance < item.costPetals) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'INSUFFICIENT_FUNDS',
-          message: `Insufficient petals. You need ${item.costPetals} petals but have ${user.petalBalance}.`,
-          requestId,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Spend petals
-    const petalService = new PetalService();
-    const spendResult = await petalService.spendPetals(
-      user.id,
-      item.costPetals,
-      `Purchased ${(item.type as string) === 'voucher' ? 'voucher' : 'cosmetic'}: ${item.name}`,
-      requestId,
-    );
-
-    if (!spendResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: spendResult.error || 'Failed to spend petals',
-          requestId,
-        },
-        { status: 500 },
-      );
-    }
-
-    // Handle voucher vs cosmetic differently
-    // Type assertion needed because voucher type may not be in all CosmeticType unions
+    // Debit and entitlement creation are one transaction so a failed inventory
+    // or voucher write cannot retain the customer's petals.
     if ((item.type as string) === 'voucher') {
-      // Create CouponGrant record for voucher
       const voucherMetadata = item.metadata as
         | {
             discountType?: string;
@@ -241,56 +221,85 @@ export async function POST(req: NextRequest) {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + validityDays);
 
-      await db.couponGrant.create({
-        data: {
-          userId: user.id,
-          code: voucherCode,
-          discountType: discountType as any,
-          percentOff: discountType === 'PERCENT' ? percentOff : null,
-          amountOff: discountType === 'OFF_AMOUNT' ? amountOff || 0 : null,
-          expiresAt,
-          petalCost: item.costPetals,
-          minSpendCents,
+      const purchase = await spendPetalsAndFulfill(
+        user.id,
+        item.costPetals,
+        `Purchased voucher: ${item.name}`,
+        'petal_shop_voucher',
+        async (tx) => {
+          await tx.idempotencyKey.create({
+            data: {
+              key: `petal-shop:${user.id}:${idempotencyKey}`,
+              purpose: 'petal_shop_voucher',
+            },
+          });
+          return tx.couponGrant.create({
+            data: {
+              userId: user.id,
+              code: voucherCode,
+              discountType: discountType as any,
+              percentOff: discountType === 'PERCENT' ? percentOff : null,
+              amountOff: discountType === 'OFF_AMOUNT' ? amountOff || 0 : null,
+              expiresAt,
+              petalCost: item.costPetals,
+              minSpendCents,
+            },
+          });
         },
-      });
+      );
 
-      // Return voucher code in response
       return NextResponse.json({
         ok: true,
         data: {
           itemId,
           itemName: item.name,
           itemType: item.type,
-          voucherCode,
-          expiresAt: expiresAt.toISOString(),
-          balance: spendResult.newBalance,
-          lifetimePetalsEarned: spendResult.lifetimePetalsEarned,
+          voucherCode: purchase.fulfillment.code,
+          expiresAt: purchase.fulfillment.expiresAt?.toISOString(),
+          balance: purchase.newBalance,
+          lifetimePetalsEarned: purchase.lifetimePetalsEarned,
         },
         requestId,
       });
-    } else {
-      // Create inventory item record for cosmetics
-      await db.inventoryItem.create({
-        data: {
-          userId: user.id,
-          sku: itemId,
-          kind: 'COSMETIC',
-          metadata: {
-            itemId,
-            itemName: item.name,
-            itemType: item.type,
-            hudSkinId: item.hudSkinId,
-            purchasedAt: new Date().toISOString(),
-          },
-        },
-      });
     }
 
-    // Get updated wallet info (includes lifetime)
-    const wallet = await db.petalWallet.findUnique({
-      where: { userId: user.id },
-      select: { balance: true, lifetimeEarned: true },
-    });
+    const purchase = await spendPetalsAndFulfill(
+      user.id,
+      item.costPetals,
+      `Purchased cosmetic: ${item.name}`,
+      'petal_shop_cosmetic',
+      async (tx) => {
+        // Recheck ownership after the wallet row has been conditionally updated.
+        // That update serializes competing spends for this user, so a second
+        // request cannot charge again after the first entitlement commits.
+        const existingItem = await tx.inventoryItem.findFirst({
+          where: { userId: user.id, sku: itemId },
+        });
+        if (existingItem) {
+          throw new PetalShopAlreadyOwnedError();
+        }
+        await tx.idempotencyKey.create({
+          data: {
+            key: `petal-shop:${user.id}:${idempotencyKey}`,
+            purpose: 'petal_shop_cosmetic',
+          },
+        });
+        return tx.inventoryItem.create({
+          data: {
+            userId: user.id,
+            sku: itemId,
+            kind: 'COSMETIC',
+            metadata: {
+              itemId,
+              itemName: item.name,
+              itemType: item.type,
+              hudSkinId: item.hudSkinId,
+              purchasedAt: new Date().toISOString(),
+            },
+          },
+        });
+      },
+    );
 
     // Log purchase
     const { logger } = await import('@/app/lib/logger');
@@ -304,7 +313,7 @@ export async function POST(req: NextRequest) {
         costPetals: item.costPetals,
         rarity: item.rarity,
         contentRating: getContentRating(item),
-        newBalance: wallet?.balance ?? spendResult.newBalance,
+        newBalance: purchase.newBalance,
       },
     });
 
@@ -314,8 +323,8 @@ export async function POST(req: NextRequest) {
         itemId,
         itemName: item.name,
         itemType: item.type,
-        balance: wallet?.balance ?? spendResult.newBalance,
-        lifetimePetalsEarned: wallet?.lifetimeEarned ?? spendResult.lifetimePetalsEarned,
+        balance: purchase.newBalance,
+        lifetimePetalsEarned: purchase.lifetimePetalsEarned,
         alreadyOwned: false,
       },
       requestId,
@@ -328,9 +337,43 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    logger.error('[Petal Shop Purchase] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof PetalShopAlreadyOwnedError) {
+      return NextResponse.json({
+        ok: true,
+        data: { alreadyOwned: true, balance: null },
+        requestId,
+      });
+    }
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'INSUFFICIENT_FUNDS',
+          message: 'Insufficient petals.',
+          requestId,
+        },
+        { status: 400 },
+      );
+    }
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { ok: false, error: 'DUPLICATE_REQUEST', requestId },
+        { status: 409 },
+      );
+    }
+    logger.error(
+      '[Petal Shop Purchase] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Purchase failed. Please try again.',
+        requestId,
+      },
       { status: 500 },
     );
   }

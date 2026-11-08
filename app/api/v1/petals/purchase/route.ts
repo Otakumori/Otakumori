@@ -7,6 +7,7 @@ import { InventoryKind } from '@prisma/client';
 import { z } from 'zod';
 
 import { db } from '@/lib/db';
+import { PetalSpendError, spendPetalsInTransaction } from '@/app/lib/petals/spend';
 
 const PurchaseSchema = z.object({
   itemId: z.string().min(1),
@@ -51,10 +52,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Item has no price' }, { status: 400 });
     }
 
-    if (user.petalBalance < item.pricePetals) {
-      return NextResponse.json({ ok: false, error: 'Insufficient petals' }, { status: 400 });
-    }
-
     const alreadyOwned = await db.inventoryItem.findFirst({
       where: {
         userId: user.id,
@@ -67,23 +64,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Item already owned' }, { status: 400 });
     }
 
-    await db.idempotencyKey.create({
-      data: {
-        key: payload.idempotencyKey,
-        purpose: 'petal_purchase',
-      },
-    });
-
     const result = await db.$transaction(async (tx) => {
-      const updatedUser = await tx.user.update({
-        where: { id: user.id },
+      await tx.idempotencyKey.create({
         data: {
-          petalBalance: {
-            decrement: item.pricePetals ?? 0,
-          },
+          key: payload.idempotencyKey,
+          purpose: 'petal_purchase',
         },
-        select: { petalBalance: true },
       });
+
+      const spend = await spendPetalsInTransaction(
+        tx,
+        user.id,
+        item.pricePetals ?? 0,
+        `Purchase:${item.sku}`,
+        'petal_purchase',
+      );
+
+      const duplicate = await tx.inventoryItem.findFirst({
+        where: { userId: user.id, sku: item.sku },
+        select: { id: true },
+      });
+      if (duplicate) throw new Error('ITEM_ALREADY_OWNED');
 
       const inventoryItem = await tx.inventoryItem.create({
         data: {
@@ -98,17 +99,8 @@ export async function POST(request: Request) {
         },
       });
 
-      await tx.petalLedger.create({
-        data: {
-          userId: user.id,
-          type: 'spend',
-          amount: item.pricePetals ?? 0,
-          reason: `Purchase:${item.sku}`,
-        },
-      });
-
       return {
-        newBalance: updatedUser.petalBalance,
+        newBalance: spend.newBalance,
         inventoryItem,
       };
     });
@@ -131,8 +123,22 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json({ ok: false, error: 'Insufficient petals' }, { status: 400 });
+    }
+    if ((error as { code?: string }).code === 'P2002') {
+      return NextResponse.json({ ok: false, error: 'Duplicate request' }, { status: 409 });
+    }
+    if (error instanceof Error && error.message === 'ITEM_ALREADY_OWNED') {
+      return NextResponse.json({ ok: false, error: 'Item already owned' }, { status: 409 });
+    }
 
-    logger.error('Error processing petal purchase', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error processing petal purchase',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

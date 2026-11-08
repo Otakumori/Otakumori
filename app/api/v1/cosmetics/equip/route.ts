@@ -219,9 +219,19 @@ export async function POST(req: NextRequest) {
       requestId,
     });
   } catch (error: any) {
-    logger.error('[Cosmetics Equip] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[Cosmetics Equip] Error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Cosmetic selection could not be saved.',
+        requestId,
+      },
       { status: 500 },
     );
   }
