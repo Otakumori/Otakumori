@@ -1,6 +1,5 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest } from 'next/server';
-import { enhancedPrintifyService } from '@/app/lib/printify/enhanced-service';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 
 export const runtime = 'nodejs';
@@ -15,6 +14,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const { validateLinks = true, fullSync = true } = body;
+    const { enhancedPrintifyService } = await import('@/app/lib/printify/enhanced-service');
 
     logger.warn('Starting enhanced Printify sync...', undefined, { validateLinks, fullSync });
 
@@ -35,7 +35,12 @@ export async function POST(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    logger.error('Enhanced Printify sync failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Enhanced Printify sync failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     return Response.json(
       {
@@ -54,6 +59,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     await requireAdminOrThrow();
+    const { enhancedPrintifyService } = await import('@/app/lib/printify/enhanced-service');
 
     // Get current sync statistics from database
     const stats = await enhancedPrintifyService.validateAllProductLinks();
@@ -66,7 +72,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    logger.error('Failed to get sync status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Failed to get sync status:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     return Response.json(
       {
