@@ -98,7 +98,8 @@ vi.mock('@/lib/requestId', () => ({
   generateRequestId: mocks.generateRequestId,
 }));
 
-const noRawInternalDetails = /Prisma|PetalShopItem|DiscountReward|does not exist|relation|table|column|provision/i;
+const noRawInternalDetails =
+  /Prisma|PetalShopItem|DiscountReward|does not exist|relation|table|column|provision/i;
 
 async function expectSchemaUnavailable(response: Response, requestId: string) {
   expect(response).toBeInstanceOf(Response);
@@ -135,7 +136,9 @@ describe('petal hotfix route contracts', () => {
     });
 
     const { GET } = await import('@/app/api/petal-shop/catalog/route');
-    const response = await GET(new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'));
+    const response = await GET(
+      new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'),
+    );
 
     await expectSchemaUnavailable(response, 'catalog-request-id');
   });
@@ -151,7 +154,9 @@ describe('petal hotfix route contracts', () => {
     ]);
 
     const { GET } = await import('@/app/api/petal-shop/catalog/route');
-    const response = await GET(new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'));
+    const response = await GET(
+      new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);
@@ -161,10 +166,14 @@ describe('petal hotfix route contracts', () => {
   });
 
   it('petal-shop catalog does not expose raw details for unexpected failures', async () => {
-    mocks.prisma.petalShopItem.findMany.mockRejectedValue(new Error('provider exploded with stack detail'));
+    mocks.prisma.petalShopItem.findMany.mockRejectedValue(
+      new Error('provider exploded with stack detail'),
+    );
 
     const { GET } = await import('@/app/api/petal-shop/catalog/route');
-    const response = await GET(new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'));
+    const response = await GET(
+      new NextRequest('https://www.otaku-mori.com/api/petal-shop/catalog'),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(500);
@@ -180,7 +189,9 @@ describe('petal hotfix route contracts', () => {
     });
 
     const { GET } = await import('@/app/api/v1/petals/shop/discounts/route');
-    const response = await GET(new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'));
+    const response = await GET(
+      new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'),
+    );
 
     await expectSchemaUnavailable(response, 'route-request-id');
   });
@@ -189,7 +200,9 @@ describe('petal hotfix route contracts', () => {
     mocks.db.discountReward.findMany.mockResolvedValue([]);
 
     const { GET } = await import('@/app/api/v1/petals/shop/discounts/route');
-    const response = await GET(new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'));
+    const response = await GET(
+      new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);
@@ -200,17 +213,21 @@ describe('petal hotfix route contracts', () => {
     mocks.db.discountReward.findMany.mockRejectedValue(new Error('unexpected stack detail'));
 
     const { GET } = await import('@/app/api/v1/petals/shop/discounts/route');
-    const response = await GET(new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'));
+    const response = await GET(
+      new Request('https://www.otaku-mori.com/api/v1/petals/shop/discounts'),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(500);
-    expect(body).toEqual({ ok: false, error: 'Internal server error', requestId: 'route-request-id' });
+    expect(body).toEqual({
+      ok: false,
+      error: 'Internal server error',
+      requestId: 'route-request-id',
+    });
     expect(JSON.stringify(body)).not.toContain('unexpected stack detail');
   });
 
-  it('petals earn keeps signed-out callers bounded as guest rewards', async () => {
-    mocks.auth.mockResolvedValue({ userId: null });
-
+  it('petals earn fails closed without invoking viewer or reward persistence', async () => {
     const { POST } = await import('@/app/api/v1/petals/earn/route');
     const response = await POST(
       new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
@@ -225,97 +242,9 @@ describe('petal hotfix route contracts', () => {
     );
     const body = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(body).toMatchObject({ ok: true, data: { earned: 12, isGuest: true } });
+    expect(response.status).toBe(410);
+    expect(body).toMatchObject({ ok: false, error: 'LEGACY_REWARD_ROUTE_DISABLED' });
     expect(mocks.requireLocalViewer).not.toHaveBeenCalled();
     expect(mocks.grantPetals).not.toHaveBeenCalled();
-  });
-
-  it('petals earn grants against local User.id for authenticated viewers', async () => {
-    mocks.auth.mockResolvedValue({ userId: 'clerk_user_123' });
-    mocks.requireLocalViewer.mockResolvedValue({
-      clerkUserId: 'clerk_user_123',
-      localUserId: 'local_user_123',
-      email: 'owner@example.invalid',
-    });
-    mocks.grantPetals.mockResolvedValue({
-      success: true,
-      granted: 12,
-      newBalance: 24,
-      lifetimeEarned: 36,
-      dailyRemaining: 1988,
-    });
-
-    const { POST } = await import('@/app/api/v1/petals/earn/route');
-    const response = await POST(
-      new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
-        method: 'POST',
-        body: JSON.stringify({
-          gameId: 'mori_runner',
-          sessionId: 'session-123',
-          score: 100,
-          didWin: true,
-        }),
-      }),
-    );
-
-    expect(response.status).toBe(200);
-    expect(mocks.grantPetals).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: 'local_user_123',
-        amount: 12,
-        source: 'mini_game',
-        idempotencyKey: 'mori_runner:session-123',
-      }),
-    );
-    expect(mocks.grantPetals).not.toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 'clerk_user_123' }),
-    );
-  });
-
-  it('petals earn returns bounded 503 when local viewer provisioning is unavailable', async () => {
-    const { LocalUserUnavailableError } = await import('@/app/lib/auth/viewer');
-    mocks.auth.mockResolvedValue({ userId: 'clerk_user_123' });
-    mocks.requireLocalViewer.mockRejectedValue(
-      new LocalUserUnavailableError('Prisma provisioning failure for User'),
-    );
-
-    const { POST } = await import('@/app/api/v1/petals/earn/route');
-    const response = await POST(
-      new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
-        method: 'POST',
-        body: JSON.stringify({ gameId: 'mori_runner', score: 100, didWin: true }),
-      }),
-    );
-
-    await expectSchemaUnavailable(response, 'route-request-id');
-    expect(mocks.grantPetals).not.toHaveBeenCalled();
-  });
-
-  it('petals earn returns bounded 503 when grant storage schema is unavailable', async () => {
-    mocks.auth.mockResolvedValue({ userId: 'clerk_user_123' });
-    mocks.requireLocalViewer.mockResolvedValue({
-      clerkUserId: 'clerk_user_123',
-      localUserId: 'local_user_123',
-      email: 'owner@example.invalid',
-    });
-    mocks.grantPetals.mockResolvedValue({
-      success: false,
-      granted: 0,
-      newBalance: 0,
-      lifetimeEarned: 0,
-      error: 'Petal grants are temporarily unavailable.',
-      errorCode: 'SCHEMA_UNAVAILABLE',
-    });
-
-    const { POST } = await import('@/app/api/v1/petals/earn/route');
-    const response = await POST(
-      new NextRequest('https://www.otaku-mori.com/api/v1/petals/earn', {
-        method: 'POST',
-        body: JSON.stringify({ gameId: 'mori_runner', score: 100, didWin: true }),
-      }),
-    );
-
-    await expectSchemaUnavailable(response, 'route-request-id');
   });
 });
