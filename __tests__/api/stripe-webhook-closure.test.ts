@@ -50,6 +50,7 @@ vi.mock('@/lib/finance/ledger', () => ({
 }));
 
 import { POST } from '@/app/api/webhooks/stripe/route';
+import { POST as compatibilityPOST } from '@/app/api/stripe/webhook/route';
 
 function request() {
   return new Request('http://localhost/api/webhooks/stripe', {
@@ -102,6 +103,10 @@ describe('Stripe webhook closure', () => {
       paidAt: null,
       User: { clerkId: 'clerk_user_1' },
     });
+  });
+
+  it('keeps the compatibility route bound to the canonical handler', () => {
+    expect(compatibilityPOST).toBe(POST);
   });
 
   it('reconciles a paid pre-created order and invokes fulfillment once', async () => {

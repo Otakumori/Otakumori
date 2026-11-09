@@ -1,9 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-import { logger } from '@/app/lib/logger';
-import { db } from '@/lib/db';
-
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -14,6 +11,7 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { db } = await import('@/lib/db');
     const user = await db.user.findUnique({
       where: { clerkId: userId },
       select: { id: true },
@@ -52,6 +50,7 @@ export async function GET() {
       },
     });
   } catch (error) {
+    const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Failed to load achievements',
       undefined,
