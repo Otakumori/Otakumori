@@ -4,7 +4,7 @@
  * Features:
  * - Multiple leaderboard categories (score, time, achievements)
  * - Time-based filtering (daily, weekly, monthly, all-time)
- * - Anti-cheat validation
+ * - Read-only access to historical, explicitly unverified scores
  * - Social features (friends leaderboards)
  * - Seasonal competitions
  */
@@ -15,23 +15,10 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { ensureUserByClerkId } from '@/lib/petals-db';
+import { legacyRewardRouteDisabled } from '@/app/lib/petals/legacyRewardRoute';
 import { withRateLimit } from '@/lib/security/rate-limiting';
 import { withSecurityHeaders } from '@/lib/security/headers';
 import { metricsCollector } from '@/lib/monitoring/advanced-metrics';
-
-const SubmitScoreSchema = z.object({
-  score: z.number().min(0),
-  category: z.enum(['score', 'time', 'achievements', 'level']),
-  metadata: z.object({
-    playtime: z.number().min(0),
-    level: z.number().optional(),
-    streak: z.number().optional(),
-    accuracy: z.number().min(0).max(1).optional(),
-    powerups: z.array(z.string()).optional(),
-    checksum: z.string(),
-  }),
-  replay: z.string().optional(), // Compressed replay data for verification
-});
 
 const GetLeaderboardSchema = z.object({
   category: z.enum(['score', 'time', 'achievements', 'level']).default('score'),
@@ -46,125 +33,6 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
 
   try {
     const { gameId } = params;
-
-    if (request.method === 'POST') {
-      // Submit new score
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json(
-          { ok: false, error: 'Authentication required' },
-          { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
-        );
-      }
-
-      const user = await ensureUserByClerkId(userId);
-      const body = await request.json();
-      const validation = SubmitScoreSchema.safeParse(body);
-
-      if (!validation.success) {
-        return NextResponse.json({ ok: false, error: 'Invalid score submission' }, { status: 400 });
-      }
-
-      const { score, category, metadata, replay } = validation.data;
-
-      // Anti-cheat validation
-      const isValidScore = await validateScore(gameId, score, category, metadata);
-      if (!isValidScore) {
-        // Log suspicious activity
-        await metricsCollector.track('leaderboard_cheat_attempt', {
-          value: 1,
-          tags: { gameId, userId: user.id, category, score: score.toString() },
-        });
-
-        return NextResponse.json({ ok: false, error: 'Score validation failed' }, { status: 400 });
-      }
-
-      // Check for existing better score
-      const existingScore = await db.leaderboardScore.findFirst({
-        where: {
-          userId: user.id,
-          game: gameId,
-          diff: category,
-        },
-        orderBy: category === 'time' ? { score: 'asc' } : { score: 'desc' },
-      });
-
-      const isNewBest =
-        !existingScore ||
-        (category === 'time' ? score < existingScore.score : score > existingScore.score);
-
-      if (isNewBest) {
-        // Create new leaderboard entry
-        const entry = await db.leaderboardScore.create({
-          data: {
-            userId: user.id,
-            game: gameId,
-            diff: category,
-            score,
-            statsJson: { ...metadata, replay, verified: true },
-          },
-        });
-
-        // Update user achievements if applicable
-        await updateAchievements(user.id, gameId, score, category, metadata);
-
-        // Award petals for new personal best using PetalService (tracks lifetimeEarned)
-        // Use centralized reward calculation for consistency
-        const { calculateGameReward } = await import('@/app/config/petalTuning');
-        const petalReward = calculateGameReward(gameId, true, score, {
-          ...metadata,
-          category,
-          isPersonalBest: true,
-        });
-        if (petalReward > 0) {
-          const { grantPetals } = await import('@/app/lib/petals/grant');
-          await grantPetals({
-            userId: user.id,
-            amount: petalReward,
-            source: 'leaderboard_reward',
-            metadata: {
-              gameId,
-              category,
-              score,
-              isPersonalBest: true,
-            },
-            description: `Leaderboard reward: ${gameId} - ${category}`,
-            req: request as any, // For rate limiting
-          });
-        }
-
-        // Calculate ranking
-        const ranking = await calculateRanking(gameId, category, score);
-
-        // Track metrics
-        await metricsCollector.track('leaderboard_score_submitted', {
-          value: score,
-          tags: { gameId, userId: user.id, category, ranking: ranking.toString() },
-        });
-
-        return NextResponse.json({
-          ok: true,
-          data: {
-            entryId: entry.id,
-            score,
-            ranking,
-            personalBest: true,
-            petalReward,
-            category,
-          },
-        });
-      } else {
-        return NextResponse.json({
-          ok: true,
-          data: {
-            score,
-            personalBest: false,
-            currentBest: existingScore.score,
-            category,
-          },
-        });
-      }
-    }
 
     if (request.method === 'GET') {
       // Get leaderboard
@@ -206,7 +74,9 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
             // });
           } catch (error: unknown) {
             const err = error instanceof Error ? error : new Error(String(error));
-            logger.warn('Friend table not available, using user-only scope:', undefined, { value: err.message });
+            logger.warn('Friend table not available, using user-only scope:', undefined, {
+              value: err.message,
+            });
           }
           scopeFilter = {
             userId: { in: [user.id, ...friends.map((f: any) => f.friendId)] },
@@ -249,9 +119,9 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
           avatarUrl: user?.avatarUrl ?? null,
           country: null, // Not available in current schema
           score: entry.score,
-          metadata: entry.statsJson || {},
+          metadata: withoutVerificationClaim(entry.statsJson),
           submittedAt: entry.createdAt,
-          verified: true, // Assume verified for now
+          verified: false,
         };
       });
 
@@ -318,86 +188,14 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
   }
 }
 
-// Utility functions
-async function validateScore(
-  gameId: string,
-  score: number,
-  category: string,
-  metadata: any,
-): Promise<boolean> {
-  // Game-specific validation rules
-  const gameRules = {
-    'memory-match': {
-      score: { max: 10000, minPlaytime: 30 },
-      time: { min: 10, maxAccuracy: 1.0 },
-    },
-    'petal-storm-rhythm': {
-      score: { max: 50000, minPlaytime: 60 },
-      accuracy: { min: 0.5, max: 1.0 },
-    },
-    'samurai-petal-slice': {
-      score: { max: 25000, minPlaytime: 45 },
-      streak: { max: 100 },
-    },
-    'bubble-pop-gacha': {
-      score: { max: 15000, minPlaytime: 90 },
-      level: { max: 20 },
-    },
-  };
-
-  const rules = (gameRules as any)[gameId];
-  if (!rules) return true; // No validation rules defined
-
-  const categoryRules = rules[category];
-  if (!categoryRules) return true;
-
-  // Validate score bounds
-  if (categoryRules.max && score > categoryRules.max) return false;
-  if (categoryRules.min && score < categoryRules.min) return false;
-
-  // Validate metadata
-  if (categoryRules.minPlaytime && metadata.playtime < categoryRules.minPlaytime) return false;
-  if (categoryRules.maxAccuracy && metadata.accuracy > categoryRules.maxAccuracy) return false;
-  if (categoryRules.minAccuracy && metadata.accuracy < categoryRules.minAccuracy) return false;
-
-  return true;
-}
-
-async function calculateRanking(gameId: string, category: string, score: number): Promise<number> {
-  const betterScores = await db.leaderboardScore.count({
-    where: {
-      game: gameId,
-      diff: category,
-      score: category === 'time' ? { lt: score } : { gt: score },
-    },
-  });
-
-  return betterScores + 1;
-}
-
-// Legacy function removed - now using calculateGameReward() from petalTuning.ts
-
-async function updateAchievements(
-  userId: string,
-  gameId: string,
-  score: number,
-  category: string,
-  metadata: any,
-) {
-  // Log achievement check for debugging
-  logger.warn('Checking achievements for:', undefined, { userId, gameId, score, category, metadata });
-
-  // Achievement logic would go here
-  // This is a placeholder for the achievement system
-
-  // Use category in achievement checks
-  if (category === 'score' && score > 1000) {
-    logger.warn(`High score achievement candidate: ${score} in ${gameId}`);
-  } else if (category === 'time' && score < 100) {
-    logger.warn(`Fast time achievement candidate: ${score}s in ${gameId}`);
-  } else if (category === 'achievements' && metadata?.achievementsUnlocked > 5) {
-    logger.warn(`Achievement master candidate: ${metadata.achievementsUnlocked} achievements in ${gameId}`);
+function withoutVerificationClaim(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
   }
+
+  const metadata = { ...(value as Record<string, unknown>) };
+  delete metadata.verified;
+  return metadata;
 }
 
 function buildDateFilter(period: string) {
@@ -422,6 +220,9 @@ function buildDateFilter(period: string) {
   }
 }
 
-export const POST = withSecurityHeaders(withRateLimit(handler, 'LEADERBOARD_SUBMIT'));
+export async function POST() {
+  return legacyRewardRouteDisabled('/api/v1/games/personal-best');
+}
+
 export const GET = withSecurityHeaders(withRateLimit(handler, 'LEADERBOARD_VIEW'));
 export const runtime = 'nodejs';
