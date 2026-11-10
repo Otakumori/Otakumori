@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+  runtimeEnv: {
+    STRIPE_SECRET_KEY: 'stripe-test-key-fixture' as string | undefined,
+    STRIPE_WEBHOOK_SECRET: 'stripe-webhook-secret-fixture' as string | undefined,
+  },
+  signature: 'test_signature' as string | null,
+  stripeConstructor: vi.fn(),
+  constructEvent: vi.fn(),
   event: null as any,
   retrieveSession: vi.fn(),
   eventCreate: vi.fn(),
@@ -15,15 +22,22 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: async () => new Headers({ 'stripe-signature': 'test_signature' }),
+  headers: async () => {
+    const result = new Headers();
+    if (mocks.signature) result.set('stripe-signature', mocks.signature);
+    return result;
+  },
 }));
 vi.mock('@/env', () => ({
-  env: { STRIPE_SECRET_KEY: 'sk_test_mock', STRIPE_WEBHOOK_SECRET: 'whsec_test_mock' },
+  env: mocks.runtimeEnv,
 }));
 vi.mock('@/app/lib/logger', () => ({ logger: { error: vi.fn() } }));
 vi.mock('stripe', () => ({
   default: class StripeMock {
-    webhooks = { constructEvent: () => mocks.event };
+    constructor() {
+      mocks.stripeConstructor();
+    }
+    webhooks = { constructEvent: mocks.constructEvent };
     checkout = { sessions: { retrieve: mocks.retrieveSession } };
   },
 }));
@@ -70,7 +84,11 @@ function checkoutEvent() {
 describe('Stripe webhook closure', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.runtimeEnv.STRIPE_SECRET_KEY = 'stripe-test-key-fixture';
+    mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = 'stripe-webhook-secret-fixture';
+    mocks.signature = 'test_signature';
     mocks.event = checkoutEvent();
+    mocks.constructEvent.mockImplementation(() => mocks.event);
     mocks.eventCreate.mockResolvedValue({});
     mocks.eventUpdate.mockResolvedValue({});
     mocks.orderUpdate.mockResolvedValue({});
@@ -107,6 +125,65 @@ describe('Stripe webhook closure', () => {
 
   it('keeps the compatibility route bound to the canonical handler', () => {
     expect(compatibilityPOST).toBe(POST);
+  });
+
+  it('imports both routes without credentials or eager Stripe construction', async () => {
+    vi.resetModules();
+    mocks.runtimeEnv.STRIPE_SECRET_KEY = undefined;
+    mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = undefined;
+
+    const canonical = await import('@/app/api/webhooks/stripe/route');
+    const compatibility = await import('@/app/api/stripe/webhook/route');
+
+    expect(canonical.POST).toBeTypeOf('function');
+    expect(compatibility.POST).toBe(canonical.POST);
+    expect(mocks.stripeConstructor).not.toHaveBeenCalled();
+  });
+
+  it('returns retryable 503 without credentials or downstream side effects', async () => {
+    mocks.runtimeEnv.STRIPE_SECRET_KEY = undefined;
+    mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = undefined;
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      retry: true,
+      error: 'Webhook processing is temporarily unavailable.',
+    });
+    expect(mocks.stripeConstructor).not.toHaveBeenCalled();
+    expect(mocks.constructEvent).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('rejects a missing signature before constructing Stripe', async () => {
+    mocks.signature = null;
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(400);
+    expect(await response.text()).toBe('Missing Stripe-Signature');
+    expect(mocks.stripeConstructor).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid signature without processing the event', async () => {
+    mocks.constructEvent.mockImplementation(() => {
+      throw new Error('invalid signature');
+    });
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(400);
+    expect(await response.text()).toBe('Invalid signature');
+    expect(mocks.stripeConstructor).toHaveBeenCalledTimes(1);
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
   });
 
   it('reconciles a paid pre-created order and invokes fulfillment once', async () => {

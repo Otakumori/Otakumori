@@ -19,6 +19,7 @@ import { getDiscountConfig } from '@/app/config/petalTuning';
 import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
+import { getCheckoutAdmissionPolicy } from '@/lib/checkout/admission';
 
 function getStripeClient() {
   return new Stripe(env.STRIPE_SECRET_KEY, {
@@ -32,6 +33,21 @@ function isHttpUrl(value: unknown): value is string {
 }
 
 export async function POST(req: NextRequest) {
+  const admission = getCheckoutAdmissionPolicy();
+  if (!admission.enabled) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: admission.code,
+        error: admission.message,
+      },
+      {
+        status: 503,
+        headers: { 'Cache-Control': 'no-store' },
+      },
+    );
+  }
+
   return withRateLimit(req, rateLimitConfigs.api, async () => {
     const requestId = generateRequestId();
     let stage = 'init';
