@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { paths } from '@/lib/paths';
@@ -130,5 +130,34 @@ describe('commerce authority convergence', () => {
     expect(screen.getByLabelText('Email')).toHaveAttribute('name', 'email');
     expect(screen.getByLabelText('Street address')).toHaveAttribute('name', 'address');
     expect(screen.getByLabelText('Country')).toHaveAttribute('name', 'country');
+  });
+
+  it('preserves the cart and disables repeated payment attempts when checkout is unavailable', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 503,
+      statusText: 'Service Unavailable',
+      text: async () =>
+        JSON.stringify({
+          ok: false,
+          code: 'CHECKOUT_TEMPORARILY_DISABLED',
+          error: 'Checkout is temporarily unavailable.',
+        }),
+    });
+    render(<CheckoutPage />);
+
+    fireEvent.change(screen.getByLabelText('State'), { target: { value: 'NY' } });
+    const submit = screen.getByRole('button', { name: 'Proceed to Payment' });
+    fireEvent.submit(submit.closest('form')!);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Checkout is temporarily unavailable while we prepare secure fulfillment. Your cart is still here.',
+    );
+    expect(screen.getByRole('button', { name: 'Checkout temporarily unavailable' })).toBeDisabled();
+    expect(screen.getByText('Sakura Tee')).toBeInTheDocument();
+    expect(mocks.removeItem).not.toHaveBeenCalled();
+    expect(mocks.clearCart).not.toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 });

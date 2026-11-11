@@ -56,6 +56,14 @@ vi.mock('@/app/lib/idempotency', () => ({
   storeIdempotencyResponse: vi.fn(),
 }));
 
+vi.mock('@/lib/checkout/admission', () => ({
+  getCheckoutAdmissionPolicy: () => ({
+    enabled: true,
+    code: 'CHECKOUT_TEMPORARILY_DISABLED',
+    message: 'Checkout temporarily unavailable',
+  }),
+}));
+
 vi.mock('@/lib/coupons/engine', () => ({
   getApplicableCoupons: vi.fn().mockResolvedValue({
     normalizedCodes: [],

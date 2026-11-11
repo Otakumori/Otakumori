@@ -10,6 +10,10 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { useCart } from '../../components/cart/CartProvider';
 import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 import { paths } from '@/lib/paths';
+import {
+  CHECKOUT_TEMPORARILY_DISABLED_CODE,
+  CHECKOUT_TEMPORARILY_DISABLED_MESSAGE,
+} from '@/lib/checkout/contract';
 
 interface ShippingInfo {
   firstName: string;
@@ -60,7 +64,15 @@ function getLineKey(item: CartItem) {
   return `${item.id}::${item.selectedVariant?.id ?? 'default'}`;
 }
 
-function formatServerError(_data: unknown): string {
+function formatServerError(data: unknown): string {
+  if (
+    data &&
+    typeof data === 'object' &&
+    'code' in data &&
+    data.code === CHECKOUT_TEMPORARILY_DISABLED_CODE
+  ) {
+    return CHECKOUT_TEMPORARILY_DISABLED_MESSAGE;
+  }
   return 'We could not begin checkout right now. Please try again in a moment.';
 }
 
@@ -115,6 +127,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cartNeedsReview, setCartNeedsReview] = useState(false);
+  const [checkoutUnavailable, setCheckoutUnavailable] = useState(false);
 
   const isUS = shippingInfo.country === 'US';
   const zipPlaceholder = useMemo(() => (isUS ? 'ZIP Code' : 'Postal Code'), [isUS]);
@@ -240,6 +253,9 @@ export default function CheckoutPage() {
         setError(buildInvalidItemsMessage(invalidItems));
       } else {
         console.error('Checkout session error:', data);
+        if (data?.code === CHECKOUT_TEMPORARILY_DISABLED_CODE) {
+          setCheckoutUnavailable(true);
+        }
         setError(formatServerError(data));
       }
     } catch (err) {
@@ -357,8 +373,8 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <button type="submit" disabled={isProcessing} className="inline-flex w-full items-center justify-center rounded-xl bg-pink-500 px-4 py-3 font-medium text-white disabled:opacity-50">
-                {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : <><Lock className="mr-2 h-4 w-4" />Proceed to Payment</>}
+              <button type="submit" disabled={isProcessing || checkoutUnavailable} className="inline-flex w-full items-center justify-center rounded-xl bg-pink-500 px-4 py-3 font-medium text-white disabled:opacity-50">
+                {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</> : checkoutUnavailable ? <><Lock className="mr-2 h-4 w-4" />Checkout temporarily unavailable</> : <><Lock className="mr-2 h-4 w-4" />Proceed to Payment</>}
               </button>
             </form>
           </section>

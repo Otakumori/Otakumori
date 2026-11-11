@@ -11,10 +11,12 @@ import { capturePaidOrderLedger, reconcileRefundLedger } from '@/lib/finance/led
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-10-29.clover',
-  typescript: true,
-});
+function createStripeClient(apiKey: string) {
+  return new Stripe(apiKey, {
+    apiVersion: '2025-10-29.clover',
+    typescript: true,
+  });
+}
 
 type EventProcessingStatus = 'processing' | 'completed' | 'failed';
 
@@ -71,14 +73,25 @@ async function readRawBody(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const apiKey = env.STRIPE_SECRET_KEY?.trim();
+  const secret = env.STRIPE_WEBHOOK_SECRET?.trim();
+  if (!apiKey || !secret) {
+    return NextResponse.json(
+      {
+        ok: false,
+        retry: true,
+        error: 'Webhook processing is temporarily unavailable.',
+      },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const headersList = await headers();
   const sig = headersList.get('stripe-signature');
   if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
 
-  const secret = env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) return new NextResponse('Missing STRIPE_WEBHOOK_SECRET', { status: 500 });
-
   const raw = await readRawBody(req);
+  const stripe = createStripeClient(apiKey);
 
   let event: Stripe.Event;
   try {
