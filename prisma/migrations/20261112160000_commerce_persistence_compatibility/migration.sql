@@ -27,8 +27,11 @@ BEGIN
        OR to_regclass('public."FinancialTransaction"') IS NOT NULL THEN
         RAISE EXCEPTION 'Expected commerce tables to be absent';
     END IF;
+    -- Prisma inserts this migration's started row before executing its SQL.
+    -- Exclude only this candidate; other unresolved rows are always blocking.
     IF (SELECT count(*) FROM public._prisma_migrations
-        WHERE finished_at IS NULL AND rolled_back_at IS NULL) <> 0 THEN
+        WHERE finished_at IS NULL AND rolled_back_at IS NULL
+          AND migration_name <> '20261112160000_commerce_persistence_compatibility') <> 0 THEN
         RAISE EXCEPTION 'Unresolved Prisma migration ledger entries';
     END IF;
     IF (SELECT count(*) FROM public._prisma_migrations

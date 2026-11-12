@@ -14,7 +14,7 @@ At exact main SHA, the disposable runner passed 85/85 mocked-provider tests acro
 
 ## Release gates
 
-Review the exact SQL and its checksum, confirm Production's intended `DATABASE_URL` / `DIRECT_URL` project, branch and database without exposing secrets, and rehearse `prisma migrate deploy` with a secure authorized runner on the clean isolated branch. Verify the `_prisma_migrations` ledger, diff and postflight. If any commerce table gains rows or the migration baseline changes from 23, stop and revisit the data backfill. Do not apply on PR #125 Preview or Production.
+Review the exact SQL and its checksum, confirm Production's intended `DATABASE_URL` / `DIRECT_URL` project, branch and database without exposing secrets, and rehearse `prisma migrate deploy` with a secure authorized runner on the clean isolated branch. Verify the `_prisma_migrations` ledger, diff and postflight. Prisma records its own pending migration as started before executing the SQL; the SQL preflight excludes **only this candidate's started row** from its unresolved-migration check, while continuing to block other unresolved entries. If any commerce table gains rows or the migration baseline changes from 23, stop and revisit the data backfill. Do not apply on PR #125 Preview or Production.
 
 The existing Production Prisma workflow only authorizes historical PR #57/#62 migration pairs. **Do not expand its allowlist automatically.** The current source checker may accept HTTP 500 and degraded HTTP 200 as healthy; this PR makes both fail. Separately, the default CI dependency security audit uses `continue-on-error` and should not be interpreted as a clean vulnerability attestation.
 
