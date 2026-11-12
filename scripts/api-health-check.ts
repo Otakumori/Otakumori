@@ -47,7 +47,6 @@ class APIHealthChecker {
       });
 
       const responseTime = Date.now() - startTime;
-      const isSuccess = allowedStatuses.includes(response.status);
 
       let details: unknown;
       try {
@@ -62,6 +61,15 @@ class APIHealthChecker {
           details = 'Unable to read response body';
         }
       }
+
+      const healthyPayload =
+        endpoint !== '/api/health' ||
+        (typeof details === 'object' &&
+          details !== null &&
+          !Array.isArray(details) &&
+          (details as Record<string, unknown>).ok === true &&
+          (details as Record<string, unknown>).status === 'healthy');
+      const isSuccess = allowedStatuses.includes(response.status) && healthyPayload;
 
       return {
         endpoint,
@@ -85,12 +93,12 @@ class APIHealthChecker {
     const isCI = process.env.CI === 'true';
 
     if (isCI) {
-      this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 500]));
+      this.results.push(await this.testEndpoint('/api/health', 'GET', 200));
       this.printResults();
       return;
     }
 
-    this.results.push(await this.testEndpoint('/api/health', 'GET', [200, 500]));
+    this.results.push(await this.testEndpoint('/api/health', 'GET', 200));
     this.results.push(await this.testEndpoint('/api/health/comprehensive', 'GET', 200));
 
     // Test 2: Public shop endpoints
@@ -182,7 +190,10 @@ async function main() {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  main().catch(console.error);
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 }
 
 export { APIHealthChecker };
