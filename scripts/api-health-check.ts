@@ -153,6 +153,16 @@ class APIHealthChecker {
         console.error(`  • ${test.method} ${test.endpoint}`);
         if (test.statusCode) console.error(`    Status: ${test.statusCode}`);
         if (test.error) console.error(`    Error: ${test.error}`);
+        if (test.endpoint === '/api/health') {
+          const payload =
+            test.details && typeof test.details === 'object' && !Array.isArray(test.details)
+              ? (test.details as Record<string, unknown>)
+              : null;
+          // Deliberately never print database errors, URLs, secrets or raw HTML.
+          console.error(
+            `    Contract: ${payload ? `JSON ok=${payload.ok === true} status=${String(payload.status ?? 'absent')}` : 'non-JSON response'}`,
+          );
+        }
         if (test.responseTime) console.error(`    Time: ${test.responseTime}ms`);
       });
     }

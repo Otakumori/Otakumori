@@ -293,6 +293,14 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
 });
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  // A public, read-only readiness probe must not depend on Clerk initialization.
+  // Exact-path GET only; all protected APIs still use normal auth middleware.
+  if (req.method === 'GET' && req.nextUrl.pathname === '/api/health') {
+    const response = addPublicSecurityHeaders(NextResponse.next(), createRequestId(req));
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
+
   const localVisualQaResponse = handleLocalVisualQaRequest(req);
   if (localVisualQaResponse) {
     return localVisualQaResponse;
