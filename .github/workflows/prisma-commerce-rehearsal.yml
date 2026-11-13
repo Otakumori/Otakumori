@@ -1,0 +1,91 @@
+name: Prisma Commerce Migration Contract (Disposable)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'prisma/migrations/20261112160000_commerce_persistence_compatibility/**'
+      - 'scripts/ci/commerce-migration-contract.mjs'
+      - '.github/workflows/prisma-commerce-rehearsal.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  prisma-commerce-contract:
+    # This intentionally certifies only the isolated PR candidate; never use live credentials.
+    if: github.head_ref == 'review/commerce-persistence-20261112'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: otm_ci
+          POSTGRES_PASSWORD: ci_only_pwd
+          POSTGRES_DB: neondb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U otm_ci -d neondb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CI: 'true'
+      SKIP_ENV_VALIDATION: '1'
+      DATABASE_URL: 'postgresql://otm_ci:ci_only_pwd@127.0.0.1:5432/neondb?schema=public'
+      DIRECT_URL: 'postgresql://otm_ci:ci_only_pwd@127.0.0.1:5432/neondb?schema=public'
+
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10.15.1'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate --schema prisma/schema.prisma
+
+      - name: Seed disposable pre-candidate commerce table stubs
+        run: node scripts/ci/commerce-migration-contract.mjs seed
+
+      - name: Baseline 23 historical migrations using the Prisma migration engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          for dir in prisma/migrations/*/; do
+            migration="${dir%/}"
+            migration="${migration##*/}"
+            if [ "${migration}" = "20261112160000_commerce_persistence_compatibility" ]; then
+              continue
+            fi
+            pnpm exec prisma migrate resolve --schema prisma/schema.prisma --applied "${migration}"
+          done
+          node scripts/ci/commerce-migration-contract.mjs baseline
+
+      - name: Apply exact candidate through Prisma CLI to disposable PostgreSQL
+        run: pnpm exec prisma migrate deploy --schema prisma/schema.prisma
+
+      - name: Verify candidate ledger, schema objects, and migration status
+        run: |
+          node scripts/ci/commerce-migration-contract.mjs verify
+          pnpm exec prisma migrate status --schema prisma/schema.prisma
+
+      - name: Verify Prisma CLI idempotent replay
+        run: |
+          pnpm exec prisma migrate deploy --schema prisma/schema.prisma
+          node scripts/ci/commerce-migration-contract.mjs verify

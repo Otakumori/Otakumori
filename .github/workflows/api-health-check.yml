@@ -109,8 +109,10 @@ jobs:
             .finally(async () => { await client.$disconnect(); });
           NODE
 
-      - name: Build project
-        run: pnpm run build
+      - name: Build project with the deployment Prisma engine
+        # The ordinary build script regenerates Prisma with --no-engine.
+        # This health smoke must use the same engine-bearing build as Vercel.
+        run: pnpm run vercel-build
 
       - name: Start production server
         run: |
