@@ -8,6 +8,12 @@ Target Prisma migration: `20261112160000_commerce_persistence_compatibility`. So
 
 The candidate SQL passed a transaction-backed isolated Neon rehearsal on `br-wild-pond-a5skkxmr`; synthetic database contract checks verified uniqueness, foreign keys, ledger replays, webhook deduplication, and cleanup. On a second clean isolated branch, `br-shiny-glitter-a5hlntsc`, Prisma CLI reported 24 migrations on disk, 23 applied and this candidate alone pending. `prisma migrate deploy` was blocked before execution by a tool safety control. **The Prisma migration-ledger write and CLI deployment remain unverified.**
 
+## Health-check certification design
+
+The pull-request API Health workflow exercises a real, disposable PostgreSQL 16 service (`otm_ci_health`) with local-only test credentials and synthetic provider placeholders. Its pre-build connectivity assertion proves Prisma reaches the exact CI database, and the API checker additionally requires HTTP 200 **and** `{ ok: true, status: "healthy" }`. It never obtains live provider secrets for pull-request jobs. Checkout remains source-controlled disabled.
+
+For trusted `push` events on `main` or `develop`, the same workflow continues using the configured secret-backed target. A pull-request green result certifies **isolated application health behavior**, not Production database availability. Separate Production runtime health verification and target identity attestation remain required prior to release.
+
 ## Application evidence
 
 At exact main SHA, the disposable runner passed 85/85 mocked-provider tests across 12 files, `prisma validate`, `prisma generate`, full TypeScript typecheck with 3 GB Node heap, and focused lint. The newly added health-check regression test in this PR requires an independent CI pass before approval; previous green checks do not certify this change.
