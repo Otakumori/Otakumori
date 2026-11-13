@@ -11,6 +11,8 @@ describe('HomeSoapstoneDialog', () => {
     render(<HomeSoapstoneDialog />);
 
     const trigger = screen.getByRole('button', { name: /read a soapstone/i });
+    expect(trigger).toHaveAttribute('data-soapstone-state', 'resting');
+    expect(trigger).not.toHaveTextContent(/read a soapstone/i);
 
     await act(async () => {
       await user.click(trigger);

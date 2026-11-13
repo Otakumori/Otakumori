@@ -147,7 +147,7 @@ describe('homepage collectible petals', () => {
     });
 
     expect(screen.getByTestId('petal-discovery-hint')).toHaveTextContent(
-      'A petal stirred. Try catching one.',
+      'A loose sakura petal drifts nearby.',
     );
 
     fireEvent.click(screen.getByRole('button', { name: /dismiss petal hint/i }));

@@ -226,7 +226,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-4 xl:gap-6" ref={megaMenuRef}>
           <Link
             href={paths.home()}
-            className={`min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === paths.home() ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
+            className={`${isHome ? 'mori-home-nav-link' : ''} min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === paths.home() ? (isHome ? 'mori-home-nav-active text-text-link-hover' : 'text-text-link-hover border-b-2 border-primary') : ''}`}
           >
             Home
           </Link>
@@ -234,7 +234,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'shop' ? null : 'shop')}
-              className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/shop') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
+              className={`${isHome ? 'mori-home-nav-link' : ''} min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/shop') ? (isHome ? 'mori-home-nav-active text-text-link-hover' : 'text-text-link-hover border-b-2 border-primary') : ''}`}
               aria-expanded={activeDropdown === 'shop'}
               aria-label="Shop menu"
             >
@@ -304,7 +304,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'games' ? null : 'games')}
-              className={`min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/mini-games') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
+              className={`${isHome ? 'mori-home-nav-link' : ''} min-h-[44px] flex items-center gap-1 whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/mini-games') ? (isHome ? 'mori-home-nav-active text-text-link-hover' : 'text-text-link-hover border-b-2 border-primary') : ''}`}
               aria-expanded={activeDropdown === 'games'}
               aria-label="Mini-games menu"
             >
@@ -377,13 +377,13 @@ export default function Navbar() {
 
           <Link
             href={paths.blogIndex()}
-            className={`min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/blog') ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
+            className={`${isHome ? 'mori-home-nav-link' : ''} min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname.startsWith('/blog') ? (isHome ? 'mori-home-nav-active text-text-link-hover' : 'text-text-link-hover border-b-2 border-primary') : ''}`}
           >
             Blog
           </Link>
           <Link
             href="/about"
-            className={`min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/about' ? 'text-text-link-hover border-b-2 border-primary' : ''}`}
+            className={`${isHome ? 'mori-home-nav-link' : ''} min-h-[44px] flex items-center whitespace-nowrap px-2 text-text-link hover:text-text-link-hover transition-colors ${pathname === '/about' ? (isHome ? 'mori-home-nav-active text-text-link-hover' : 'text-text-link-hover border-b-2 border-primary') : ''}`}
           >
             About
           </Link>

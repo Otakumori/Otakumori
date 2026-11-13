@@ -82,21 +82,23 @@ export default function RootFooter() {
       aria-labelledby="home-root-footer-title"
       data-testid="mori-root-footer"
       data-root-footer-contract="combined-world-overlay"
-      data-portrait-root-master="missing"
+      data-portrait-root-master="integrated-for-owner-review"
     >
       <div className={`${styles.contentShell} mx-auto w-full max-w-7xl px-5 pb-8 sm:px-7 md:px-8`}>
         <div className="grid gap-8 md:grid-cols-[1.05fr_1.15fr] md:items-end">
           <div data-root-region="footer-voice">
-            <p className="font-ui text-xs font-semibold uppercase tracking-[0.3em] text-[#f2bfd1]/76">
+            <p
+              className={`${styles.eyebrow} font-ui text-xs font-semibold uppercase tracking-[0.3em]`}
+            >
               Beneath the tree
             </p>
             <h2
               id="home-root-footer-title"
-              className="font-display mt-3 max-w-xl text-2xl font-semibold text-[#fff1e4] drop-shadow-[0_3px_14px_rgba(0,0,0,0.7)] md:text-3xl"
+              className={`${styles.footerTitle} font-display mt-3 max-w-xl text-2xl font-semibold md:text-3xl`}
             >
               The roots remember every path.
             </h2>
-            <p className="font-body mt-3 max-w-xl text-sm leading-7 text-[#f7dcd5]/72">
+            <p className={`${styles.footerIntro} font-body mt-3 max-w-xl text-sm leading-7`}>
               Quiet paths back to the shop, the games, the petals, and the little messages left in
               the dark.
             </p>
@@ -106,11 +108,13 @@ export default function RootFooter() {
           <div className="grid gap-5" data-root-region="html-navigation-cavities">
             <nav
               aria-label="Rooted homepage navigation"
-              className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4"
+              className={`${styles.rootNavigation} grid grid-cols-2 gap-4 text-sm sm:grid-cols-4`}
             >
               {footerGroups.map((group) => (
                 <div key={group.title} className={styles.linkGroup}>
-                  <h3 className="font-ui text-[0.67rem] font-semibold uppercase tracking-[0.24em] text-[#f2bfd1]/70">
+                  <h3
+                    className={`${styles.groupTitle} font-ui text-[0.67rem] font-semibold uppercase tracking-[0.24em]`}
+                  >
                     {group.title}
                   </h3>
                   <ul className="mt-3 grid gap-1">
@@ -120,7 +124,7 @@ export default function RootFooter() {
                           href={link.href}
                           prefetch={false}
                           data-root-region={link.region}
-                          className={`${styles.rootLink} inline-flex items-center rounded-full px-2 py-1.5 text-[#fff4e8]/78 transition hover:bg-[#f3b3c8]/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/26`}
+                          className={`${styles.rootLink} inline-flex items-center px-2 py-1.5 transition focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/32`}
                         >
                           {link.art ? (
                             <Image
@@ -162,7 +166,7 @@ export default function RootFooter() {
         </div>
 
         <div
-          className="font-body mt-8 flex flex-col gap-2 border-t border-[#f6dcc7]/12 pt-5 text-xs text-[#f7dcd5]/58 sm:flex-row sm:items-center sm:justify-between"
+          className={`${styles.legal} font-body mt-8 flex flex-col gap-2 pt-5 text-xs sm:flex-row sm:items-center sm:justify-between`}
           data-root-region="footer-legal-copy"
         >
           <p>Otaku-mori &trade; keeps a lantern lit beneath the roots.</p>
