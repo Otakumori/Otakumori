@@ -51,7 +51,7 @@ export default function OwnedRunesGrid() {
   return (
     <div>
       <div className="mb-2 text-xs text-zinc-400">
-        Tip: fuse 2+ runes in Trade Center to discover new ones.
+        Fusion is not enabled yet. Your persisted rune inventory remains available here.
       </div>
       <div
         className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"

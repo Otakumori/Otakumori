@@ -1,36 +1,15 @@
-
-import { logger } from '@/app/lib/logger';
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
-export const maxDuration = 10;
 
-export async function POST(req: NextRequest) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { itemId, slot } = await req.json();
-
-    // TODO: Implement equipment logic
-    return NextResponse.json({
-      ok: true,
-      data: {
-        message: 'Profile equip endpoint - implementation pending',
-        itemId,
-        slot,
-      },
-    });
-  } catch (error) {
-    logger.error(
-      'Error equipping item:',
-      undefined,
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
-    );
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
-  }
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: 'ENDPOINT_RETIRED',
+      message: 'Use the persisted cosmetics equip endpoint.',
+      canonical: '/api/v1/cosmetics/equip',
+    },
+    { status: 410 },
+  );
 }

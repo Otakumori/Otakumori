@@ -121,7 +121,7 @@ export function AvatarDisplay({
 
   // After fix: avatarData is already the user object (from result.data?.user), so avatarConfig is directly on avatarData
   let avatarConfig = avatarData?.avatarConfig;
-  
+
   // Handle case where avatarConfig might be a JSON string (defensive check)
   if (typeof avatarConfig === 'string') {
     try {
@@ -131,12 +131,11 @@ export function AvatarDisplay({
       avatarConfig = null;
     }
   }
-  
+
   // Validate avatarConfig structure - ensure it's an object, not null/undefined/string
   // Less strict validation - just check if it's a valid object, let AvatarRenderer handle format validation
-  const isValidConfig = avatarConfig && 
-    typeof avatarConfig === 'object' && 
-    !Array.isArray(avatarConfig);
+  const isValidConfig =
+    avatarConfig && typeof avatarConfig === 'object' && !Array.isArray(avatarConfig);
 
   if (isLoading) {
     return <AvatarSkeleton size={size} className={className} />;
@@ -148,7 +147,7 @@ export function AvatarDisplay({
         <AvatarFallback size={size} mode="user" className="w-full h-full" />
         {isOwnProfile && showEditButton && (
           <Link
-            href="/adults/editor"
+            href="/character-editor"
             className="mt-2 block text-xs text-pink-400 hover:text-pink-300 transition-colors text-center"
           >
             Create Avatar
@@ -169,7 +168,12 @@ export function AvatarDisplay({
       {/* 3D Avatar Renderer */}
       <div className="w-full h-full relative">
         {isValidConfig ? (
-          <AvatarRendererWrapper config={avatarConfig} size={size} showInteractions={true} fallback={<AvatarFallback size={size} mode="user" className="w-full h-full" />} />
+          <AvatarRendererWrapper
+            config={avatarConfig}
+            size={size}
+            showInteractions={true}
+            fallback={<AvatarFallback size={size} mode="user" className="w-full h-full" />}
+          />
         ) : (
           <AvatarFallback size={size} mode="user" className="w-full h-full" />
         )}
@@ -183,7 +187,7 @@ export function AvatarDisplay({
             transition={{ duration: 0.2 }}
           >
             <Link
-              href="/adults/editor"
+              href="/character-editor"
               className="px-3 py-1 bg-pink-500 text-white text-sm rounded-lg hover:bg-pink-600 transition-colors"
             >
               Edit Avatar
