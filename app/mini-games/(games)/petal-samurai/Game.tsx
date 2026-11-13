@@ -4,10 +4,10 @@
  * Core Fantasy: Slice falling petals with precision - chain combos for petals.
  *
  * Game Flow: instructions → playing → results
- * Win Condition: Survive time limit or reach target score
- * Lose Condition: Miss 3 petals or time runs out
+ * Win Condition: Survive the timed ritual
+ * Lose Condition: Miss 3 petals (timed or endless)
  *
- * Progression: Speed increases every 20 seconds, storm mode after 60 seconds
+ * Progression: Speed increases every 20 seconds; endless enters storm mode after 60 seconds
  * Scoring: Base points per petal, combo multipliers, gold petals worth more
  * Petals: Awarded based on final score, combo, and accuracy
  */
@@ -19,7 +19,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import { useGameHud } from '../../_shared/useGameHud';
-import { useGameProgress } from '@/app/lib/games/progress';
 import { getGameVisualProfile, applyVisualProfile } from '../../_shared/gameVisuals';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
@@ -35,11 +34,25 @@ import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer
 import { createGlowEffect } from '../../_shared/enhancedTextures';
 
 type Props = {
-  mode: 'classic' | 'storm' | 'endless' | 'timed';
-  difficulty?: 'easy' | 'normal' | 'medium' | 'hard';
+  mode: 'endless' | 'timed';
+  difficulty?: 'easy' | 'normal' | 'hard';
   paused?: boolean;
-  onGameEnd?: (results: { score: number; combo: number; misses: number; didWin: boolean }) => void;
-  onStatsUpdate?: (stats: { score: number; combo: number; timer: number; progress: number; lives?: number }) => void;
+  onGameEnd?: (results: {
+    score: number;
+    combo: number;
+    misses: number;
+    didWin: boolean;
+    durationMs: number;
+    multiplier: number;
+    stormMode: boolean;
+  }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    combo: number;
+    timer: number;
+    progress: number;
+    lives?: number;
+  }) => void;
 };
 
 // Game configuration - difficulty tuning parameters
@@ -79,7 +92,7 @@ interface GameState {
   isGameOver: boolean;
   isStunned: boolean;
   stormMode: boolean;
-  }
+}
 
 interface Petal {
   id: string;
@@ -93,7 +106,7 @@ interface Petal {
   spriteIndex: number; // Index in 4x3 sprite grid (0-11)
   vx: number; // Horizontal drift velocity
   vy: number; // Vertical velocity
-  }
+}
 
 interface PowerUp {
   id: string;
@@ -102,7 +115,7 @@ interface PowerUp {
   type: 'slow_time' | 'combo_boost' | 'miss_forgive';
   duration: number;
   active: boolean;
-  }
+}
 
 export default function Game({
   mode,
@@ -127,8 +140,6 @@ export default function Game({
     isStunned: false,
     stormMode: false,
   });
-  const [petalReward, setPetalReward] = useState<number | null>(null);
-  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
   // gameStateOverlay removed - handled by GameStateMachine wrapper
 
   // VFX hooks
@@ -140,21 +151,19 @@ export default function Game({
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-samurai');
   const { balance: petalBalance } = usePetalBalance();
-  const { recordResult } = useGameProgress();
-
   // Get container size for responsive canvas
-  const containerSize = useResizeObserverHook(containerRef, 100);
+  useResizeObserverHook(containerRef, 100);
 
   // Initialize game engine with visual profile and proper DPI scaling
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current || typeof window === 'undefined') return;
 
     const canvas = canvasRef.current;
-    
+
     // Size canvas based on container with DPR scaling
     const { ctx, cssWidth, cssHeight } = sizeCanvasFromContainer(canvas, containerRef.current);
     if (!ctx) return;
-    
+
     // Update or create game engine with new dimensions
     if (gameRef.current) {
       // Update existing game engine dimensions
@@ -162,20 +171,23 @@ export default function Game({
     } else {
       // Create new game engine
       const game = new GameEngine(canvas, mode, visualProfile, difficulty, cssWidth, cssHeight);
+      game.startGame();
       gameRef.current = game;
     }
 
-    // Start game loop
+    // React owns the only animation loop for this engine instance.
     let animationId: number;
+    let disposed = false;
+    let completed = false;
     let lastTime = performance.now();
 
     const gameLoop = (currentTime: number) => {
       if (!gameRef.current) return;
-      
+
       const deltaTime = Math.min(0.033, (currentTime - lastTime) / 1000);
       lastTime = currentTime;
 
-      if (gameState.isRunning && !gameState.isStunned && !pausedRef.current) {
+      if (!completed && !pausedRef.current) {
         gameRef.current.update(deltaTime);
         gameRef.current.render();
 
@@ -185,7 +197,7 @@ export default function Game({
         const currentMisses = gameRef.current.getMisses();
         const currentTime = gameRef.current.getTime();
         const currentTimeLeft = mode === 'endless' ? 999 : Math.max(0, 60 - currentTime);
-        
+
         setGameState((prev) => ({
           ...prev,
           score: currentScore,
@@ -195,14 +207,14 @@ export default function Game({
           timeLeft: currentTimeLeft,
           stormMode: gameRef.current!.isStormMode(),
         }));
-        
+
         // Update stats via callback
         if (onStatsUpdate) {
           onStatsUpdate({
             score: currentScore,
             combo: currentCombo,
             timer: currentTimeLeft,
-            progress: mode === 'endless' ? 0 : 1 - (currentTimeLeft / GAME_CONFIG.TIME_LIMIT),
+            progress: mode === 'endless' ? 0 : 1 - currentTimeLeft / GAME_CONFIG.TIME_LIMIT,
             lives: GAME_CONFIG.MAX_MISSES - currentMisses,
           });
         }
@@ -211,13 +223,12 @@ export default function Game({
         const isGameOver =
           gameRef.current.getMisses() >= GAME_CONFIG.MAX_MISSES ||
           (mode !== 'endless' && gameRef.current.getTime() >= GAME_CONFIG.TIME_LIMIT);
-        if (isGameOver && gameState.isRunning) {
-          const didWin =
-            gameRef.current.getMisses() < GAME_CONFIG.MAX_MISSES &&
-            (mode === 'endless' || gameRef.current.getTime() < GAME_CONFIG.TIME_LIMIT);
+        if (isGameOver) {
+          completed = true;
+          const didWin = mode === 'timed' && gameRef.current.getMisses() < GAME_CONFIG.MAX_MISSES;
           setGameState((prev) => ({ ...prev, isRunning: false, isGameOver: true }));
           gameRef.current.endGame();
-          
+
           // Notify parent component
           if (onGameEnd) {
             onGameEnd({
@@ -225,38 +236,15 @@ export default function Game({
               combo: gameRef.current.getCombo(),
               misses: gameRef.current.getMisses(),
               didWin,
+              durationMs: Math.floor(gameRef.current.getTime() * 1000),
+              multiplier: gameRef.current.getMultiplier(),
+              stormMode: gameRef.current.isStormMode(),
             });
-          }
-
-          // Award petals on game end
-          if (!hasAwardedPetals) {
-            setHasAwardedPetals(true);
-            const awardPetals = async () => {
-              const result = await recordResult({
-                gameId: 'petal-samurai',
-                score: gameRef.current!.getScore(),
-                difficulty: difficulty || 'normal',
-                durationMs: Math.floor(gameRef.current!.getTime() * 1000),
-                didWin,
-                metadata: {
-                  combo: gameRef.current!.getCombo(),
-                  multiplier: gameRef.current!.getMultiplier(),
-                  misses: gameRef.current!.getMisses(),
-                  mode,
-                  stormMode: gameRef.current!.isStormMode(),
-                },
-              });
-
-              if (result.success && result.petalReward) {
-                setPetalReward(result.petalReward.earned);
-              }
-            };
-            awardPetals();
           }
         }
       }
 
-      if (gameState.isRunning) {
+      if (!disposed && !completed) {
         animationId = requestAnimationFrame(gameLoop);
       }
     };
@@ -264,16 +252,18 @@ export default function Game({
     animationId = requestAnimationFrame(gameLoop);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(animationId);
       gameRef.current?.destroy();
+      gameRef.current = null;
     };
-  }, [mode, difficulty, recordResult, onGameEnd, onStatsUpdate]);
+  }, [mode, difficulty, onGameEnd, onStatsUpdate]);
 
   useEffect(() => {
     gameRef.current?.setPaused(paused);
   }, [paused]);
 
-  // Handle mouse/touch slash mechanics
+  // Pointer events provide one slash path for mouse, pen, and direct touch.
   const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
   const isSlashing = useRef(false);
   const trailRendererRef = useRef<TrailRenderer | null>(null);
@@ -283,26 +273,29 @@ export default function Game({
     trailRendererRef.current = createTrailRenderer(200); // 200ms lifetime
   }, []);
 
-  const handleMouseDown = useCallback(
-    (_event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
       if (paused || gameState.isStunned) return;
+      event.currentTarget.setPointerCapture(event.pointerId);
       isSlashing.current = true;
-      slashPoints.current = [];
+      const rect = event.currentTarget.getBoundingClientRect();
+      slashPoints.current = [
+        { x: event.clientX - rect.left, y: event.clientY - rect.top, time: Date.now() },
+      ];
     },
     [gameState.isStunned, paused],
   );
 
-  const handleMouseMove = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
       if (paused || !isSlashing.current || !canvasRef.current || !gameRef.current) return;
 
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
 
       // Calculate proper canvas-relative coordinates in CSS pixels (context is already scaled)
-      const x = (event.clientX - rect.left);
-      const y = (event.clientY - rect.top);
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
 
       slashPoints.current.push({ x, y, time: Date.now() });
 
@@ -345,7 +338,10 @@ export default function Game({
     [paused, shake],
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     isSlashing.current = false;
     slashPoints.current = [];
     if (gameRef.current) {
@@ -405,49 +401,6 @@ export default function Game({
     }
   }, []);
 
-  // Submit score to leaderboard when game ends
-  useEffect(() => {
-    if (gameState.isGameOver && gameRef.current) {
-      const submitScore = async () => {
-        try {
-          await fetch('/api/v1/leaderboards/petal-samurai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              score: gameState.score,
-              combo: gameState.combo,
-              mode: mode,
-              metadata: {
-                multiplier: gameState.multiplier,
-                misses: gameState.misses,
-                stormMode: gameState.stormMode,
-              },
-            }),
-          });
-        } catch (error) {
-          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-        }
-      };
-      submitScore();
-    }
-  }, [
-    gameState.isGameOver,
-    gameState.score,
-    gameState.combo,
-    gameState.multiplier,
-    gameState.misses,
-    gameState.stormMode,
-    mode,
-  ]);
-
-  // Start game when component mounts (handled by GameStateMachine)
-  useEffect(() => {
-    if (gameRef.current && !gameState.isRunning && !gameState.isGameOver) {
-      setGameState((prev) => ({ ...prev, isRunning: true }));
-      gameRef.current.startGame();
-    }
-  }, [gameState.isRunning, gameState.isGameOver]);
-
   // handleRestart removed - handled by GameStateMachine wrapper
 
   return (
@@ -466,13 +419,14 @@ export default function Game({
           <canvas
             ref={canvasRef}
             className="w-full h-full cursor-crosshair rounded-2xl border-2 border-pink-500/30 shadow-2xl bg-black/20"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
             aria-label="Petal Samurai game area - slash through petals to score"
             style={{
               imageRendering: 'crisp-edges',
+              touchAction: 'none',
             }}
           />
         </div>
@@ -583,7 +537,6 @@ class GameEngine {
   private baseSpeed: number = 1.0;
   private stormMode: boolean = false;
   private stunTime: number = 0;
-  private animationId: number | null = null;
   private lastPetalSpawn: number = 0;
   private lastPowerUpSpawn: number = 0;
   private slashTrail: { x: number; y: number; time: number }[] = [];
@@ -593,7 +546,7 @@ class GameEngine {
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
   private isGameStarted: boolean = false;
   private isPaused: boolean = false;
-  private difficulty: 'easy' | 'normal' | 'medium' | 'hard' = 'normal';
+  private difficulty: 'easy' | 'normal' | 'hard' = 'normal';
   private logicalWidth: number;
   private logicalHeight: number;
 
@@ -601,7 +554,7 @@ class GameEngine {
     canvas: HTMLCanvasElement,
     mode: string,
     visualProfile: ReturnType<typeof getGameVisualProfile>,
-    difficulty: 'easy' | 'normal' | 'medium' | 'hard' = 'normal',
+    difficulty: 'easy' | 'normal' | 'hard' = 'normal',
     width: number = 800,
     height: number = 600,
   ) {
@@ -621,8 +574,6 @@ class GameEngine {
 
     // Load sprite sheet from visual profile
     this.loadSpriteSheet();
-
-    this.startGameLoop();
   }
 
   setDimensions(width: number, height: number) {
@@ -646,17 +597,6 @@ class GameEngine {
       logger.warn('Failed to load petal sprite sheet, falling back to canvas drawing');
       this.spriteSheetLoaded = false;
     };
-  }
-
-  private startGameLoop() {
-    const gameLoop = () => {
-      if (!this.isPaused) {
-        this.update(1 / 60);
-        this.render();
-      }
-      this.animationId = requestAnimationFrame(gameLoop);
-    };
-    this.animationId = requestAnimationFrame(gameLoop);
   }
 
   update(deltaTime: number) {
@@ -689,7 +629,7 @@ class GameEngine {
 
     // Apply difficulty multiplier
     const difficultyMultiplier =
-      this.difficulty === 'easy' ? 1.5 : this.difficulty === 'hard' ? 0.6 : this.difficulty === 'medium' ? 1.2 : 1.0;
+      this.difficulty === 'easy' ? 1.5 : this.difficulty === 'hard' ? 0.6 : 1.0;
     spawnRate *= difficultyMultiplier;
 
     // Difficulty curve: slower spawn at start
@@ -1040,7 +980,7 @@ class GameEngine {
     }
 
     this.ctx.fillStyle = bgGradient;
-        this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
+    this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
     // Add rim lighting effect for dojo
     if (bg.kind === 'dojo') {
@@ -1607,15 +1547,11 @@ class GameEngine {
   }
 
   endGame() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
+    this.isGameStarted = false;
   }
 
   destroy() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
+    this.isGameStarted = false;
     // Cleanup physics renderer
     if (this.physicsRenderer) {
       this.physicsRenderer.dispose();

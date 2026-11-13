@@ -167,7 +167,9 @@ describe('final game platform closure', () => {
     expect(source).not.toContain('PetalStormRhythmGameWrapper');
     expect(source).toContain('completionSubmittedRef.current');
     expect(source).toContain("beginResultSession('petal-storm-rhythm')");
-    expect(source).toContain("fetch('/api/v1/leaderboards/petal-storm-rhythm'");
+    expect(source).toContain('await recordResult({');
+    expect(source).toContain("gameId: 'petal-storm-rhythm'");
+    expect(source).not.toContain("fetch('/api/v1/leaderboards/petal-storm-rhythm'");
   });
 
   it('routes Maid pause and exit through the shared session while preserving exit save', () => {
