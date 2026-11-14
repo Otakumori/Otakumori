@@ -6,10 +6,10 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { isAdminEmail } from '@/app/lib/config/admin';
+import { hasAdminRole } from '@/app/lib/auth/adminRole';
 import { getEffectiveFeatureFlags } from '@/app/lib/config/featureFlags.server';
 import { getSiteSettingsMap, upsertSiteSetting } from '@/app/lib/config/siteSettings.server';
 import { env } from '@/env';
@@ -19,27 +19,22 @@ export const runtime = 'nodejs';
 const UpdateSettingSchema = z.object({
   key: z.enum(['AVATARS_ENABLED', 'REQUIRE_AUTH_FOR_MINI_GAMES', 'NSFW_AVATARS_ENABLED']),
   boolValue: z.boolean(),
-  updatedBy: z.string().min(1),
 });
 
 /**
  * Check if user is admin
  */
 async function requireAdmin() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) {
     return { error: 'Unauthorized', status: 401 };
   }
 
-  const user = await currentUser();
-  const email =
-    user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? null;
-
-  if (!isAdminEmail(email)) {
+  if (!hasAdminRole(sessionClaims)) {
     return { error: 'Forbidden', status: 403 };
   }
 
-  return { userId, email };
+  return { userId };
 }
 
 /**
@@ -112,10 +107,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { key, boolValue, updatedBy } = validation.data;
+    const { key, boolValue } = validation.data;
 
     // Update setting
-    await upsertSiteSetting(key, { boolValue }, updatedBy);
+    await upsertSiteSetting(key, { boolValue }, adminCheck.userId);
 
     // Return updated effective flags
     const effectiveFlags = await getEffectiveFeatureFlags();

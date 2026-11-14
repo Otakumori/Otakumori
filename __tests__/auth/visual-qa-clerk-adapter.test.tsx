@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   VISUAL_QA_AUTH_STATE_COOKIE,
   isVisualQaAuthEnabled,
+  isVisualQaHostAllowed,
   resolveVisualQaAuthStateFromCookieHeader,
   resolveVisualQaAuthState,
 } from '@/app/lib/visual-qa/mode';
@@ -27,12 +28,42 @@ describe('visual QA Clerk adapter', () => {
     window.history.replaceState({}, '', '/');
   });
 
-  it('cannot be enabled in Production or Vercel builds', () => {
+  it('requires an explicit local host and server flag in Production', () => {
     expect(
-      isVisualQaAuthEnabled({
-        OTM_VISUAL_QA_AUTH: '1',
-        NODE_ENV: 'production',
-      } as NodeJS.ProcessEnv),
+      isVisualQaAuthEnabled(
+        {
+          OTM_VISUAL_QA_AUTH: '1',
+          NODE_ENV: 'production',
+        } as NodeJS.ProcessEnv,
+        null,
+      ),
+    ).toBe(false);
+    expect(
+      isVisualQaAuthEnabled(
+        {
+          OTM_VISUAL_QA_AUTH: '1',
+          NODE_ENV: 'production',
+        } as NodeJS.ProcessEnv,
+        '127.0.0.1:3000',
+      ),
+    ).toBe(true);
+    expect(
+      isVisualQaAuthEnabled(
+        {
+          OTM_VISUAL_QA_AUTH: '1',
+          NODE_ENV: 'production',
+        } as NodeJS.ProcessEnv,
+        'www.otaku-mori.com',
+      ),
+    ).toBe(false);
+    expect(
+      isVisualQaAuthEnabled(
+        {
+          NEXT_PUBLIC_OTM_VISUAL_QA_AUTH: '1',
+          NODE_ENV: 'production',
+        } as NodeJS.ProcessEnv,
+        'localhost',
+      ),
     ).toBe(false);
     expect(
       isVisualQaAuthEnabled({
@@ -73,14 +104,38 @@ describe('visual QA Clerk adapter', () => {
     ).toBe(true);
   });
 
+  it('rejects forged and malformed local Host values', () => {
+    expect(isVisualQaHostAllowed('localhost:3000')).toBe(true);
+    expect(isVisualQaHostAllowed('127.0.0.1:65535')).toBe(true);
+    expect(isVisualQaHostAllowed('[::1]:3000')).toBe(true);
+    expect(isVisualQaHostAllowed('localhost.evil.example')).toBe(false);
+    expect(isVisualQaHostAllowed('localhost:443@evil.example')).toBe(false);
+    expect(isVisualQaHostAllowed('localhost,evil.example')).toBe(false);
+    expect(isVisualQaHostAllowed('127.0.0.1.evil.example')).toBe(false);
+    expect(isVisualQaHostAllowed('localhost:65536')).toBe(false);
+  });
+
   it('honors the local visual QA shell marker without enabling Production or Vercel', () => {
     document.body.setAttribute('data-visual-qa-auth', 'true');
 
     expect(isVisualQaAuthEnabled({ NODE_ENV: 'development' } as NodeJS.ProcessEnv)).toBe(true);
     expect(
-      isVisualQaAuthEnabled({
-        NODE_ENV: 'production',
-      } as NodeJS.ProcessEnv),
+      isVisualQaAuthEnabled(
+        {
+          NODE_ENV: 'production',
+        } as NodeJS.ProcessEnv,
+        'localhost',
+      ),
+    ).toBe(false);
+    expect(
+      isVisualQaAuthEnabled(
+        {
+          OTM_VISUAL_QA_AUTH: '1',
+          NODE_ENV: 'production',
+          VERCEL: '1',
+        } as NodeJS.ProcessEnv,
+        'localhost',
+      ),
     ).toBe(false);
     expect(
       isVisualQaAuthEnabled({
@@ -90,6 +145,11 @@ describe('visual QA Clerk adapter', () => {
     ).toBe(false);
     expect(
       isVisualQaAuthEnabled({ NODE_ENV: 'development' } as NodeJS.ProcessEnv, 'www.otaku-mori.com'),
+    ).toBe(false);
+
+    window.history.replaceState({}, '', '/?visualAuth=signed-in');
+    expect(
+      isVisualQaAuthEnabled({ NODE_ENV: 'production' } as NodeJS.ProcessEnv, 'localhost'),
     ).toBe(false);
   });
 

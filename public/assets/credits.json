@@ -19,5 +19,176 @@
     "creator": "Ansimuz",
     "license": "Royalty-free (see creator terms), attribution required",
     "source": "https://ansimuz.itch.io/gothicvania-patreon-collection"
+  },
+  {
+    "kind": "audio",
+    "title": "Free Fantasy 200 SFX Pack",
+    "creator": "TomMusic",
+    "license": "CUSTOM_ROYALTY_FREE",
+    "licenseUrl": "https://tommusic.itch.io/free-fantasy-200-sfx-pack",
+    "modifications": "No runtime transformation approved; publisher OGG variants preferred.",
+    "source": "https://tommusic.itch.io/free-fantasy-200-sfx-pack"
+  },
+  {
+    "kind": "audio",
+    "title": "Super Dialogue Audio Pack v1",
+    "creator": "Dillon Becker",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "No runtime derivatives selected.",
+    "source": "https://dillonbecker.itch.io/sdap"
+  },
+  {
+    "kind": "audio",
+    "title": "Bubble Pops",
+    "creator": "Abacagi",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://freesound.org/people/Abacagi/sounds/497198/"
+  },
+  {
+    "kind": "audio",
+    "title": "Sword Slash",
+    "creator": "54427377",
+    "license": "PIXABAY_CONTENT_LICENSE",
+    "licenseUrl": "https://pixabay.com/service/license-summary/",
+    "modifications": "None; source library intake only.",
+    "source": "https://pixabay.com/sound-effects/sword-slash-476148/"
+  },
+  {
+    "kind": "audio",
+    "title": "Atlantean Twilight",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100322"
+  },
+  {
+    "kind": "audio",
+    "title": "Baba Yaga",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500079"
+  },
+  {
+    "kind": "audio",
+    "title": "Bleeping Demo",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2000021"
+  },
+  {
+    "kind": "audio",
+    "title": "Cretaceous Dawn",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2500001"
+  },
+  {
+    "kind": "audio",
+    "title": "Ethernight Club",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100002"
+  },
+  {
+    "kind": "audio",
+    "title": "Katana Sword",
+    "creator": "crawfordjohnb@bellsouth.net (Freesound)",
+    "license": "PIXABAY_CONTENT_LICENSE",
+    "licenseUrl": "https://pixabay.com/service/license-summary/",
+    "modifications": "None; source library intake only.",
+    "source": "https://pixabay.com/sound-effects/film-special-effects-katana-sword-70247/"
+  },
+  {
+    "kind": "audio",
+    "title": "Loud Silence",
+    "creator": "qubodup (Freesound)",
+    "license": "PIXABAY_CONTENT_LICENSE",
+    "licenseUrl": "https://pixabay.com/service/license-summary/",
+    "modifications": "None; source library intake only.",
+    "source": "https://pixabay.com/sound-effects/film-special-effects-loud-silence-75803/"
+  },
+  {
+    "kind": "audio",
+    "title": "SFX_SPIRIT_GAIN",
+    "creator": "Brimistic (Freesound)",
+    "license": "PIXABAY_CONTENT_LICENSE",
+    "licenseUrl": "https://pixabay.com/service/license-summary/",
+    "modifications": "None; source library intake only.",
+    "source": "https://pixabay.com/sound-effects/musical-sfx-spirit-gain-95855/"
+  },
+  {
+    "kind": "audio",
+    "title": "Gregorian Chant",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600052"
+  },
+  {
+    "kind": "audio",
+    "title": "Journey to Ascend",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2200001"
+  },
+  {
+    "kind": "audio",
+    "title": "Lewis and Dekalb",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600027"
+  },
+  {
+    "kind": "audio",
+    "title": "Screen Saver",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900046"
+  },
+  {
+    "kind": "audio",
+    "title": "Wrong Place",
+    "creator": "SoundReality",
+    "license": "PIXABAY_CONTENT_LICENSE",
+    "licenseUrl": "https://pixabay.com/service/license-summary/",
+    "modifications": "None; source library intake only.",
+    "source": "https://pixabay.com/sound-effects/film-special-effects-wrong-place-129242/"
+  },
+  {
+    "kind": "audio",
+    "title": "Valse Gymnopedie",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100012"
+  },
+  {
+    "kind": "audio",
+    "title": "Master Disorder",
+    "creator": "Kevin MacLeod",
+    "license": "CC_BY_4_0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "modifications": "None; source library intake only.",
+    "source": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600034"
   }
 ]

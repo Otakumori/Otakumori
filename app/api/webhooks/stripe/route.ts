@@ -7,6 +7,10 @@ import { db as prisma } from '@/lib/db';
 import { env } from '@/env';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
 import { capturePaidOrderLedger, reconcileRefundLedger } from '@/lib/finance/ledger';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isVercelPreview,
+} from '@/app/lib/security/previewIsolation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -73,6 +77,13 @@ async function readRawBody(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (isVercelPreview()) {
+    return NextResponse.json(
+      { ok: false, error: PREVIEW_EXTERNAL_MUTATION_ERROR },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const apiKey = env.STRIPE_SECRET_KEY?.trim();
   const secret = env.STRIPE_WEBHOOK_SECRET?.trim();
   if (!apiKey || !secret) {

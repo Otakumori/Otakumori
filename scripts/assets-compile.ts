@@ -1,142 +1,66 @@
 #!/usr/bin/env tsx
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { pathToFileURL } from 'url';
 
-interface AssetRole {
-  id: string;
-  name: string;
-  description: string;
+interface PublicAssetCredit {
+  kind: string;
+  title: string;
+  creator: string;
   license: string;
-  url: string;
-  author: string;
-  category: 'ui' | 'games' | 'audio' | 'cosmetics';
+  licenseUrl?: string;
+  modifications?: string;
+  source: string;
 }
 
-const ASSET_CREDITS: AssetRole[] = [
-  // UI Assets
-  {
-    id: 'ui-hub-icons',
-    name: 'Hub Navigation Icons',
-    description: 'Minimalist navigation icons for the GameCube hub',
-    license: 'MIT',
-    url: 'https://github.com/feathericons/feather',
-    author: 'Feather Icons',
-    category: 'ui',
-  },
-  {
-    id: 'ui-placeholders',
-    name: 'Placeholder Assets',
-    description: 'Fallback images and placeholders for missing content',
-    license: 'MIT',
-    url: 'https://github.com/otakumori/placeholders',
-    author: 'Otakumori Team',
-    category: 'ui',
-  },
+interface CanonicalAudioCredit {
+  id: string;
+  title: string;
+  creator: string;
+  sourceUrl: string;
+  licenseId: string;
+  licenseUrl: string;
+  modifications: string;
+  publicationState: string;
+  publicCredit: boolean;
+}
 
-  // Game Assets
-  {
-    id: 'game-samurai',
-    name: 'Samurai Game Assets',
-    description: 'Samurai-themed sprites and backgrounds',
-    license: 'CC0',
-    url: 'https://kenney.nl/assets/fantasy-ui-borders',
-    author: 'Kenney',
-    category: 'games',
-  },
-  {
-    id: 'game-memory',
-    name: 'Memory Match Cards',
-    description: 'Anime character cards for memory matching game',
-    license: 'CC BY-NC 4.0',
-    url: 'https://unsplash.com/collections/anime',
-    author: 'Various Artists',
-    category: 'games',
-  },
-  {
-    id: 'game-bubble',
-    name: 'Bubble Pop Particles',
-    description: 'Bubble particle effects and sprites',
-    license: 'CC0',
-    url: 'https://kenney.nl/assets/particle-pack',
-    author: 'Kenney',
-    category: 'games',
-  },
-  {
-    id: 'game-rhythm',
-    name: 'Rhythm Game Assets',
-    description: 'Beat-em-up sprites and rhythm lane graphics',
-    license: 'CC BY 4.0',
-    url: 'https://ansimuz.itch.io/gothicvania-patreon-collection',
-    author: 'Ansimuz',
-    category: 'games',
-  },
+interface CanonicalAudioAttributions {
+  entries: CanonicalAudioCredit[];
+}
 
-  // Audio Assets
-  {
-    id: 'audio-sfx',
-    name: 'Sound Effects',
-    description: 'Game sound effects and UI audio',
-    license: 'CC0',
-    url: 'https://freesound.org/',
-    author: 'Various Artists',
-    category: 'audio',
-  },
-  {
-    id: 'audio-music',
-    name: 'Background Music',
-    description: 'Game background music and ambient tracks',
-    license: 'CC BY 4.0',
-    url: 'https://incompetech.com/',
-    author: 'Kevin MacLeod',
-    category: 'audio',
-  },
+function loadCanonicalAudioCredits(): PublicAssetCredit[] {
+  const authorityPath = join(process.cwd(), 'docs', 'legal', 'audio-attributions.json');
+  const authority = JSON.parse(readFileSync(authorityPath, 'utf8')) as CanonicalAudioAttributions;
 
-  // Cosmetic Assets
-  {
-    id: 'cosmetic-frames',
-    name: 'Profile Frames',
-    description: 'Avatar frames and profile decorations',
-    license: 'MIT',
-    url: 'https://github.com/otakumori/cosmetics',
-    author: 'Otakumori Team',
-    category: 'cosmetics',
-  },
-  {
-    id: 'cosmetic-overlays',
-    name: 'Profile Overlays',
-    description: 'Special effects and overlays for profiles',
-    license: 'MIT',
-    url: 'https://github.com/otakumori/cosmetics',
-    author: 'Otakumori Team',
-    category: 'cosmetics',
-  },
-];
+  return authority.entries
+    .filter(({ publicCredit }) => publicCredit)
+    .map((entry) => ({
+      kind: 'audio',
+      title: entry.title,
+      creator: entry.creator,
+      license: entry.licenseId,
+      licenseUrl: entry.licenseUrl,
+      modifications: entry.modifications,
+      source: entry.sourceUrl,
+    }));
+}
+
+function loadExistingNonAudioCredits(creditsPath: string): PublicAssetCredit[] {
+  if (!existsSync(creditsPath)) return [];
+  const credits = JSON.parse(readFileSync(creditsPath, 'utf8')) as PublicAssetCredit[];
+  return Array.isArray(credits) ? credits.filter(({ kind }) => kind !== 'audio') : [];
+}
 
 function generateCreditsJson(): void {
   const creditsPath = join(process.cwd(), 'public', 'assets', 'credits.json');
-
-  const credits = {
-    generated: new Date().toISOString(),
-    version: '1.0.0',
-    assets: ASSET_CREDITS,
-    licenses: {
-      MIT: 'https://opensource.org/licenses/MIT',
-      CC0: 'https://creativecommons.org/publicdomain/zero/1.0/',
-      'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
-      'CC BY-NC 4.0': 'https://creativecommons.org/licenses/by-nc/4.0/',
-    },
-    acknowledgments: [
-      'Special thanks to all asset creators and contributors',
-      'This project uses assets under various open source licenses',
-      'Please respect individual asset licenses and attribution requirements',
-    ],
-  };
+  const credits = [...loadExistingNonAudioCredits(creditsPath), ...loadCanonicalAudioCredits()];
 
   // Ensure directory exists
   const dir = join(process.cwd(), 'public', 'assets');
   if (!existsSync(dir)) {
     // 'Creating assets directory...'
-    require('fs').mkdirSync(dir, { recursive: true });
+    mkdirSync(dir, { recursive: true });
   }
 
   writeFileSync(creditsPath, JSON.stringify(credits, null, 2));
@@ -200,6 +124,6 @@ function main(): void {
   }
 }
 
-if (require.main === module) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main();
 }

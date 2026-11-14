@@ -1,6 +1,9 @@
 // app/lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 import { env } from '@/env.mjs';
+import { assertPreviewDatabaseIsolation } from '@/app/lib/security/previewIsolation';
+
+assertPreviewDatabaseIsolation();
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 

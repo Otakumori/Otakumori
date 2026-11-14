@@ -37,6 +37,8 @@ interface MemoryMatchGameProps {
     moves: number;
     timeElapsed: number;
     didWin: boolean;
+    difficulty: MemoryDefragDifficulty;
+    challenge: MemoryDefragChallenge;
     rewardIntent?: MemoryDefragRewardIntent | null;
     achievementIntent?: MemoryDefragAchievementIntent | null;
   }) => void;
@@ -49,6 +51,7 @@ interface MemoryMatchGameProps {
 }
 
 const DIFFICULTIES: MemoryDefragDifficulty[] = ['initiate', 'keeper', 'warden'];
+export type MemoryDefragChallenge = 'standard' | 'echo-preview';
 
 const MEMORY_DEFRAG_AUDIO = {
   reveal: '/assets/sounds/runic-reveal.mp3',
@@ -113,6 +116,8 @@ export default function MemoryMatchGame({
   const isPauseControlled = paused !== undefined;
   const reducedMotion = usePrefersReducedMotion();
   const [selectedDifficulty, setSelectedDifficulty] = useState<MemoryDefragDifficulty>(difficulty);
+  const [selectedChallenge, setSelectedChallenge] = useState<MemoryDefragChallenge>('standard');
+  const [previewActive, setPreviewActive] = useState(false);
   const [game, setGame] = useState(() =>
     createMemoryDefragGame({ difficulty, seed, nowMs: performance.now() }),
   );
@@ -136,7 +141,8 @@ export default function MemoryMatchGame({
   const elapsedMs = getMemoryDefragElapsedMs(game, clockMs);
   const score = getMemoryDefragScore(game, clockMs);
   const progress = getMemoryDefragProgress(game);
-  const inputLocked = game.phase === 'resolving' || game.phase === 'paused' || game.phase === 'won';
+  const inputLocked =
+    previewActive || game.phase === 'resolving' || game.phase === 'paused' || game.phase === 'won';
   const feedbackIds = useMemo(() => new Set(feedback.ids), [feedback.ids]);
   const mismatchIds = useMemo(
     () => new Set(game.pendingMismatch?.ids ?? []),
@@ -145,11 +151,15 @@ export default function MemoryMatchGame({
   const streakTier = game.streak >= 3 ? 'high' : game.streak >= 2 ? 'warm' : 'quiet';
 
   const startNewGame = useCallback(
-    (nextDifficulty: MemoryDefragDifficulty = selectedDifficulty) => {
+    (
+      nextDifficulty: MemoryDefragDifficulty = selectedDifficulty,
+      nextChallenge: MemoryDefragChallenge = selectedChallenge,
+    ) => {
       const nextSeed = seed ?? `${nextDifficulty}-${Date.now()}`;
       const now = performance.now();
       finishedSeedRef.current = null;
       setSelectedDifficulty(nextDifficulty);
+      setSelectedChallenge(nextChallenge);
       setClockMs(now);
       setGame(createMemoryDefragGame({ difficulty: nextDifficulty, seed: nextSeed, nowMs: now }));
       setFeedback((current) => ({ kind: 'reset', ids: [], nonce: current.nonce + 1 }));
@@ -158,8 +168,28 @@ export default function MemoryMatchGame({
       );
       requestAnimationFrame(() => cardRefs.current[0]?.focus());
     },
-    [seed, selectedDifficulty],
+    [seed, selectedChallenge, selectedDifficulty],
   );
+
+  useEffect(() => {
+    if (selectedChallenge !== 'echo-preview') {
+      setPreviewActive(false);
+      return;
+    }
+
+    setPreviewActive(true);
+    setAnnouncement('Echo preview active. Memorize the relics before the seals return.');
+    const timeout = window.setTimeout(
+      () => {
+        setPreviewActive(false);
+        setAnnouncement('Echo preview sealed. Begin matching fragments.');
+        requestAnimationFrame(() => cardRefs.current[0]?.focus());
+      },
+      reducedMotion ? 350 : 1500,
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [game.seed, reducedMotion, selectedChallenge]);
 
   const activateCard = useCallback((cardId: string) => {
     const now = performance.now();
@@ -391,6 +421,8 @@ export default function MemoryMatchGame({
       moves: game.moves,
       timeElapsed: Math.floor(elapsedMs / 1000),
       didWin: true,
+      difficulty: game.difficulty,
+      challenge: selectedChallenge,
       rewardIntent,
       achievementIntent,
     });
@@ -410,7 +442,17 @@ export default function MemoryMatchGame({
         playerDisplayName: player?.displayName,
       },
     }).catch(() => {});
-  }, [clockMs, config.pairs, elapsedMs, game, onGameEnd, player?.displayName, saveOnExit, score]);
+  }, [
+    clockMs,
+    config.pairs,
+    elapsedMs,
+    game,
+    onGameEnd,
+    player?.displayName,
+    saveOnExit,
+    score,
+    selectedChallenge,
+  ]);
 
   const focusByOffset = useCallback(
     (index: number, offset: number) => {
@@ -512,6 +554,28 @@ export default function MemoryMatchGame({
           </div>
           <p className={styles.controlHint}>Difficulty opens a fresh board.</p>
 
+          <div
+            className={styles.segmented}
+            role="group"
+            aria-label="Challenge. Changing challenge starts a fresh board."
+          >
+            <button
+              aria-pressed={selectedChallenge === 'standard'}
+              onClick={() => startNewGame(game.difficulty, 'standard')}
+              type="button"
+            >
+              Standard
+            </button>
+            <button
+              aria-pressed={selectedChallenge === 'echo-preview'}
+              onClick={() => startNewGame(game.difficulty, 'echo-preview')}
+              type="button"
+            >
+              Echo Preview
+            </button>
+          </div>
+          <p className={styles.controlHint}>Echo Preview briefly reveals the seeded board.</p>
+
           <button
             type="button"
             className={styles.controlButton}
@@ -552,9 +616,11 @@ export default function MemoryMatchGame({
               <p className={styles.statusLine}>
                 {game.phase === 'paused'
                   ? 'Paused'
-                  : inputLocked
-                    ? 'Resolving memory lock'
-                    : 'Select two fragments'}
+                  : previewActive
+                    ? 'Memorize the echo preview'
+                    : inputLocked
+                      ? 'Resolving memory lock'
+                      : 'Select two fragments'}
               </p>
               <p className={styles.metaLine}>
                 Streak {game.streak} / Best {game.bestStreak}
@@ -575,7 +641,7 @@ export default function MemoryMatchGame({
             aria-label={`${config.label} memory defrag board`}
           >
             {game.cards.map((card, index) => {
-              const isFaceUp = card.state !== 'hidden';
+              const isFaceUp = previewActive || card.state !== 'hidden';
               const hasFeedback = feedbackIds.has(card.id);
               const isMismatched = mismatchIds.has(card.id);
               return (
@@ -592,7 +658,9 @@ export default function MemoryMatchGame({
                   data-feedback={hasFeedback ? feedback.kind : undefined}
                   data-mismatch={isMismatched ? 'true' : undefined}
                   data-feedback-nonce={hasFeedback ? feedback.nonce : undefined}
-                  onClick={() => activateCard(card.id)}
+                  onClick={() => {
+                    if (!inputLocked) activateCard(card.id);
+                  }}
                   onKeyDown={(event) => handleCardKeyDown(event, index, card.id)}
                   aria-label={
                     isFaceUp
@@ -600,6 +668,7 @@ export default function MemoryMatchGame({
                       : `Hidden memory card ${index + 1}`
                   }
                   aria-disabled={inputLocked || card.state === 'matched'}
+                  disabled={inputLocked || card.state === 'matched'}
                   role="gridcell"
                 >
                   <span className={styles.cardInner}>

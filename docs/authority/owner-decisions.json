@@ -1,0 +1,467 @@
+{
+  "version": 1,
+  "lastReviewedDate": "2026-10-30",
+  "authorityContract": "docs/authority/owner-authority.md",
+  "recognizedStatuses": [
+    "OWNER_APPROVED_POLICY",
+    "IMPLEMENTATION_AUTHORIZED",
+    "OWNER_REVIEW_REQUIRED",
+    "PROPOSED",
+    "PROHIBITED"
+  ],
+  "recognizedImplementationStatuses": [
+    "SATISFIED",
+    "PARTIAL",
+    "NOT_IMPLEMENTED",
+    "DOCUMENTED_ONLY",
+    "OWNER_REVIEW_REQUIRED",
+    "PROHIBITED_UNTIL_APPROVED"
+  ],
+  "decisions": [
+    {
+      "id": "BETA-001",
+      "scope": "closed-beta-access-and-commerce",
+      "decision": "Closed beta is invite-only and live purchasing is disabled for beta participants.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": [
+        "Audit server-side access and checkout gates",
+        "Implement focused local enforcement and tests in the appropriate security or commerce branch"
+      ],
+      "approvalRequiredFor": [
+        "Remote push",
+        "Deployment",
+        "Environment or provider configuration",
+        "Enabling live purchases"
+      ],
+      "evidence": [
+        "No canonical server-side invite-only beta gate or beta-wide purchase-disable gate was verified on the current asset branch."
+      ]
+    },
+    {
+      "id": "BETA-002",
+      "scope": "controlled-beta-game-catalog",
+      "decision": "Every existing game intended for the beta catalog must pass functional, visual, responsive, accessibility, performance, lifecycle, progression, and security acceptance; a four-game subset is not a substitute.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": ["Validate and correct existing games using shared acceptance criteria"],
+      "approvalRequiredFor": [
+        "Removing a catalog game",
+        "Changing launch scope",
+        "Final beta acceptance"
+      ],
+      "evidence": ["docs/release-convergence.md", "docs/game-product-completion-audit.md"]
+    },
+    {
+      "id": "IDENTITY-001",
+      "scope": "profile-privacy",
+      "decision": "Profiles are private by default; public visibility and sharing require explicit user opt-in enforced at the API and data layer.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": [
+        "Audit profile read/write authorization",
+        "Add focused local privacy tests and corrections"
+      ],
+      "approvalRequiredFor": [
+        "Changing the default visibility",
+        "New sharing behavior",
+        "Additional personal-data collection"
+      ],
+      "evidence": [
+        "app/api/webhooks/clerk/route.ts creates visibility private",
+        "API-level public-read and opt-in enforcement still require complete verification"
+      ]
+    },
+    {
+      "id": "PETALS-001",
+      "scope": "petal-retention",
+      "decision": "Legitimately earned petals never expire because of inactivity.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": [
+        "Audit expiration and balance code paths",
+        "Add non-expiration regression tests"
+      ],
+      "approvalRequiredFor": ["Any balance mutation", "Economy redesign"],
+      "evidence": [
+        "No inactivity-expiration path was identified in lib/petal-wallet.ts; full economy audit remains separate."
+      ]
+    },
+    {
+      "id": "PETALS-002",
+      "scope": "participation-and-streaks",
+      "decision": "Participation must not use punitive attendance streaks, guilt-based retention, or artificial FOMO.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": [
+        "Audit streak presentation and reward behavior",
+        "Prepare a nonpunitive replacement proposal"
+      ],
+      "approvalRequiredFor": [
+        "Reward-value changes",
+        "Petal balance mutations",
+        "Economy activation"
+      ],
+      "evidence": [
+        "lib/petal-wallet.ts resets currentStreak to 1 after an absence and grants escalating streak bonuses."
+      ]
+    },
+    {
+      "id": "PETALS-003",
+      "scope": "petal-gifting",
+      "decision": "Controlled petal gifting is an approved future direction only; transfers are not currently authorized.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PROHIBITED_UNTIL_APPROVED",
+      "allowedActions": ["Document threats and design constraints without enabling transfers"],
+      "approvalRequiredFor": [
+        "Implementation branch",
+        "Transfer endpoint",
+        "Balance change",
+        "Activation"
+      ],
+      "evidence": ["Owner directive explicitly withholds current implementation authorization."]
+    },
+    {
+      "id": "PETALS-004",
+      "scope": "petal-financial-boundary",
+      "decision": "Monetary redemption values, entitlement changes, transfers, and reward-economy mutations remain owner-gated.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PROHIBITED_UNTIL_APPROVED",
+      "allowedActions": ["Perform read-only integrity review"],
+      "approvalRequiredFor": [
+        "Any monetary rate",
+        "Entitlement mutation",
+        "Transfer",
+        "Reward-economy mutation"
+      ],
+      "evidence": ["AGENTS.md mutation boundaries"]
+    },
+    {
+      "id": "AUDIO-001",
+      "scope": "owner-authored-audio-rights",
+      "decision": "The owner attests that interesting ui and satisfying-soft-cute-butt-uqdnx4eo were independently created without third-party samples, loops, or AI-generated components.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-attestation-2026-10-30",
+      "implementationStatus": "SATISFIED",
+      "allowedActions": [
+        "Record owner-authored rights confirmation while preserving placement and publication gates"
+      ],
+      "approvalRequiredFor": ["Specific artistic placement", "Runtime publication", "Deployment"],
+      "evidence": [
+        "Exact owner-supplied hashes remain recorded by scripts/catalog-owner-asset-library.py."
+      ]
+    },
+    {
+      "id": "AUDIO-002",
+      "scope": "verified-audio-packs",
+      "decision": "Preserve verified TomMusic and Dillon Becker pack membership and their respective license requirements.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "SATISFIED",
+      "allowedActions": [
+        "Regenerate the canonical provenance manifests",
+        "Prepare candidate shortlists"
+      ],
+      "approvalRequiredFor": ["Specific artistic placement", "Runtime publication"],
+      "evidence": [
+        "docs/design/production-authority/audio-library-manifest.json",
+        "docs/legal/audio-attributions.json"
+      ]
+    },
+    {
+      "id": "AUDIO-003",
+      "scope": "audio-playback",
+      "decision": "Audio begins only after an appropriate user interaction and provides accessible music, SFX, and mute controls with persistent preferences and browser-autoplay compliance.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": [
+        "Audit existing audio contexts and controls",
+        "Correct demonstrated local lifecycle or accessibility defects"
+      ],
+      "approvalRequiredFor": ["Autoplay policy change", "New global audio behavior", "Deployment"],
+      "evidence": [
+        "app/lib/audio.ts and mini-game settings contain interaction and preference mechanisms; sitewide consistency remains unverified."
+      ]
+    },
+    {
+      "id": "AUDIO-004",
+      "scope": "audio-art-direction",
+      "decision": "Verified rights do not establish artistic approval; specific sound placement requires owner review.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "SATISFIED",
+      "allowedActions": ["Prepare bounded audition recommendations"],
+      "approvalRequiredFor": ["Final creative selection", "Production publication"],
+      "evidence": [
+        "Canonical audio manifests retain OWNER_REVIEW_REQUIRED and NOT_AUTHORIZED states."
+      ]
+    },
+    {
+      "id": "VISUAL-001",
+      "scope": "mori-visual-authority",
+      "decision": "Preserve canonical Mori design and previously approved artwork.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "SATISFIED",
+      "allowedActions": ["Make contract-consistent responsive and accessibility corrections"],
+      "approvalRequiredFor": [
+        "New visual direction",
+        "Replacing approved artwork",
+        "Final artistic acceptance"
+      ],
+      "evidence": ["docs/design/mori-production-system.md"]
+    },
+    {
+      "id": "VISUAL-002",
+      "scope": "petal-samurai-review",
+      "decision": "Petal Samurai arena crops, result composition, slash family, and individual VFX remain owner-review controlled.",
+      "status": "OWNER_REVIEW_REQUIRED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "OWNER_REVIEW_REQUIRED",
+      "allowedActions": ["Prepare non-destructive comparable review evidence"],
+      "approvalRequiredFor": ["Approve or reject each visual candidate", "Production publication"],
+      "evidence": ["content/petal-samurai-assets.manifest.json"]
+    },
+    {
+      "id": "VISUAL-003",
+      "scope": "bubble-ragdoll-review",
+      "decision": "Bubble Ragdoll ornate VFX v1 and restrained VFX v2 remain available for owner comparison; neither is automatically approved.",
+      "status": "OWNER_REVIEW_REQUIRED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "OWNER_REVIEW_REQUIRED",
+      "allowedActions": ["Prepare equivalent gameplay comparison evidence"],
+      "approvalRequiredFor": ["Choose a VFX direction", "Production publication"],
+      "evidence": ["Existing Bubble candidate visual records and runtime review implementation"]
+    },
+    {
+      "id": "GAMES-001",
+      "scope": "blossomware-system-panic",
+      "decision": "System Panic planning and technical preparation are authorized; branch creation and production gameplay implementation are not yet authorized.",
+      "status": "IMPLEMENTATION_AUTHORIZED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "DOCUMENTED_ONLY",
+      "allowedActions": ["Maintain the bounded plan", "Inspect existing Blossomware architecture"],
+      "approvalRequiredFor": [
+        "Create codex/blossomware-system-panic-v1",
+        "Implement gameplay",
+        "Acquire candidate assets"
+      ],
+      "evidence": ["docs/design/blossomware-system-panic-v1-plan.md"]
+    },
+    {
+      "id": "EXPERIENCE-001",
+      "scope": "interaction-response",
+      "decision": "Effortless Utility, Earned Spectacle: functional interactions respond immediately and recover predictably; spectacle is reserved for meaningful moments.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": ["Apply the existing 180ms response and material-settling contract"],
+      "approvalRequiredFor": [
+        "Changing canonical motion timing",
+        "New global interaction framework"
+      ],
+      "evidence": ["docs/design/mori-production-system.md"]
+    },
+    {
+      "id": "EXPERIENCE-002",
+      "scope": "everlasting-mori",
+      "decision": "Legitimate identity and progression persist without attendance pressure or manufactured FOMO.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": ["Audit existing continuity and recovery states"],
+      "approvalRequiredFor": [
+        "Progression deletion",
+        "Economy mutation",
+        "Retention-policy change"
+      ],
+      "evidence": ["PETALS-001", "PETALS-002"]
+    },
+    {
+      "id": "EXPERIENCE-003",
+      "scope": "universal-comfort",
+      "decision": "Interactions remain accessible, responsive, interruptible, and consistent across keyboard, pointer, touch, motion, effects, and audio preferences.",
+      "status": "OWNER_APPROVED_POLICY",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PARTIAL",
+      "allowedActions": [
+        "Correct demonstrated accessibility, responsive, and lifecycle defects within existing architecture"
+      ],
+      "approvalRequiredFor": [
+        "Removing an accommodation",
+        "New global input or settings architecture"
+      ],
+      "evidence": ["docs/design/mori-production-system.md", "docs/repository-validation.md Tier 8"]
+    },
+    {
+      "id": "DOMAIN-001",
+      "scope": "canonical-domain",
+      "decision": "Canonical domain and redirect configuration remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Perform read-only domain verification"],
+      "approvalRequiredFor": ["DNS change", "Domain alias or redirect change"],
+      "evidence": ["Trigger milestone: before beta"]
+    },
+    {
+      "id": "FINANCE-001",
+      "scope": "hosting-and-operating-spend",
+      "decision": "Hosting upgrades and operating expenditure limits remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Prepare cost evidence"],
+      "approvalRequiredFor": ["Paid-plan change", "New subscription"],
+      "evidence": ["Trigger milestone: before production launch"]
+    },
+    {
+      "id": "INFRA-001",
+      "scope": "preview-database-lifecycle",
+      "decision": "Preview database lifecycle and cleanup policy remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": [
+        "Inspect branch lifecycle read-only",
+        "Recommend a bounded cleanup policy"
+      ],
+      "approvalRequiredFor": [
+        "Neon branch action",
+        "Vercel-Neon configuration",
+        "Environment change"
+      ],
+      "evidence": ["Trigger milestone: before beta"]
+    },
+    {
+      "id": "OPS-001",
+      "scope": "rollback-and-emergency-authority",
+      "decision": "Production rollback and emergency operator authority remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Draft non-executing containment and rollback proposals"],
+      "approvalRequiredFor": ["Production rollback", "Emergency provider mutation"],
+      "evidence": ["Trigger milestone: before production launch"]
+    },
+    {
+      "id": "TAX-001",
+      "scope": "sales-tax",
+      "decision": "Sales-tax configuration and registrations remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Preserve existing owner-controlled tax boundary"],
+      "approvalRequiredFor": ["Tax registration", "Stripe Tax activation", "Filing or payment"],
+      "evidence": ["Trigger milestone: before live commerce"]
+    },
+    {
+      "id": "COMMERCE-001",
+      "scope": "shipping-refunds-returns",
+      "decision": "Shipping territories, refunds, and returns policy remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Audit existing policy surfaces without changing provider behavior"],
+      "approvalRequiredFor": [
+        "Customer-facing policy publication",
+        "Provider or fulfillment change"
+      ],
+      "evidence": ["Trigger milestone: before live commerce"]
+    },
+    {
+      "id": "SUPPORT-001",
+      "scope": "customer-support",
+      "decision": "Customer support standards remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Inventory existing support entry points"],
+      "approvalRequiredFor": ["Service-level commitment", "New support provider"],
+      "evidence": ["Trigger milestone: before beta"]
+    },
+    {
+      "id": "CONTENT-001",
+      "scope": "age-and-mature-content",
+      "decision": "Age classification and mature-content boundaries remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Fail closed and inspect existing server-side authorization"],
+      "approvalRequiredFor": [
+        "Age-verification provider",
+        "Adult Zone activation",
+        "Public classification"
+      ],
+      "evidence": ["Trigger milestone: before beta"]
+    },
+    {
+      "id": "COMMUNITY-001",
+      "scope": "community-moderation",
+      "decision": "Community moderation policy remains unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Keep social activation gated"],
+      "approvalRequiredFor": [
+        "Social activation",
+        "Moderation policy publication",
+        "Moderation provider"
+      ],
+      "evidence": ["Trigger milestone: before social activation"]
+    },
+    {
+      "id": "PRIVACY-001",
+      "scope": "data-retention-and-deletion",
+      "decision": "Data retention and deletion policy remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "allowedActions": ["Audit existing account lifecycle read-only"],
+      "approvalRequiredFor": [
+        "Retention-policy publication",
+        "Destructive data workflow",
+        "Provider configuration"
+      ],
+      "evidence": ["Trigger milestone: before beta"]
+    },
+    {
+      "id": "PETALS-005",
+      "scope": "petal-redemption-and-gifting-safeguards",
+      "decision": "Petal redemption economics and gifting safeguards remain unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PROHIBITED_UNTIL_APPROVED",
+      "allowedActions": ["Review concurrency and anti-abuse risks without mutation"],
+      "approvalRequiredFor": [
+        "Implementation",
+        "Balance transfer",
+        "Redemption rate",
+        "Activation"
+      ],
+      "evidence": [
+        "lib/petal-wallet.ts currently performs a non-atomic balance precheck before decrement",
+        "Trigger milestone: before any gifting or redemption implementation"
+      ]
+    },
+    {
+      "id": "LAUNCH-001",
+      "scope": "public-launch",
+      "decision": "Final public launch authorization remains unresolved.",
+      "status": "PROPOSED",
+      "source": "owner-directive-2026-10-30",
+      "implementationStatus": "PROHIBITED_UNTIL_APPROVED",
+      "allowedActions": ["Prepare release evidence and rehearsal results"],
+      "approvalRequiredFor": ["Production release", "Public launch"],
+      "evidence": ["Trigger milestone: before production launch"]
+    }
+  ]
+}

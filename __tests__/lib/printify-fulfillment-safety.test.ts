@@ -73,6 +73,7 @@ function orderItem(overrides: Record<string, unknown> = {}) {
 
 describe('Printify fulfillment safety', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue(null);
     vi.mocked(db.printifyOrderSync.create).mockResolvedValue({} as never);
@@ -85,6 +86,18 @@ describe('Printify fulfillment safety', () => {
         text: vi.fn().mockResolvedValue(JSON.stringify({ id: 'printify_order_1', status: 'ok' })),
       }),
     );
+  });
+
+  it('refuses Preview fulfillment before database or provider access', async () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('VERCEL_ENV', 'preview');
+
+    await expect(createPrintifyOrder('order_1', stripeSession())).rejects.toThrow(
+      'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+    );
+    expect(db.printifyOrderSync.findUnique).not.toHaveBeenCalled();
+    expect(db.orderItem.findMany).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('does not call Printify for non-Printify order items', async () => {
@@ -156,7 +169,9 @@ describe('Printify fulfillment safety', () => {
     const first = await createPrintifyOrder('order_1', stripeSession());
     expect(first.ok).toBe(false);
     expect(db.printifyOrderSync.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ status: 'submission_uncertain' }) }),
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'submission_uncertain' }),
+      }),
     );
 
     vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue({

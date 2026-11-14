@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { requireUserId } from '@/app/lib/auth';
+import { requireLocalViewer } from '@/app/lib/auth/viewer';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 
 const COST = 50; // petals per pull
 const TABLE: ReadonlyArray<{ key: string; weight: number }> = [
@@ -26,36 +27,59 @@ function pick(table: ReadonlyArray<{ key: string; weight: number }> = TABLE): st
   return fallback.key;
 }
 
-export async function POST() {
-  const userId = await requireUserId();
-  const { db } = await import('@/lib/db');
-
-  const u = await db.petalWallet.findUnique({ where: { userId } });
-  const total = u?.balance ?? 0;
-  if (total < COST) return new NextResponse('Not enough petals', { status: 400 });
+export async function POST(req: Request) {
+  const { localUserId } = await requireLocalViewer();
+  const idempotencyKey = req.headers.get('x-idempotency-key')?.trim();
+  if (!idempotencyKey || idempotencyKey.length > 128) {
+    return NextResponse.json({ ok: false, error: 'IDEMPOTENCY_KEY_REQUIRED' }, { status: 400 });
+  }
 
   const reward = pick();
 
-  await db.$transaction(async (tx) => {
-    await tx.petalWallet.update({ where: { userId }, data: { balance: total - COST } });
+  try {
+    const result = await spendPetalsAndFulfill(
+      localUserId,
+      COST,
+      `Gacha pull: ${reward}`,
+      'petal_gacha',
+      async (tx) => {
+        await tx.idempotencyKey.create({
+          data: {
+            key: `petal-gacha:${localUserId}:${idempotencyKey}`,
+            purpose: 'petal_gacha',
+          },
+        });
+        const existing = await tx.inventoryItem.findFirst({
+          where: { userId: localUserId, sku: reward },
+        });
 
-    const existing = await tx.inventoryItem.findFirst({
-      where: { userId, sku: reward },
-    });
+        if (existing) {
+          const currentMeta = existing.metadata as Record<string, unknown> | null;
+          const count = typeof currentMeta?.count === 'number' ? currentMeta.count : 1;
+          await tx.inventoryItem.update({
+            where: { id: existing.id },
+            data: { metadata: { ...currentMeta, count: count + 1 } },
+          });
+        } else {
+          await tx.inventoryItem.create({
+            data: {
+              User: { connect: { id: localUserId } },
+              sku: reward,
+              kind: 'COSMETIC',
+            },
+          });
+        }
+      },
+    );
 
-    if (existing) {
-      // Already have this item - could increment count in metadata if needed
-      const currentMeta = existing.metadata as any;
-      await tx.inventoryItem.update({
-        where: { id: existing.id },
-        data: { metadata: { ...currentMeta, count: (currentMeta?.count || 1) + 1 } },
-      });
-    } else {
-      await tx.inventoryItem.create({
-        data: { User: { connect: { id: userId } }, sku: reward, kind: 'COSMETIC' },
-      });
+    return NextResponse.json({ ok: true, reward, remaining: result.newBalance });
+  } catch (error) {
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return new NextResponse('Not enough petals', { status: 400 });
     }
-  });
-
-  return NextResponse.json({ ok: true, reward, remaining: total - COST });
+    if ((error as { code?: string }).code === 'P2002') {
+      return NextResponse.json({ ok: false, error: 'DUPLICATE_REQUEST' }, { status: 409 });
+    }
+    throw error;
+  }
 }

@@ -84,6 +84,7 @@ export class DatabaseAccess {
       clerkId: clerkUser.id,
       email: clerkUser.emailAddresses?.[0]?.emailAddress || '',
       username: clerkUser.username || `user_${clerkUser.id.slice(0, 8)}`,
+      visibility: 'private',
     };
     if (updateDisplayName) createData.display_name = updateDisplayName;
     if (updateAvatar) createData.avatarUrl = updateAvatar;

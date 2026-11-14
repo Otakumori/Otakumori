@@ -119,14 +119,22 @@ function TreePetalEmitter({
 }
 
 export default function HeroScene() {
-  const { projection, reducedMotion, scene } = useHomeSceneContext();
-  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() =>
-    createSceneLayer(scene),
-  );
+  const { projection, reducedMotion, scene, sceneReady } = useHomeSceneContext();
+  const [displayedLayer, setDisplayedLayer] = useState<SceneLayer>(() => createSceneLayer(scene));
   const [incomingLayer, setIncomingLayer] = useState<SceneLayer | null>(null);
+  const [initialSceneResolved, setInitialSceneResolved] = useState(false);
 
   useEffect(() => {
     const nextLayer = createSceneLayer(scene);
+
+    if (sceneReady && !initialSceneResolved) {
+      setDisplayedLayer(nextLayer);
+      setIncomingLayer(null);
+      setInitialSceneResolved(true);
+      return;
+    }
+
+    if (!initialSceneResolved) return;
     if (nextLayer.key === displayedLayer.key) return;
 
     if (reducedMotion) {
@@ -142,7 +150,7 @@ export default function HeroScene() {
     }, HOME_SCENE_CROSSFADE_MS);
 
     return () => window.clearTimeout(timeout);
-  }, [displayedLayer.key, reducedMotion, scene]);
+  }, [displayedLayer.key, initialSceneResolved, reducedMotion, scene, sceneReady]);
 
   useEffect(() => {
     const nextBucket = resolveNextHomeSceneBucket(scene.bucket);
@@ -168,28 +176,30 @@ export default function HeroScene() {
     >
       <div className={styles.worldExtension} data-testid="mori-world-extension">
         <div className={styles.scenePlate} data-testid="mori-scene-plate">
-          <Image
-            key={displayedLayer.key}
-            src={displayedLayer.src}
-            alt={incomingLayer ? '' : displayedLayer.alt}
-            aria-hidden={incomingLayer ? 'true' : undefined}
-            fill
-            priority
-            sizes="100vw"
-            className={`${styles.image} ${styles.imageLayer} ${
-              incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
-            }`}
-            style={{
-              transitionDuration: `${
-                reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS
-              }ms`,
-            }}
-            onError={() => {
-              if (displayedLayer.src !== displayedLayer.fallback) {
-                setDisplayedLayer({ ...displayedLayer, src: displayedLayer.fallback });
-              }
-            }}
-          />
+          {initialSceneResolved ? (
+            <Image
+              key={displayedLayer.key}
+              src={displayedLayer.src}
+              alt={incomingLayer ? '' : displayedLayer.alt}
+              aria-hidden={incomingLayer ? 'true' : undefined}
+              fill
+              priority
+              sizes="100vw"
+              className={`${styles.image} ${styles.imageLayer} ${
+                incomingLayer ? styles.imageLayerUnder : styles.imageLayerActive
+              }`}
+              style={{
+                transitionDuration: `${
+                  reducedMotion ? HOME_SCENE_REDUCED_MOTION_CROSSFADE_MS : HOME_SCENE_CROSSFADE_MS
+                }ms`,
+              }}
+              onError={() => {
+                if (displayedLayer.src !== displayedLayer.fallback) {
+                  setDisplayedLayer({ ...displayedLayer, src: displayedLayer.fallback });
+                }
+              }}
+            />
+          ) : null}
           {incomingLayer ? (
             <Image
               key={incomingLayer.key}
@@ -206,7 +216,9 @@ export default function HeroScene() {
               }}
             />
           ) : null}
-          <TreePetalEmitter projection={projection} scene={scene} />
+          {projection && initialSceneResolved ? (
+            <TreePetalEmitter projection={projection} scene={scene} />
+          ) : null}
         </div>
       </div>
 

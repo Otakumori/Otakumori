@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "policy": "Every enabled Hub game must have explicit PASS evidence for every required dimension before controlled-beta certification.",
+  "requiredDimensions": [
+    "hub-route-identity",
+    "start-tutorial",
+    "core-objective",
+    "win-fail-result",
+    "pause-resume-replay",
+    "keyboard-pointer-touch",
+    "mobile-layout",
+    "reduced-motion-accessibility",
+    "performance-lifecycle",
+    "persistence-failure-truth",
+    "reward-idempotency",
+    "production-art-authority",
+    "owner-visual-acceptance",
+    "age-access-gating"
+  ],
+  "games": [
+    { "slug": "petal-samurai", "dimensions": {} },
+    { "slug": "memory-match", "dimensions": {} },
+    { "slug": "otaku-beat-em-up", "dimensions": {} },
+    { "slug": "bubble-ragdoll", "dimensions": {} },
+    { "slug": "maid-cafe-manager", "dimensions": {} },
+    { "slug": "petal-storm-rhythm", "dimensions": {} },
+    { "slug": "blossomware", "dimensions": {} },
+    { "slug": "dungeon-of-desire", "dimensions": {} },
+    { "slug": "thigh-coliseum", "dimensions": {} },
+    { "slug": "puzzle-reveal", "dimensions": {} }
+  ],
+  "evidenceContract": {
+    "status": "PASS | FAIL | BLOCKED | OWNER_REVIEW_REQUIRED",
+    "requiredForPass": ["sourceSha", "checks", "evidence"],
+    "note": "No dimension may be inferred from route existence, green unit tests, or file presence alone."
+  }
+}

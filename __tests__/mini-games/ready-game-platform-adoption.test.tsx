@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -9,7 +9,15 @@ import OtakuBeatEmUpGameWrapper from '@/app/mini-games/(games)/otaku-beat-em-up/
 
 const { beginResultSession, recordResult, routerPush } = vi.hoisted(() => ({
   beginResultSession: vi.fn(),
-  recordResult: vi.fn().mockResolvedValue({ success: true }),
+  recordResult: vi.fn().mockResolvedValue({
+    success: true,
+    personalBest: {
+      status: 'new_best',
+      previousBest: 1800,
+      currentBest: 2400,
+      isNewBest: true,
+    },
+  }),
   routerPush: vi.fn(),
 }));
 
@@ -58,10 +66,12 @@ vi.mock('@/app/mini-games/_shared/GameResultsScreen', () => ({
   GameResultsScreen: ({
     score,
     stats = [],
+    personalBest,
     onBack,
   }: {
     score: number;
     stats?: Array<{ label: string; value: string | number }>;
+    personalBest?: { currentBest: number | null; isNewBest: boolean } | null;
     onBack: () => void;
   }) => (
     <section aria-label="Results">
@@ -71,6 +81,7 @@ vi.mock('@/app/mini-games/_shared/GameResultsScreen', () => ({
           {stat.label}: {stat.value}
         </p>
       ))}
+      {personalBest?.isNewBest && <p>NEW BEST {personalBest.currentBest}</p>}
       <button type="button" onClick={onBack}>
         Return to games
       </button>
@@ -83,13 +94,19 @@ vi.mock('@/app/mini-games/_shared/GameUI', () => ({ GameUI: () => null }));
 vi.mock('@/app/mini-games/_shared/GamePlatform', () => ({
   GamePlatformControls: ({ session }: { session: { pause: () => void; exit: () => void } }) => (
     <nav aria-label="Game session controls">
-      <button type="button" onClick={session.pause}>Pause</button>
-      <button type="button" onClick={session.exit}>Exit</button>
+      <button type="button" onClick={session.pause}>
+        Pause
+      </button>
+      <button type="button" onClick={session.exit}>
+        Exit
+      </button>
     </nav>
   ),
   GamePlatformPause: ({ session }: { session: { phase: string; resume: () => void } }) =>
     session.phase === 'paused' ? (
-      <button type="button" onClick={session.resume}>Resume</button>
+      <button type="button" onClick={session.resume}>
+        Resume
+      </button>
     ) : null,
   GameSessionAnnouncement: () => null,
 }));
@@ -123,7 +140,7 @@ afterEach(() => {
 });
 
 describe('ready-game shared-platform adoption', () => {
-  it('coordinates Beat-em-up lifecycle and submits one canonical result', () => {
+  it('coordinates Beat-em-up lifecycle and submits one canonical result', async () => {
     render(<OtakuBeatEmUpGameWrapper mode="arcade" />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }));
@@ -137,13 +154,13 @@ describe('ready-game shared-platform adoption', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Resume' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Finish combat' }));
-    expect(recordResult).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(recordResult).toHaveBeenCalledTimes(1));
     expect(recordResult).toHaveBeenCalledWith(
       expect.objectContaining({ gameId: 'otaku-beat-em-up', score: 2400, didWin: true }),
     );
     expect(screen.getByRole('status', { name: 'Final score' })).toHaveTextContent('2400');
     expect(screen.getByText(/Run Grade: C/)).toBeInTheDocument();
-    expect(screen.queryByText(/personal best/i)).not.toBeInTheDocument();
+    expect(await screen.findByText('NEW BEST 2400')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Return to games' }));
     expect(routerPush).toHaveBeenCalledWith('/mini-games');
@@ -179,6 +196,7 @@ describe('ready-game shared-platform adoption', () => {
     expect(beatRuntime).toContain('paused?: boolean');
     expect(puzzleRuntime).toContain('paused?: boolean');
     expect(beatRuntime).toContain('Light Attack (on-beat for bonus!)');
+    expect(beatRuntime).toContain('Touch combat controls');
     expect(puzzleRuntime).toContain('handleCanvasClick');
   });
 });

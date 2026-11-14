@@ -203,6 +203,7 @@ export async function ensureLocalUser(
           username,
           displayName,
           avatarUrl: clerkUser.imageUrl ?? null,
+          visibility: 'private',
         },
         select: localViewerSelect,
       });
@@ -266,6 +267,7 @@ export async function upsertLocalUserFromClerkWebhook(
         username,
         displayName,
         avatarUrl: imageUrl,
+        visibility: 'private',
       },
       select: localViewerSelect,
     });

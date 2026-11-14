@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   createPrintifyOrder: vi.fn(),
   capturePaidOrderLedger: vi.fn(),
   reconcileRefundLedger: vi.fn(),
+  preview: false,
 }));
 
 vi.mock('next/headers', () => ({
@@ -62,6 +63,10 @@ vi.mock('@/lib/finance/ledger', () => ({
   capturePaidOrderLedger: mocks.capturePaidOrderLedger,
   reconcileRefundLedger: mocks.reconcileRefundLedger,
 }));
+vi.mock('@/app/lib/security/previewIsolation', () => ({
+  PREVIEW_EXTERNAL_MUTATION_ERROR: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+  isVercelPreview: () => mocks.preview,
+}));
 
 import { POST } from '@/app/api/webhooks/stripe/route';
 import { POST as compatibilityPOST } from '@/app/api/stripe/webhook/route';
@@ -87,6 +92,7 @@ describe('Stripe webhook closure', () => {
     mocks.runtimeEnv.STRIPE_SECRET_KEY = 'stripe-test-key-fixture';
     mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = 'stripe-webhook-secret-fixture';
     mocks.signature = 'test_signature';
+    mocks.preview = false;
     mocks.event = checkoutEvent();
     mocks.constructEvent.mockImplementation(() => mocks.event);
     mocks.eventCreate.mockResolvedValue({});
@@ -152,6 +158,24 @@ describe('Stripe webhook closure', () => {
       ok: false,
       retry: true,
       error: 'Webhook processing is temporarily unavailable.',
+    });
+    expect(mocks.stripeConstructor).not.toHaveBeenCalled();
+    expect(mocks.constructEvent).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('refuses webhook mutations on a deployed Preview before provider or database access', async () => {
+    mocks.preview = true;
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
     });
     expect(mocks.stripeConstructor).not.toHaveBeenCalled();
     expect(mocks.constructEvent).not.toHaveBeenCalled();

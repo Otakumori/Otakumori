@@ -58,6 +58,9 @@ jobs:
       - name: Mini-Games QA Validation
         run: pnpm run mini-games:qa
 
+      - name: Production Asset Registry Validation
+        run: pnpm run assets:production:validate
+
       - name: Run unit tests
         run: pnpm run test
 
@@ -79,6 +82,17 @@ jobs:
       UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
       UPSTASH_REDIS_REST_TOKEN: ci_placeholder
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+      NEXT_PUBLIC_FEATURE_HERO: '1'
+      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+      NEXT_PUBLIC_FEATURE_SHOP: '1'
+      NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
+      NEXT_PUBLIC_FEATURE_BLOG: '1'
+      NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+      NEXT_PUBLIC_LIVE_DATA: '0'
+      NEXT_PUBLIC_PROBE_MODE: '1'
+      # Both optimized build passes must produce the same localhost-only QA artifact.
+      # next.config.mjs refuses this adapter whenever VERCEL=1.
+      OTM_VISUAL_QA_AUTH: '1'
 
     steps:
       - name: Checkout code
@@ -113,15 +127,6 @@ jobs:
 
       - name: Build application
         run: pnpm run build
-        env:
-          NEXT_PUBLIC_FEATURE_HERO: '1'
-          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
-          NEXT_PUBLIC_FEATURE_SHOP: '1'
-          NEXT_PUBLIC_FEATURE_MINIGAMES: 'on'
-          NEXT_PUBLIC_FEATURE_BLOG: '1'
-          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
-          NEXT_PUBLIC_LIVE_DATA: '0'
-          NEXT_PUBLIC_PROBE_MODE: '1'
 
       - name: Analyze bundle size
         run: |
@@ -272,11 +277,14 @@ jobs:
           NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
           NEXT_PUBLIC_LIVE_DATA: '0'
           NEXT_PUBLIC_PROBE_MODE: '1'
+          OTM_VISUAL_QA_AUTH: '1'
 
       - name: Run Playwright tests
         run: pnpm exec playwright test
         env:
           BASE_URL: http://localhost:3000
+          # Keep test expectations aligned with the localhost-only server adapter.
+          OTM_VISUAL_QA_AUTH: '1'
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

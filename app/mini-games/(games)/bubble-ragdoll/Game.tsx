@@ -18,6 +18,9 @@ import { GameStateMachine, type GameState } from '../../_shared/GameStateMachine
 import { GameTitleScreen } from '../../_shared/GameTitleScreen';
 import { GameUI } from '../../_shared/GameUI';
 import BubbleRagdollScene from './Scene';
+import { BUBBLE_RAGDOLL_ASSETS } from './bubbleRagdollAssets';
+import { bubbleObjectiveForRun, type BubbleObjective } from '../../_shared/secondaryGameContracts';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
 
 type BubbleRagdollResult = GameSessionResult & {
   outcome: 'completed';
@@ -26,6 +29,8 @@ type BubbleRagdollResult = GameSessionResult & {
   combo: number;
   misses: number;
   pops: number;
+  objectiveId: BubbleObjective['id'];
+  objectiveComplete: boolean;
 };
 
 export default function BubbleRagdollGame() {
@@ -35,12 +40,16 @@ export default function BubbleRagdollGame() {
   });
   const { beginResultSession, recordResult } = useGameProgress();
   const resultSubmittedRef = useRef(false);
+  const [runIndex, setRunIndex] = useState(0);
+  const objective = bubbleObjectiveForRun(runIndex);
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const [gameResults, setGameResults] = useState<BubbleRagdollResult | null>(null);
   const [gameStats, setGameStats] = useState({ score: 0, combo: 0, timer: 60, progress: 0 });
 
   const gameAssets: AssetManifest = {
     images: [
-      getAsset('bubble-ragdoll', 'bg') || '',
+      BUBBLE_RAGDOLL_ASSETS.arena.desktop,
+      BUBBLE_RAGDOLL_ASSETS.arena.mobile,
       getAsset('bubble-ragdoll', 'bubbleSprite') || '',
     ].filter(Boolean),
     audio: [
@@ -60,15 +69,21 @@ export default function BubbleRagdollGame() {
         resultSubmittedRef.current = true;
         void recordResult({
           gameId: 'bubble-ragdoll',
+          resultKey: objective.id,
           score: result.score,
           difficulty: 'default',
           durationMs: result.durationMs,
-          didWin: result.score > 0,
-          metadata: { combo: result.combo, misses: result.misses, pops: result.pops },
-        });
+          didWin: result.objectiveComplete,
+          metadata: {
+            combo: result.combo,
+            misses: result.misses,
+            pops: result.pops,
+            objective: objective.id,
+          },
+        }).then((saved) => setPersonalBest(saved.personalBest ?? null));
       }
     },
-    [recordResult, session.complete],
+    [objective.id, recordResult, session.complete],
   );
 
   const handleGameStatsUpdate = useCallback(
@@ -107,12 +122,14 @@ export default function BubbleRagdollGame() {
           return (
             <GameTitleScreen
               title="Bubble Ragdoll"
-              description="Toss the ragdoll into bubbles. Survive the chaos."
+              description="Drift through the moonlit arena and complete a rotating bubble trial."
+              artworkSrc={BUBBLE_RAGDOLL_ASSETS.arena.desktop}
               instructions={[
                 'Click to spawn bubbles',
                 'Drag the ragdoll to throw it',
                 'Pop bubbles for points',
                 'Survive as long as possible',
+                `Objective: ${objective.label}`,
               ]}
               onStart={() => transitionTo('playing')}
             />
@@ -124,14 +141,18 @@ export default function BubbleRagdollGame() {
             <GameResultsScreen
               title="Bubble Ragdoll"
               score={gameResults.score}
-              isWin={gameResults.score > 0}
+              isWin={gameResults.objectiveComplete}
               stats={[
                 { label: 'Best combo', value: gameResults.combo },
                 { label: 'Bubbles popped', value: gameResults.pops },
+                { label: 'Objective', value: objective.label },
               ]}
+              personalBest={personalBest}
               onRestart={() => {
                 setGameResults(null);
                 setGameStats({ score: 0, combo: 0, timer: 60, progress: 0 });
+                setPersonalBest(null);
+                setRunIndex((current) => current + 1);
                 session.restart();
                 transitionTo('title');
               }}
@@ -148,10 +169,11 @@ export default function BubbleRagdollGame() {
                 combo={gameStats.combo}
                 timer={gameStats.timer}
                 progress={gameStats.progress}
-                milestone="Pop those bubbles!"
+                milestone={objective.label}
               />
               <GamePlatformControls session={session} />
               <BubbleRagdollScene
+                objective={objective}
                 paused={session.phase === 'paused'}
                 onGameEnd={(result) => {
                   handleGameEnd(result);

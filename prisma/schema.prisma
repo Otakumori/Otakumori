@@ -1801,7 +1801,7 @@ model User {
   bannerUrl                                             String?
   bio                                                   String?
   location                                              String?
-  visibility                                            String                   @default("public")
+  visibility                                            String                   @default("private")
   website                                               String?
   avatarBundle                                          Json?
   avatarConfig                                          Json?

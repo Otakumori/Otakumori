@@ -14,7 +14,6 @@
 
 'use client';
 
-import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -22,7 +21,10 @@ import { useRouter } from 'next/navigation';
 import GlassCard from '@/app/components/ui/GlassCard';
 import { useGameAvatar } from '../../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../../_shared/PhysicsAvatarCanvas';
+import {
+  PhysicsAvatarCanvas,
+  type PhysicsAvatarCanvasRef,
+} from '../../_shared/PhysicsAvatarCanvas';
 import { GameOverlay } from '../../_shared/GameOverlay';
 import { useGameHud } from '../../_shared/useGameHud';
 import {
@@ -43,14 +45,17 @@ import { AvatarPresetChoice, type AvatarChoice } from '../../_shared/AvatarPrese
 import { getGameAvatarUsage } from '../../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
+import { nextPuzzleContentIndex } from '../../_shared/secondaryGameContracts';
+import { PUZZLE_REVEAL_CONTENT } from './puzzleRevealContent';
 
 const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-96">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-pink-200">Loading artwork...</p>
+        <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-amber-700/70 border-t-transparent motion-reduce:animate-none" />
+        <p className="text-amber-100">Preparing recovered memory...</p>
       </div>
     </div>
   ),
@@ -76,6 +81,8 @@ export default function PuzzleRevealPage() {
   const [combo, setCombo] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
+  const [contentIndex, setContentIndex] = useState(0);
   const resultSubmittedRef = useRef(false);
   const gameStartedAtRef = useRef(Date.now());
   const session = useGameSession<GameSessionResult>({
@@ -109,9 +116,9 @@ export default function PuzzleRevealPage() {
 
   useEffect(() => {
     const unregister = session.registerLifecycle({
-        pause: () => setGameState('paused'),
-        resume: () => setGameState('playing'),
-      });
+      pause: () => setGameState('paused'),
+      resume: () => setGameState('playing'),
+    });
     return () => {
       unregister();
     };
@@ -147,6 +154,9 @@ export default function PuzzleRevealPage() {
 
   const handleModeChange = (newMode: GameMode) => {
     setMode(newMode);
+    setContentIndex(
+      (current) => nextPuzzleContentIndex(current, key + 1, PUZZLE_REVEAL_CONTENT.length) ?? 0,
+    );
     setKey((prev) => prev + 1); // Restart game with new mode
   };
 
@@ -161,6 +171,7 @@ export default function PuzzleRevealPage() {
     resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
+    setPersonalBest(null);
   };
 
   const handleRestart = () => {
@@ -171,6 +182,10 @@ export default function PuzzleRevealPage() {
     resultSubmittedRef.current = false;
     setGameState('playing');
     setPetalReward(null);
+    setPersonalBest(null);
+    setContentIndex(
+      (current) => nextPuzzleContentIndex(current, key + 1, PUZZLE_REVEAL_CONTENT.length) ?? 0,
+    );
   };
 
   const handleGameEnd = useCallback(
@@ -190,6 +205,7 @@ export default function PuzzleRevealPage() {
         resultSubmittedRef.current = true;
         const result = await recordResult({
           gameId: 'puzzle-reveal',
+          resultKey: mode,
           score: finalScoreValue,
           difficulty: mode,
           durationMs: Math.max(0, Date.now() - gameStartedAtRef.current),
@@ -202,24 +218,7 @@ export default function PuzzleRevealPage() {
         });
 
         if (result.success) setPetalReward(result.petalReward?.earned ?? null);
-      }
-
-      // Submit to leaderboard
-      try {
-        await fetch('/api/v1/leaderboards/puzzle-reveal', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            score: finalScoreValue,
-            metadata: {
-              mode,
-              didWin,
-              combo,
-            },
-          }),
-        });
-      } catch (error) {
-        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        setPersonalBest(result.personalBest ?? null);
       }
     },
     [combo, mode, recordResult, session.complete],
@@ -235,7 +234,7 @@ export default function PuzzleRevealPage() {
           <header className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                <h1 className="mb-2 bg-gradient-to-r from-amber-200 via-rose-200 to-amber-500 bg-clip-text font-serif text-4xl font-bold text-transparent">
                   {displayName}
                 </h1>
                 <p className="text-zinc-300 font-medium">
@@ -244,7 +243,7 @@ export default function PuzzleRevealPage() {
               </div>
               <Link
                 href="/mini-games"
-                className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+                className="rounded-lg border border-amber-700/40 bg-stone-950/75 px-4 py-2 text-amber-100 backdrop-blur transition-colors hover:border-amber-500/60 hover:bg-stone-900"
               >
                 Back to Arcade
               </Link>
@@ -258,8 +257,8 @@ export default function PuzzleRevealPage() {
                   onClick={() => handleModeChange(difficulty)}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     mode === difficulty
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/50'
-                      : 'bg-black/30 border border-white/20 text-zinc-300 hover:bg-black/50 hover:border-white/40'
+                      ? 'border border-amber-500/70 bg-gradient-to-r from-stone-900 to-amber-950 text-amber-100 shadow-lg shadow-black/40'
+                      : 'border border-stone-600/70 bg-stone-950/55 text-zinc-300 hover:border-amber-700/60 hover:bg-stone-900/75'
                   }`}
                 >
                   {DIFFICULTY_LABELS[difficulty]}
@@ -337,9 +336,14 @@ export default function PuzzleRevealPage() {
             <EnhancedTileGame
               key={key}
               mode={mode}
+              contentIndex={contentIndex}
               onScoreChange={setScore}
               onComboChange={setCombo}
               onGameEnd={handleGameEnd}
+              onReplay={handleRestart}
+              onBack={session.exit}
+              personalBest={personalBest}
+              petalReward={petalReward}
               paused={session.phase === 'paused'}
               physicsAvatarRef={physicsAvatarRef}
             />
@@ -351,7 +355,7 @@ export default function PuzzleRevealPage() {
           {/* Game Overlay */}
           {!showAvatarChoice && (
             <GameOverlay
-              state={gameState === 'paused' ? 'playing' : gameState}
+              state={gameState === 'paused' || gameState === 'win' ? 'playing' : gameState}
               instructions={[
                 'Click tiles to reveal the hidden artwork',
                 'Click tiles quickly (within 0.5s) to build combos',
@@ -363,6 +367,7 @@ export default function PuzzleRevealPage() {
               loseMessage="Out of energy! Try again and manage your clicks better!"
               score={finalScore || score}
               petalReward={petalReward}
+              personalBest={personalBest}
               onRestart={handleRestart}
               onResume={handleStart}
               onBack={session.exit}
@@ -376,22 +381,22 @@ export default function PuzzleRevealPage() {
             <h3 className="font-semibold text-white text-lg mb-4">How to Play</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium text-pink-300 mb-3 text-lg">Objective</h4>
+                <h4 className="mb-3 text-lg font-medium text-amber-200">Objective</h4>
                 <ul className="text-sm text-zinc-300 space-y-2">
                   <li className="flex items-start gap-2">
-                    <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Click tiles to reveal the hidden artwork beneath</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Reveal all tiles to complete the puzzle</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Higher difficulties have more tiles and better rewards</span>
@@ -399,10 +404,10 @@ export default function PuzzleRevealPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-purple-300 mb-3 text-lg">Combo System</h4>
+                <h4 className="mb-3 text-lg font-medium text-amber-200">Combo System</h4>
                 <ul className="text-sm text-zinc-300 space-y-2">
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>
@@ -410,19 +415,19 @@ export default function PuzzleRevealPage() {
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Each combo level adds +50 bonus points per tile</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Max combo: 10x for massive score boosts!</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    <span className="mt-0.5 text-rose-300" aria-hidden="true">
                       *
                     </span>
                     <span>Combo resets if you wait too long between clicks</span>
