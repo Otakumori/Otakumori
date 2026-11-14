@@ -70,11 +70,15 @@ test('Footer components work', async ({ page }) => {
   expect(noisy).not.toMatch(/Failed to fetch RSC payload/i);
 });
 
-test('API routes return 200', async ({ page }) => {
-  const routes = ['/api/health', '/api/shop/products'];
+test('API readiness and catalog availability are truthful', async ({ page }) => {
+  const health = await page.request.get('/api/health');
+  expect(health.status()).toBe(200);
+  await expect(health.json()).resolves.toMatchObject({ ok: true, status: 'healthy' });
 
-  for (const route of routes) {
-    const res = await page.request.get(route);
-    expect(res?.ok()).toBeTruthy();
-  }
+  const catalog = await page.request.get('/api/shop/products');
+  expect(catalog.status()).toBe(200);
+  const payload = await catalog.json();
+  expect(payload.source).not.toBe('error');
+  expect(payload.source).not.toBe('unavailable');
+  expect(Array.isArray(payload.products)).toBe(true);
 });

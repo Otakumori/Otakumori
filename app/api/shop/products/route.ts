@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    if (!data.ok) {
+    if (!data.ok || data.source === 'error-fallback') {
       const { logger } = await import('@/app/lib/logger');
       logger.error('Printify API returned error:', undefined, { error: data.error }, undefined);
       throw new Error(data.error || 'Failed to fetch products');
@@ -63,11 +63,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         products: deduplicated,
-        source: 'v1-api',
+        source: data.source || 'v1-api',
         count: deduplicated.length,
+        ...(data.message ? { message: data.message } : {}),
         timestamp: new Date().toISOString(),
       },
-      { status: 200 },
+      { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
     const { logger } = await import('@/app/lib/logger');
@@ -78,15 +79,17 @@ export async function GET(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error)),
     );
 
-    // Return empty products with 200 status for graceful degradation
+    // Consumers preserve their own fallback UI, but the API must not report an
+    // unexpected upstream failure as a successful catalog response.
     return NextResponse.json(
       {
         products: [],
-        source: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        source: 'unavailable',
+        code: 'PRODUCT_CATALOG_UNAVAILABLE',
+        message: 'Products are temporarily unavailable.',
         timestamp: new Date().toISOString(),
       },
-      { status: 200 },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
     );
   }
 }
