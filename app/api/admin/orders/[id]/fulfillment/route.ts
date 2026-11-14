@@ -50,11 +50,11 @@ async function handlePost(
       );
     }
 
-    const [{ stripe }, { createPrintifyOrder }] = await Promise.all([
+    const [{ getStripeClient }, { createPrintifyOrder }] = await Promise.all([
       import('@/app/lib/stripe'),
       import('@/lib/fulfillment/printify'),
     ]);
-    const session = await stripe.checkout.sessions.retrieve(order.stripeId);
+    const session = await getStripeClient().checkout.sessions.retrieve(order.stripeId);
     const result = await createPrintifyOrder(order.id, session, { allowRetry: true });
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   } catch {

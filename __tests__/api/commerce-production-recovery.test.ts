@@ -19,7 +19,9 @@ vi.mock('@/app/lib/auth/admin', () => ({
 vi.mock('@/lib/db', () => ({ db: { order: { findUnique: mocks.findOrder } } }));
 vi.mock('@/app/lib/stripe', () => {
   mocks.providerModuleLoads('stripe');
-  return { stripe: { checkout: { sessions: { retrieve: mocks.retrieveSession } } } };
+  return {
+    getStripeClient: () => ({ checkout: { sessions: { retrieve: mocks.retrieveSession } } }),
+  };
 });
 vi.mock('@/lib/fulfillment/printify', () => {
   mocks.providerModuleLoads('printify');

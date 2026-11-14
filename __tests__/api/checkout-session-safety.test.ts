@@ -5,6 +5,7 @@ import { prisma } from '@/app/lib/prisma';
 import { LocalUserUnavailableError, requireLocalViewer } from '@/app/lib/auth/viewer';
 
 const stripeSessionCreate = vi.hoisted(() => vi.fn());
+const checkoutAdmission = vi.hoisted(() => ({ enabled: true }));
 
 vi.mock('@/app/lib/auth/viewer', () => ({
   AuthenticationRequiredError: class AuthenticationRequiredError extends Error {},
@@ -57,7 +58,7 @@ vi.mock('@/app/lib/idempotency', () => ({
 
 vi.mock('@/lib/checkout/admission', () => ({
   getCheckoutAdmissionPolicy: () => ({
-    enabled: true,
+    enabled: checkoutAdmission.enabled,
     code: 'CHECKOUT_TEMPORARILY_DISABLED',
     message: 'Checkout temporarily unavailable',
   }),
@@ -149,6 +150,7 @@ describe('checkout session safety gates', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
     vi.clearAllMocks();
+    checkoutAdmission.enabled = true;
     vi.mocked(auth).mockResolvedValue({ userId: 'clerk_user_1' } as never);
     vi.mocked(requireLocalViewer).mockResolvedValue({
       clerkUserId: 'clerk_user_1',
@@ -160,17 +162,16 @@ describe('checkout session safety gates', () => {
     });
   });
 
-  it('/api/v1/checkout/session refuses Preview checkout before Stripe', async () => {
-    vi.stubEnv('VERCEL', '1');
-    vi.stubEnv('VERCEL_ENV', 'preview');
+  it('/api/v1/checkout/session refuses disabled checkout before Stripe', async () => {
+    checkoutAdmission.enabled = false;
     const mod = await import('../../app/api/v1/checkout/session/route');
 
     const response = await mod.POST(request('http://localhost/api/v1/checkout/session'));
 
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({
-      error: 'BETA_PURCHASES_DISABLED',
-      code: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+      code: 'CHECKOUT_TEMPORARILY_DISABLED',
+      error: 'Checkout temporarily unavailable',
     });
     expect(stripeSessionCreate).not.toHaveBeenCalled();
     expect(prisma.product.findUnique).not.toHaveBeenCalled();

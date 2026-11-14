@@ -4,15 +4,12 @@ import { env } from '@/env.mjs';
 
 // Database singleton for server-side use only
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const databaseUrl = env.DATABASE_URL;
 
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: {
-      db: {
-        url: env.DATABASE_URL,
-      },
-    },
+    ...(databaseUrl ? { datasources: { db: { url: databaseUrl } } } : {}),
     log: ['query', 'error', 'warn'],
     errorFormat: 'pretty',
   });
