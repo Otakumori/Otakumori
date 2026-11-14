@@ -222,6 +222,23 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build
     if: github.event_name == 'pull_request'
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: otm_e2e
+          POSTGRES_PASSWORD: ci_only_pwd
+          POSTGRES_DB: otm_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U otm_e2e -d otm_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://otm_e2e:ci_only_pwd@127.0.0.1:5432/otm_e2e?schema=public
+      DIRECT_URL: postgresql://otm_e2e:ci_only_pwd@127.0.0.1:5432/otm_e2e?schema=public
 
     steps:
       - name: Checkout code
@@ -241,6 +258,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate engine-bearing Prisma client
+        run: pnpm exec prisma generate --schema prisma/schema.prisma
+
+      - name: Verify disposable E2E database
+        shell: bash
+        run: |
+          node <<'NODE'
+          const { PrismaClient } = require('@prisma/client');
+          const client = new PrismaClient();
+          async function verify() {
+            const rows = await client.$queryRawUnsafe('SELECT current_database() AS db');
+            if (rows?.[0]?.db !== 'otm_e2e') {
+              throw new Error('Unexpected E2E database identity');
+            }
+            console.log('Disposable E2E PostgreSQL identity and connectivity verified');
+          }
+          verify()
+            .catch(() => {
+              console.error('Disposable E2E PostgreSQL connectivity or identity failed');
+              process.exitCode = 1;
+            })
+            .finally(async () => { await client.$disconnect(); });
+          NODE
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -252,20 +293,25 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pnpm run start &
-          sleep 30
+          pnpm run start > /tmp/otm-next.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:3000/api/health > /dev/null; then
+              echo "Next.js readiness and database connectivity verified"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Next.js did not become database-ready"
+          tail -n 50 /tmp/otm-next.log
+          exit 1
         env:
           PORT: 3000
-          DATABASE_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
-          DIRECT_URL: postgresql://ci_placeholder:ci_placeholder@localhost:5432/otakumori_ci
           STRIPE_SECRET_KEY: sk_test_ci_placeholder
           STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
           CLERK_SECRET_KEY: sk_test_ci_placeholder
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
           CLERK_PROXY_URL: ''
           NEXT_PUBLIC_CLERK_PROXY_URL: ''
-          PRINTIFY_API_KEY: ci_placeholder
-          PRINTIFY_SHOP_ID: ci_placeholder
           UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
           UPSTASH_REDIS_REST_TOKEN: ci_placeholder
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
@@ -327,9 +373,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run security audit
-        # Pre-existing transitive advisory debt (237+ advisories); track in a dedicated cleanup issue.
+        # Critical production advisories are release-blocking. Lower-severity
+        # debt remains visible in the audit output and is tracked separately.
         run: pnpm audit --prod --audit-level critical
-        continue-on-error: true
 
       - name: Run dependency check
         run: pnpm run check-deps
