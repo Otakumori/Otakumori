@@ -2,18 +2,26 @@ import { test, expect } from '@playwright/test';
 
 import { expectRootFooterContract, expectSinglePrimaryNavigation } from './helpers/home';
 
-test('Home → Sign in → Shop → Add to cart', async ({ page }) => {
+test('Home account entry → Shop → Add to cart', async ({ page }) => {
   await page.goto('/');
   await expectSinglePrimaryNavigation(page);
 
-  // Clerk redirect entry point or bounded unavailable state when CI uses synthetic Clerk config.
-  const signInLink = page.getByRole('link', { name: /^sign in$/i }).first();
-  const unavailableButton = page.getByRole('button', {
-    name: /account service unavailable\. reload account state/i,
-  });
-  await expect(signInLink.or(unavailableButton)).toBeVisible({ timeout: 10000 });
-  if ((await signInLink.count()) > 0) {
-    await expect(signInLink).toHaveAttribute('href', /\/sign-in\?redirect_url=/);
+  if ((await page.locator('body[data-visual-qa-auth="true"]').count()) > 0) {
+    // The localhost-only visual-QA shell intentionally avoids Clerk initialization.
+    await expect(page.getByTestId('mori-root-footer').getByRole('link', { name: 'Account' })).toHaveAttribute(
+      'href',
+      '/account',
+    );
+  } else {
+    // Real auth shell: Clerk redirect entry point or a bounded unavailable state.
+    const signInLink = page.getByRole('link', { name: /^sign in$/i }).first();
+    const unavailableButton = page.getByRole('button', {
+      name: /account service unavailable\. reload account state/i,
+    });
+    await expect(signInLink.or(unavailableButton)).toBeVisible({ timeout: 10000 });
+    if ((await signInLink.count()) > 0) {
+      await expect(signInLink).toHaveAttribute('href', /\/sign-in\?redirect_url=/);
+    }
   }
 
   // Back to shop

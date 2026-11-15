@@ -282,6 +282,9 @@ jobs:
             .finally(async () => { await client.$disconnect(); });
           NODE
 
+      - name: Apply schema to disposable E2E database
+        run: pnpm exec prisma db push --schema prisma/schema.prisma --skip-generate
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:

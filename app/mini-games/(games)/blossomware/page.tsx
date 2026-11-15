@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GAMES } from '@/components/arcade/registry';
@@ -94,6 +94,7 @@ export default function BlossomwarePage() {
   const [runKey, setRunKey] = useState(0);
   const [orchestrator, setOrchestrator] = useState(INITIAL_ORCHESTRATOR_STATE);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [playlistVariant, setPlaylistVariant] = useState<BlossomwarePlaylistVariant>('classic');
   const [runSeed, setRunSeed] = useState(BLOSSOMWARE_CLASSIC_SEED);
   const [personalBest, setPersonalBest] = useState<PersonalBestResult>();
@@ -103,6 +104,8 @@ export default function BlossomwarePage() {
   );
   const selectedVariant =
     PLAYLIST_VARIANTS.find((variant) => variant.id === playlistVariant) ?? PLAYLIST_VARIANTS[0];
+
+  useEffect(() => setIsHydrated(true), []);
 
   const handleRunComplete = useCallback(
     (result: BlossomwareRunResult) => {
@@ -230,7 +233,8 @@ export default function BlossomwarePage() {
                 <p className="mt-1 text-xs text-slate-400">{playlist.length} microgames</p>
               </div>
               <button
-                className="min-h-11 rounded-lg bg-pink-500 px-5 py-3 font-semibold text-white transition-colors hover:bg-pink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-200"
+                className="min-h-11 rounded-lg bg-pink-500 px-5 py-3 font-semibold text-white transition-colors hover:bg-pink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-200 disabled:cursor-wait disabled:opacity-60"
+                disabled={!isHydrated}
                 onClick={startRun}
                 type="button"
               >
