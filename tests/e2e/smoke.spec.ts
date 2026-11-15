@@ -84,8 +84,23 @@ test('API readiness and catalog availability are truthful', async ({ page }) => 
   await expect(health.json()).resolves.toMatchObject({ ok: true, status: 'healthy' });
 
   const catalog = await page.request.get('/api/shop/products');
-  expect(catalog.status()).toBe(200);
   const payload = await catalog.json();
+
+  // Disposable GitHub E2E runs deliberately use an unreachable Printify endpoint.
+  // Verify the catalog fails closed there; normal environments must still be available.
+  const isIsolatedVisualQaCI =
+    process.env.CI === 'true' && process.env.OTM_VISUAL_QA_AUTH === '1';
+  if (isIsolatedVisualQaCI) {
+    expect(catalog.status()).toBe(503);
+    expect(payload).toMatchObject({
+      source: 'unavailable',
+      code: 'PRODUCT_CATALOG_UNAVAILABLE',
+      products: [],
+    });
+    return;
+  }
+
+  expect(catalog.status()).toBe(200);
   expect(payload.source).not.toBe('error');
   expect(payload.source).not.toBe('unavailable');
   expect(Array.isArray(payload.products)).toBe(true);
