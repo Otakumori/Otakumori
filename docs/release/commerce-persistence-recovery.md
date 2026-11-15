@@ -5,6 +5,7 @@ reconciliation and Printify submission tracking:
 
 - `WebhookEvent.updatedAt`;
 - `OrderItem.createdAt` and `OrderItem.updatedAt`;
+- `StripeCustomer.createdAt` and `StripeCustomer.updatedAt`;
 - `FinancialTransaction` with its Prisma-declared indexes and `Order` foreign key;
 - `PrintifyOrderSync` with its unique local-order claim, indexes, and `Order` foreign key.
 
@@ -21,6 +22,10 @@ Checkout remains source-disabled. Outbound Printify order submission has a separ
 source-controlled admission gate that defaults disabled even when credentials exist. Signed Stripe
 events may still verify, record paid/refund truth, and leave fulfillment for operator review without
 contacting Printify.
+
+`20261112160000_commerce_persistence_compatibility` is the sole canonical migration identity.
+The later local draft identity was removed before rehearsal so Prisma can never see two overlapping
+commerce migrations.
 
 Do not apply this migration to Production or an existing Preview without separate authorization,
 positive target identity verification, a reviewed migration checksum, and an isolated rehearsal.

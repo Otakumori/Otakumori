@@ -316,6 +316,16 @@ describe('Stripe webhook closure', () => {
         notes: expect.stringMatching(/operator review/i),
       }),
     });
+    expect(mocks.eventUpdate).toHaveBeenLastCalledWith({
+      where: { id: 'evt_checkout_1' },
+      data: {
+        payload: expect.objectContaining({
+          processingStatus: 'completed',
+          fulfillment: 'operator_review',
+          financialLedger: 'captured',
+        }),
+      },
+    });
   });
 
   it('reconciles cumulative refunds into the canonical finance ledger', async () => {

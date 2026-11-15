@@ -4,9 +4,9 @@
 
 ## Boundaries
 
-Target Prisma migration: `20261112160000_commerce_persistence_compatibility`. Source baseline: `main` at `5655168a4a01eb461501a2ec353d1292aacbfc06`. The migration creates `PrintifyOrderSync` and `FinancialTransaction`, adds five timestamp columns across `WebhookEvent`, `OrderItem`, and `StripeCustomer`, plus required indexes and foreign keys. It intentionally excludes PR #125's beta runtime migration.
+Target Prisma migration: `20261112160000_commerce_persistence_compatibility`. Source baseline: `main` at `5655168a4a01eb461501a2ec353d1292aacbfc06`. The migration creates `PrintifyOrderSync` and `FinancialTransaction`, adds five timestamp columns across `WebhookEvent`, `OrderItem`, and `StripeCustomer`, plus required indexes and foreign keys. It does not duplicate PR #125's beta runtime objects, but its ledger preflight accepts either the reviewed 23-migration baseline or the exact 24-migration baseline containing `20261102193000_beta_runtime_compatibility`.
 
-The candidate SQL passed a transaction-backed isolated Neon rehearsal on `br-wild-pond-a5skkxmr`; synthetic database contract checks verified uniqueness, foreign keys, ledger replays, webhook deduplication, and cleanup. On a second clean isolated branch, `br-shiny-glitter-a5hlntsc`, Prisma CLI reported 24 migrations on disk, 23 applied and this candidate alone pending. `prisma migrate deploy` was blocked before execution by a tool safety control. **The Prisma migration-ledger write and CLI deployment remain unverified.**
+The consolidated SQL passed local PostgreSQL 18.3 Prisma rehearsals from both accepted baselines: 23 to 24 migrations and exact beta-24 to 25 migrations, with zero unresolved entries, preserved synthetic rows, correct Prisma timestamp defaults, and no pending migration on repeat deploy. The reverse operational order—commerce first, then the exact protected beta SQL—also produced 25 completed migrations and preserved both schema families. These local results do not authorize or certify any Neon execution. The existing `br-shiny-glitter-a5hlntsc` checkpoint remains read-only until a fresh identity check and exact-operation authorization.
 
 ## Health-check certification design
 
@@ -16,12 +16,21 @@ For trusted `push` events on `main` or `develop`, the same workflow continues us
 
 ## Application evidence
 
-At exact main SHA, the disposable runner passed 85/85 mocked-provider tests across 12 files, `prisma validate`, `prisma generate`, full TypeScript typecheck with 3 GB Node heap, and focused lint. The newly added health-check regression test in this PR requires an independent CI pass before approval; previous green checks do not certify this change.
+The local consolidation passed 63 focused health, migration, checkout, webhook, ledger, and fulfillment tests across 14 files, followed by the complete 917-test Vitest suite. Prisma validation, TypeScript, pre-build validation, documentation security, and full lint (zero errors; baseline warnings only) also passed. Remote CI remains unverified because this branch has not been published.
 
 ## Release gates
 
-Review the exact SQL and its checksum, confirm Production's intended `DATABASE_URL` / `DIRECT_URL` project, branch and database without exposing secrets, and rehearse `prisma migrate deploy` with a secure authorized runner on the clean isolated branch. Verify the `_prisma_migrations` ledger, diff and postflight. Prisma records its own pending migration as started before executing the SQL; the SQL preflight excludes **only this candidate's started row** from its unresolved-migration check, while continuing to block other unresolved entries. If any commerce table gains rows or the migration baseline changes from 23, stop and revisit the data backfill. Do not apply on PR #125 Preview or Production.
+Review the exact SQL and checksum, confirm the direct connection identifies the authorized project, branch, and `neondb` without exposing secrets, and rehearse `prisma migrate deploy` only after exact-target approval. Verify `_prisma_migrations`, preserved rows, schema diff, and postflight. Prisma records its own pending migration as started before executing SQL; the preflight excludes **only this candidate's started row** while blocking every other unresolved entry. Stop if the baseline is neither 23 nor the exact beta-24 sequence, or if any target object already exists. Do not apply on PR #125 Preview or Production.
 
-The existing Production Prisma workflow only authorizes historical PR #57/#62 migration pairs. **Do not expand its allowlist automatically.** The current source checker may accept HTTP 500 and degraded HTTP 200 as healthy; this PR makes both fail. Separately, the default CI dependency security audit uses `continue-on-error` and should not be interpreted as a clean vulnerability attestation.
+The existing Production Prisma workflow only authorizes historical PR #57/#62 migration pairs. **Do not expand its allowlist automatically.** The health checker now rejects HTTP 500 and degraded HTTP 200 responses.
+
+## Separate dependency-security blocker
+
+`pnpm audit --prod --audit-level critical` still reports five critical advisories: three direct
+Next.js advisories (`15.5.21`, fixes beginning at `15.5.24`/`15.5.28`), one direct
+`@sentry/nextjs` advisory (`10.15.0`, fixed at `10.75.2`), and transitive `shell-quote` `1.9.0`
+through `@react-three/gltfjsx` (fixed at `1.11.0`). The default CI audit remains allowed to
+continue after failure. This migration candidate must not be described as security-release clean
+until compatible upgrades and a truthful blocking audit gate are independently validated.
 
 This is a narrow first schema compatibility slice. The larger database inventory still has additional absent tables and columns. Do not treat a successful narrow migration as beta or commerce launch approval.
