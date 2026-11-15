@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { db } from '@/lib/db';
+import { getFulfillmentSubmissionPolicy } from '@/lib/fulfillment/admission';
 
 export const runtime = 'nodejs';
 
@@ -47,6 +48,14 @@ async function handlePost(
             'Fulfillment is not safely retryable. Reconcile in-progress or uncertain provider submissions first.',
         },
         { status: 409 },
+      );
+    }
+
+    const admission = getFulfillmentSubmissionPolicy();
+    if (!admission.enabled) {
+      return NextResponse.json(
+        { ok: false, code: admission.code, error: admission.message },
+        { status: 503 },
       );
     }
 

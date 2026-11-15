@@ -13,6 +13,7 @@ import { existsSync } from 'node:fs';
 
 const CANDIDATE = '20261112160000_commerce_persistence_compatibility';
 const BETA_CANDIDATE = '20261102193000_beta_runtime_compatibility';
+const expectedPort = process.env.OTM_COMMERCE_CONTRACT_PORT ?? '5432';
 const mode = process.argv[2];
 const direct = process.env.DIRECT_URL;
 const pooled = process.env.DATABASE_URL;
@@ -23,7 +24,7 @@ if (process.env.CI !== 'true' || !direct || direct !== pooled) {
 const target = new URL(direct);
 if (
   target.hostname !== '127.0.0.1' ||
-  target.port !== '5432' ||
+  target.port !== expectedPort ||
   target.pathname !== '/neondb' ||
   target.username !== 'otm_ci' ||
   !existsSync(`prisma/migrations/${BETA_CANDIDATE}/migration.sql`) ||
@@ -64,7 +65,15 @@ async function run() {
     for (const table of ['InventoryItem', 'IdempotencyKey', 'Order', 'OrderItem', 'StripeCustomer', 'WebhookEvent']) {
       await prisma.$executeRawUnsafe(`CREATE TABLE "${table}" ("id" TEXT NOT NULL PRIMARY KEY)`);
     }
-    console.log('Seeded the required pre-candidate table stubs on disposable PostgreSQL');
+    await prisma.$executeRawUnsafe(`INSERT INTO "Order" ("id") VALUES ('contract_order')`);
+    await prisma.$executeRawUnsafe(`INSERT INTO "OrderItem" ("id") VALUES ('contract_item')`);
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "StripeCustomer" ("id") VALUES ('contract_customer')`,
+    );
+    await prisma.$executeRawUnsafe(`INSERT INTO "WebhookEvent" ("id") VALUES ('contract_event')`);
+    console.log(
+      'Seeded required pre-candidate stubs and synthetic preserved rows on disposable PostgreSQL',
+    );
     return;
   }
 
@@ -106,13 +115,26 @@ async function run() {
         OR (table_name = 'IdempotencyKey' AND column_name = 'updatedAt'))) AS beta_timestamp_count,
       (SELECT column_default FROM information_schema.columns
        WHERE table_schema = 'public' AND table_name = 'User' AND column_name = 'visibility') AS visibility_default,
+      (SELECT count(*)::integer FROM information_schema.columns
+       WHERE table_schema = 'public' AND column_name = 'updatedAt' AND column_default IS NULL AND
+       table_name IN ('WebhookEvent','OrderItem','StripeCustomer','PrintifyOrderSync')) AS updated_without_default,
+      (SELECT count(*)::integer FROM information_schema.columns
+       WHERE table_schema = 'public' AND column_name = 'createdAt' AND column_default IS NOT NULL AND
+       table_name IN ('OrderItem','StripeCustomer','FinancialTransaction','PrintifyOrderSync')) AS created_with_default,
       (SELECT count(*)::integer FROM pg_constraint
        WHERE conname IN ('PrintifyOrderSync_localOrderId_fkey',
                          'FinancialTransaction_orderId_fkey')) AS fkey_count,
       (SELECT count(*)::integer FROM pg_indexes
        WHERE schemaname = 'public' AND
        ((tablename = 'PrintifyOrderSync' AND indexname = 'PrintifyOrderSync_localOrderId_key')
-        OR (tablename = 'FinancialTransaction' AND indexname = 'FinancialTransaction_orderId_idx'))) AS index_count
+        OR (tablename = 'FinancialTransaction' AND indexname = 'FinancialTransaction_orderId_idx'))) AS index_count,
+      ((SELECT count(*)::integer FROM "Order" WHERE "id" = 'contract_order') +
+       (SELECT count(*)::integer FROM "OrderItem" WHERE "id" = 'contract_item'
+          AND "createdAt" IS NOT NULL AND "updatedAt" IS NOT NULL) +
+       (SELECT count(*)::integer FROM "StripeCustomer" WHERE "id" = 'contract_customer'
+          AND "createdAt" IS NOT NULL AND "updatedAt" IS NOT NULL) +
+       (SELECT count(*)::integer FROM "WebhookEvent" WHERE "id" = 'contract_event'
+          AND "updatedAt" IS NOT NULL)) AS preserved_rows
   `);
 
   if (
@@ -128,8 +150,11 @@ async function run() {
     post.timestamp_count !== 5 ||
     post.beta_timestamp_count !== 3 ||
     post.visibility_default !== "'private'::text" ||
+    post.updated_without_default !== 4 ||
+    post.created_with_default !== 4 ||
     post.fkey_count !== 2 ||
-    post.index_count !== 2
+    post.index_count !== 2 ||
+    post.preserved_rows !== 4
   ) {
     throw new Error('Prisma migration lifecycle or candidate schema contract failed');
   }

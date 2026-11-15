@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import type { PrintifyOrderData, PrintifyShippingAddress } from '@/app/lib/printify';
 import { logger } from '@/app/lib/logger';
+import { getFulfillmentSubmissionPolicy } from '@/lib/fulfillment/admission';
 
 /**
  * Handle order fulfillment after successful payment
@@ -16,6 +17,11 @@ export const fulfillOrder = inngest.createFunction(
   { event: 'order/fulfilled' },
   async ({ event, step }) => {
     const { orderId, userId, stripeSessionId, shippingDetails, email } = event.data;
+
+    const fulfillmentAdmission = getFulfillmentSubmissionPolicy();
+    if (!fulfillmentAdmission.enabled) {
+      throw new Error(`${fulfillmentAdmission.code}: ${fulfillmentAdmission.message}`);
+    }
 
     // Step 1: Validate order
     const order = await step.run('validate-order', async () => {

@@ -63,7 +63,7 @@ jobs:
       - name: Seed disposable pre-candidate table stubs
         run: node scripts/ci/commerce-migration-contract.mjs seed
 
-      - name: Baseline 23 historical migrations using the Prisma migration engine
+      - name: Baseline the exact reviewed historical migration set using the Prisma engine
         shell: bash
         run: |
           set -euo pipefail

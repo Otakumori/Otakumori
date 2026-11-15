@@ -1,5 +1,6 @@
 import { env } from '@/env.mjs';
 import { assertExternalMutationAllowed } from '@/app/lib/security/previewIsolation';
+import { getFulfillmentSubmissionPolicy } from '@/lib/fulfillment/admission';
 
 export interface PrintifyProduct {
   id: string;
@@ -463,6 +464,11 @@ export class PrintifyService {
   }
 
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
+    const admission = getFulfillmentSubmissionPolicy();
+    if (!admission.enabled) {
+      throw new Error(`${admission.code}: ${admission.message}`);
+    }
+
     try {
       const { logger } = await import('@/app/lib/logger');
       logger.info('printify_order_creation_started', undefined, {
