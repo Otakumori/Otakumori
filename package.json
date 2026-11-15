@@ -12,10 +12,10 @@
   },
   "pnpm": {
     "overrides": {
-      "@sentry/nextjs": "10.15.0",
-      "@sentry/node": "10.15.0",
-      "@sentry/react": "10.15.0",
-      "@sentry/core": "10.15.0",
+      "@sentry/nextjs": "10.75.2",
+      "@sentry/node": "10.75.2",
+      "@sentry/react": "10.75.2",
+      "@sentry/core": "10.75.2",
       "@opentelemetry/api": "1.9.0",
       "@opentelemetry/auto-instrumentations-node": "0.75.0",
       "@opentelemetry/sdk-node": "0.217.0",
@@ -29,7 +29,7 @@
       "next>sharp": "0.35.3",
       "request>form-data": "2.5.6",
       "jsdom>form-data": "3.0.5",
-      "react-devtools-core>shell-quote": "1.9.0",
+      "react-devtools-core>shell-quote": "1.11.0",
       "hono": "4.12.27"
     },
     "peerDependencyRules": {
@@ -239,8 +239,8 @@
     "@react-three/fiber": "^9.3.0",
     "@react-three/gltfjsx": "^4.3.4",
     "@sanity/client": "^7.0.0",
-    "@sentry/nextjs": "10.16.0",
-    "@sentry/react": "10.16.0",
+    "@sentry/nextjs": "10.75.2",
+    "@sentry/react": "10.75.2",
     "@sentry/replay": "^7.116.0",
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/supabase-js": "^2.58.0",
@@ -273,7 +273,7 @@
     "jszip": "^3.10.1",
     "lucide-react": "^0.544.0",
     "mitt": "^3.0.1",
-    "next": "15.5.21",
+    "next": "15.5.29",
     "next-themes": "^0.4.6",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
