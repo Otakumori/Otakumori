@@ -6,6 +6,8 @@ on:
     paths:
       - 'prisma/migrations/20261112160000_commerce_persistence_compatibility/**'
       - 'prisma/migrations/20261102193000_beta_runtime_compatibility/**'
+      - 'prisma/migrations/20261116180000_financial_report_exports/**'
+      - 'prisma/schema.prisma'
       - 'scripts/ci/commerce-migration-contract.mjs'
       - '.github/workflows/prisma-commerce-rehearsal.yml'
 
@@ -14,7 +16,7 @@ permissions:
 
 jobs:
   prisma-commerce-contract:
-    # This certifies the ordered beta + commerce candidates; never use live credentials.
+    # This certifies the ordered beta + commerce + reporting candidates; never use live credentials.
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -71,14 +73,15 @@ jobs:
             migration="${dir%/}"
             migration="${migration##*/}"
             if [ "${migration}" = "20261102193000_beta_runtime_compatibility" ] ||
-               [ "${migration}" = "20261112160000_commerce_persistence_compatibility" ]; then
+               [ "${migration}" = "20261112160000_commerce_persistence_compatibility" ] ||
+               [ "${migration}" = "20261116180000_financial_report_exports" ]; then
               continue
             fi
             pnpm exec prisma migrate resolve --schema prisma/schema.prisma --applied "${migration}"
           done
           node scripts/ci/commerce-migration-contract.mjs baseline
 
-      - name: Apply ordered beta and commerce candidates through Prisma CLI
+      - name: Apply ordered beta, commerce, and reporting candidates through Prisma CLI
         run: pnpm exec prisma migrate deploy --schema prisma/schema.prisma
 
       - name: Verify candidate ledger, schema objects, and migration status

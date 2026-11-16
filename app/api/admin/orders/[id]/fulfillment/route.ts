@@ -13,10 +13,7 @@ const RetrySchema = z.object({
 
 const RETRYABLE_STATUSES = new Set(['failed', 'mapping_failed', 'no_items']);
 
-async function handlePost(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+async function handlePost(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const parsed = RetrySchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
@@ -59,11 +56,13 @@ async function handlePost(
       );
     }
 
-    const [{ getStripeClient }, { createPrintifyOrder }] = await Promise.all([
+    const [{ getVerifiedStripeClient }, { createPrintifyOrder }] = await Promise.all([
       import('@/app/lib/stripe'),
       import('@/lib/fulfillment/printify'),
     ]);
-    const session = await getStripeClient().checkout.sessions.retrieve(order.stripeId);
+    const session = await (
+      await getVerifiedStripeClient()
+    ).checkout.sessions.retrieve(order.stripeId);
     const result = await createPrintifyOrder(order.id, session, { allowRetry: true });
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   } catch {

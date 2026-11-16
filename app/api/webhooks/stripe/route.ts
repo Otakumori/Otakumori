@@ -11,6 +11,10 @@ import {
   PREVIEW_EXTERNAL_MUTATION_ERROR,
   isVercelPreview,
 } from '@/app/lib/security/previewIsolation';
+import {
+  attestStripeMerchantAccount,
+  readStripeMerchantConfiguration,
+} from '@/lib/stripe/merchant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -115,6 +119,16 @@ export async function POST(req: Request) {
       err instanceof Error ? err : new Error(String(err)),
     );
     return new NextResponse('Invalid signature', { status: 400 });
+  }
+
+  try {
+    readStripeMerchantConfiguration(env);
+    await attestStripeMerchantAccount(stripe, env);
+  } catch {
+    return NextResponse.json(
+      { ok: false, retry: true, error: 'Webhook processing is temporarily unavailable.' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   try {

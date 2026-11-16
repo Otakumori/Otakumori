@@ -18,14 +18,10 @@ vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn(),
 }));
 
-vi.mock('stripe', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    checkout: {
-      sessions: {
-        create: stripeSessionCreate,
-      },
-    },
-  })),
+vi.mock('@/app/lib/stripe', () => ({
+  getVerifiedStripeClient: async () => ({
+    checkout: { sessions: { create: stripeSessionCreate } },
+  }),
 }));
 
 vi.mock('@/env', () => ({

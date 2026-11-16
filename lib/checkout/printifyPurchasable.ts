@@ -23,6 +23,7 @@ export type PrintifyPurchasableLineItem = {
   currency: string;
   printifyProductId: string;
   printifyVariantId: number;
+  taxCode: string | null;
 };
 
 export type PrintifyPurchasableErrorCode =
@@ -97,6 +98,7 @@ export function validateLoadedPrintifyPurchasableLineItem(
       currency: variant.currency ?? 'USD',
       printifyProductId: product.printifyProductId,
       printifyVariantId: variant.printifyVariantId,
+      taxCode: product.taxCode,
     },
   };
 }

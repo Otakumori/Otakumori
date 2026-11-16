@@ -2,14 +2,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   runtimeEnv: {
-    STRIPE_SECRET_KEY: 'stripe-test-key-fixture' as string | undefined,
+    STRIPE_SECRET_KEY: 'sk_test_fixture' as string | undefined,
     STRIPE_WEBHOOK_SECRET: 'stripe-webhook-secret-fixture' as string | undefined,
+    STRIPE_EXPECTED_ACCOUNT_ID: 'acct_1RwMJgHN4OLBC1u4',
+    STRIPE_MODE: 'test',
   },
   signature: 'test_signature' as string | null,
   stripeConstructor: vi.fn(),
   constructEvent: vi.fn(),
   event: null as any,
   retrieveSession: vi.fn(),
+  retrieveCurrentAccount: vi.fn(),
   eventCreate: vi.fn(),
   eventFind: vi.fn(),
   eventUpdate: vi.fn(),
@@ -40,6 +43,7 @@ vi.mock('stripe', () => ({
     }
     webhooks = { constructEvent: mocks.constructEvent };
     checkout = { sessions: { retrieve: mocks.retrieveSession } };
+    accounts = { retrieveCurrent: mocks.retrieveCurrentAccount };
   },
 }));
 vi.mock('@/lib/db', () => ({
@@ -89,10 +93,14 @@ function checkoutEvent() {
 describe('Stripe webhook closure', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.runtimeEnv.STRIPE_SECRET_KEY = 'stripe-test-key-fixture';
+    mocks.runtimeEnv.STRIPE_SECRET_KEY = 'sk_test_fixture';
     mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = 'stripe-webhook-secret-fixture';
     mocks.signature = 'test_signature';
     mocks.preview = false;
+    process.env.STRIPE_SECRET_KEY = 'sk_test_fixture';
+    process.env.STRIPE_EXPECTED_ACCOUNT_ID = 'acct_1RwMJgHN4OLBC1u4';
+    process.env.STRIPE_MODE = 'test';
+    mocks.retrieveCurrentAccount.mockResolvedValue({ id: 'acct_1RwMJgHN4OLBC1u4', country: 'US' });
     mocks.event = checkoutEvent();
     mocks.constructEvent.mockImplementation(() => mocks.event);
     mocks.eventCreate.mockResolvedValue({});

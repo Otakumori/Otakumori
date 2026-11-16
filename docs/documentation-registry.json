@@ -146,6 +146,16 @@
       "verification": "corepack pnpm exec vitest run __tests__/docs/repository-operating-contract.test.ts"
     },
     {
+      "path": "docs/operations/commerce-finance-readiness.md",
+      "domain": "commerce-operations",
+      "status": "current-reference",
+      "owner": "commerce-operations",
+      "lastVerifiedDate": "2026-11-16",
+      "maintenance": "manual",
+      "verification": "corepack pnpm docs:security:check",
+      "warning": "Engineering prerequisites only; this document does not authorize payment, fulfillment, tax, banking, provider, environment, deployment, or database operations."
+    },
+    {
       "path": "docs/qa/game-beta-acceptance.json",
       "domain": "game-release-acceptance",
       "status": "canonical",

@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { resolveCatalogProvider } from '@/lib/catalog/provider';
+import { taxRegistrationState } from '@/lib/finance/tax-registry';
 
 export type PaidOrderLedgerInput = {
   orderId: string;
@@ -53,6 +54,11 @@ export async function capturePaidOrderLedger(input: PaidOrderLedgerInput) {
     paymentIntentId: input.paymentIntentId,
     jurisdiction: input.jurisdiction,
   };
+  const taxCodes = Array.from(
+    new Set(
+      order.OrderItem.map((item) => item.taxCode).filter((code): code is string => Boolean(code)),
+    ),
+  );
 
   const rows: LedgerCreate[] = [
     {
@@ -111,7 +117,16 @@ export async function capturePaidOrderLedger(input: PaidOrderLedgerInput) {
       description: `Tax collected for order ${order.displayNumber}`,
       category: 'tax_collected',
       stripeChargeId: input.chargeId,
-      metadata: source as Prisma.InputJsonObject,
+      metadata: {
+        ...source,
+        calculationProvenance: 'stripe_checkout_total_details',
+        taxCodes,
+        registrationState: taxRegistrationState(
+          input.jurisdiction.country,
+          input.jurisdiction.state,
+        ),
+        refundAdjustmentCents: 0,
+      } as Prisma.InputJsonObject,
       createdAt: order.paidAt ?? new Date(),
     });
   }

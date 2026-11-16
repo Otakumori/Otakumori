@@ -21,7 +21,9 @@ vi.mock('@/lib/db', () => ({ db: { order: { findUnique: mocks.findOrder } } }));
 vi.mock('@/app/lib/stripe', () => {
   mocks.providerModuleLoads('stripe');
   return {
-    getStripeClient: () => ({ checkout: { sessions: { retrieve: mocks.retrieveSession } } }),
+    getVerifiedStripeClient: async () => ({
+      checkout: { sessions: { retrieve: mocks.retrieveSession } },
+    }),
   };
 });
 vi.mock('@/lib/fulfillment/printify', () => {
