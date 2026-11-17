@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
 
 export const metadata = {
   title: 'Closed Beta Access | Otaku-mori',
@@ -24,12 +23,12 @@ export default function BetaAccessPage() {
           place outside the gate is preserved—there is no attendance penalty or expiring progress.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href={buildCanonicalSignInUrl('/')}
+          <Link
+            href="/sign-in?redirect_url=%2F"
             className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#d1a45c]/60 bg-[#7d293f] px-6 py-3 font-semibold text-white transition hover:bg-[#91334c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0bdca]"
           >
             Sign in with an invitation
-          </a>
+          </Link>
           <Link
             href="/terms"
             className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-6 py-3 font-semibold text-[#e4d7cc] transition hover:border-white/30 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0bdca]"

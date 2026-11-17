@@ -1,4 +1,6 @@
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import BetaAccessPage from '@/app/beta-access/page';
 import {
   hasBetaAccess,
   isBetaCheckoutBlocked,
@@ -7,6 +9,13 @@ import {
 } from '@/app/lib/auth/betaAccess';
 
 describe('closed beta access policy', () => {
+  it('routes Preview invitations through the request-aware local sign-in shim', () => {
+    const html = renderToStaticMarkup(BetaAccessPage());
+
+    expect(html).toContain('href="/sign-in?redirect_url=%2F"');
+    expect(html).not.toContain('redirect_url=https%3A%2F%2Fwww.otaku-mori.com');
+  });
+
   it('allows only server-issued beta claims or admins', () => {
     expect(hasBetaAccess({ public_metadata: { betaAccess: true } })).toBe(true);
     expect(hasBetaAccess({ metadata: { betaAccess: true } })).toBe(true);

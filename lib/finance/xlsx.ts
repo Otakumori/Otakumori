@@ -1,7 +1,9 @@
 import 'server-only';
 
 import ExcelJS from 'exceljs';
-import type { loadFinanceReport } from './reporting';
+import { spreadsheetSafeText, type loadFinanceReport } from './reporting';
+
+export { spreadsheetSafeText } from './reporting';
 
 type FinanceReport = Awaited<ReturnType<typeof loadFinanceReport>>;
 
@@ -13,11 +15,6 @@ const BRAND = {
   muted: 'D8CEC8',
   warning: 'F4C76A',
 };
-
-export function spreadsheetSafeText(value: unknown): string {
-  const text = value == null ? '' : String(value);
-  return /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
-}
 
 function addSheet(
   workbook: ExcelJS.Workbook,

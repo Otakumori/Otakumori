@@ -277,9 +277,15 @@ export async function loadFinanceReport(period: FinancePeriod) {
   };
 }
 
+export function spreadsheetSafeText(value: unknown): string {
+  const text = value == null ? '' : String(value);
+  return /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+}
+
 function csvCell(value: unknown) {
-  const text =
+  const raw =
     value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+  const text = spreadsheetSafeText(raw);
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
