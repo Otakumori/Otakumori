@@ -4,15 +4,12 @@ import { env } from '@/env.mjs';
 
 // Database singleton for server-side use only
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const databaseUrl = env.DATABASE_URL;
 
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: {
-      db: {
-        url: env.DATABASE_URL,
-      },
-    },
+    ...(databaseUrl ? { datasources: { db: { url: databaseUrl } } } : {}),
     log: ['query', 'error', 'warn'],
     errorFormat: 'pretty',
   });
@@ -84,6 +81,7 @@ export class DatabaseAccess {
       clerkId: clerkUser.id,
       email: clerkUser.emailAddresses?.[0]?.emailAddress || '',
       username: clerkUser.username || `user_${clerkUser.id.slice(0, 8)}`,
+      visibility: 'private',
     };
     if (updateDisplayName) createData.display_name = updateDisplayName;
     if (updateAvatar) createData.avatarUrl = updateAvatar;

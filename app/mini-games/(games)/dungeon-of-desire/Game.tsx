@@ -15,6 +15,7 @@ import DungeonGame from './DungeonGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 import { useGameProgress } from '@/app/lib/games/progress';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
 
 type DungeonResult = GameSessionResult & {
   outcome: 'completed';
@@ -32,6 +33,7 @@ export default function DungeonOfDesireGameWrapper() {
   const completionSubmittedRef = useRef(false);
   const startedAtRef = useRef(0);
   const { beginResultSession, recordResult } = useGameProgress();
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
     health: 100,
@@ -62,12 +64,13 @@ export default function DungeonOfDesireGameWrapper() {
       session.complete(result);
       void recordResult({
         gameId: 'dungeon-of-desire',
+        resultKey: 'ten-floor-expedition',
         score,
         difficulty: 'medium',
         durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
         didWin,
         metadata: { floor, wavesCleared: floor },
-      });
+      }).then((saved) => setPersonalBest(saved.personalBest ?? null));
     },
     [recordResult, session.complete],
   );
@@ -140,6 +143,7 @@ export default function DungeonOfDesireGameWrapper() {
               title="Dungeon of Desire"
               score={gameResults.score}
               isWin={gameResults.didWin}
+              personalBest={personalBest}
               stats={[
                 { label: 'Final Score', value: gameResults.score },
                 { label: 'Floor Reached', value: gameResults.floor },
@@ -149,6 +153,7 @@ export default function DungeonOfDesireGameWrapper() {
                 setGameResults(null);
                 completionSubmittedRef.current = false;
                 setGameStats({ score: 0, health: 100, maxHealth: 100, floor: 1, progress: 0 });
+                setPersonalBest(null);
                 session.restart();
                 transitionTo('title');
               }}
@@ -172,8 +177,8 @@ export default function DungeonOfDesireGameWrapper() {
               />
               <DungeonGame
                 paused={session.phase === 'paused'}
-                onGameEnd={(score, didWin) => {
-                  handleGameEnd(score, didWin, gameStats.floor);
+                onGameEnd={(score, didWin, floor) => {
+                  handleGameEnd(score, didWin, floor);
                   transitionTo('results');
                 }}
                 onStatsUpdate={handleGameStatsUpdate}

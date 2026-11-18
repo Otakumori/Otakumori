@@ -13,6 +13,13 @@ const trimmedEnv = Object.fromEntries(
 // Assign back to process.env
 Object.assign(process.env, trimmedEnv);
 
+// Server-only consumers that must validate request-time credential rotation use this
+// accessor rather than retaining the createEnv snapshot. Callers still validate every
+// value before use and must never return the resulting object to a client.
+export function getRuntimeEnvironment() {
+  return process.env;
+}
+
 export const env = createEnv({
   /**
    * Server-side environment validation.
@@ -26,6 +33,8 @@ export const env = createEnv({
     PRISMA_ACCELERATE_API_KEY: z.string().optional(),
     STRIPE_SECRET_KEY: z.string(),
     STRIPE_WEBHOOK_SECRET: z.string(),
+    STRIPE_EXPECTED_ACCOUNT_ID: z.literal('acct_1RwMJgHN4OLBC1u4').optional(),
+    STRIPE_MODE: z.enum(['test', 'live']).optional(),
     CLERK_SECRET_KEY: z.string(),
     CLERK_PROXY_URL: z.string().url().optional(),
     CLERK_WEBHOOK_SECRET: z.string().optional(),
@@ -42,6 +51,7 @@ export const env = createEnv({
     MERCHIZE_LOCAL_IMPORT_ENABLED: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
+    OTM_PREVIEW_REDIS_ISOLATED: z.enum(['1']).optional(),
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
     BLOB_READ_WRITE_URL: z.string().optional(),
     BLOB_PUBLIC_BASE_URL: z.string().optional(),
@@ -192,6 +202,8 @@ export const env = createEnv({
     PRISMA_ACCELERATE_API_KEY: process.env.PRISMA_ACCELERATE_API_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_EXPECTED_ACCOUNT_ID: process.env.STRIPE_EXPECTED_ACCOUNT_ID,
+    STRIPE_MODE: process.env.STRIPE_MODE,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     CLERK_PROXY_URL: process.env.CLERK_PROXY_URL,
     CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
@@ -208,6 +220,7 @@ export const env = createEnv({
     MERCHIZE_LOCAL_IMPORT_ENABLED: process.env.MERCHIZE_LOCAL_IMPORT_ENABLED,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    OTM_PREVIEW_REDIS_ISOLATED: process.env.OTM_PREVIEW_REDIS_ISOLATED,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     BLOB_READ_WRITE_URL: process.env.BLOB_READ_WRITE_URL,
     BLOB_PUBLIC_BASE_URL: process.env.BLOB_PUBLIC_BASE_URL,

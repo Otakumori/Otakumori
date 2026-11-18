@@ -1,6 +1,8 @@
 import { env } from '@/env';
 import { db as prisma } from '@/lib/db';
 import { resolveCatalogProvider } from '@/lib/catalog/provider';
+import { assertExternalMutationAllowed } from '@/app/lib/security/previewIsolation';
+import { getFulfillmentSubmissionPolicy } from '@/lib/fulfillment/admission';
 
 export interface PrintifyAddress {
   first_name: string;
@@ -31,6 +33,7 @@ export interface PrintifyOrderPayload {
 
 export interface PrintifyOrderResult {
   ok: boolean;
+  code?: string;
   printifyOrderId?: string;
   status?: string;
   error?: string;
@@ -126,6 +129,13 @@ export async function createPrintifyOrder(
   session: any,
   options: PrintifyFulfillmentOptions = {},
 ): Promise<PrintifyOrderResult> {
+  const admission = getFulfillmentSubmissionPolicy();
+  if (!admission.enabled) {
+    return { ok: false, code: admission.code, error: admission.message };
+  }
+
+  assertExternalMutationAllowed('printify-fulfillment');
+
   const existingSync = await prisma.printifyOrderSync.findUnique({
     where: { localOrderId },
   });

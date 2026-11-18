@@ -15,7 +15,14 @@ export interface GameOverlayProps {
   loseMessage?: string;
   score?: number;
   petalReward?: number | null;
-  achievements?: Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }> | any;
+  personalBest?: {
+    currentBest: number | null;
+    isNewBest: boolean;
+    status: 'new_best' | 'unchanged' | 'unavailable';
+  } | null;
+  achievements?:
+    | Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>
+    | any;
   onRestart?: () => void;
   onResume?: () => void;
   onPause?: () => void;
@@ -34,6 +41,7 @@ export function GameOverlay({
   loseMessage,
   score,
   petalReward,
+  personalBest,
   achievements,
   onRestart,
   onResume,
@@ -96,6 +104,19 @@ export function GameOverlay({
             {score !== undefined && (
               <p className="text-2xl font-bold mb-4" style={{ color: palette.accent }}>
                 Final Score: {score.toLocaleString()}
+              </p>
+            )}
+            {personalBest &&
+              personalBest.status !== 'unavailable' &&
+              personalBest.currentBest !== null && (
+                <p className="mb-4 text-sm font-semibold" style={{ color: palette.petals }}>
+                  {personalBest.isNewBest ? 'New personal best' : 'Personal best'}:{' '}
+                  {personalBest.currentBest.toLocaleString()}
+                </p>
+              )}
+            {personalBest?.status === 'unavailable' && (
+              <p className="mb-4 text-sm" role="status" style={{ color: palette.softPink }}>
+                Score not saved. Your completed run is still shown here.
               </p>
             )}
             {petalReward !== null && petalReward !== undefined && petalReward > 0 && (

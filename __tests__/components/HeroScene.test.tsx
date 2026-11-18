@@ -24,14 +24,43 @@ function stubMatchMedia(matches: boolean) {
 }
 
 async function renderHeroScene() {
-  const [{ default: HeroScene }, { HomeSceneProvider }] = await Promise.all([
+  const [{ default: HeroScene }, { HomeSceneProvider, useHomeSceneContext }] = await Promise.all([
     import('@/app/components/hero/HeroScene'),
     import('@/app/components/hero/HomeSceneContext'),
   ]);
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+    width: 1280,
+    height: 900,
+    top: 0,
+    right: 1280,
+    bottom: 900,
+    left: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  });
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    },
+  );
+
+  function SceneFixture() {
+    const { surfaceRef } = useHomeSceneContext();
+
+    return (
+      <div ref={surfaceRef}>
+        <HeroScene />
+      </div>
+    );
+  }
 
   return render(
     <HomeSceneProvider>
-      <HeroScene />
+      <SceneFixture />
     </HomeSceneProvider>,
   );
 }

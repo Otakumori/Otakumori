@@ -572,6 +572,29 @@ model FinancialTransaction {
   @@index([stripeRefundId])
 }
 
+model FinancialReportExport {
+  id                String   @id @default(cuid())
+  merchantAccountId String
+  environment       String
+  periodStart       DateTime
+  periodEnd         DateTime
+  timezone          String
+  accountingMethod  String
+  reportVersion     String
+  sourceDigest      String
+  fileName          String
+  status            String
+  generatedBy       String
+  rowCounts         Json
+  limitations       Json
+  createdAt         DateTime @default(now())
+
+  @@unique([merchantAccountId, environment, periodStart, periodEnd, reportVersion, sourceDigest], map: "FinancialReportExport_period_source_key")
+  @@index([periodStart, periodEnd])
+  @@index([createdAt])
+  @@index([status])
+}
+
 model Follow {
   followerId                   String
   followeeId                   String
@@ -938,6 +961,7 @@ model OrderItem {
   printifyProductId String?
   printifyVariantId Int?
   upc               String?
+  taxCode           String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   Order             Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -1211,6 +1235,7 @@ model Product {
   blueprintId       Int?
   printProviderId   Int?
   tags              String[]           @default([])
+  taxCode           String?            @map("tax_code")
   options           Json?
   specs             Json?
   lastSyncedAt      DateTime?          @map("last_synced_at")
@@ -1801,7 +1826,7 @@ model User {
   bannerUrl                                             String?
   bio                                                   String?
   location                                              String?
-  visibility                                            String                   @default("public")
+  visibility                                            String                   @default("private")
   website                                               String?
   avatarBundle                                          Json?
   avatarConfig                                          Json?

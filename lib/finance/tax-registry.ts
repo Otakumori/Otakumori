@@ -34,3 +34,14 @@ export const STRIPE_TAX_READINESS = {
     'Stripe Checkout automatic_tax remains disabled.',
   ],
 } as const;
+
+export function taxRegistrationState(country: string | null, state: string | null) {
+  const jurisdiction = [country, state].filter(Boolean).join('-').toUpperCase();
+  const registration = TAX_REGISTRATIONS.find(
+    (candidate) => candidate.jurisdiction.toUpperCase() === jurisdiction,
+  );
+  if (!registration) return 'unverified' as const;
+  return registration.registered && registration.status === 'configured'
+    ? ('registered' as const)
+    : registration.status;
+}

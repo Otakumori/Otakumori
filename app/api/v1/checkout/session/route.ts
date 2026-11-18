@@ -1,7 +1,7 @@
 export const runtime = 'nodejs';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 import { createHash } from 'node:crypto';
 import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
@@ -20,13 +20,7 @@ import { generateRequestId } from '@/lib/requestId';
 import { checkIdempotency, storeIdempotencyResponse } from '@/app/lib/idempotency';
 import { validatePrintifyPurchasableLineItem } from '@/lib/checkout/printifyPurchasable';
 import { getCheckoutAdmissionPolicy } from '@/lib/checkout/admission';
-
-function getStripeClient() {
-  return new Stripe(env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-10-29.clover',
-    typescript: true,
-  });
-}
+import { getVerifiedStripeClient } from '@/app/lib/stripe';
 
 function isHttpUrl(value: unknown): value is string {
   return typeof value === 'string' && /^https?:\/\//i.test(value);
@@ -68,7 +62,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const stripe = getStripeClient();
+      const stripe = await getVerifiedStripeClient();
 
       stage = 'auth';
       const viewer = await requireLocalViewer();
@@ -143,6 +137,7 @@ export async function POST(req: NextRequest) {
           currency: validation.item.currency,
           printifyProductId: validation.item.printifyProductId,
           printifyVariantId: validation.item.printifyVariantId,
+          taxCode: validation.item.taxCode,
           variantId: validation.item.variantId,
           productId: validation.item.productId,
         });
@@ -353,6 +348,7 @@ export async function POST(req: NextRequest) {
             printifyProductId: item.printifyProductId,
             printifyVariantId:
               typeof item.printifyVariantId === 'number' ? item.printifyVariantId : null,
+            taxCode: item.taxCode ?? null,
           },
         });
       }
@@ -374,6 +370,9 @@ export async function POST(req: NextRequest) {
         if (Array.isArray(i.images)) {
           const validImages = i.images.filter(isHttpUrl).slice(0, 8);
           if (validImages.length > 0) productData.images = validImages;
+        }
+        if (typeof i.taxCode === 'string' && i.taxCode.trim()) {
+          productData.tax_code = i.taxCode.trim();
         }
         return {
           price_data: {

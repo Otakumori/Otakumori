@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   findOrder: vi.fn(),
   retrieveSession: vi.fn(),
   createPrintifyOrder: vi.fn(),
+  fulfillmentPolicy: vi.fn(),
 }));
 
 vi.mock('@/app/lib/auth/admin', () => ({
@@ -19,12 +20,19 @@ vi.mock('@/app/lib/auth/admin', () => ({
 vi.mock('@/lib/db', () => ({ db: { order: { findUnique: mocks.findOrder } } }));
 vi.mock('@/app/lib/stripe', () => {
   mocks.providerModuleLoads('stripe');
-  return { stripe: { checkout: { sessions: { retrieve: mocks.retrieveSession } } } };
+  return {
+    getVerifiedStripeClient: async () => ({
+      checkout: { sessions: { retrieve: mocks.retrieveSession } },
+    }),
+  };
 });
 vi.mock('@/lib/fulfillment/printify', () => {
   mocks.providerModuleLoads('printify');
   return { createPrintifyOrder: mocks.createPrintifyOrder };
 });
+vi.mock('@/lib/fulfillment/admission', () => ({
+  getFulfillmentSubmissionPolicy: mocks.fulfillmentPolicy,
+}));
 
 import { POST } from '@/app/api/admin/orders/[id]/fulfillment/route';
 
@@ -44,6 +52,11 @@ describe('commerce fulfillment recovery', () => {
     mocks.authorize.mockResolvedValue(null);
     mocks.retrieveSession.mockResolvedValue({ id: 'cs_test_1' });
     mocks.createPrintifyOrder.mockResolvedValue({ ok: true, printifyOrderId: 'po_1' });
+    mocks.fulfillmentPolicy.mockReturnValue({
+      enabled: true,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+      message: 'Fulfillment submission is temporarily disabled pending operational verification.',
+    });
   });
 
   afterEach(() => {
@@ -63,9 +76,7 @@ describe('commerce fulfillment recovery', () => {
     [403, 'FORBIDDEN'],
   ])('fails closed with %i before loading providers', async (status, code) => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    mocks.authorize.mockResolvedValue(
-      Response.json({ ok: false, error: code }, { status }),
-    );
+    mocks.authorize.mockResolvedValue(Response.json({ ok: false, error: code }, { status }));
 
     const response = await POST(request({}) as never, context);
 
@@ -121,6 +132,34 @@ describe('commerce fulfillment recovery', () => {
     );
 
     expect(response.status).toBe(409);
+    expect(mocks.providerModuleLoads).not.toHaveBeenCalled();
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('returns a stable 503 before loading providers while fulfillment is disabled', async () => {
+    mocks.findOrder.mockResolvedValue({
+      id: 'order_1',
+      stripeId: 'cs_test_1',
+      paidAt: new Date(),
+      PrintifyOrderSync: { status: 'failed' },
+    });
+    mocks.fulfillmentPolicy.mockReturnValue({
+      enabled: false,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+      message: 'Fulfillment submission is temporarily disabled pending operational verification.',
+    });
+
+    const response = await POST(
+      request({ action: 'retry', confirmation: 'RETRY PRINTIFY FULFILLMENT' }) as never,
+      context,
+    );
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+    });
     expect(mocks.providerModuleLoads).not.toHaveBeenCalled();
     expect(mocks.retrieveSession).not.toHaveBeenCalled();
     expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();

@@ -5,6 +5,7 @@ import {
   CHECKOUT_TEMPORARILY_DISABLED_MESSAGE,
 } from '@/lib/checkout/contract';
 import { env } from '@/env';
+import { isStripeMerchantConfigurationValid } from '@/lib/stripe/merchant';
 
 type CheckoutAdmissionInputs = {
   releaseAuthorized: boolean;
@@ -23,7 +24,7 @@ export function evaluateCheckoutAdmission(inputs: CheckoutAdmissionInputs): bool
 export function getCheckoutAdmissionPolicy() {
   const enabled = evaluateCheckoutAdmission({
     releaseAuthorized: RELEASE_AUTHORIZED,
-    checkoutConfigured: Boolean(env.STRIPE_SECRET_KEY),
+    checkoutConfigured: Boolean(env.STRIPE_SECRET_KEY) && isStripeMerchantConfigurationValid(env),
     fulfillmentVerified:
       FULFILLMENT_VERIFIED && Boolean(env.PRINTIFY_API_KEY && env.PRINTIFY_SHOP_ID),
   });

@@ -38,7 +38,7 @@ interface GameState {
   beatAccuracy: number; // 0-100%
   timeElapsed?: number; // For survival mode
   startTime?: number; // For survival mode
-  }
+}
 
 interface Player {
   x: number;
@@ -55,7 +55,7 @@ interface Player {
   comboCount: number;
   beatMultiplier: number;
   comboChain: number; // Chain of successful hits
-  }
+}
 
 interface Enemy {
   id: string;
@@ -81,21 +81,23 @@ interface BeatIndicator {
   opacity: number;
   size: number;
   perfect: boolean;
-  }
+}
 
 interface Props {
   mode: GameMode;
   paused?: boolean;
   onGameEnd?: (score: number, didWin: boolean) => void;
-  onStatsUpdate?: (stats: { score: number; health: number; maxHealth: number; combo: number; wavesCleared: number; progress?: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    health: number;
+    maxHealth: number;
+    combo: number;
+    wavesCleared: number;
+    progress?: number;
+  }) => void;
 }
 
-export default function BeatEmUpGame({
-  mode,
-  paused,
-  onGameEnd,
-  onStatsUpdate,
-}: Props) {
+export default function BeatEmUpGame({ mode, paused, onGameEnd, onStatsUpdate }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(800);
@@ -174,9 +176,10 @@ export default function BeatEmUpGame({
   // Update stats via callback
   useEffect(() => {
     if (gameState.wave > 0 && onStatsUpdate) {
-      const progress = mode === 'survival' 
-        ? Math.min(1.0, (gameState.timeElapsed || 0) / 300) // 5 minutes max for survival
-        : gameState.wave / 10; // Assuming 10 waves max for story/arcade
+      const progress =
+        mode === 'survival'
+          ? Math.min(1.0, (gameState.timeElapsed || 0) / 300) // 5 minutes max for survival
+          : gameState.wave / 10; // Assuming 10 waves max for story/arcade
       onStatsUpdate({
         score: gameState.score,
         health: gameState.health,
@@ -186,7 +189,16 @@ export default function BeatEmUpGame({
         progress,
       });
     }
-  }, [gameState.score, gameState.health, gameState.maxHealth, gameState.combo, gameState.wave, gameState.timeElapsed, mode, onStatsUpdate]);
+  }, [
+    gameState.score,
+    gameState.health,
+    gameState.maxHealth,
+    gameState.combo,
+    gameState.wave,
+    gameState.timeElapsed,
+    mode,
+    onStatsUpdate,
+  ]);
 
   // BPM and rhythm settings
   const BPM = 128; // Beats per minute
@@ -318,7 +330,6 @@ export default function BeatEmUpGame({
         playerRef.current.state = 'block';
         playerRef.current.blockCooldown = 500;
       }
-
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -343,6 +354,7 @@ export default function BeatEmUpGame({
   // Perform player attack
   const performAttack = useCallback(
     (attackType: 'light' | 'heavy' = 'light') => {
+      if (isPausedRef.current) return;
       const player = playerRef.current;
 
       if (attackType === 'heavy' && player.heavyAttackCooldown > 0) {
@@ -497,6 +509,21 @@ export default function BeatEmUpGame({
     [shake],
   );
 
+  const setTouchDirection = useCallback((key: string, active: boolean) => {
+    if (active && !isPausedRef.current) keysRef.current.add(key);
+    else keysRef.current.delete(key);
+  }, []);
+
+  const startTouchBlock = useCallback(() => {
+    if (isPausedRef.current || playerRef.current.blockCooldown > 0) return;
+    playerRef.current.state = 'block';
+    playerRef.current.blockCooldown = 500;
+  }, []);
+
+  const stopTouchBlock = useCallback(() => {
+    if (playerRef.current.state === 'block') playerRef.current.state = 'idle';
+  }, []);
+
   useControllerFrames({
     enabled: !gameState.isGameOver,
     onFrame: (controller) => {
@@ -505,12 +532,7 @@ export default function BeatEmUpGame({
         else keysRef.current.delete(key);
       };
       const clearControllerDirections = () => {
-        for (const key of [
-          'controllerleft',
-          'controllerright',
-          'controllerup',
-          'controllerdown',
-        ]) {
+        for (const key of ['controllerleft', 'controllerright', 'controllerup', 'controllerdown']) {
           keysRef.current.delete(key);
         }
       };
@@ -541,12 +563,7 @@ export default function BeatEmUpGame({
 
   useEffect(
     () => () => {
-      for (const key of [
-        'controllerleft',
-        'controllerright',
-        'controllerup',
-        'controllerdown',
-      ]) {
+      for (const key of ['controllerleft', 'controllerright', 'controllerup', 'controllerdown']) {
         keysRef.current.delete(key);
       }
     },
@@ -673,7 +690,7 @@ export default function BeatEmUpGame({
     if (!canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
-    
+
     // Size canvas based on container with DPR scaling
     const { ctx, cssWidth, cssHeight } = sizeCanvasFromContainer(canvas, containerRef.current);
     if (!ctx) return;
@@ -919,7 +936,7 @@ export default function BeatEmUpGame({
       // Wave progression - advance when all enemies defeated
       const aliveEnemies = enemiesRef.current.filter((e) => e.state !== 'dead');
       const currentWave = gameState.wave;
-      
+
       // Check for wave completion (only if we have enemies and they're all dead)
       if (
         enemiesRef.current.length > 0 &&
@@ -929,7 +946,7 @@ export default function BeatEmUpGame({
       ) {
         // Wave cleared! Advance to next wave
         const nextWave = currentWave + 1;
-        
+
         // Check mode-specific win conditions
         if (shouldCompleteStoryRun(mode, currentWave)) {
           // Story mode: Win after completing all waves
@@ -939,7 +956,7 @@ export default function BeatEmUpGame({
           }
           return;
         }
-        
+
         setGameState((prev) => ({
           ...prev,
           wave: nextWave,
@@ -973,7 +990,7 @@ export default function BeatEmUpGame({
         spawnEnemy(randomType);
         enemySpawnTimer = 0;
       }
-      
+
       // If no enemies exist and timer is ready, spawn initial wave
       if (
         enemiesRef.current.length === 0 &&
@@ -1010,7 +1027,7 @@ export default function BeatEmUpGame({
         }
         return;
       }
-      
+
       // Arcade mode: Endless waves (no win condition, only lose on death)
       // Story mode: Win after STORY_MAX_WAVES waves (checked above)
       // Survival mode: Win after time limit (checked above)
@@ -1033,13 +1050,13 @@ export default function BeatEmUpGame({
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     // Draw background using CSS variables
-    const bgColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--om-bg-root')
-      .trim() || '#1a1816';
-    const accentColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-primary')
-      .trim() || '#db2777';
-    
+    const bgColor =
+      getComputedStyle(document.documentElement).getPropertyValue('--om-bg-root').trim() ||
+      '#1a1816';
+    const accentColor =
+      getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() ||
+      '#db2777';
+
     const bgGradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
     bgGradient.addColorStop(0, bgColor);
     bgGradient.addColorStop(0.5, bgColor);
@@ -1062,9 +1079,9 @@ export default function BeatEmUpGame({
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // Draw ground line using CSS variables
-    const borderColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--om-border-soft')
-      .trim() || 'rgba(229, 224, 216, 0.15)';
+    const borderColor =
+      getComputedStyle(document.documentElement).getPropertyValue('--om-border-soft').trim() ||
+      'rgba(229, 224, 216, 0.15)';
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1169,9 +1186,11 @@ export default function BeatEmUpGame({
     });
 
     // Render beat indicators using design system colors
-    const petalColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-petal').trim() || '#eac8d6'
-      : '#eac8d6';
+    const petalColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-petal').trim() ||
+          '#eac8d6'
+        : '#eac8d6';
     beatIndicatorsRef.current.forEach((ind) => {
       ctx.save();
       ctx.globalAlpha = ind.opacity;
@@ -1185,9 +1204,11 @@ export default function BeatEmUpGame({
     });
 
     // Render beat track (top bar) using design system colors
-    const beatTrackBorderColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim() || 'rgba(235, 232, 247, 0.2)'
-      : 'rgba(235, 232, 247, 0.2)';
+    const beatTrackBorderColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim() ||
+          'rgba(235, 232, 247, 0.2)'
+        : 'rgba(235, 232, 247, 0.2)';
     ctx.fillStyle = beatTrackBorderColor;
     ctx.fillRect(canvasWidth - 120, 10, 100, 40);
     ctx.strokeStyle = petalColor;
@@ -1307,16 +1328,22 @@ export default function BeatEmUpGame({
     ctx.globalAlpha = 1.0;
 
     // Color based on type using design system colors
-    const petalColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-petal').trim() || '#eac8d6'
-      : '#eac8d6';
-    const errorColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-error').trim() || '#c97a7a'
-      : '#c97a7a';
-    const accentColor = typeof window !== 'undefined'
-      ? getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#ebe8f7'
-      : '#ebe8f7';
-    
+    const petalColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-petal').trim() ||
+          '#eac8d6'
+        : '#eac8d6';
+    const errorColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-error').trim() ||
+          '#c97a7a'
+        : '#c97a7a';
+    const accentColor =
+      typeof window !== 'undefined'
+        ? getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() ||
+          '#ebe8f7'
+        : '#ebe8f7';
+
     let color = petalColor;
     if (enemy.type === 'brute') color = errorColor;
     if (enemy.type === 'ninja') color = accentColor;
@@ -1467,8 +1494,8 @@ export default function BeatEmUpGame({
         </motion.div>
       )}
 
-      {/* HUD Overlay */}
-      <div className="absolute top-4 left-4 space-y-2">
+      {/* Detailed desktop telemetry; the shared HUD remains authoritative on mobile. */}
+      <div className="beat-em-up-runtime-hud absolute top-4 left-4 space-y-2">
         <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white border border-white/20">
           <div className="text-xs text-pink-300 mb-1">HEALTH</div>
           <div className="w-48 h-4 bg-black/50 rounded-full overflow-hidden border border-red-500/30">
@@ -1517,6 +1544,109 @@ export default function BeatEmUpGame({
           </div>
         )}
       </div>
+
+      <div aria-label="Touch combat controls" className="beat-em-up-touch-controls" role="group">
+        <div className="beat-em-up-touch-controls__movement" aria-label="Movement controls">
+          {[
+            ['w', '↑', 'Move up'],
+            ['a', '←', 'Move left'],
+            ['s', '↓', 'Move down'],
+            ['d', '→', 'Move right'],
+          ].map(([key, label, ariaLabel]) => (
+            <button
+              aria-label={ariaLabel}
+              key={key}
+              onPointerCancel={() => setTouchDirection(key, false)}
+              onPointerDown={(event) => {
+                event.preventDefault();
+                event.currentTarget.setPointerCapture(event.pointerId);
+                setTouchDirection(key, true);
+              }}
+              onPointerLeave={() => setTouchDirection(key, false)}
+              onPointerUp={(event) => {
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                }
+                setTouchDirection(key, false);
+              }}
+              type="button"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="beat-em-up-touch-controls__actions" aria-label="Combat controls">
+          <button onPointerDown={() => performAttack('light')} type="button">
+            Strike
+          </button>
+          <button onPointerDown={() => performAttack('heavy')} type="button">
+            Heavy
+          </button>
+          <button
+            onPointerCancel={stopTouchBlock}
+            onPointerDown={startTouchBlock}
+            onPointerLeave={stopTouchBlock}
+            onPointerUp={stopTouchBlock}
+            type="button"
+          >
+            Guard
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        .beat-em-up-touch-controls {
+          display: none;
+        }
+
+        @media (max-width: 767px), (pointer: coarse) {
+          .beat-em-up-runtime-hud {
+            display: none;
+          }
+
+          .beat-em-up-touch-controls {
+            position: absolute;
+            inset: auto 0.5rem 0.5rem;
+            z-index: 20;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 0.75rem;
+            pointer-events: none;
+          }
+
+          .beat-em-up-touch-controls button {
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            border: 1px solid rgba(251, 191, 36, 0.42);
+            border-radius: 999px;
+            background: rgba(20, 16, 14, 0.82);
+            color: #fff7ed;
+            font-size: 0.75rem;
+            font-weight: 700;
+            touch-action: none;
+            pointer-events: auto;
+          }
+
+          .beat-em-up-touch-controls__movement {
+            display: grid;
+            grid-template-columns: repeat(3, 2.75rem);
+            grid-template-areas: '. up .' 'left down right';
+            gap: 0.25rem;
+          }
+
+          .beat-em-up-touch-controls__movement button:nth-child(1) { grid-area: up; }
+          .beat-em-up-touch-controls__movement button:nth-child(2) { grid-area: left; }
+          .beat-em-up-touch-controls__movement button:nth-child(3) { grid-area: down; }
+          .beat-em-up-touch-controls__movement button:nth-child(4) { grid-area: right; }
+
+          .beat-em-up-touch-controls__actions {
+            display: flex;
+            align-items: end;
+            gap: 0.35rem;
+          }
+        }
+      `}</style>
 
       {/* Pause Screen */}
       {paused === undefined && gameState.isPaused && (

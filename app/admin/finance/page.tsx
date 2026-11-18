@@ -258,6 +258,19 @@ export default async function AdminFinancePage({
 
           <section className="rounded-xl border border-white/8 bg-white/[0.025] p-5">
             <h2 className="text-lg font-semibold">Exports</h2>
+            <p className="mt-2 text-sm text-[#9f9691]">
+              The accountant workbook contains source-backed ledgers, tax and fulfillment gaps,
+              reconciliation evidence, and methodology. It does not file or move money.
+            </p>
+            <form
+              className="mt-3"
+              action={`/api/admin/finance/export?year=${safeYear}${fromValue ? `&from=${encodeURIComponent(fromValue)}` : ''}${toValue ? `&to=${encodeURIComponent(toValue)}` : ''}`}
+              method="post"
+            >
+              <button className="inline-flex rounded border border-[#d98aa8]/45 bg-[#d98aa8]/12 px-4 py-2 text-sm font-semibold text-[#f5eee9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5eee9]">
+                Generate accountant XLSX
+              </button>
+            </form>
             <div className="mt-3 flex flex-wrap gap-2">
               {[
                 'pnl',

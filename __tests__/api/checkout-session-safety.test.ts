@@ -5,6 +5,7 @@ import { prisma } from '@/app/lib/prisma';
 import { LocalUserUnavailableError, requireLocalViewer } from '@/app/lib/auth/viewer';
 
 const stripeSessionCreate = vi.hoisted(() => vi.fn());
+const checkoutAdmission = vi.hoisted(() => ({ enabled: true }));
 
 vi.mock('@/app/lib/auth/viewer', () => ({
   AuthenticationRequiredError: class AuthenticationRequiredError extends Error {},
@@ -17,14 +18,10 @@ vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn(),
 }));
 
-vi.mock('stripe', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    checkout: {
-      sessions: {
-        create: stripeSessionCreate,
-      },
-    },
-  })),
+vi.mock('@/app/lib/stripe', () => ({
+  getVerifiedStripeClient: async () => ({
+    checkout: { sessions: { create: stripeSessionCreate } },
+  }),
 }));
 
 vi.mock('@/env', () => ({
@@ -45,7 +42,6 @@ vi.mock('@/app/lib/prisma', () => ({
   },
 }));
 
-
 vi.mock('@/app/lib/rateLimit', () => ({
   rateLimitConfigs: { api: {}, auth: {} },
   withRateLimit: vi.fn((_req, _config, handler) => handler()),
@@ -58,7 +54,7 @@ vi.mock('@/app/lib/idempotency', () => ({
 
 vi.mock('@/lib/checkout/admission', () => ({
   getCheckoutAdmissionPolicy: () => ({
-    enabled: true,
+    enabled: checkoutAdmission.enabled,
     code: 'CHECKOUT_TEMPORARILY_DISABLED',
     message: 'Checkout temporarily unavailable',
   }),
@@ -148,7 +144,9 @@ function merchizeProduct() {
 
 describe('checkout session safety gates', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
+    checkoutAdmission.enabled = true;
     vi.mocked(auth).mockResolvedValue({ userId: 'clerk_user_1' } as never);
     vi.mocked(requireLocalViewer).mockResolvedValue({
       clerkUserId: 'clerk_user_1',
@@ -158,6 +156,21 @@ describe('checkout session safety gates', () => {
       displayName: null,
       avatarUrl: null,
     });
+  });
+
+  it('/api/v1/checkout/session refuses disabled checkout before Stripe', async () => {
+    checkoutAdmission.enabled = false;
+    const mod = await import('../../app/api/v1/checkout/session/route');
+
+    const response = await mod.POST(request('http://localhost/api/v1/checkout/session'));
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      code: 'CHECKOUT_TEMPORARILY_DISABLED',
+      error: 'Checkout temporarily unavailable',
+    });
+    expect(stripeSessionCreate).not.toHaveBeenCalled();
+    expect(prisma.product.findUnique).not.toHaveBeenCalled();
   });
 
   it('/api/v1/checkout/session rejects hidden products before Stripe', async () => {
@@ -212,5 +225,4 @@ describe('checkout session safety gates', () => {
     expect(legacySession.maxDuration).toBe(10);
     expect(legacyCheckout).not.toHaveProperty('maxDuration');
   });
-
 });

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { db } from '@/lib/db';
+import { getFulfillmentSubmissionPolicy } from '@/lib/fulfillment/admission';
 
 export const runtime = 'nodejs';
 
@@ -12,10 +13,7 @@ const RetrySchema = z.object({
 
 const RETRYABLE_STATUSES = new Set(['failed', 'mapping_failed', 'no_items']);
 
-async function handlePost(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+async function handlePost(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const parsed = RetrySchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) {
@@ -50,11 +48,21 @@ async function handlePost(
       );
     }
 
-    const [{ stripe }, { createPrintifyOrder }] = await Promise.all([
+    const admission = getFulfillmentSubmissionPolicy();
+    if (!admission.enabled) {
+      return NextResponse.json(
+        { ok: false, code: admission.code, error: admission.message },
+        { status: 503 },
+      );
+    }
+
+    const [{ getVerifiedStripeClient }, { createPrintifyOrder }] = await Promise.all([
       import('@/app/lib/stripe'),
       import('@/lib/fulfillment/printify'),
     ]);
-    const session = await stripe.checkout.sessions.retrieve(order.stripeId);
+    const session = await (
+      await getVerifiedStripeClient()
+    ).checkout.sessions.retrieve(order.stripeId);
     const result = await createPrintifyOrder(order.id, session, { allowRetry: true });
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   } catch {

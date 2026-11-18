@@ -12,12 +12,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PhysicsCharacterRenderer } from '../../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../../_shared/enhancedTextures';
 import { sizeCanvasFromContainer, useResizeObserverHook } from '../../_engine/hiDpi';
+import { DUNGEON_FINAL_FLOOR, dungeonEnemyGrammar } from '../../_shared/secondaryGameContracts';
 
 interface Enemy {
   id: number;
   x: number;
   y: number;
-  type: 'succubus' | 'demon_lord';
+  type: 'succubus' | 'wraith' | 'demon_lord';
   health: number;
   maxHealth: number;
   speed: number;
@@ -55,7 +56,7 @@ export default function DungeonGame({
   onStatsUpdate,
   paused,
 }: {
-  onGameEnd?: (score: number, didWin: boolean) => void;
+  onGameEnd?: (score: number, didWin: boolean, floor: number) => void;
   onStatsUpdate?: (stats: {
     score: number;
     health: number;
@@ -72,6 +73,7 @@ export default function DungeonGame({
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(600);
   const animationRef = useRef<number | undefined>(undefined);
+  const endedRef = useRef(false);
   const keysRef = useRef<Set<string>>(new Set());
 
   // Physics renderers for enemies (Map<enemyId, PhysicsCharacterRenderer>)
@@ -105,7 +107,7 @@ export default function DungeonGame({
   // Update stats via callback
   useEffect(() => {
     if (gameState === 'playing' && onStatsUpdate) {
-      const progress = floor / 10; // Assuming 10 floors max, adjust as needed
+      const progress = Math.min(1, floor / DUNGEON_FINAL_FLOOR);
       onStatsUpdate({
         score,
         health: player.health,
@@ -177,6 +179,7 @@ export default function DungeonGame({
 
   // Initialize game
   const startGame = useCallback(() => {
+    endedRef.current = false;
     setGameState('playing');
     setFloor(1);
     setScore(0);
@@ -295,9 +298,10 @@ export default function DungeonGame({
 
   // Enemy spawning
   const spawnEnemy = useCallback(
-    (type: 'succubus' | 'demon_lord', spawnX: number) => {
+    (type: Enemy['type'], spawnX: number) => {
       const configs = {
         succubus: { health: 80, speed: 2, damage: 15 },
+        wraith: { health: 55, speed: 3.2, damage: 12 },
         demon_lord: { health: 200, speed: 1.2, damage: 30 },
       };
 
@@ -324,7 +328,7 @@ export default function DungeonGame({
         if (ctx) {
           const renderer = new PhysicsCharacterRenderer(
             ctx,
-            type === 'succubus' ? 'succubus' : 'demon_lord',
+            type === 'demon_lord' ? 'demon_lord' : 'succubus',
             { quality: 'high', enabled: true },
           );
           enemyRenderersRef.current.set(newEnemy.id, renderer);
@@ -339,26 +343,8 @@ export default function DungeonGame({
 
   // Generate room layout based on floor
   const generateRoomLayout = useCallback(
-    (floorNum: number, enemyCount: number): Array<'succubus' | 'demon_lord'> => {
-      const layout: Array<'succubus' | 'demon_lord'> = [];
-
-      // Boss room every 5 floors
-      if (floorNum % 5 === 0 && enemyCount > 0) {
-        layout.push('demon_lord');
-        enemyCount--;
-      }
-
-      // Mix of enemies based on floor
-      for (let i = 0; i < enemyCount; i++) {
-        const demonLordChance = Math.min(0.1 + floorNum * 0.05, 0.4); // More demon lords as floors increase
-        if (Math.random() < demonLordChance) {
-          layout.push('demon_lord');
-        } else {
-          layout.push('succubus');
-        }
-      }
-
-      return layout;
+    (floorNum: number, enemyCount: number): Enemy['type'][] => {
+      return Array.from({ length: enemyCount }, (_, slot) => dungeonEnemyGrammar(floorNum, slot));
     },
     [],
   );
@@ -459,7 +445,14 @@ export default function DungeonGame({
         const currentRoomIndex = Math.floor(gameTime / 1000 / 30); // Approximate room index
 
         if (currentRoomIndex >= roomsPerFloor - 1) {
-          // Floor cleared! Advance to next floor
+          if (floor >= DUNGEON_FINAL_FLOOR && !endedRef.current) {
+            endedRef.current = true;
+            const finalScore = score + 5000;
+            setScore(finalScore);
+            setGameState('victory');
+            onGameEnd?.(finalScore, true, floor);
+            return;
+          }
           setFloor((f) => {
             const newFloor = f + 1;
             // Award score bonus for floor completion
@@ -665,11 +658,12 @@ export default function DungeonGame({
       });
 
       // Check game over
-      if (player.health <= 0) {
+      if (player.health <= 0 && !endedRef.current) {
+        endedRef.current = true;
         setGameState('gameOver');
         // Notify parent of game over
         if (onGameEnd) {
-          onGameEnd(score, false); // didWin = false (health reached 0)
+          onGameEnd(score, false, floor); // didWin = false (health reached 0)
         }
       }
 

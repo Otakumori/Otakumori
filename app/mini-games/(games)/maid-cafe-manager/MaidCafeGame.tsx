@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useGameSave } from '../../_shared/SaveSystem';
 import { RUNTIME_FLAGS } from '@/constants.client';
+import { MAID_SHIFT_MS, maidShiftPhase } from '../../_shared/secondaryGameContracts';
 
 interface Customer {
   id: number;
@@ -15,7 +16,7 @@ interface Customer {
   orderTime?: number;
   serveTime?: number;
   tips: number;
-  }
+}
 
 interface MenuItem {
   id: string;
@@ -23,7 +24,7 @@ interface MenuItem {
   prepTime: number; // in seconds
   price: number;
   emoji: string;
-  }
+}
 
 interface Table {
   id: number;
@@ -31,7 +32,7 @@ interface Table {
   y: number;
   occupied: boolean;
   needsCleaning: boolean;
-  }
+}
 
 interface Order {
   id: number;
@@ -40,11 +41,16 @@ interface Order {
   status: 'preparing' | 'ready' | 'served';
   startTime: number;
   readyTime: number;
-  }
+}
 
 interface MaidCafeGameProps {
   onGameEnd?: (results: { score: number; money: number; level: number }) => void;
-  onStatsUpdate?: (stats: { score: number; combo: number; timer?: number; progress: number }) => void;
+  onStatsUpdate?: (stats: {
+    score: number;
+    combo: number;
+    timer?: number;
+    progress: number;
+  }) => void;
   paused?: boolean;
   onPauseChange?: (paused: boolean) => void;
   onExitSaveReady?: (save: () => void) => void;
@@ -79,6 +85,7 @@ export default function MaidCafeGame({
   // Game timing
   const [customerSpawnTimer, setCustomerSpawnTimer] = useState(0);
   const nextCustomerIdRef = useRef(1);
+  const endedRef = useRef(false);
 
   const { saveOnExit, autoSave } = useGameSave('maid-cafe-manager');
   const timeoutIdsRef = useRef<Set<number>>(new Set());
@@ -157,6 +164,7 @@ export default function MaidCafeGame({
 
   // Start game
   const startGame = useCallback(() => {
+    endedRef.current = false;
     setGameState('playing');
     setScore(0);
     setMoney(50);
@@ -216,9 +224,16 @@ export default function MaidCafeGame({
       const deltaTime = 100;
       setGameTime((prev) => prev + deltaTime);
 
+      if (gameTime >= MAID_SHIFT_MS && !endedRef.current) {
+        endedRef.current = true;
+        setGameState('gameOver');
+        return;
+      }
+
       // Update customer spawn timer
       setCustomerSpawnTimer((prev) => {
-        const spawnRate = Math.max(3000, 8000 - level * 500); // Faster spawning each level
+        const rushMultiplier = maidShiftPhase(gameTime) === 'rush' ? 0.55 : 1;
+        const spawnRate = Math.max(1800, (8000 - level * 500) * rushMultiplier);
         if (prev <= 0) {
           spawnCustomer();
           return spawnRate;
@@ -368,6 +383,7 @@ export default function MaidCafeGame({
         score,
         combo: 0, // Could track combo if needed
         progress: Math.min(1.0, score / 2000),
+        timer: Math.max(0, Math.ceil((MAID_SHIFT_MS - gameTime) / 1000)),
       });
     }
   }, [gameState, score, onStatsUpdate]);
@@ -376,7 +392,7 @@ export default function MaidCafeGame({
   useEffect(() => {
     if (gameState === 'gameOver') {
       saveCurrentShift();
-      
+
       // Notify parent component
       if (onGameEnd) {
         onGameEnd({ score, money, level });
@@ -496,7 +512,9 @@ export default function MaidCafeGame({
                     {order.item.emoji} {order.item.name}
                   </span>
                   <span className="text-xs">
-                    {order.status === 'ready' ? ' Ready!' : '⏱<span role="img" aria-label="emoji">️</span> Cooking...'}
+                    {order.status === 'ready'
+                      ? ' Ready!'
+                      : '⏱<span role="img" aria-label="emoji">️</span> Cooking...'}
                   </span>
                 </div>
               </div>

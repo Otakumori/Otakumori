@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { env } from '@/env';
 import type { PrintifyOrder, PrintifyOrderPayload } from './types';
+import { assertExternalMutationAllowed } from '@/app/lib/security/previewIsolation';
 
 const client = axios.create({
   baseURL: 'https://api.printify.com/v1',
@@ -20,6 +21,7 @@ export async function createPrintifyOrder(
   shopId: string,
   payload: PrintifyOrderPayload,
 ): Promise<PrintifyOrder> {
+  assertExternalMutationAllowed('printify-direct-order');
   const { data } = await client.post(`/shops/${shopId}/orders.json`, payload);
   return data;
 }

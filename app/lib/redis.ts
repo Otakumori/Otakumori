@@ -2,12 +2,14 @@
 import { logger } from '@/app/lib/logger';
 import { assertServer } from './server-only';
 import { env } from '@/env.mjs';
+import { assertPreviewRedisIsolation } from '@/app/lib/security/previewIsolation';
 import type { Redis } from 'ioredis';
 
 let _client: Redis | null = null;
 
 export async function getRedis() {
   assertServer();
+  assertPreviewRedisIsolation();
   if (_client) return _client;
 
   // Lazy import so nothing runs at build time

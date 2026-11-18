@@ -15,12 +15,14 @@ import ThighChaseGame from './ThighChaseGame';
 import { getAsset } from '../../_shared/assets-resolver';
 import type { AssetManifest } from '@/app/components/games/GameAssetPreloader';
 import { useGameProgress } from '@/app/lib/games/progress';
+import type { PersonalBestResult } from '@/app/lib/games/progress';
 
 type ThighColiseumResult = GameSessionResult & {
   outcome: 'completed';
   score: number;
   stage: number;
   didWin: boolean;
+  distance: number;
 };
 
 export default function ThighColiseumGameWrapper() {
@@ -32,11 +34,13 @@ export default function ThighColiseumGameWrapper() {
   const completionSubmittedRef = useRef(false);
   const startedAtRef = useRef(0);
   const { beginResultSession, recordResult } = useGameProgress();
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const [gameStats, setGameStats] = useState({
     score: 0,
     lives: 3,
     stage: 1,
     progress: 0,
+    distance: 0,
   });
 
   const gameAssets: AssetManifest = {
@@ -53,31 +57,39 @@ export default function ThighColiseumGameWrapper() {
   };
 
   const handleGameEnd = useCallback(
-    (score: number, didWin: boolean, stage: number) => {
+    (score: number, didWin: boolean, stage: number, distance: number) => {
       if (completionSubmittedRef.current) return;
       completionSubmittedRef.current = true;
-      const result: ThighColiseumResult = { outcome: 'completed', score, stage, didWin };
+      const result: ThighColiseumResult = { outcome: 'completed', score, stage, didWin, distance };
       setGameResults(result);
       session.complete(result);
       void recordResult({
         gameId: 'thigh-coliseum',
+        resultKey: 'expedition',
         score,
         difficulty: 'hard',
         durationMs: startedAtRef.current > 0 ? Date.now() - startedAtRef.current : 0,
         didWin,
-        metadata: { stage, wavesCleared: stage },
-      });
+        metadata: { stage, wavesCleared: stage, distance },
+      }).then((saved) => setPersonalBest(saved.personalBest ?? null));
     },
     [recordResult, session.complete],
   );
 
   const handleGameStatsUpdate = useCallback(
-    (stats: { score: number; lives: number; stage: number; progress?: number }) => {
+    (stats: {
+      score: number;
+      lives: number;
+      stage: number;
+      progress?: number;
+      distance: number;
+    }) => {
       setGameStats({
         score: stats.score,
         lives: stats.lives,
         stage: stats.stage,
         progress: stats.progress || 0,
+        distance: stats.distance,
       });
     },
     [],
@@ -135,12 +147,15 @@ export default function ThighColiseumGameWrapper() {
               stats={[
                 { label: 'Final Score', value: gameResults.score },
                 { label: 'Stage Reached', value: gameResults.stage },
+                { label: 'Final Distance', value: `${Math.floor(gameResults.distance)}m` },
                 { label: 'Result', value: gameResults.didWin ? 'Victory!' : 'Defeated' },
               ]}
+              personalBest={personalBest}
               onRestart={() => {
                 setGameResults(null);
                 completionSubmittedRef.current = false;
-                setGameStats({ score: 0, lives: 3, stage: 1, progress: 0 });
+                setGameStats({ score: 0, lives: 3, stage: 1, progress: 0, distance: 0 });
+                setPersonalBest(null);
                 session.restart();
                 transitionTo('title');
               }}
@@ -164,8 +179,8 @@ export default function ThighColiseumGameWrapper() {
               />
               <ThighChaseGame
                 paused={session.phase === 'paused'}
-                onGameEnd={(score, didWin) => {
-                  handleGameEnd(score, didWin, gameStats.stage);
+                onGameEnd={(score, didWin, distance) => {
+                  handleGameEnd(score, didWin, gameStats.stage, distance);
                   transitionTo('results');
                 }}
                 onStatsUpdate={handleGameStatsUpdate}

@@ -8,7 +8,7 @@ export interface ValidationIssue {
   type: ValidationIssueType;
   message: string;
   reference?: string;
-  }
+}
 
 export interface ValidationSummary {
   productsChecked: number;
@@ -16,7 +16,7 @@ export interface ValidationSummary {
   invalidProductCount: number;
   issues: ValidationIssue[];
   checkedAt: string;
-  }
+}
 
 function isValidHttpsUrl(url: string | undefined): boolean {
   if (!url) return false;
@@ -114,4 +114,9 @@ class EnhancedPrintifyService {
   }
 }
 
-export const enhancedPrintifyService = new EnhancedPrintifyService();
+let enhancedPrintifyService: EnhancedPrintifyService | null = null;
+
+export function getEnhancedPrintifyService(): EnhancedPrintifyService {
+  enhancedPrintifyService ??= new EnhancedPrintifyService();
+  return enhancedPrintifyService;
+}
