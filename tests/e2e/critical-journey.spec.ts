@@ -6,7 +6,6 @@ test.describe('Critical User Journey', () => {
     page,
   }: any) => {
     const localApplicationOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
-    let capturedClerkUrl: string | null = null;
     const applicationServerErrors: string[] = [];
     const checkoutOrPaymentRequests: string[] = [];
 
@@ -30,15 +29,6 @@ test.describe('Critical User Journey', () => {
       ) {
         checkoutOrPaymentRequests.push(url);
       }
-    });
-
-    await page.route('https://accounts.otaku-mori.com/sign-in**', async (route: any) => {
-      capturedClerkUrl = route.request().url();
-      await route.fulfill({
-        status: 200,
-        contentType: 'text/html',
-        body: '<!doctype html><title>Stubbed Clerk boundary</title><main>Stubbed Clerk sign-in boundary</main>',
-      });
     });
 
     // Navigate to home page
@@ -102,22 +92,21 @@ test.describe('Critical User Journey', () => {
 
     // Proceed to checkout
     const cartOrigin = new URL(page.url()).origin;
-    const authBoundaryRequest = page.waitForRequest((request: any) =>
-      request.url().startsWith('https://accounts.otaku-mori.com/sign-in'),
-    );
+    const authBoundaryRequest = page.waitForRequest((request: any) => {
+      const requestUrl = new URL(request.url());
+      return requestUrl.origin === cartOrigin && requestUrl.pathname === '/sign-in';
+    });
 
     await page.getByRole('link', { name: 'Proceed to Checkout' }).click();
     const authRequest = await authBoundaryRequest;
 
-    // The internal checkout route is protected. Without a real Clerk session,
-    // this journey must stop at the hosted Clerk boundary and preserve the
-    // same application origin without automating Clerk or Cloudflare.
-    await expect(page.getByText('Stubbed Clerk sign-in boundary')).toBeVisible({
-      timeout: 15000,
-    });
+    // The local/Preview journey must stop at the same-origin Development
+    // Clerk boundary without automating credentials or crossing into the
+    // Production Account Portal.
+    await page.waitForURL(/\/sign-in(?:\?|$)/, { timeout: 15000 });
 
-    const clerkUrl = new URL(capturedClerkUrl ?? authRequest.url());
-    expect(clerkUrl.origin).toBe('https://accounts.otaku-mori.com');
+    const clerkUrl = new URL(authRequest.url());
+    expect(clerkUrl.origin).toBe(cartOrigin);
     expect(clerkUrl.pathname).toBe('/sign-in');
 
     const redirectUrl = clerkUrl.searchParams.get('redirect_url');
@@ -127,6 +116,7 @@ test.describe('Critical User Journey', () => {
     expect(parsedRedirectUrl.origin).toBe(cartOrigin);
     expect(parsedRedirectUrl.pathname).toBe('/shop/checkout');
     expect(parsedRedirectUrl.origin).not.toBe('https://www.otaku-mori.com');
+    expect(clerkUrl.origin).not.toBe('https://accounts.otaku-mori.com');
 
     expect(applicationServerErrors).toEqual([]);
     expect(checkoutOrPaymentRequests).toEqual([]);

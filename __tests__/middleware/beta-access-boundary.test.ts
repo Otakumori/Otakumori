@@ -125,6 +125,58 @@ describe('closed beta middleware boundary', () => {
     expect(response.headers.get('x-middleware-next')).toBe('1');
   });
 
+  it('keeps invited non-admin Preview admin denials on the active Preview origin', async () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_test_preview');
+    mocks.auth.mockResolvedValue({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: true, role: 'authenticated' } },
+    });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://otaku-mori-example.vercel.app/admin'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(307);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.origin).toBe('https://otaku-mori-example.vercel.app');
+    expect(location.pathname).toBe('/beta-access');
+    expect(location.searchParams.get('state')).toBe('admin-required');
+  });
+
+  it('preserves the hosted Production Account Portal for non-admin denials', async () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_live_production');
+    mocks.auth.mockResolvedValue({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: true, role: 'authenticated' } },
+    });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://www.otaku-mori.com/admin'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(307);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.origin).toBe('https://accounts.otaku-mori.com');
+    expect(location.pathname).toBe('/unauthorized-sign-in');
+  });
+
+  it('fails closed when a Preview admin denial is configured with Production credentials', async () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_live_production');
+    mocks.auth.mockResolvedValue({
+      userId: 'user_1',
+      sessionClaims: { metadata: { betaAccess: true, role: 'authenticated' } },
+    });
+    const { default: middleware } = await import('@/middleware');
+    const response = await middleware(
+      new NextRequest('https://otaku-mori-example.vercel.app/admin'),
+      {} as never,
+    );
+
+    expect(response.status).toBe(503);
+  });
+
   it('does not trust browser headers as a beta invitation signal', async () => {
     mocks.auth.mockResolvedValue({ userId: 'user_1', sessionClaims: {} });
     const { default: middleware } = await import('@/middleware');

@@ -1,6 +1,7 @@
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
+import { resolveClerkRouting } from '@/app/lib/auth/accountUrls';
 import { isVisualQaAuthEnabled } from '@/app/lib/visual-qa/mode';
 
 async function getLogger() {
@@ -15,15 +16,15 @@ interface ClerkProviderWrapperProps {
 }
 
 const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
-const PRODUCTION_HOSTS = new Set(['otaku-mori.com', 'www.otaku-mori.com', 'accounts.otaku-mori.com']);
-
 function normalizeHost(host: string | undefined) {
   return host?.split(':')[0]?.trim().toLowerCase();
 }
 
-function isProductionClerkHost(host: string | undefined) {
+function appOriginForHost(host: string | undefined) {
   const normalizedHost = normalizeHost(host);
-  return Boolean(normalizedHost && PRODUCTION_HOSTS.has(normalizedHost));
+  if (!normalizedHost) return undefined;
+  const isLocal = normalizedHost === 'localhost' || normalizedHost === '127.0.0.1';
+  return `${isLocal ? 'http' : 'https'}://${host}`;
 }
 
 export default function ClerkProviderWrapper({
@@ -50,7 +51,12 @@ export default function ClerkProviderWrapper({
 
   const configuredDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN?.trim();
   const configuredProxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL?.trim();
-  const useProductionClerkOrigin = isProductionClerkHost(requestHost);
+  const routing = resolveClerkRouting(appOriginForHost(requestHost), publishableKey);
+  if (routing.mode === 'blocked') {
+    return <div role="alert">Authentication configuration error</div>;
+  }
+
+  const useProductionClerkOrigin = routing.mode === 'production-hosted';
   const clerkProps: any = {
     publishableKey,
     signInUrl: useProductionClerkOrigin ? `${ACCOUNTS_BASE_URL}/sign-in` : '/sign-in',

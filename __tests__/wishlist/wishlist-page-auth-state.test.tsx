@@ -93,7 +93,7 @@ describe('WishlistPage auth settlement', () => {
 
     await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
     const target = new URL(push.mock.calls[0][0]);
-    expect(target.origin).toBe('https://accounts.otaku-mori.com');
+    expect(target.origin).toBe('http://localhost:3000');
     expect(target.pathname).toBe('/sign-in');
     expect(target.searchParams.get('redirect_url')).toBe('http://localhost:3000/wishlist');
     expect(fetchMock).not.toHaveBeenCalled();

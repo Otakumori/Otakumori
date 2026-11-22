@@ -6,13 +6,9 @@ const viewports = [
 ] as const;
 
 const visualQaAuthEnabled =
-  process.env.OTM_VISUAL_QA_AUTH === '1' ||
-  process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH === '1';
+  process.env.OTM_VISUAL_QA_AUTH === '1' || process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH === '1';
 
-async function expectProtectedCommanderBoundary(
-  page: Page,
-  returnPath: '/profile' | '/orders',
-) {
+async function expectProtectedCommanderBoundary(page: Page, returnPath: '/profile' | '/orders') {
   const response = await page.request.get(returnPath, { maxRedirects: 0 });
   expect(response.status()).toBe(307);
 
@@ -20,13 +16,18 @@ async function expectProtectedCommanderBoundary(
   expect(location).toBeTruthy();
 
   const clerkUrl = new URL(location!);
-  expect(clerkUrl.origin).toBe('https://accounts.otaku-mori.com');
+  const expectedOrigin = new URL(process.env.BASE_URL ?? 'http://localhost:3000').origin;
+  const expectedAuthOrigin = ['https://otaku-mori.com', 'https://www.otaku-mori.com'].includes(
+    expectedOrigin,
+  )
+    ? 'https://accounts.otaku-mori.com'
+    : expectedOrigin;
+  expect(clerkUrl.origin).toBe(expectedAuthOrigin);
   expect(clerkUrl.pathname).toBe('/sign-in');
 
   const redirectUrl = clerkUrl.searchParams.get('redirect_url');
   expect(redirectUrl).toBeTruthy();
 
-  const expectedOrigin = new URL(process.env.BASE_URL ?? 'http://localhost:3000').origin;
   const parsedRedirectUrl = new URL(redirectUrl!);
   expect(parsedRedirectUrl.origin).toBe(expectedOrigin);
   expect(parsedRedirectUrl.pathname).toBe(returnPath);

@@ -1,17 +1,14 @@
 import { expect, test } from '@playwright/test';
 
 const visualQaAuthEnabled =
-  process.env.OTM_VISUAL_QA_AUTH === '1' ||
-  process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH === '1';
+  process.env.OTM_VISUAL_QA_AUTH === '1' || process.env.NEXT_PUBLIC_OTM_VISUAL_QA_AUTH === '1';
 
 test.describe('Ritual / System Space', () => {
   test('keeps production Settings behind the Clerk boundary', async ({ page }) => {
     if (visualQaAuthEnabled) {
       await page.goto('/settings');
       await expect(page.locator('main[data-mori-archetype="ritual"]')).toBeVisible();
-      await expect(
-        page.locator('[role="status"][data-mori-system-state="locked"]'),
-      ).toBeVisible();
+      await expect(page.locator('[role="status"][data-mori-system-state="locked"]')).toBeVisible();
       return;
     }
 
@@ -22,7 +19,13 @@ test.describe('Ritual / System Space', () => {
     expect(location).toBeTruthy();
 
     const target = new URL(location!);
-    expect(target.hostname).toBe('accounts.otaku-mori.com');
+    const appOrigin = new URL(process.env.BASE_URL ?? 'http://localhost:3000').origin;
+    const expectedAuthOrigin = ['https://otaku-mori.com', 'https://www.otaku-mori.com'].includes(
+      appOrigin,
+    )
+      ? 'https://accounts.otaku-mori.com'
+      : appOrigin;
+    expect(target.origin).toBe(expectedAuthOrigin);
     expect(target.pathname).toBe('/sign-in');
     expect(new URL(target.searchParams.get('redirect_url')!).pathname).toBe('/settings');
   });
@@ -39,9 +42,7 @@ test.describe('Ritual / System Space', () => {
       await expect(page.locator('main[data-mori-archetype="ritual"]')).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Settings sections' })).toBeVisible();
       await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
-      await expect(
-        page.locator('[role="status"][data-mori-system-state="success"]'),
-      ).toBeVisible();
+      await expect(page.locator('[role="status"][data-mori-system-state="success"]')).toBeVisible();
 
       const dimensions = await page.evaluate(() => ({
         clientWidth: document.documentElement.clientWidth,
@@ -71,6 +72,5 @@ test.describe('Ritual / System Space', () => {
     await expect(page.getByRole('button', { name: 'Remove draft' })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
-
   });
 });

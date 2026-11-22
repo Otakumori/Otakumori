@@ -3,6 +3,12 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
 import {
+  ACCOUNTS_ORIGIN,
+  buildCanonicalSignInUrl,
+  resolveClerkRouting,
+  safeReturnUrl,
+} from '@/app/lib/auth/accountUrls';
+import {
   hasBetaAccess,
   isBetaCheckoutBlocked,
   isBetaCheckoutPage,
@@ -20,7 +26,6 @@ import {
   isPreviewExternalMutationRequest,
 } from '@/app/lib/security/previewIsolation';
 
-const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 const AGE_GATE_COOKIE = 'om_age_ok';
 const MATURE_MINI_GAME_PATHS = new Set([
   '/mini-games/dungeon-of-desire',
@@ -112,11 +117,23 @@ const isProtected = createRouteMatcher([
 
 const isAdmin = createRouteMatcher(['/admin(.*)', '/panel(.*)', '/api/admin(.*)']);
 
-function buildAccountsUrl(path: string, redirectUrl?: string) {
-  const url = new URL(path, ACCOUNTS_BASE_URL);
-  if (redirectUrl) {
-    url.searchParams.set('redirect_url', redirectUrl);
+function buildUnauthorizedUrl(requestUrl: string) {
+  const request = new URL(requestUrl);
+  const routing = resolveClerkRouting(request.origin);
+
+  if (routing.mode === 'blocked') {
+    throw new Error('AUTH_ROUTING_UNAVAILABLE');
   }
+
+  if (routing.mode === 'production-hosted') {
+    const url = new URL('/unauthorized-sign-in', ACCOUNTS_ORIGIN);
+    url.searchParams.set('redirect_url', safeReturnUrl(requestUrl, request.origin));
+    return url;
+  }
+
+  const url = new URL('/beta-access', request.origin);
+  url.searchParams.set('returnTo', `${request.pathname}${request.search}`);
+  url.searchParams.set('state', 'admin-required');
   return url;
 }
 
@@ -331,12 +348,12 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
 
       if (!userId) {
         if (isApi) return apiAuthError(401, 'Unauthorized', reqId);
-        return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
+        return NextResponse.redirect(buildCanonicalSignInUrl(req.url, req.nextUrl.origin));
       }
 
       if (!hasAdminRole(sessionClaims)) {
         if (isApi) return apiAuthError(403, 'Forbidden', reqId);
-        return NextResponse.redirect(buildAccountsUrl('/unauthorized-sign-in', req.url));
+        return NextResponse.redirect(buildUnauthorizedUrl(req.url));
       }
     }
 
@@ -354,7 +371,7 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
     }
 
     if (requiresProtectedAuth && !userId) {
-      return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
+      return NextResponse.redirect(buildCanonicalSignInUrl(req.url, req.nextUrl.origin));
     }
 
     return addPublicSecurityHeaders(NextResponse.next(), reqId);
