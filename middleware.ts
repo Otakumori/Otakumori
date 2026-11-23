@@ -3,14 +3,29 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server
 import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 import { hasAdminRole } from '@/app/lib/auth/adminRole';
 import {
+  ACCOUNTS_ORIGIN,
+  buildCanonicalSignInUrl,
+  resolveClerkRouting,
+  safeReturnUrl,
+} from '@/app/lib/auth/accountUrls';
+import {
+  hasBetaAccess,
+  isBetaCheckoutBlocked,
+  isBetaCheckoutPage,
+  isBetaPublicPath,
+} from '@/app/lib/auth/betaAccess';
+import {
   VISUAL_QA_AUTH_STATE_COOKIE,
   VISUAL_QA_AUTH_STATE_HEADER,
   isVisualQaAuthEnabled,
   normalizeVisualQaAuthState,
   resolveVisualQaAuthStateFromCookieHeader,
 } from '@/app/lib/visual-qa/mode';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isPreviewExternalMutationRequest,
+} from '@/app/lib/security/previewIsolation';
 
-const ACCOUNTS_BASE_URL = 'https://accounts.otaku-mori.com';
 const AGE_GATE_COOKIE = 'om_age_ok';
 const MATURE_MINI_GAME_PATHS = new Set([
   '/mini-games/dungeon-of-desire',
@@ -102,11 +117,23 @@ const isProtected = createRouteMatcher([
 
 const isAdmin = createRouteMatcher(['/admin(.*)', '/panel(.*)', '/api/admin(.*)']);
 
-function buildAccountsUrl(path: string, redirectUrl?: string) {
-  const url = new URL(path, ACCOUNTS_BASE_URL);
-  if (redirectUrl) {
-    url.searchParams.set('redirect_url', redirectUrl);
+function buildUnauthorizedUrl(requestUrl: string) {
+  const request = new URL(requestUrl);
+  const routing = resolveClerkRouting(request.origin);
+
+  if (routing.mode === 'blocked') {
+    throw new Error('AUTH_ROUTING_UNAVAILABLE');
   }
+
+  if (routing.mode === 'production-hosted') {
+    const url = new URL('/unauthorized-sign-in', ACCOUNTS_ORIGIN);
+    url.searchParams.set('redirect_url', safeReturnUrl(requestUrl, request.origin));
+    return url;
+  }
+
+  const url = new URL('/beta-access', request.origin);
+  url.searchParams.set('returnTo', `${request.pathname}${request.search}`);
+  url.searchParams.set('state', 'admin-required');
   return url;
 }
 
@@ -117,6 +144,13 @@ function isAgeGatedRoute(pathname: string) {
 function buildAgeCheckUrl(reqUrl: string, returnTo: string) {
   const url = new URL('/age-check', reqUrl);
   url.searchParams.set('returnTo', returnTo);
+  return url;
+}
+
+function buildBetaAccessUrl(reqUrl: string, returnTo: string, state?: string) {
+  const url = new URL('/beta-access', reqUrl);
+  url.searchParams.set('returnTo', returnTo);
+  if (state) url.searchParams.set('state', state);
   return url;
 }
 
@@ -140,6 +174,13 @@ function addPublicSecurityHeaders(res: NextResponse, reqId: string) {
 function handleLocalVisualQaRequest(req: NextRequest) {
   const host = req.headers.get('host');
   if (!isVisualQaAuthEnabled(undefined, host)) return null;
+
+  // The local Clerk substitute never substitutes for mature-content consent.
+  if (isAgeGatedRoute(req.nextUrl.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
+    return NextResponse.redirect(
+      buildAgeCheckUrl(req.url, `${req.nextUrl.pathname}${req.nextUrl.search}`),
+    );
+  }
 
   const queryState = normalizeVisualQaAuthState(req.nextUrl.searchParams.get('visualAuth'));
   const cookieState = resolveVisualQaAuthStateFromCookieHeader(req.headers.get('cookie'));
@@ -175,7 +216,9 @@ function apiAuthError(status: 401 | 403, message: string, reqId: string) {
 }
 
 function isLighthousePublicRoute(req: NextRequest) {
+  const hostname = (req.headers.get('host') || '').split(':')[0]?.toLowerCase();
   return (
+    (hostname === 'localhost' || hostname === '127.0.0.1') &&
     req.headers.get('x-otakumori-lighthouse-ci') === '1' &&
     !req.nextUrl.pathname.startsWith('/api/') &&
     !req.nextUrl.pathname.startsWith('/ingest') &&
@@ -217,6 +260,8 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
     const requiresAdminAuth = isAdmin(req) && !isMerchizeAdminProbe;
 
     const reqId = createRequestId(req);
+    let userId: string | null = null;
+    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
 
     if (req.method === 'OPTIONS' && (isApi || isIngest)) {
       return handleCorsPreflight(req);
@@ -235,26 +280,80 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(url, 308);
     }
 
+    const betaPublicPath = isBetaPublicPath(url.pathname);
+    if (!betaPublicPath && !userId) {
+      const authResult = await auth();
+      userId = authResult.userId;
+      sessionClaims = authResult.sessionClaims;
+    }
+
+    if (!betaPublicPath && !userId) {
+      if (isApi || isIngest) return apiAuthError(401, 'BETA_INVITE_REQUIRED', reqId);
+      return NextResponse.redirect(
+        buildBetaAccessUrl(req.url, `${url.pathname}${url.search}`, 'sign-in-required'),
+      );
+    }
+
+    if (!betaPublicPath && !hasBetaAccess(sessionClaims)) {
+      if (isApi || isIngest) return apiAuthError(403, 'BETA_INVITE_REQUIRED', reqId);
+      return NextResponse.redirect(
+        buildBetaAccessUrl(req.url, `${url.pathname}${url.search}`, 'not-invited'),
+      );
+    }
+
+    if (isBetaCheckoutBlocked(url.pathname, req.method)) {
+      return addPublicSecurityHeaders(
+        NextResponse.json(
+          {
+            ok: false,
+            error: 'BETA_PURCHASES_DISABLED',
+            message: 'Purchases are unavailable during the closed beta.',
+          },
+          { status: 503 },
+        ),
+        reqId,
+      );
+    }
+
+    if (isBetaCheckoutPage(url.pathname)) {
+      const shopUrl = new URL('/shop', req.url);
+      shopUrl.searchParams.set('beta', 'purchases-disabled');
+      return NextResponse.redirect(shopUrl);
+    }
+
+    if (isPreviewExternalMutationRequest(url.pathname, req.method)) {
+      return addPublicSecurityHeaders(
+        NextResponse.json(
+          {
+            ok: false,
+            error: PREVIEW_EXTERNAL_MUTATION_ERROR,
+            message: 'External provider mutations are disabled in Preview.',
+          },
+          { status: 503 },
+        ),
+        reqId,
+      );
+    }
+
     if (isAgeGatedRoute(url.pathname) && req.cookies.get(AGE_GATE_COOKIE)?.value !== '1') {
       return NextResponse.redirect(buildAgeCheckUrl(req.url, `${url.pathname}${url.search}`));
     }
 
-    let userId: string | null = null;
-    let sessionClaims: Awaited<ReturnType<typeof auth>>['sessionClaims'] | null = null;
-
     if (requiresAdminAuth) {
-      const authResult = await auth();
-      userId = authResult.userId;
-      sessionClaims = authResult.sessionClaims;
+      if (!userId) {
+        const authResult = await auth();
+        userId = authResult.userId;
+        sessionClaims = authResult.sessionClaims;
+      }
 
       if (!userId) {
         if (isApi) return apiAuthError(401, 'Unauthorized', reqId);
-        return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
+        return NextResponse.redirect(buildCanonicalSignInUrl(req.url, req.nextUrl.origin));
       }
 
       if (!hasAdminRole(sessionClaims)) {
         if (isApi) return apiAuthError(403, 'Forbidden', reqId);
-        return NextResponse.redirect(buildAccountsUrl('/unauthorized-sign-in', req.url));
+        return NextResponse.redirect(buildUnauthorizedUrl(req.url));
       }
     }
 
@@ -272,14 +371,17 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
     }
 
     if (requiresProtectedAuth && !userId) {
-      return NextResponse.redirect(buildAccountsUrl('/sign-in', req.url));
+      return NextResponse.redirect(buildCanonicalSignInUrl(req.url, req.nextUrl.origin));
     }
 
     return addPublicSecurityHeaders(NextResponse.next(), reqId);
   } catch {
     const reqId = createRequestId(req);
     const isSensitiveRoute =
-      req.nextUrl.pathname.startsWith('/api/') || isAdmin(req) || isProtected(req);
+      !isBetaPublicPath(req.nextUrl.pathname) ||
+      req.nextUrl.pathname.startsWith('/api/') ||
+      isAdmin(req) ||
+      isProtected(req);
 
     if (isSensitiveRoute) {
       return addPublicSecurityHeaders(
@@ -293,6 +395,14 @@ const clerkAuthMiddleware = clerkMiddleware(async (auth, req) => {
 });
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  // A public, read-only readiness probe must not depend on Clerk initialization.
+  // Exact-path GET only; all protected APIs still use normal auth middleware.
+  if (req.method === 'GET' && req.nextUrl.pathname === '/api/health') {
+    const response = addPublicSecurityHeaders(NextResponse.next(), createRequestId(req));
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
+  }
+
   const localVisualQaResponse = handleLocalVisualQaRequest(req);
   if (localVisualQaResponse) {
     return localVisualQaResponse;

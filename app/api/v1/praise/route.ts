@@ -1,6 +1,5 @@
 import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import {
   PraiseCreateSchema,
@@ -10,6 +9,13 @@ import {
 } from '../../../lib/api-contracts';
 import { checkIdempotency, storeIdempotencyResponse } from '../../../lib/idempotency';
 import { withRateLimit } from '../../../lib/rate-limiting';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+  schemaUnavailableResponse,
+} from '@/app/lib/auth/viewer';
 
 export const runtime = 'nodejs';
 
@@ -18,17 +24,7 @@ export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
-        {
-          status: 401,
-          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
-        },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     // Check idempotency
     const idempotencyKey = req.headers.get('x-idempotency-key');
@@ -60,7 +56,7 @@ export async function POST(req: NextRequest) {
       const { receiverId } = validation.data;
 
       // Prevent self-praise
-      if (userId === receiverId) {
+      if (localUserId === receiverId) {
         return NextResponse.json(
           createApiError('VALIDATION_ERROR', 'Cannot praise yourself', requestId),
           { status: 400 },
@@ -83,7 +79,7 @@ export async function POST(req: NextRequest) {
         // Create praise (will fail if duplicate due to unique constraint)
         const praise = await db.praise.create({
           data: {
-            User: { connect: { id: userId } },
+            User: { connect: { id: localUserId } },
             Target: { connect: { id: receiverId } },
           },
           include: {
@@ -135,9 +131,26 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    return rateLimitedHandler(req);
+    return await rateLimitedHandler(req);
   } catch (error) {
-    logger.error('Error creating praise:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
+    if (isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
+    logger.error(
+      'Error creating praise:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to send praise', requestId), {
       status: 500,
     });
@@ -149,17 +162,7 @@ export async function GET(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
-        {
-          status: 401,
-          headers: { 'x-otm-reason': 'AUTH_REQUIRED' },
-        },
-      );
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const { searchParams } = new URL(req.url);
     const cursor = searchParams.get('cursor');
@@ -167,7 +170,7 @@ export async function GET(req: NextRequest) {
 
     const praises = await db.praise.findMany({
       where: {
-        targetId: userId,
+        targetId: localUserId,
       },
       orderBy: {
         createdAt: 'desc',
@@ -213,7 +216,24 @@ export async function GET(req: NextRequest) {
       ),
     );
   } catch (error) {
-    logger.error('Error fetching praises:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json(
+        createApiError('AUTH_REQUIRED', 'Authentication required', requestId),
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
+    }
+    if (error instanceof LocalUserUnavailableError) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
+    if (isMissingSchemaError(error)) {
+      return NextResponse.json(schemaUnavailableResponse(requestId), { status: 503 });
+    }
+    logger.error(
+      'Error fetching praises:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch praises', requestId),
       { status: 500 },

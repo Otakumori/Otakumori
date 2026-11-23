@@ -2,6 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '@/lib/db';
 import { createPrintifyOrder } from '@/lib/fulfillment/printify';
 
+const mocks = vi.hoisted(() => ({
+  admission: vi.fn(),
+}));
+
 vi.mock('@/env', () => ({
   env: {
     PRINTIFY_API_URL: 'https://api.printify.example',
@@ -26,6 +30,10 @@ vi.mock('@/lib/db', () => ({
     },
     $transaction: vi.fn(async (operations: Promise<unknown>[]) => Promise.all(operations)),
   },
+}));
+
+vi.mock('@/lib/fulfillment/admission', () => ({
+  getFulfillmentSubmissionPolicy: mocks.admission,
 }));
 
 function stripeSession() {
@@ -73,7 +81,13 @@ function orderItem(overrides: Record<string, unknown> = {}) {
 
 describe('Printify fulfillment safety', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
+    mocks.admission.mockReturnValue({
+      enabled: true,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+      message: 'Fulfillment submission is temporarily disabled pending operational verification.',
+    });
     vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue(null);
     vi.mocked(db.printifyOrderSync.create).mockResolvedValue({} as never);
     vi.mocked(db.printifyOrderSync.update).mockResolvedValue({} as never);
@@ -85,6 +99,37 @@ describe('Printify fulfillment safety', () => {
         text: vi.fn().mockResolvedValue(JSON.stringify({ id: 'printify_order_1', status: 'ok' })),
       }),
     );
+  });
+
+  it('refuses Preview fulfillment before database or provider access', async () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('VERCEL_ENV', 'preview');
+
+    await expect(createPrintifyOrder('order_1', stripeSession())).rejects.toThrow(
+      'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+    );
+    expect(db.printifyOrderSync.findUnique).not.toHaveBeenCalled();
+    expect(db.orderItem.findMany).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('blocks provider submission before database or network access when authorization is disabled', async () => {
+    mocks.admission.mockReturnValue({
+      enabled: false,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+      message: 'Fulfillment submission is temporarily disabled pending operational verification.',
+    });
+
+    const result = await createPrintifyOrder('order_1', stripeSession());
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'FULFILLMENT_TEMPORARILY_DISABLED',
+      error: 'Fulfillment submission is temporarily disabled pending operational verification.',
+    });
+    expect(db.printifyOrderSync.findUnique).not.toHaveBeenCalled();
+    expect(db.orderItem.findMany).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('does not call Printify for non-Printify order items', async () => {
@@ -156,7 +201,9 @@ describe('Printify fulfillment safety', () => {
     const first = await createPrintifyOrder('order_1', stripeSession());
     expect(first.ok).toBe(false);
     expect(db.printifyOrderSync.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ status: 'submission_uncertain' }) }),
+      expect.objectContaining({
+        data: expect.objectContaining({ status: 'submission_uncertain' }),
+      }),
     );
 
     vi.mocked(db.printifyOrderSync.findUnique).mockResolvedValue({
@@ -169,6 +216,17 @@ describe('Printify fulfillment safety', () => {
     const replay = await createPrintifyOrder('order_1', stripeSession(), { allowRetry: true });
     expect(replay.ok).toBe(false);
     expect(replay.error).toMatch(/reconcile/i);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('allows only one concurrent request to own the provider submission claim', async () => {
+    vi.mocked(db.orderItem.findMany).mockResolvedValue([orderItem()] as never);
+    vi.mocked(db.printifyOrderSync.create).mockRejectedValue({ code: 'P2002' });
+
+    const result = await createPrintifyOrder('order_1', stripeSession());
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toMatch(/owned by another request/i);
     expect(fetch).not.toHaveBeenCalled();
   });
 });

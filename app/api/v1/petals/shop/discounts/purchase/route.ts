@@ -2,7 +2,7 @@ import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse, type NextRequest } from 'next/server';
 import { db } from '@/app/lib/db';
-import { PetalService } from '@/app/lib/petals';
+import { PetalSpendError, spendPetalsAndFulfill } from '@/app/lib/petals/spend';
 import { z } from 'zod';
 import { generateRequestId } from '@/lib/requestId';
 import { getPolicyFromRequest } from '@/app/lib/policy/fromRequest';
@@ -128,47 +128,34 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Spend petals
-    const petalService = new PetalService();
-    const spendResult = await petalService.spendPetals(
-      user.id,
-      reward.petalCost,
-      `Discount reward purchase: ${reward.name}`,
-      requestId,
-    );
-
-    if (!spendResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: spendResult.error || 'Failed to spend petals',
-          requestId,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Create CouponGrant
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + reward.validityDays);
 
     const code = `OM-${Math.random().toString(36).slice(2, 9).toUpperCase()}`;
 
-    const couponGrant = await db.couponGrant.create({
-      data: {
-        userId: user.id,
-        code,
-        discountType: reward.discountType,
-        amountOff: reward.amountOff,
-        percentOff: reward.percentOff,
-        expiresAt,
-        petalCost: reward.petalCost,
-        nsfwOnly: reward.nsfwOnly,
-        requiresAchievementId: reward.requiresAchievementId,
-        minSpendCents: reward.minSpendCents,
-        discountRewardId: reward.id,
-      },
-    });
+    const purchase = await spendPetalsAndFulfill(
+      user.id,
+      reward.petalCost,
+      `Discount reward purchase: ${reward.name}`,
+      'discount_reward_purchase',
+      (tx) =>
+        tx.couponGrant.create({
+          data: {
+            userId: user.id,
+            code,
+            discountType: reward.discountType,
+            amountOff: reward.amountOff,
+            percentOff: reward.percentOff,
+            expiresAt,
+            petalCost: reward.petalCost,
+            nsfwOnly: reward.nsfwOnly,
+            requiresAchievementId: reward.requiresAchievementId,
+            minSpendCents: reward.minSpendCents,
+            discountRewardId: reward.id,
+          },
+        }),
+    );
+    const couponGrant = purchase.fulfillment;
 
     // Log discount purchase
     const { logger } = await import('@/app/lib/logger');
@@ -184,7 +171,7 @@ export async function POST(req: NextRequest) {
         discountType: couponGrant.discountType,
         amountOff: couponGrant.amountOff,
         percentOff: couponGrant.percentOff,
-        newBalance: spendResult.newBalance,
+        newBalance: purchase.newBalance,
       },
     });
 
@@ -200,11 +187,17 @@ export async function POST(req: NextRequest) {
           expiresAt: couponGrant.expiresAt,
           minSpendCents: couponGrant.minSpendCents,
         },
-        newBalance: spendResult.newBalance,
+        newBalance: purchase.newBalance,
       },
       requestId,
     });
   } catch (error: any) {
+    if (error instanceof PetalSpendError && error.code === 'INSUFFICIENT_PETALS') {
+      return NextResponse.json(
+        { ok: false, error: 'Insufficient petals', requestId },
+        { status: 400 },
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -216,7 +209,12 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    logger.error('Error purchasing discount reward:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error purchasing discount reward:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       { ok: false, error: 'Internal server error', requestId },
       { status: 500 },

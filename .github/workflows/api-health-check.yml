@@ -17,22 +17,40 @@ env:
 jobs:
   api-health-check:
     runs-on: ubuntu-latest
+    # Pull requests exercise a real, disposable local PostgreSQL service.
+    # Only trusted push events use the existing secret-backed database and providers.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: otm_ci
+          POSTGRES_PASSWORD: ci_only_pwd
+          POSTGRES_DB: otm_ci_health
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U otm_ci -d otm_ci_health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-      PRINTIFY_API_KEY: ${{ secrets.PRINTIFY_API_KEY }}
-      PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
-      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      DATABASE_URL: ${{ github.event_name == 'pull_request' && 'postgresql://otm_ci:ci_only_pwd@127.0.0.1:5432/otm_ci_health?schema=public' || secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ github.event_name == 'pull_request' && 'postgresql://otm_ci:ci_only_pwd@127.0.0.1:5432/otm_ci_health?schema=public' || secrets.DIRECT_URL }}
+      CLERK_SECRET_KEY: ${{ github.event_name == 'pull_request' && 'sk_test_ci_no_real_provider_access' || secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ github.event_name == 'pull_request' && 'pk_test_ci00000000000000000000000' || secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      STRIPE_SECRET_KEY: ${{ github.event_name == 'pull_request' && 'sk_test_ci_no_real_provider_access' || secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ github.event_name == 'pull_request' && 'whsec_ci_no_real_provider_access' || secrets.STRIPE_WEBHOOK_SECRET }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ github.event_name == 'pull_request' && 'pk_test_ci_no_real_provider_access' || secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      PRINTIFY_API_KEY: ${{ github.event_name == 'pull_request' && 'ci_no_provider_access' || secrets.PRINTIFY_API_KEY }}
+      PRINTIFY_SHOP_ID: ${{ github.event_name == 'pull_request' && 'ci_no_provider_access' || secrets.PRINTIFY_SHOP_ID }}
+      UPSTASH_REDIS_REST_URL: ${{ github.event_name == 'pull_request' && 'https://ci-placeholder.upstash.io' || secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ github.event_name == 'pull_request' && 'ci_no_network_calls' || secrets.UPSTASH_REDIS_REST_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Ensure DIRECT_URL for Prisma
         run: |
@@ -59,7 +77,7 @@ jobs:
           check-latest: true
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
 
@@ -69,8 +87,32 @@ jobs:
       - name: Generate Prisma client
         run: pnpm prisma generate
 
-      - name: Build project
-        run: pnpm run build
+      - name: Verify isolated pull-request database before build
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          node <<'NODE'
+          const { PrismaClient } = require('@prisma/client');
+          const client = new PrismaClient();
+          async function verify() {
+            const rows = await client.$queryRawUnsafe('SELECT current_database() AS db');
+            if (rows?.[0]?.db !== 'otm_ci_health') {
+              throw new Error('Unexpected database identity in pull-request health test');
+            }
+            console.log('Pull-request PostgreSQL identity and connectivity verified');
+          }
+          verify()
+            .catch(() => {
+              console.error('Isolated CI PostgreSQL connectivity or identity failed');
+              process.exitCode = 1;
+            })
+            .finally(async () => { await client.$disconnect(); });
+          NODE
+
+      - name: Build project with the deployment Prisma engine
+        # The ordinary build script regenerates Prisma with --no-engine.
+        # This health smoke must use the same engine-bearing build as Vercel.
+        run: pnpm run vercel-build
 
       - name: Start production server
         run: |

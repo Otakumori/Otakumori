@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const { validateLinks = true, fullSync = true } = body;
-    const { enhancedPrintifyService } = await import('@/app/lib/printify/enhanced-service');
+    const { getEnhancedPrintifyService } = await import(
+      '@/app/lib/printify/enhanced-service'
+    );
+    const enhancedPrintifyService = getEnhancedPrintifyService();
 
     logger.warn('Starting enhanced Printify sync...', undefined, { validateLinks, fullSync });
 
@@ -59,7 +62,10 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     await requireAdminOrThrow();
-    const { enhancedPrintifyService } = await import('@/app/lib/printify/enhanced-service');
+    const { getEnhancedPrintifyService } = await import(
+      '@/app/lib/printify/enhanced-service'
+    );
+    const enhancedPrintifyService = getEnhancedPrintifyService();
 
     // Get current sync statistics from database
     const stats = await enhancedPrintifyService.validateAllProductLinks();

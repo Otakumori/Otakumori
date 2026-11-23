@@ -116,6 +116,17 @@ describe('finance reporting', () => {
     expect(csv).toContain('amount,source');
   });
 
+  it('neutralizes spreadsheet formulas in CSV exports', () => {
+    const csv = rowsToCsv(
+      [{ product: '=HYPERLINK("https://example.invalid")', note: '+cmd', safe: 'sakura' }],
+      { period: '2026' },
+    );
+
+    expect(csv).toContain('"\'=HYPERLINK(""https://example.invalid"")"');
+    expect(csv).toContain("'+cmd");
+    expect(csv).toContain('sakura');
+  });
+
   it('selects the unresolved reconciliation export without hiding known gaps', async () => {
     mocks.ledgerFind.mockResolvedValue([row('sale', 'product_sale', 3000)]);
     const report = await loadFinanceReport(period);

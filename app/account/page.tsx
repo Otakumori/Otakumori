@@ -1,7 +1,12 @@
+import { UserProfile } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-import { buildCanonicalSignInUrl, buildCanonicalUserProfileUrl } from '@/app/lib/auth/accountUrls';
+import {
+  buildCanonicalSignInUrl,
+  buildCanonicalUserProfileUrl,
+  resolveClerkRouting,
+} from '@/app/lib/auth/accountUrls';
 import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 import { generateSEO } from '@/app/lib/seo';
 
@@ -16,10 +21,23 @@ export function generateMetadata() {
 export default async function AccountPage() {
   const { userId } = await auth();
   const appOrigin = await resolveServerAppOrigin();
+  const routing = resolveClerkRouting(appOrigin);
+
+  if (routing.mode === 'blocked') {
+    return <main role="alert">Authentication is temporarily unavailable.</main>;
+  }
 
   if (!userId) {
     redirect(buildCanonicalSignInUrl('/account', appOrigin));
   }
 
-  redirect(buildCanonicalUserProfileUrl('/profile', appOrigin));
+  if (routing.mode === 'production-hosted') {
+    redirect(buildCanonicalUserProfileUrl('/profile', appOrigin));
+  }
+
+  return (
+    <main className="flex min-h-screen items-center justify-center px-4 py-10">
+      <UserProfile routing="hash" />
+    </main>
+  );
 }

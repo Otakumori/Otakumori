@@ -7,6 +7,18 @@ import { ProfileViewSchema } from '../../../../lib/contracts';
 
 export const runtime = 'nodejs';
 
+type ProfileVisibility = 'public' | 'friends' | 'private';
+
+export function normalizeProfileVisibility(visibility: string): ProfileVisibility {
+  const normalized = visibility.trim().toLowerCase();
+
+  if (normalized === 'public' || normalized === 'friends' || normalized === 'private') {
+    return normalized;
+  }
+
+  return 'private';
+}
+
 export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
   try {
     // Extract query params
@@ -59,13 +71,20 @@ export async function GET(request: NextRequest, { params }: { params: { username
       return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
+    const viewer = userId
+      ? await db.user.findUnique({
+          where: { clerkId: userId },
+          select: { id: true },
+        })
+      : null;
+
     // Check if viewer is blocked
-    if (userId) {
+    if (viewer) {
       const isBlocked = await db.block.findUnique({
         where: {
           blockerId_blockedId: {
             blockerId: profileUser.id,
-            blockedId: userId,
+            blockedId: viewer.id,
           },
         },
       });
@@ -76,11 +95,11 @@ export async function GET(request: NextRequest, { params }: { params: { username
     }
 
     // Check if viewer is blocked by profile user
-    if (userId) {
+    if (viewer) {
       const isBlockedBy = await db.block.findUnique({
         where: {
           blockerId_blockedId: {
-            blockerId: userId,
+            blockerId: viewer.id,
             blockedId: profileUser.id,
           },
         },
@@ -91,67 +110,53 @@ export async function GET(request: NextRequest, { params }: { params: { username
       }
     }
 
-    // Check visibility permissions
+    // Check visibility permissions. Clerk provisioning and settings persist lowercase values;
+    // normalize defensively so legacy uppercase rows retain the same authorization semantics.
     let canView = true;
     let isFollowing = false;
+    const visibility = normalizeProfileVisibility(profileUser.visibility);
+    const isOwner = userId === profileUser.clerkId;
 
-    if (profileUser.visibility === 'PRIVATE') {
-      canView = false;
-    } else if (profileUser.visibility === 'FRIENDS') {
-      if (!userId) {
+    if (visibility === 'private') {
+      canView = isOwner;
+    } else if (visibility === 'friends' && !isOwner) {
+      if (!viewer) {
         canView = false;
       } else {
-        // Get current user's ID from Clerk ID
-        const currentUser = await db.user.findUnique({
-          where: { clerkId: userId },
-          select: { id: true },
+        // Check if they're mutual followers (friends)
+        const mutualFollow = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: viewer.id,
+              followeeId: profileUser.id,
+            },
+          },
         });
 
-        if (!currentUser) {
-          canView = false;
-        } else {
-          // Check if they're mutual followers (friends)
-          const mutualFollow = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: currentUser.id,
-                followeeId: profileUser.id,
-              },
+        const mutualFollowBack = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: profileUser.id,
+              followeeId: viewer.id,
             },
-          });
+          },
+        });
 
-          const mutualFollowBack = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: profileUser.id,
-                followeeId: currentUser.id,
-              },
-            },
-          });
-
-          canView = !!(mutualFollow && mutualFollowBack);
-          isFollowing = !!mutualFollow;
-        }
+        canView = !!(mutualFollow && mutualFollowBack);
+        isFollowing = !!mutualFollow;
       }
     } else {
       // Public profile
-      if (userId) {
-        const currentUser = await db.user.findUnique({
-          where: { clerkId: userId },
-          select: { id: true },
-        });
-
-        if (currentUser) {
-          const follow = await db.follow.findUnique({
-            where: {
-              followerId_followeeId: {
-                followerId: currentUser.id,
-                followeeId: profileUser.id,
-              },
+      if (viewer) {
+        const follow = await db.follow.findUnique({
+          where: {
+            followerId_followeeId: {
+              followerId: viewer.id,
+              followeeId: profileUser.id,
             },
-          });
-          isFollowing = !!follow;
-        }
+          },
+        });
+        isFollowing = !!follow;
       }
     }
 
@@ -163,13 +168,13 @@ export async function GET(request: NextRequest, { params }: { params: { username
     const profileData = {
       id: profileUser.id,
       username: profileUser.username,
-      displayName: profileUser.displayName,
+      display_name: profileUser.displayName,
       bio: profileUser.bio,
       location: profileUser.location,
       website: profileUser.website,
       avatarUrl: profileUser.avatarUrl,
       bannerUrl: profileUser.bannerUrl,
-      visibility: profileUser.visibility,
+      visibility,
       isFollowing,
       isBlocked: false, // We already checked blocks above
       followerCount: profileUser._count.Follow_Follow_followeeIdToUser,

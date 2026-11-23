@@ -55,7 +55,10 @@ export default function StaticPublicNavbar() {
       >
         Skip to main content
       </a>
-      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
+      <nav
+        aria-label="Primary navigation"
+        className="container mx-auto flex items-center justify-between px-4 py-3"
+      >
         <Link href={paths.home()} className="flex items-center py-1" aria-label="Otaku-mori home">
           <div className="relative h-20 w-20 md:h-24 md:w-24">
             <Image
@@ -91,9 +94,7 @@ export default function StaticPublicNavbar() {
           <summary className="min-h-[44px] list-none cursor-pointer rounded-full border border-[#f2d7c4]/28 bg-[#170d12]/42 px-4 py-3 text-sm text-[#fff0e7] marker:hidden focus:outline-none focus:ring-2 focus:ring-[#f3b3c8]/42 [&::-webkit-details-marker]:hidden">
             Menu
           </summary>
-          <div
-            className="absolute right-0 top-[calc(100%+0.5rem)] grid w-48 gap-1 rounded-xl border border-[#f2d7c4]/20 bg-[#170d12]/90 p-2 shadow-[0_12px_28px_rgba(0,0,0,0.3)] backdrop-blur-[5px]"
-          >
+          <div className="absolute right-0 top-[calc(100%+0.5rem)] grid w-48 gap-1 rounded-xl border border-[#f2d7c4]/20 bg-[#170d12]/90 p-2 shadow-[0_12px_28px_rgba(0,0,0,0.3)] backdrop-blur-[5px]">
             {links.map((link) => (
               <Link
                 aria-current={pathname === link.href ? 'page' : undefined}

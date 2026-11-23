@@ -67,6 +67,7 @@ describe('ClerkProviderWrapper homepage auth origin continuity', () => {
   });
 
   it('uses the production Account Portal only on production hosts', () => {
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_homepage_origin_parity';
     render(
       <ClerkProviderWrapper requestHost="www.otaku-mori.com">
         <span>production</span>
@@ -81,6 +82,30 @@ describe('ClerkProviderWrapper homepage auth origin continuity', () => {
         proxyUrl: 'https://accounts.otaku-mori.com',
       }),
     );
+  });
+
+  it('fails closed when Preview receives a Production Clerk key', () => {
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_wrong_environment';
+
+    render(
+      <ClerkProviderWrapper requestHost="preview-branch.vercel.app">
+        <span>preview</span>
+      </ClerkProviderWrapper>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Authentication configuration error');
+    expect(clerkProviderSpy).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when Production receives a Development Clerk key', () => {
+    render(
+      <ClerkProviderWrapper requestHost="www.otaku-mori.com">
+        <span>production</span>
+      </ClerkProviderWrapper>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Authentication configuration error');
+    expect(clerkProviderSpy).not.toHaveBeenCalled();
   });
 
   it('can bypass Clerk only for the explicit local visual QA harness', () => {

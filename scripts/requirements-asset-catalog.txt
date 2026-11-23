@@ -1,0 +1,4 @@
+# Pinned local tooling for scripts/catalog-owner-asset-library.py.
+# These packages inspect owner-managed source files; they are not application runtime dependencies.
+mutagen==1.48.1
+imageio-ffmpeg==0.7.0

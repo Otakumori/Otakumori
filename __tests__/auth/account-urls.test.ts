@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   ACCOUNTS_ORIGIN,
@@ -6,6 +6,7 @@ import {
   buildCanonicalSignInUrl,
   buildCanonicalSignUpUrl,
   buildCanonicalUserProfileUrl,
+  resolveClerkRouting,
   safeReturnUrl,
 } from '@/app/lib/auth/accountUrls';
 
@@ -16,7 +17,16 @@ function redirectParam(url: string) {
 }
 
 describe('canonical Clerk Account Portal URLs', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_test_auth_routing');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('builds hosted sign-in and sign-up URLs with production return URLs', () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_live_auth_routing');
     const signIn = new URL(buildCanonicalSignInUrl('/shop', 'https://www.otaku-mori.com'));
     const signUp = new URL(buildCanonicalSignUpUrl('/profile', 'https://www.otaku-mori.com'));
 
@@ -30,6 +40,7 @@ describe('canonical Clerk Account Portal URLs', () => {
   });
 
   it('rejects arbitrary external HTTPS return origins', () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_live_auth_routing');
     expect(
       redirectParam(
         buildCanonicalSignInUrl('https://not-otaku.example/sign-in', 'https://www.otaku-mori.com'),
@@ -37,12 +48,12 @@ describe('canonical Clerk Account Portal URLs', () => {
     ).toBe('https://www.otaku-mori.com/');
   });
 
-  it('accepts exact trusted production and staging return origins', () => {
-    expect(safeReturnUrl('https://www.otaku-mori.com/shop?tab=saved#top')).toBe(
-      'https://www.otaku-mori.com/shop?tab=saved#top',
-    );
+  it('accepts same-environment returns and rejects cross-environment returns', () => {
+    expect(
+      safeReturnUrl('https://www.otaku-mori.com/shop?tab=saved#top', 'https://www.otaku-mori.com'),
+    ).toBe('https://www.otaku-mori.com/shop?tab=saved#top');
     expect(safeReturnUrl('https://otaku-mori.com/profile', STAGING_APP_ORIGIN)).toBe(
-      'https://otaku-mori.com/profile',
+      `${STAGING_APP_ORIGIN}/`,
     );
     expect(safeReturnUrl(`${STAGING_APP_ORIGIN}/wishlist`, STAGING_APP_ORIGIN)).toBe(
       `${STAGING_APP_ORIGIN}/wishlist`,
@@ -105,11 +116,14 @@ describe('canonical Clerk Account Portal URLs', () => {
       `${PR73_PREVIEW_ORIGIN}/`,
     );
     expect(
-      safeReturnUrl('https://pr73-preview.otaku-mori.com.attacker.example/shop', PR73_PREVIEW_ORIGIN),
+      safeReturnUrl(
+        'https://pr73-preview.otaku-mori.com.attacker.example/shop',
+        PR73_PREVIEW_ORIGIN,
+      ),
     ).toBe(`${PR73_PREVIEW_ORIGIN}/`);
-    expect(safeReturnUrl('https://evil-pr73-preview.otaku-mori.com/shop', PR73_PREVIEW_ORIGIN)).toBe(
-      `${PR73_PREVIEW_ORIGIN}/`,
-    );
+    expect(
+      safeReturnUrl('https://evil-pr73-preview.otaku-mori.com/shop', PR73_PREVIEW_ORIGIN),
+    ).toBe(`${PR73_PREVIEW_ORIGIN}/`);
     expect(safeReturnUrl('http://pr73-preview.otaku-mori.com/shop', PR73_PREVIEW_ORIGIN)).toBe(
       `${PR73_PREVIEW_ORIGIN}/`,
     );
@@ -156,16 +170,16 @@ describe('canonical Clerk Account Portal URLs', () => {
     );
 
     const signUp = new URL(buildCanonicalSignUpUrl('/profile', STAGING_APP_ORIGIN));
-    expect(signUp.origin).toBe(ACCOUNTS_ORIGIN);
+    expect(signUp.origin).toBe(STAGING_APP_ORIGIN);
     expect(signUp.pathname).toBe('/sign-up');
     expect(signUp.searchParams.get('redirect_url')).toBe('https://staging.otaku-mori.com/profile');
   });
 
-  it('uses staging return URLs for hosted Account & Security links', () => {
+  it('keeps Account & Security inside the active non-Production origin', () => {
     const account = new URL(buildCanonicalUserProfileUrl('/account', STAGING_APP_ORIGIN));
 
-    expect(account.origin).toBe(ACCOUNTS_ORIGIN);
-    expect(account.pathname).toBe('/user');
+    expect(account.origin).toBe(STAGING_APP_ORIGIN);
+    expect(account.pathname).toBe('/account');
     expect(account.searchParams.get('redirect_url')).toBe('https://staging.otaku-mori.com/account');
   });
 
@@ -183,10 +197,36 @@ describe('canonical Clerk Account Portal URLs', () => {
   });
 
   it('builds the hosted Account & Security URL with a bounded return URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_live_auth_routing');
     const account = new URL(buildCanonicalUserProfileUrl('/profile', 'https://www.otaku-mori.com'));
 
     expect(account.origin).toBe(ACCOUNTS_ORIGIN);
     expect(account.pathname).toBe('/user');
     expect(account.searchParams.get('redirect_url')).toBe('https://www.otaku-mori.com/profile');
+  });
+
+  it('fails closed for cross-environment Clerk keys', () => {
+    expect(resolveClerkRouting('https://preview-branch.vercel.app', 'pk_live_wrong')).toMatchObject(
+      {
+        mode: 'blocked',
+        reason: 'CLERK_ENVIRONMENT_MISMATCH',
+      },
+    );
+    expect(resolveClerkRouting('https://www.otaku-mori.com', 'pk_test_wrong')).toMatchObject({
+      mode: 'blocked',
+      reason: 'CLERK_ENVIRONMENT_MISMATCH',
+    });
+    expect(() => buildCanonicalSignInUrl('/account', 'https://www.otaku-mori.com')).toThrow(
+      'CLERK_ENVIRONMENT_MISMATCH',
+    );
+  });
+
+  it('rejects untrusted application origins before selecting a Clerk destination', () => {
+    expect(
+      resolveClerkRouting('https://otaku-mori.com.attacker.example', 'pk_test_wrong'),
+    ).toMatchObject({ mode: 'blocked', reason: 'UNTRUSTED_APP_ORIGIN' });
+    expect(
+      resolveClerkRouting('https://user@preview-branch.vercel.app', 'pk_test_wrong'),
+    ).toMatchObject({ mode: 'blocked', reason: 'INVALID_APP_ORIGIN' });
   });
 });

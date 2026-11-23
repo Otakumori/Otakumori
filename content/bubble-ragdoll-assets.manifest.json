@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "packId": "bubble_ragdoll_visual_family_v1",
+  "surface": "Bubble Ragdoll",
+  "integrationState": "OWNER_VISUAL_REVIEW_REQUIRED",
+  "audioState": "MIXED_CLEARANCE_OWNER_REVIEW_REQUIRED",
+  "audioCandidates": [
+    {
+      "sourceAssetId": "audio_05fa084b71ba21d3",
+      "semanticRole": "BUBBLE_POP",
+      "sourceAuthority": "freesound-bubble-pops-497198",
+      "licenseState": "ATTRIBUTION_REQUIRED",
+      "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
+      "runtimeState": "NOT_PREPARED"
+    },
+    {
+      "sourceAssetId": "audio_917e1c41a1857736",
+      "semanticRole": "BUBBLE_SOFT_IMPACT",
+      "sourceAuthority": "OWNER_AUTHORED",
+      "licenseState": "OWNER_AUTHORED_RIGHTS_CONFIRMED",
+      "ownerPlacementState": "OWNER_REVIEW_REQUIRED",
+      "runtimeState": "NOT_PREPARED_OWNER_REVIEW_REQUIRED"
+    }
+  ],
+  "assets": [
+    {
+      "id": "bubble_ragdoll_moonlit_bubble_arena_candidate_v1",
+      "role": "primary arena candidate",
+      "source": "docs/design/references/provisional/game-production-assets-v1/bubble-ragdoll/bubble-ragdoll_moonlit-bubble-arena_candidate-v1.png",
+      "sourceSha256": "37563642088A7967E2A051C909BD441459B82E3F435DD6D983EA707A6828DAA8",
+      "sourceDimensions": { "width": 1672, "height": 941 },
+      "ownerApprovalState": "CANDIDATE_OWNER_REVIEW_REQUIRED",
+      "runtime": [
+        {
+          "path": "public/assets/games/bubble-ragdoll/environment/bubble-ragdoll-moonlit-bubble-arena-candidate-v1-desktop.webp",
+          "sha256": "B9FDD52FE7CC85E7041474C0464AF9EF92FBF66D42E4F8D744E246985A1B6A5B",
+          "dimensions": { "width": 1600, "height": 900 },
+          "viewport": "desktop/tablet",
+          "cropNotes": "Intentional 16:9 crop preserves the full ceremonial play circle, moon, bridge, and bubble field."
+        },
+        {
+          "path": "public/assets/games/bubble-ragdoll/environment/bubble-ragdoll-moonlit-bubble-arena-candidate-v1-mobile.webp",
+          "sha256": "83B11CBE9CE5F3A9C8B75B45B5A3C3B06B5F4C8CBA79103A6A1628274C61E653",
+          "dimensions": { "width": 900, "height": 1600 },
+          "viewport": "mobile portrait",
+          "cropNotes": "Intentional central portrait crop keeps the moon, torii, waterfalls, and playable floor centerline."
+        }
+      ],
+      "gameplaySafeZone": "Central 60% width and middle 72% height; HUD occupies the top rail."
+    }
+  ]
+}

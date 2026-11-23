@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { env } from '@/env.mjs';
 import { db } from '@/lib/db';
 import { STRIPE_TAX_READINESS, TAX_REGISTRATIONS } from './tax-registry';
 
@@ -17,6 +18,10 @@ export const FINANCE_EXPORT_DATASETS = [
 export type FinanceExportDataset = (typeof FINANCE_EXPORT_DATASETS)[number];
 
 export type FinancePeriod = { from: Date; to: Date; label: string };
+
+export const FINANCE_REPORT_TIMEZONE = 'America/New_York' as const;
+export const FINANCE_ACCOUNTING_METHOD = 'cash' as const;
+export const FINANCE_REPORT_VERSION = '1.0.0' as const;
 
 type ReconciliationOrder = {
   id: string;
@@ -99,6 +104,9 @@ export function parseFinancePeriod(params: URLSearchParams, now = new Date()): F
   if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || from >= to) {
     throw new Error('Invalid finance period');
   }
+  if (to.getTime() - from.getTime() > 370 * 24 * 60 * 60 * 1000) {
+    throw new Error('Finance period exceeds 370 days');
+  }
   return { from, to, label: `${from.toISOString()}..${to.toISOString()}` };
 }
 
@@ -141,10 +149,12 @@ export async function loadFinanceReport(period: FinancePeriod) {
   const taxCollected = sumCategory('tax_collected');
   const paymentFees = Math.abs(sumCategory('payment_processing'));
   const providerCogs = Math.abs(sumCategory('provider_cogs'));
+  const operatingExpenses = Math.abs(sumCategory('operating_expense'));
   const unresolved = reconciliation.filter((row) => !row.reconciled);
   const unresolvedValue = unresolved.reduce((sum, row) => sum + row.localTotal, 0);
   const netSales = grossSales - discounts - refunds;
-  const contribution = netSales + shippingCollected - paymentFees - providerCogs;
+  const contribution =
+    netSales + shippingCollected - paymentFees - providerCogs - operatingExpenses;
 
   const sourceDigest = createHash('sha256')
     .update(
@@ -165,6 +175,9 @@ export async function loadFinanceReport(period: FinancePeriod) {
       taxCollectedCents: number;
       orderIds: Set<string>;
       authority: string;
+      taxCodes: Set<string>;
+      registrationState: string;
+      refundAdjustmentCents: number;
     }
   >();
   for (const row of ledger.filter((entry) =>
@@ -172,6 +185,9 @@ export async function loadFinanceReport(period: FinancePeriod) {
   )) {
     const metadata = (row.metadata ?? {}) as {
       jurisdiction?: { country?: string | null; state?: string | null };
+      taxCodes?: string[];
+      registrationState?: string;
+      refundAdjustmentCents?: number;
     };
     const country = metadata.jurisdiction?.country ?? 'UNKNOWN';
     const state = metadata.jurisdiction?.state ?? 'UNKNOWN';
@@ -183,10 +199,18 @@ export async function loadFinanceReport(period: FinancePeriod) {
       taxCollectedCents: 0,
       orderIds: new Set<string>(),
       authority: 'stripe_checkout_shipping_address',
+      taxCodes: new Set<string>(),
+      registrationState: 'unverified',
+      refundAdjustmentCents: 0,
     };
     if (row.category === 'tax_collected') current.taxCollectedCents += row.amount;
     else current.salesCents += row.amount;
     if (row.orderId) current.orderIds.add(row.orderId);
+    for (const taxCode of metadata.taxCodes ?? []) current.taxCodes.add(taxCode);
+    if (metadata.registrationState) current.registrationState = metadata.registrationState;
+    if (Number.isInteger(metadata.refundAdjustmentCents)) {
+      current.refundAdjustmentCents += Number(metadata.refundAdjustmentCents);
+    }
     jurisdictionMap.set(key, current);
   }
   const jurisdictionRows = [...jurisdictionMap.values()].map((row) => ({
@@ -197,6 +221,9 @@ export async function loadFinanceReport(period: FinancePeriod) {
     orderCount: row.orderIds.size,
     authority: row.authority,
     taxReadiness: STRIPE_TAX_READINESS.status,
+    taxCodes: [...row.taxCodes],
+    registrationState: row.registrationState,
+    refundAdjustmentCents: row.refundAdjustmentCents,
   }));
 
   return {
@@ -211,7 +238,10 @@ export async function loadFinanceReport(period: FinancePeriod) {
       taxCollected,
       paymentFees,
       providerCogs,
+      operatingExpenses,
       contribution,
+      transactionCount: ledger.length,
+      orderCount: orders.length,
       unreconciledCount: unresolved.length,
       unreconciledValue: unresolvedValue,
     },
@@ -231,12 +261,31 @@ export async function loadFinanceReport(period: FinancePeriod) {
         ...(STRIPE_TAX_READINESS.status === 'BLOCKED' ? ['Stripe Tax readiness is blocked'] : []),
       ],
     },
+    methodology: {
+      merchantAccountId: 'acct_1RwMJgHN4OLBC1u4',
+      reportingEnvironment: env.STRIPE_MODE ?? 'unconfigured',
+      timezone: FINANCE_REPORT_TIMEZONE,
+      accountingMethod: FINANCE_ACCOUNTING_METHOD,
+      reportVersion: FINANCE_REPORT_VERSION,
+      generatedAt: new Date().toISOString(),
+      sources: ['Order', 'OrderItem', 'FinancialTransaction', 'PrintifyOrderSync'],
+      limitations: [
+        'Payout, dispute, and manually approved expense coverage is limited to persisted FinancialTransaction events.',
+        'Tax results are not filing instructions and remain blocked until registrations and Stripe Tax settings are verified.',
+      ],
+    },
   };
 }
 
+export function spreadsheetSafeText(value: unknown): string {
+  const text = value == null ? '' : String(value);
+  return /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+}
+
 function csvCell(value: unknown) {
-  const text =
+  const raw =
     value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+  const text = spreadsheetSafeText(raw);
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 

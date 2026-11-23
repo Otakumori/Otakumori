@@ -98,7 +98,7 @@ describe('wishlist auth settlement', () => {
     rerender(<WishlistPage />);
 
     await waitFor(() => expect(testState.push).toHaveBeenCalledTimes(1));
-    expect(testState.push.mock.calls[0]?.[0]).toContain('https://accounts.otaku-mori.com/sign-in');
+    expect(testState.push.mock.calls[0]?.[0]).toContain('http://localhost:3000/sign-in');
     const redirectUrl = new URL(String(testState.push.mock.calls[0]?.[0])).searchParams.get(
       'redirect_url',
     );

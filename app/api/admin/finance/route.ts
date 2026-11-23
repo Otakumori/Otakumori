@@ -20,7 +20,11 @@ export async function GET(req: NextRequest) {
         status: 403,
       });
     }
-    if (error instanceof Error && error.message === 'Invalid finance period') {
+    if (
+      error instanceof Error &&
+      (error.message === 'Invalid finance period' ||
+        error.message === 'Finance period exceeds 370 days')
+    ) {
       return NextResponse.json(createApiError('VALIDATION_ERROR', error.message, requestId), {
         status: 400,
       });

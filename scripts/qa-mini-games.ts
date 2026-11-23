@@ -18,18 +18,9 @@ import {
   validateFeatureFlags,
 } from './qa/validators';
 import { formatGameResult, formatSummary, generateSummary, type GameQAResult } from './qa/report';
+import gamesMeta from '../lib/games.meta.json';
 
-const GAMES = [
-  'petal-samurai',
-  'memory-match',
-  'otaku-beat-em-up',
-  'bubble-girl',
-  'petal-storm-rhythm',
-  'blossomware',
-  'dungeon-of-desire',
-  'thigh-coliseum',
-  'puzzle-reveal',
-] as const;
+const GAMES = gamesMeta.games.filter((game) => game.enabled).map((game) => game.slug);
 
 /** App Router route-group segment for mini-game pages. */
 const MINI_GAMES_ROUTE_GROUP = '(games)';

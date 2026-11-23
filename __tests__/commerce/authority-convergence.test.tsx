@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   removeItem: vi.fn(),
   retryServerSync: vi.fn(),
   fetch: vi.fn(),
+  isSignedIn: true,
   search: new URLSearchParams('session_id=cs_test_confirmed'),
 }));
 
@@ -30,7 +31,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@clerk/nextjs', () => ({
-  useAuth: () => ({ isSignedIn: true }),
+  useAuth: () => ({ isSignedIn: mocks.isSignedIn }),
   useUser: () => ({ user: null }),
 }));
 
@@ -66,6 +67,7 @@ vi.mock('next/image', () => ({
 describe('commerce authority convergence', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.isSignedIn = true;
     mocks.search = new URLSearchParams('session_id=cs_test_confirmed');
     mocks.fetch.mockResolvedValue({
       ok: true,
@@ -76,6 +78,7 @@ describe('commerce authority convergence', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it('centralizes canonical commerce destinations', () => {
@@ -120,6 +123,19 @@ describe('commerce authority convergence', () => {
     expect(screen.getByRole('button', { name: 'Decrease quantity for Sakura Tee' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Increase quantity for Sakura Tee' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Remove Sakura Tee from cart' })).toBeInTheDocument();
+  });
+
+  it('defers signed-out cart routing until the client origin is available', async () => {
+    mocks.isSignedIn = false;
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_test_cart_route');
+
+    render(<CartPage />);
+
+    const checkoutLink = await screen.findByRole('link', { name: 'Proceed to Checkout' });
+    expect(checkoutLink).toHaveAttribute(
+      'href',
+      expect.stringMatching(/^http:\/\/localhost(?::\d+)?\/sign-in\?redirect_url=/),
+    );
   });
 
   it('gives canonical checkout fields visible associated labels', () => {

@@ -26,7 +26,7 @@ export async function expectSinglePrimaryNavigation(page: Page) {
 }
 
 export function homeNavbar(page: Page) {
-  return page.locator('header.navbar-scroll');
+  return page.locator('header[data-mori-navbar="home"]');
 }
 
 export async function expectHomeNavbarState(page: Page, state: 'top' | 'scrolled') {
@@ -34,11 +34,7 @@ export async function expectHomeNavbarState(page: Page, state: 'top' | 'scrolled
 
   await expect(navbar).toHaveCount(1);
   await expect(navbar).toBeVisible();
-  if (state === 'scrolled') {
-    await expect(navbar).toHaveClass(/\bscrolled\b/);
-  } else {
-    await expect(navbar).not.toHaveClass(/\bscrolled\b/);
-  }
+  await expect(navbar).toHaveAttribute('data-home-navbar-state', state);
 }
 
 export function rootFooter(page: Page) {
@@ -51,12 +47,12 @@ export async function expectRootFooterContract(page: Page) {
   await expect(footer).toBeVisible();
   await expect(footer).toHaveAttribute('data-root-footer-contract', 'combined-world-overlay');
   await expect(page.getByRole('navigation', { name: /rooted homepage navigation/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /^Cart$/i })).toHaveAttribute('href', '/shop/cart');
-  await expect(page.getByRole('link', { name: /^Wishlist$/i })).toHaveAttribute(
+  await expect(footer.getByRole('link', { name: /^Cart$/i })).toHaveAttribute('href', '/shop/cart');
+  await expect(footer.getByRole('link', { name: /^Wishlist$/i })).toHaveAttribute(
     'href',
     '/wishlist',
   );
-  await expect(page.getByRole('link', { name: /^Petal Wallet$/i })).toHaveAttribute(
+  await expect(footer.getByRole('link', { name: /^Petal Wallet$/i })).toHaveAttribute(
     'href',
     '/profile/petals',
   );

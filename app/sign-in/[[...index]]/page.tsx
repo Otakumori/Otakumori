@@ -1,6 +1,11 @@
+import { SignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-import { buildCanonicalSignInUrl } from '@/app/lib/auth/accountUrls';
+import {
+  buildCanonicalSignInUrl,
+  resolveClerkRouting,
+  safeReturnUrl,
+} from '@/app/lib/auth/accountUrls';
 import { resolveServerAppOrigin } from '@/app/lib/auth/serverAppOrigin';
 
 type AuthRedirectPageProps = {
@@ -14,6 +19,25 @@ function firstParam(value: string | string[] | undefined) {
 export default async function SignInPage({ searchParams }: AuthRedirectPageProps) {
   const params = (await searchParams) ?? {};
   const returnUrl = firstParam(params.redirect_url) ?? firstParam(params.redirect) ?? '/';
+  const appOrigin = await resolveServerAppOrigin();
+  const routing = resolveClerkRouting(appOrigin);
 
-  redirect(buildCanonicalSignInUrl(returnUrl, await resolveServerAppOrigin()));
+  if (routing.mode === 'blocked') {
+    return <main role="alert">Authentication is temporarily unavailable.</main>;
+  }
+
+  if (routing.mode === 'production-hosted') {
+    redirect(buildCanonicalSignInUrl(returnUrl, appOrigin));
+  }
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-black px-4 py-10">
+      <SignIn
+        routing="path"
+        path="/sign-in"
+        signUpUrl="/sign-up"
+        forceRedirectUrl={safeReturnUrl(returnUrl, appOrigin)}
+      />
+    </main>
+  );
 }

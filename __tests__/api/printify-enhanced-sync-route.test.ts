@@ -36,10 +36,10 @@ async function loadRoute(options: { authorized: boolean }) {
   vi.doMock('@/app/lib/printify/enhanced-service', () => {
     providerModuleLoads();
     return {
-      enhancedPrintifyService: {
+      getEnhancedPrintifyService: () => ({
         validateAllProductLinks,
         syncProductsWithValidation,
-      },
+      }),
     };
   });
 

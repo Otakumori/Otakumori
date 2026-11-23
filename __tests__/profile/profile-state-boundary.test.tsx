@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ProfilePage from '@/app/profile/page';
 import { getProfileData } from '@/app/profile/_data/profile';
 import { AuthenticationRequiredError, LocalUserUnavailableError } from '@/app/lib/auth/viewer';
+
+const PREVIEW_ORIGIN = 'https://otaku-mori-profile-state-test.vercel.app';
 
 vi.mock('server-only', () => ({}));
 
@@ -18,7 +20,9 @@ vi.mock('@/app/lib/auth/viewer', () => ({
 }));
 
 vi.mock('@/app/lib/auth/serverAppOrigin', () => ({
-  resolveServerAppOrigin: vi.fn().mockResolvedValue('https://www.otaku-mori.com'),
+  resolveServerAppOrigin: vi
+    .fn()
+    .mockResolvedValue('https://otaku-mori-profile-state-test.vercel.app'),
 }));
 
 vi.mock('@/app/components/profile/ProfileHeader', () => ({
@@ -53,6 +57,14 @@ vi.mock('@/app/components/profile/RecentActivity', () => ({ default: () => <div>
 vi.mock('@/app/components/profile/CosmeticsTab', () => ({ default: () => <div>Cosmetics</div> }));
 
 describe('profile authenticated state boundary', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'pk_test_profile_state_boundary');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('shows sign-in only when no Clerk session exists', async () => {
     vi.mocked(getProfileData).mockRejectedValue(new AuthenticationRequiredError());
 
@@ -60,6 +72,9 @@ describe('profile authenticated state boundary', () => {
 
     expect(html).toContain('Sign in to view your Otaku-mori profile');
     expect(html).toContain('data-mori-archetype="commander"');
+    expect(html).toContain(
+      `${PREVIEW_ORIGIN}/sign-in?redirect_url=${encodeURIComponent(`${PREVIEW_ORIGIN}/profile`)}`,
+    );
   });
 
   it('does not show sign-in when a signed-in local profile cannot be provisioned', async () => {

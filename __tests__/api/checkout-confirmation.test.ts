@@ -6,10 +6,8 @@ import { prisma } from '@/app/lib/prisma';
 const retrieveSession = vi.hoisted(() => vi.fn());
 
 vi.mock('@/env', () => ({ env: { STRIPE_SECRET_KEY: 'sk_test_mock' } }));
-vi.mock('stripe', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    checkout: { sessions: { retrieve: retrieveSession } },
-  })),
+vi.mock('@/app/lib/stripe', () => ({
+  getVerifiedStripeClient: async () => ({ checkout: { sessions: { retrieve: retrieveSession } } }),
 }));
 vi.mock('@/app/lib/auth/viewer', () => ({
   AuthenticationRequiredError: class AuthenticationRequiredError extends Error {},
@@ -48,7 +46,9 @@ describe('checkout success confirmation', () => {
 
   it('confirms only a paid Stripe session owned by the local user', async () => {
     const { GET } = await import('@/app/api/v1/checkout/confirmation/route');
-    const response = await GET(new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'));
+    const response = await GET(
+      new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'),
+    );
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
@@ -65,12 +65,14 @@ describe('checkout success confirmation', () => {
       payment_status: 'unpaid',
     });
     const { GET } = await import('@/app/api/v1/checkout/confirmation/route');
-    const response = await GET(new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'));
+    const response = await GET(
+      new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'),
+    );
 
     expect(response.status).toBe(409);
   });
 
-  it('does not disclose another user\'s session', async () => {
+  it("does not disclose another user's session", async () => {
     vi.mocked(prisma.order.findUnique).mockResolvedValue({
       id: 'order_1',
       userId: 'another_user',
@@ -78,7 +80,9 @@ describe('checkout success confirmation', () => {
       status: 'pending',
     } as never);
     const { GET } = await import('@/app/api/v1/checkout/confirmation/route');
-    const response = await GET(new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'));
+    const response = await GET(
+      new NextRequest('http://localhost/api/v1/checkout/confirmation?session_id=cs_test_confirmed'),
+    );
 
     expect(response.status).toBe(404);
     expect(retrieveSession).not.toHaveBeenCalled();

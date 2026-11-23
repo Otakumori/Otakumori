@@ -1,7 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
+import {
+  AuthenticationRequiredError,
+  LocalUserUnavailableError,
+  isMissingSchemaError,
+  requireLocalViewer,
+} from '@/app/lib/auth/viewer';
 
 export const runtime = 'nodejs';
 
@@ -24,13 +29,22 @@ const SessionSchema = z.object({
   synced: z.boolean(),
 });
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'P2002'
+  );
+}
+
 /**
  * POST /api/v1/analytics/session
  * Store game session analytics
  */
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { localUserId } = await requireLocalViewer();
     const body = await req.json();
 
     // Validate request body
@@ -48,17 +62,11 @@ export async function POST(req: NextRequest) {
 
     const session = validation.data;
 
-    // Store in database - only if we have a valid userId
-    const finalUserId = userId || session.userId;
-    if (!finalUserId) {
-      return NextResponse.json({ ok: false, error: 'User ID is required' }, { status: 400 });
-    }
-
     await db.gameSession.create({
       data: {
         id: session.id,
         gameId: session.gameId,
-        userId: finalUserId,
+        userId: localUserId,
         startTime: new Date(session.startTime),
         endTime: session.endTime ? new Date(session.endTime) : null,
         score: session.score,
@@ -73,6 +81,25 @@ export async function POST(req: NextRequest) {
       data: { sessionId: session.id },
     });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Session analytics are temporarily unavailable' },
+        { status: 503 },
+      );
+    }
+    if (isUniqueConstraintError(error)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'DUPLICATE_SESSION',
+          message: 'This game session has already been recorded.',
+        },
+        { status: 409 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Session analytics error:',
@@ -96,10 +123,7 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const { localUserId } = await requireLocalViewer();
 
     const gameId = req.nextUrl.searchParams.get('gameId');
     if (!gameId) {
@@ -110,7 +134,7 @@ export async function GET(req: NextRequest) {
     const sessions = await db.gameSession.findMany({
       where: {
         gameId,
-        userId,
+        userId: localUserId,
       },
       orderBy: {
         startTime: 'desc',
@@ -145,6 +169,15 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof LocalUserUnavailableError || isMissingSchemaError(error)) {
+      return NextResponse.json(
+        { ok: false, error: 'Session analytics are temporarily unavailable' },
+        { status: 503 },
+      );
+    }
     const { logger } = await import('@/app/lib/logger');
     logger.error(
       'Session stats error:',

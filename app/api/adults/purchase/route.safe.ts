@@ -17,7 +17,7 @@ import { env } from '@/env';
 import { z } from 'zod';
 import { redis } from '@/app/lib/redis-rest';
 import { generateRequestId } from '@/app/lib/request-id';
-import { stripe } from '@/app/lib/stripe';
+import { getStripeClient } from '@/app/lib/stripe';
 import { PetalService } from '@/app/lib/petals';
 
 /**
@@ -144,7 +144,7 @@ async function purchaseWithStripe(
 ): Promise<{ checkoutUrl: string }> {
   try {
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripeClient().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {

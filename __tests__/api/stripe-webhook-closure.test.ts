@@ -2,14 +2,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   runtimeEnv: {
-    STRIPE_SECRET_KEY: 'stripe-test-key-fixture' as string | undefined,
+    STRIPE_SECRET_KEY: 'sk_test_fixture' as string | undefined,
     STRIPE_WEBHOOK_SECRET: 'stripe-webhook-secret-fixture' as string | undefined,
+    STRIPE_EXPECTED_ACCOUNT_ID: 'acct_1RwMJgHN4OLBC1u4',
+    STRIPE_MODE: 'test',
   },
   signature: 'test_signature' as string | null,
   stripeConstructor: vi.fn(),
   constructEvent: vi.fn(),
   event: null as any,
   retrieveSession: vi.fn(),
+  retrieveCurrentAccount: vi.fn(),
   eventCreate: vi.fn(),
   eventFind: vi.fn(),
   eventUpdate: vi.fn(),
@@ -19,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   createPrintifyOrder: vi.fn(),
   capturePaidOrderLedger: vi.fn(),
   reconcileRefundLedger: vi.fn(),
+  preview: false,
 }));
 
 vi.mock('next/headers', () => ({
@@ -39,6 +43,7 @@ vi.mock('stripe', () => ({
     }
     webhooks = { constructEvent: mocks.constructEvent };
     checkout = { sessions: { retrieve: mocks.retrieveSession } };
+    accounts = { retrieveCurrent: mocks.retrieveCurrentAccount };
   },
 }));
 vi.mock('@/lib/db', () => ({
@@ -62,6 +67,10 @@ vi.mock('@/lib/finance/ledger', () => ({
   capturePaidOrderLedger: mocks.capturePaidOrderLedger,
   reconcileRefundLedger: mocks.reconcileRefundLedger,
 }));
+vi.mock('@/app/lib/security/previewIsolation', () => ({
+  PREVIEW_EXTERNAL_MUTATION_ERROR: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
+  isVercelPreview: () => mocks.preview,
+}));
 
 import { POST } from '@/app/api/webhooks/stripe/route';
 import { POST as compatibilityPOST } from '@/app/api/stripe/webhook/route';
@@ -84,9 +93,14 @@ function checkoutEvent() {
 describe('Stripe webhook closure', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.runtimeEnv.STRIPE_SECRET_KEY = 'stripe-test-key-fixture';
+    mocks.runtimeEnv.STRIPE_SECRET_KEY = 'sk_test_fixture';
     mocks.runtimeEnv.STRIPE_WEBHOOK_SECRET = 'stripe-webhook-secret-fixture';
     mocks.signature = 'test_signature';
+    mocks.preview = false;
+    process.env.STRIPE_SECRET_KEY = 'sk_test_fixture';
+    process.env.STRIPE_EXPECTED_ACCOUNT_ID = 'acct_1RwMJgHN4OLBC1u4';
+    process.env.STRIPE_MODE = 'test';
+    mocks.retrieveCurrentAccount.mockResolvedValue({ id: 'acct_1RwMJgHN4OLBC1u4', country: 'US' });
     mocks.event = checkoutEvent();
     mocks.constructEvent.mockImplementation(() => mocks.event);
     mocks.eventCreate.mockResolvedValue({});
@@ -152,6 +166,24 @@ describe('Stripe webhook closure', () => {
       ok: false,
       retry: true,
       error: 'Webhook processing is temporarily unavailable.',
+    });
+    expect(mocks.stripeConstructor).not.toHaveBeenCalled();
+    expect(mocks.constructEvent).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('refuses webhook mutations on a deployed Preview before provider or database access', async () => {
+    mocks.preview = true;
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: 'PREVIEW_EXTERNAL_MUTATION_DISABLED',
     });
     expect(mocks.stripeConstructor).not.toHaveBeenCalled();
     expect(mocks.constructEvent).not.toHaveBeenCalled();
@@ -230,6 +262,77 @@ describe('Stripe webhook closure', () => {
     expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
   });
 
+  it('rejects a concurrent fresh processing claim without replaying payment work', async () => {
+    mocks.eventCreate.mockRejectedValue({ code: 'P2002' });
+    mocks.eventFind.mockResolvedValue({
+      updatedAt: new Date(),
+      payload: { processingStatus: 'processing' },
+    });
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(409);
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
+    expect(mocks.capturePaidOrderLedger).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['stale processing', { processingStatus: 'processing' }, new Date(Date.now() - 6 * 60 * 1000)],
+    ['failed', { processingStatus: 'failed' }, new Date()],
+  ])('reclaims a %s event through the durable retry path', async (_label, payload, updatedAt) => {
+    mocks.eventCreate.mockRejectedValue({ code: 'P2002' });
+    mocks.eventFind.mockResolvedValue({ updatedAt, payload });
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(200);
+    expect(mocks.eventUpdate).toHaveBeenCalledWith({
+      where: { id: 'evt_checkout_1' },
+      data: { payload: expect.objectContaining({ processingStatus: 'processing', retry: true }) },
+    });
+    expect(mocks.capturePaidOrderLedger).toHaveBeenCalledTimes(1);
+    expect(mocks.createPrintifyOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it('records payment pending without creating ledger or fulfillment work', async () => {
+    mocks.retrieveSession.mockResolvedValue({
+      id: 'cs_test_1',
+      payment_status: 'unpaid',
+    });
+
+    const response = await POST(request());
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.paymentPending).toBe(true);
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.capturePaidOrderLedger).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+  });
+
+  it('fails a paid event when the persisted order owner does not match Stripe', async () => {
+    mocks.retrieveSession.mockResolvedValue({
+      id: 'cs_test_1',
+      payment_status: 'paid',
+      client_reference_id: 'different_clerk_user',
+      amount_total: 4200,
+      amount_subtotal: 4000,
+      currency: 'usd',
+    });
+
+    const response = await POST(request());
+
+    expect(response.status).toBe(500);
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.capturePaidOrderLedger).not.toHaveBeenCalled();
+    expect(mocks.createPrintifyOrder).not.toHaveBeenCalled();
+    expect(mocks.eventUpdate).toHaveBeenLastCalledWith({
+      where: { id: 'evt_checkout_1' },
+      data: { payload: expect.objectContaining({ processingStatus: 'failed' }) },
+    });
+  });
+
   it('keeps paid truth and exposes operator review when fulfillment fails', async () => {
     mocks.createPrintifyOrder.mockResolvedValue({ ok: false, error: 'provider rejected variant' });
 
@@ -244,6 +347,16 @@ describe('Stripe webhook closure', () => {
         status: 'pending_mapping',
         notes: expect.stringMatching(/operator review/i),
       }),
+    });
+    expect(mocks.eventUpdate).toHaveBeenLastCalledWith({
+      where: { id: 'evt_checkout_1' },
+      data: {
+        payload: expect.objectContaining({
+          processingStatus: 'completed',
+          fulfillment: 'operator_review',
+          financialLedger: 'captured',
+        }),
+      },
     });
   });
 

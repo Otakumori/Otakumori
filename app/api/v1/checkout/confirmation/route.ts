@@ -1,35 +1,41 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
 import { env } from '@/env';
 import { prisma } from '@/app/lib/prisma';
+import { getVerifiedStripeClient } from '@/app/lib/stripe';
 import {
   AuthenticationRequiredError,
   LocalUserUnavailableError,
   requireLocalViewer,
 } from '@/app/lib/auth/viewer';
+import {
+  PREVIEW_EXTERNAL_MUTATION_ERROR,
+  isVercelPreview,
+} from '@/app/lib/security/previewIsolation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-function getStripeClient() {
-  return new Stripe(env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-10-29.clover',
-    typescript: true,
-  });
-}
 
 /**
  * Confirms a checkout return against the authenticated local order and Stripe.
  * The client never receives authority to clear a cart from a query parameter.
  */
 export async function GET(request: NextRequest) {
+  if (isVercelPreview()) {
+    return NextResponse.json(
+      { ok: false, error: 'BETA_PURCHASES_DISABLED', code: PREVIEW_EXTERNAL_MUTATION_ERROR },
+      { status: 503 },
+    );
+  }
+
   try {
     const viewer = await requireLocalViewer();
     const sessionId = new URL(request.url).searchParams.get('session_id');
 
     if (!sessionId || sessionId.length > 255) {
-      return NextResponse.json({ ok: false, error: 'Checkout session is required.' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Checkout session is required.' },
+        { status: 400 },
+      );
     }
 
     const order = await prisma.order.findUnique({
@@ -55,7 +61,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const session = await getStripeClient().checkout.sessions.retrieve(sessionId);
+    const session = await (await getVerifiedStripeClient()).checkout.sessions.retrieve(sessionId);
     const isOwnedSession = session.client_reference_id === viewer.clerkUserId;
     const isCompletePayment = session.status === 'complete' && session.payment_status === 'paid';
 
