@@ -36,8 +36,34 @@ test('Home account entry → Shop → Add to cart', async ({ page }) => {
   await page.goto(productHref!);
   await page.getByRole('button', { name: /add to cart/i }).click();
 
+  // Observe the canonical cart state before exercising the compatibility
+  // redirect with a document navigation. This proves that Add to Cart wrote
+  // the item without seeding test-only state or relying on an arbitrary delay.
+  await expect(page.getByTestId('cart-success')).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const persistedCart = window.localStorage.getItem('cart');
+        if (!persistedCart) return 0;
+        const items = JSON.parse(persistedCart);
+        return Array.isArray(items) ? items.length : 0;
+      }),
+    )
+    .toBe(1);
+
   // Cart page
   await page.goto('/cart');
+  await expect(page).toHaveURL('/shop/cart');
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const persistedCart = window.localStorage.getItem('cart');
+        if (!persistedCart) return 0;
+        const items = JSON.parse(persistedCart);
+        return Array.isArray(items) ? items.length : 0;
+      }),
+    )
+    .toBe(1);
   await expect(page.getByText(/subtotal/i)).toBeVisible();
 });
 

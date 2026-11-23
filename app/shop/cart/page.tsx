@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,7 @@ export default function CartPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [couponInput, setCouponInput] = useState('');
+  const [hasClientOrigin, setHasClientOrigin] = useState(false);
   const couponCodes = useMemo(
     () => normalizeCouponCodes(searchParams.get('coupons')),
     [searchParams],
@@ -63,9 +64,18 @@ export default function CartPage() {
   const checkoutPath = couponCodes.length
     ? `${paths.checkout()}?coupons=${encodeURIComponent(couponCodes.join(','))}`
     : paths.checkout();
-  const checkoutHref = isSignedIn
-    ? checkoutPath
-    : buildCanonicalSignInUrl(checkoutPath);
+  useEffect(() => setHasClientOrigin(true), []);
+
+  const checkoutHref = useMemo(() => {
+    if (isSignedIn) return checkoutPath;
+    if (!hasClientOrigin) return null;
+
+    try {
+      return buildCanonicalSignInUrl(checkoutPath);
+    } catch {
+      return null;
+    }
+  }, [checkoutPath, hasClientOrigin, isSignedIn]);
 
   const updateCouponCodes = (nextCodes: string[]) => {
     const query = new URLSearchParams(searchParams.toString());
@@ -218,9 +228,15 @@ export default function CartPage() {
                 <div className="flex justify-between border-t border-glass-border pt-4 font-semibold text-primary"><span>Total</span><span>${total.toFixed(2)}</span></div>
               </div>
               <div className="mt-6">
-                <Link href={checkoutHref}>
-                  <Button className="w-full btn-primary">Proceed to Checkout</Button>
-                </Link>
+                {checkoutHref ? (
+                  <Link href={checkoutHref}>
+                    <Button className="w-full btn-primary">Proceed to Checkout</Button>
+                  </Link>
+                ) : (
+                  <Button className="w-full btn-primary" disabled>
+                    Checkout sign-in unavailable
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -74,7 +74,7 @@ jobs:
       STRIPE_SECRET_KEY: sk_test_ci_placeholder
       STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
       CLERK_SECRET_KEY: sk_test_ci_placeholder
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
       CLERK_PROXY_URL: ''
       NEXT_PUBLIC_CLERK_PROXY_URL: ''
       PRINTIFY_API_KEY: ci_placeholder
@@ -183,7 +183,7 @@ jobs:
           STRIPE_SECRET_KEY: sk_test_ci_placeholder
           STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
           CLERK_SECRET_KEY: sk_test_ci_placeholder
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
           CLERK_PROXY_URL: ''
           NEXT_PUBLIC_CLERK_PROXY_URL: ''
           PRINTIFY_API_KEY: ci_placeholder
@@ -315,7 +315,7 @@ jobs:
           PRINTIFY_API_KEY: ci_printify_disabled_placeholder
           PRINTIFY_SHOP_ID: ci_printify_disabled_shop
           PRINTIFY_API_URL: https://ci-placeholder.invalid/v1
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZTJlLWNpLmNsZXJrLmFjY291bnRzLmRldiQ
           CLERK_PROXY_URL: ''
           NEXT_PUBLIC_CLERK_PROXY_URL: ''
           UPSTASH_REDIS_REST_URL: https://ci-placeholder.invalid
